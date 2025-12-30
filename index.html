@@ -1,31 +1,28 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raccoon.Fit - 软软的个人小窝</title>
+    <title>软软的小窝</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
-    <!-- 内联所有CSS样式，避免外部文件 -->
     <style>
-        /* 全局样式与变量 */
+        /* 高级配色系统 */
         :root {
-            --primary-color: #2C2C2C;      /* 浣熊黑色 */
-            --secondary-color: #8C8C8C;    /* 浣熊灰色 */
-            --accent-color: #FF6B35;       /* 强调色 - 橙色 */
-            --light-color: #F5F5F5;        /* 浅色背景 */
-            --dark-color: #1A1A1A;         /* 深色背景 */
-            --text-dark: #333333;          /* 深色文字 */
-            --text-light: #FFFFFF;         /* 浅色文字 */
-            --spacing-xs: 0.5rem;
-            --spacing-sm: 1rem;
-            --spacing-md: 2rem;
-            --spacing-lg: 4rem;
-            --spacing-xl: 6rem;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --deep-space: #0A0A14;
+            --space-gray: #1A1A24;
+            --cosmic-silver: #2A2A34;
+            --nebula-blue: #4A6FA5;
+            --quantum-teal: #2DD4BF;
+            --starlight: #E4E4E7;
+            --moon-dust: #A1A1AA;
+            --aurora-purple: #8B5CF6;
+            --glass-bg: rgba(20, 20, 30, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --spacing-unit: 1rem;
         }
         
+        /* 重置与基础样式 */
         * {
             margin: 0;
             padding: 0;
@@ -34,118 +31,54 @@
         
         html {
             scroll-behavior: smooth;
+            font-size: 16px;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--deep-space);
+            color: var(--starlight);
             line-height: 1.6;
-            color: var(--text-dark);
-            background-color: var(--light-color);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(74, 111, 165, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(45, 212, 191, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 40%);
         }
         
-        /* 布局与容器 */
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 var(--spacing-sm);
+        /* 玻璃态效果 */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
         }
         
-        /* 标题样式 */
-        h1, h2, h3, h4 {
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: var(--spacing-sm);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-        }
-        
-        h2 {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: var(--spacing-md);
-            position: relative;
-        }
-        
-        h2:after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 4px;
-            background-color: var(--accent-color);
-            border-radius: 2px;
-        }
-        
-        h3 {
-            font-size: 1.5rem;
-        }
-        
-        /* 链接样式 */
-        a {
-            color: var(--accent-color);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        
-        a:hover {
-            color: var(--primary-color);
-        }
-        
-        /* 按钮样式 */
-        .btn {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--accent-color);
-            color: var(--text-light);
-            border: none;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-        }
-        
-        .btn:hover {
-            background-color: var(--primary-color);
-            color: var(--text-light);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--accent-color);
-            color: var(--text-light);
-        }
-        
-        /* 导航栏 */
-        header {
+        /* 粒子背景 */
+        #particles {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* 导航栏 - 高级设计 */
+        .main-nav {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1000px;
             z-index: 1000;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 1rem 0;
-            transition: var(--transition);
+            padding: 1rem 2rem;
         }
         
-        .header-scrolled {
-            padding: 0.5rem 0;
-        }
-        
-        nav {
+        .nav-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -153,555 +86,767 @@
         
         .logo {
             font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
+            font-weight: 600;
+            color: var(--starlight);
+            text-decoration: none;
             display: flex;
             align-items: center;
+            gap: 0.75rem;
         }
         
         .logo-icon {
-            font-size: 1.8rem;
-            margin-right: 0.5rem;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--quantum-teal), var(--aurora-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
         }
         
-        .nav-links {
+        .nav-menu {
             display: flex;
             list-style: none;
+            gap: 3rem;
         }
         
-        .nav-links li {
-            margin-left: var(--spacing-md);
-        }
-        
-        .nav-links a {
-            color: var(--primary-color);
+        .nav-link {
+            color: var(--moon-dust);
+            text-decoration: none;
             font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            transition: all 0.3s ease;
         }
         
-        .nav-links a:hover {
-            color: var(--accent-color);
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--quantum-teal), transparent);
+            transition: width 0.3s ease;
         }
         
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--primary-color);
+        .nav-link:hover {
+            color: var(--starlight);
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
         }
         
         /* 英雄区域 */
-        .hero {
-            padding: var(--spacing-xl) 0 var(--spacing-lg);
-            background: linear-gradient(135deg, var(--light-color) 0%, #e8f4f8 100%);
-            text-align: center;
-            margin-top: 60px;
-        }
-        
-        .hero-content h1 {
-            font-size: 3rem;
-            margin-bottom: var(--spacing-sm);
-        }
-        
-        .hero-content p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto var(--spacing-md);
-            color: var(--secondary-color);
-        }
-        
-        .hero-btns {
+        .hero-section {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            gap: var(--spacing-sm);
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(45, 212, 191, 0.1);
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            border-radius: 100px;
+            color: var(--quantum-teal);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--starlight) 0%, var(--quantum-teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--moon-dust);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+        }
+        
+        /* 高级按钮 */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
             flex-wrap: wrap;
         }
         
-        .raccoon-illustration {
-            font-size: 5rem;
-            margin-bottom: var(--spacing-md);
-            animation: float 6s ease-in-out infinite;
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--quantum-teal), var(--nebula-blue));
+            color: var(--deep-space);
+            border: none;
         }
         
-        /* 项目展示区域 */
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(45, 212, 191, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--starlight);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* 章节样式 */
         .section {
-            padding: var(--spacing-xl) 0;
+            padding: 6rem 2rem;
+            position: relative;
         }
         
-        .section-alt {
-            background-color: #f9f9f9;
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--starlight);
         }
         
+        .section-subtitle {
+            text-align: center;
+            color: var(--moon-dust);
+            max-width: 600px;
+            margin: 0 auto 4rem;
+            font-size: 1.125rem;
+        }
+        
+        /* 项目卡片 - 高级设计 */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: var(--spacing-md);
-            margin-top: var(--spacing-md);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .project-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
         
         .project-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
-        .project-img {
-            height: 180px;
-            background-color: var(--secondary-color);
+        .project-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--quantum-teal), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .project-card:hover:before {
+            opacity: 1;
+        }
+        
+        .project-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 3rem;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.1), rgba(74, 111, 165, 0.1));
         }
         
-        .project-content {
-            padding: var(--spacing-md);
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--starlight);
         }
         
-        .project-content h3 {
-            margin-bottom: var(--spacing-xs);
+        .project-description {
+            color: var(--moon-dust);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
         }
         
         .project-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: 1.5rem;
         }
         
         .tag {
             padding: 0.25rem 0.75rem;
-            background-color: #e9ecef;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--quantum-teal);
         }
         
-        .project-links {
-            display: flex;
-            gap: var(--spacing-sm);
-            margin-top: var(--spacing-sm);
-        }
-        
-        /* 实验室区域 */
-        .lab-intro {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto var(--spacing-lg);
-        }
-        
+        /* 实验室网格 */
         .lab-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: var(--spacing-md);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .lab-item {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: var(--spacing-md);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            border-left: 4px solid var(--accent-color);
-        }
-        
-        .lab-item:hover {
-            transform: translateY(-5px);
-        }
-        
-        .lab-item h3 {
-            margin-bottom: var(--spacing-xs);
-            display: flex;
-            align-items: center;
+            padding: 2rem;
         }
         
         .lab-icon {
-            margin-right: 0.5rem;
-            font-size: 1.2rem;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
         }
         
         /* 关于我区域 */
-        .about-content {
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-xl);
+            gap: 4rem;
             align-items: center;
         }
         
-        .about-text p {
-            margin-bottom: var(--spacing-sm);
+        .about-content h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--starlight);
         }
         
-        .skills-list {
+        .about-text {
+            color: var(--moon-dust);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+        
+        /* 技能展示 */
+        .skill-meter {
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-label {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: var(--spacing-md);
-        }
-        
-        .skill {
-            padding: 0.5rem 1rem;
-            background-color: var(--accent-color);
-            color: white;
-            border-radius: 20px;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: var(--starlight);
             font-size: 0.9rem;
         }
         
-        .raccoon-facts {
-            background-color: var(--primary-color);
-            color: white;
-            padding: var(--spacing-md);
-            border-radius: var(--border-radius);
+        .meter-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
         }
         
-        .raccoon-facts h3 {
-            color: white;
-            margin-bottom: var(--spacing-sm);
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--quantum-teal), var(--nebula-blue));
+            border-radius: 2px;
+            width: 0;
+            transition: width 1.5s ease-out;
         }
         
         /* 页脚 */
-        footer {
-            background-color: var(--dark-color);
-            color: var(--text-light);
-            padding: var(--spacing-xl) 0 var(--spacing-md);
-        }
-        
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .footer {
+            padding: 4rem 2rem 2rem;
             text-align: center;
         }
         
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
         .footer-logo {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: var(--spacing-md);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .footer-links {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
-            gap: var(--spacing-md);
-            margin: var(--spacing-md) 0;
+            gap: 2rem;
+            margin: 2rem 0;
         }
         
-        .footer-links a {
-            color: #ddd;
+        .footer-link {
+            color: var(--moon-dust);
+            text-decoration: none;
+            transition: color 0.3s ease;
         }
         
-        .footer-links a:hover {
-            color: var(--accent-color);
+        .footer-link:hover {
+            color: var(--quantum-teal);
         }
         
         .copyright {
-            margin-top: var(--spacing-md);
-            padding-top: var(--spacing-md);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            width: 100%;
-            color: #aaa;
-            font-size: 0.9rem;
+            color: var(--moon-dust);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+            opacity: 0.6;
         }
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
+            .main-nav {
+                top: 1rem;
+                padding: 1rem;
             }
             
-            h2 {
-                font-size: 1.8rem;
+            .nav-menu {
+                display: none;
             }
             
-            .hero-content h1 {
-                font-size: 2.2rem;
+            .hero-section {
+                padding: 6rem 1.5rem 3rem;
             }
             
-            .nav-links {
-                position: fixed;
-                top: 60px;
-                left: 0;
-                width: 100%;
-                background-color: white;
+            .btn-group {
                 flex-direction: column;
-                align-items: center;
-                padding: var(--spacing-md) 0;
-                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-                transform: translateY(-100%);
-                opacity: 0;
-                transition: var(--transition);
-                z-index: 999;
             }
             
-            .nav-links.active {
-                transform: translateY(0);
-                opacity: 1;
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
             
-            .nav-links li {
-                margin: var(--spacing-sm) 0;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .about-content {
+            .about-container {
                 grid-template-columns: 1fr;
-                gap: var(--spacing-md);
+                gap: 3rem;
             }
             
-            .hero-btns {
-                flex-direction: column;
-                align-items: center;
+            .section {
+                padding: 4rem 1.5rem;
             }
             
-            .hero-btns .btn {
-                width: 100%;
-                max-width: 300px;
+            .projects-grid {
+                grid-template-columns: 1fr;
             }
+        }
+        
+        /* 动画 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--space-gray);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--quantum-teal), var(--nebula-blue));
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--quantum-teal), var(--aurora-purple));
         }
     </style>
 </head>
 <body>
+    <!-- 粒子背景 -->
+    <canvas id="particles"></canvas>
+    
     <!-- 导航栏 -->
-    <header id="header">
-        <div class="container">
-            <nav>
-                <a href="#home" class="logo">
-                    <span class="logo-icon">🦝</span>
-                    <span>Raccoon.Fit</span>
-                </a>
-                
-                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-                
-                <ul class="nav-links" id="navLinks">
-                    <li><a href="#home">首页</a></li>
-                    <li><a href="#projects">项目</a></li>
-                    <li><a href="#lab">实验室</a></li>
-                    <li><a href="#about">关于我</a></li>
-                    <li><a href="#contact">联系</a></li>
-                </ul>
-            </nav>
+    <nav class="main-nav glass">
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <div class="logo-icon">🦝</div>
+                <span>Raccoon.Fit</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">首页</a></li>
+                <li><a href="#projects" class="nav-link">项目</a></li>
+                <li><a href="#lab" class="nav-link">实验室</a></li>
+                <li><a href="#about" class="nav-link">关于</a></li>
+                <li><a href="#contact" class="nav-link">联系</a></li>
+            </ul>
         </div>
-    </header>
-
+    </nav>
+    
     <!-- 英雄区域 -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content">
-                <div class="raccoon-illustration">🦝</div>
-                <h1>欢迎来到浣熊的小窝</h1>
-                <p>这里是 <strong>软软</strong> 的数字空间。我是一名热爱编程、充满好奇心的开发者，正在探索数字世界的无限可能。</p>
-                <p>这里是我的个人网站，展示我的软件项目、实验性想法以及学习历程。一切刚刚开始，欢迎常来看看！</p>
-                <div class="hero-btns">
-                    <a href="#projects" class="btn">查看项目</a>
-                    <a href="#lab" class="btn btn-outline">探索实验室</a>
-                </div>
+    <section id="home" class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge glass">数字创意实验室</div>
+            <h1 class="hero-title">
+                探索代码的<br>
+                <span style="background: linear-gradient(135deg, var(--quantum-teal), var(--aurora-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">无限可能</span>
+            </h1>
+            <p class="hero-subtitle">
+                这里是软软的数字空间，一个专注于创造、学习和分享的地方。
+                通过代码探索未知，用技术解决现实问题，记录每一次成长与突破。
+            </p>
+            <div class="btn-group">
+                <a href="#projects" class="btn btn-primary">探索项目</a>
+                <a href="#contact" class="btn btn-secondary">联系我</a>
             </div>
         </div>
     </section>
-
-    <!-- 项目展示区域 -->
-    <section class="section" id="projects">
-        <div class="container">
-            <h2>我的项目</h2>
-            <p style="text-align: center; max-width: 700px; margin: 0 auto var(--spacing-md);">以下是我开发的一些软件项目，涵盖Web开发、工具应用等多个领域。每个项目都是学习与实践的结晶。</p>
+    
+    <!-- 项目展示 -->
+    <section id="projects" class="section">
+        <h2 class="section-title">精选作品</h2>
+        <p class="section-subtitle">每个项目都是对技术深度的探索和对用户体验的思考</p>
+        
+        <div class="projects-grid">
+            <div class="project-card glass">
+                <div class="project-icon">📱</div>
+                <h3 class="project-title">MULU 应用</h3>
+                <p class="project-description">
+                    一个已归档的移动应用项目，探索了完整的开发流程和用户体验设计。
+                    在项目中实践了React Native、状态管理和API集成。
+                </p>
+                <div class="project-tags">
+                    <span class="tag">React Native</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">UI/UX</span>
+                </div>
+                <a href="#" class="btn btn-secondary" style="width: 100%;">查看归档</a>
+            </div>
             
-            <div class="projects-grid">
-                <!-- 项目1 -->
-                <div class="project-card">
-                    <div class="project-img" style="background-color: #3a506b;">
-                        <span>📱</span>
-                    </div>
-                    <div class="project-content">
-                        <h3>MULU</h3>
-                        <p>该应用已停服</p>
-                        <div class="project-tags">
-                            <span class="tag">React</span>
-                            <span class="tag">JavaScript</span>
-                            <span class="tag">CSS3</span>
-                        </div>
-                        <div class="project-links">
-                            <a href="#" class="btn">查看演示</a>
-                            <a href="#" class="btn btn-outline">GitHub</a>
-                        </div>
-                    </div>
+            <div class="project-card glass">
+                <div class="project-icon">📝</div>
+                <h3 class="project-title">灵熊小记</h3>
+                <p class="project-description">
+                    轻量级笔记工具，专注于简洁高效的内容管理。
+                    支持Markdown、标签分类和快速搜索，帮助整理灵感和学习笔记。
+                </p>
+                <div class="project-tags">
+                    <span class="tag">Vue.js</span>
+                    <span class="tag">LocalStorage</span>
+                    <span class="tag">Markdown</span>
                 </div>
-                
-                <!-- 项目2 -->
-                <div class="project-card">
-                    <div class="project-img" style="background-color: #1c2541;">
-                        <span>🌦️</span>
-                    </div>
-                    <div class="project-content">
-                        <h3>灵熊小记</h3>
-                        <p></p>
-                        <div class="project-tags">
-                            <span class="tag">JavaScript</span>
-                            <span class="tag">API</span>
-                            <span class="tag">Chart.js</span>
-                        </div>
-                        <div class="project-links">
-                            <a href="https://link3.cc/training_fengfeng_games" class="btn">访问</a>
-                            <a href="#" class="btn btn-outline">GitHub</a>
-                        </div>
-                    </div>
+                <a href="https://link3.cc/training_fengfeng_games" class="btn btn-primary" style="width: 100%;">访问项目</a>
+            </div>
+            
+            <div class="project-card glass">
+                <div class="project-icon">🚀</div>
+                <h3 class="project-title">即将启动</h3>
+                <p class="project-description">
+                    下一个项目正在酝酿中，将探索人工智能与前端开发的结合。
+                    关注这个空间，见证想法的诞生与实现。
+                </p>
+                <div class="project-tags">
+                    <span class="tag">AI</span>
+                    <span class="tag">Next.js</span>
+                    <span class="tag">创意</span>
                 </div>
-                
-                
-                
+                <a href="#lab" class="btn btn-secondary" style="width: 100%;">了解详情</a>
             </div>
         </div>
     </section>
-
+    
     <!-- 实验室区域 -->
-    <section class="section section-alt" id="lab">
-        <div class="container">
-            <h2>浣熊实验室</h2>
-            <p class="lab-intro">这里是实验性想法和进行中项目的空间。我会在这里尝试新技术、探索有趣的概念，并记录学习过程。</p>
+    <section id="lab" class="section" style="background: rgba(10, 10, 20, 0.5);">
+        <h2 class="section-title">创意实验室</h2>
+        <p class="section-subtitle">这里存放着正在进行中的实验、原型和创意构思</p>
+        
+        <div class="lab-grid">
+            <div class="lab-item glass">
+                <div class="lab-icon">🔮</div>
+                <h3 style="color: var(--starlight); margin-bottom: 1rem;">AI 辅助设计</h3>
+                <p style="color: var(--moon-dust);">探索人工智能在设计流程中的应用，尝试自动生成UI组件和设计系统。</p>
+            </div>
             
-            <div class="lab-grid">
-                <div class="lab-item">
-                    <h3><span class="lab-icon">🔮</span> 想法孵化器</h3>
-                    <p>记录各种灵感和未来可能实现的项目构想，包括一个基于AI的代码助手和互动式学习工具。</p>
-                </div>
-                
+            <div class="lab-item glass">
+                <div class="lab-icon">🎨</div>
+                <h3 style="color: var(--starlight); margin-bottom: 1rem;">交互原型</h3>
+                <p style="color: var(--moon-dust);">创建高级交互动画和微交互，提升数字产品的体验质感。</p>
+            </div>
             
-            <div style="text-align: center; margin-top: var(--spacing-lg);">
-                <p>实验室内容会持续更新，欢迎关注我的GitHub获取最新动态！</p>
-                <a href="https://github.com" target="_blank" class="btn" style="margin-top: var(--spacing-sm);">访问我的GitHub</a>
+            <div class="lab-item glass">
+                <div class="lab-icon">📊</div>
+                <h3 style="color: var(--starlight); margin-bottom: 1rem;">数据可视化</h3>
+                <p style="color: var(--moon-dust);">将复杂数据转化为直观的视觉故事，探索信息设计的边界。</p>
             </div>
         </div>
     </section>
-
-    <!-- 关于我区域 -->
-    <section class="section" id="about">
-        <div class="container">
-            <h2>关于我</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>你好！我是<strong>软软</strong>，一名对编程充满热情的年轻开发者。</p>
-                    <p>我热爱探索新技术，享受从零开始构建产品的过程。对我来说，编程不仅是解决问题的手段，更是创造价值的艺术。</p>
-                    <p>我选择<b>浣熊</b>作为我的个人品牌形象，是因为欣赏它们聪明、适应力强且富有好奇心的特质——这些正是我在技术学习路上所追求的品质。</p>
-                    <p>目前，我正在深入学习Web开发、数据结构与算法，并积极探索人工智能的应用。我相信持续学习和实践是成长的最佳路径。</p>
-                    
-                    <h3 style="margin-top: var(--spacing-md);">技术栈</h3>
-                    <div class="skills-list">
-                        <span class="skill">HTML/CSS</span>
-                        <span class="skill">JavaScript</span>
-                        <span class="skill">React</span>
-                        <span class="skill">Node.js</span>
-                        <span class="skill">Python</span>
-                        <span class="skill">Git</span>
-                        <span class="skill">Next.js</span>
-                        <span class="skill">Vercel</span>
+    
+    <!-- 关于我 -->
+    <section id="about" class="section">
+        <div class="about-container">
+            <div>
+                <h3 class="section-title" style="text-align: left; margin-bottom: 2rem;">关于软软</h3>
+                <p class="about-text">
+                    一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，
+                    更是创造美和价值的艺术形式。
+                </p>
+                <p class="about-text">
+                    选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——
+                    这些特质正是技术探索者所需要的核心品质。
+                </p>
+                <p class="about-text">
+                    Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、
+                    追求卓越的技术哲学。
+                </p>
+            </div>
+            
+            <div>
+                <h3 style="color: var(--starlight); margin-bottom: 2rem; font-size: 1.5rem;">技术专长</h3>
+                
+                <div class="skill-meter">
+                    <div class="skill-label">
+                        <span>前端开发</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" data-width="85"></div>
                     </div>
                 </div>
                 
-                <div class="raccoon-facts">
-                    <h3>为什么是浣熊？</h3>
-                    <p>浣熊以其灵活、聪明和适应性强而闻名。它们能够解决复杂问题，使用工具，并且在各种环境中都能茁壮成长。</p>
-                    <p>对我来说，这些特质象征着优秀开发者应具备的能力：解决问题、适应新技术，以及在不断变化的技术环境中持续成长。</p>
-                    <p>我的网站命名为 <strong>Raccoon.Fit</strong>，寓意着通过持续学习与实践，让自己不断"适应"和"匹配"技术发展的需求。</p>
+                <div class="skill-meter">
+                    <div class="skill-label">
+                        <span>UI/UX 设计</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" data-width="75"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-meter">
+                    <div class="skill-label">
+                        <span>产品思维</span>
+                        <span>80%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" data-width="80"></div>
+                    </div>
+                </div>
+                
+                <div class="skill-meter">
+                    <div class="skill-label">
+                        <span>创意编程</span>
+                        <span>70%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" data-width="70"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- 页脚/联系区域 -->
-    <footer id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <span>🦝</span> Raccoon.Fit
-                </div>
-                
-                <p>欢迎与我联系，一起交流技术、分享想法！</p>
-                
-                <div class="footer-links">
-                    <a href="mailto:example@example.com">邮箱联系</a>
-                    <a href="https://github.com" target="_blank">GitHub</a>
-                    <a href="https://twitter.com" target="_blank">Twitter</a>
-                    <a href="#home">回到顶部</a>
-                </div>
-                
-                <div class="copyright">
-                    <p>© 2025 软软. 保留所有权利.</p>
-                    <p>本网站由 🦝 设计与开发 | 最后更新: 2025年12月</p>
-                </div>
+    
+    <!-- 页脚 -->
+    <footer id="contact" class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="logo-icon" style="width: 32px; height: 32px; font-size: 1rem;">🦝</div>
+                Raccoon.Fit
+            </div>
+            
+            <p style="color: var(--moon-dust); margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+                探索、创造、成长。欢迎与我联系，交流想法，合作创新。
+            </p>
+            
+            <div class="footer-links">
+                <a href="mailto:hello@raccoon.fit" class="footer-link">邮箱</a>
+                <a href="https://github.com" class="footer-link">GitHub</a>
+                <a href="#" class="footer-link">作品集</a>
+                <a href="#home" class="footer-link">返回顶部</a>
+            </div>
+            
+            <div class="copyright">
+                © 2025 软软. 本网站由 🦝 设计与开发
             </div>
         </div>
     </footer>
 
-    <!-- 内联JavaScript，避免外部文件 -->
     <script>
-        // 移动端菜单切换
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const navLinks = document.getElementById('navLinks');
-            const header = document.getElementById('header');
+        // 粒子背景
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = 80;
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = `rgba(45, 212, 191, ${Math.random() * 0.3 + 0.1})`;
+            }
             
-            // 移动端菜单切换
-            mobileMenuBtn.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-                mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-            });
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
             
-            // 点击导航链接后关闭移动端菜单
-            const navItems = document.querySelectorAll('.nav-links a');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    navLinks.classList.remove('active');
-                    mobileMenuBtn.textContent = '☰';
-                });
-            });
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function initParticles() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // 滚动时改变导航栏样式
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    header.classList.add('header-scrolled');
-                } else {
-                    header.classList.remove('header-scrolled');
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(45, 212, 191, ${0.1 * (1 - distance/100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
                 }
-            });
+            }
             
-            // 平滑滚动到锚点
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
+            requestAnimationFrame(animateParticles);
+        }
+        
+        // 窗口调整
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // 技能条动画
+        function animateSkills() {
+            const skillBars = document.querySelectorAll('.meter-fill');
+            skillBars.forEach(bar => {
+                const width = bar.getAttribute('data-width');
+                bar.style.width = width + '%';
+            });
+        }
+        
+        // 滚动动画
+        function initScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                        if (entry.target.classList.contains('meter-fill')) {
+                            animateSkills();
+                        }
                     }
                 });
+            }, observerOptions);
+            
+            document.querySelectorAll('.project-card, .lab-item, .meter-fill').forEach(el => {
+                observer.observe(el);
             });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initParticles();
+            animateParticles();
+            animateSkills();
+            initScrollAnimations();
             
             // 控制台欢迎信息
-            console.log('%c🦝 欢迎来到 Raccoon.Fit！', 'font-size: 18px; font-weight: bold; color: #FF6B35;');
-            console.log('%c这是一个年轻开发者的数字小窝，一切都在不断进化中。', 'color: #8C8C8C;');
+            console.log('%c🦝 Raccoon.Fit', 'font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #2DD4BF, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;');
+            console.log('%c高级数字创意空间已加载', 'color: #A1A1AA;');
+            
+            // 导航栏滚动效果
+            window.addEventListener('scroll', () => {
+                const nav = document.querySelector('.main-nav');
+                if (window.scrollY > 100) {
+                    nav.style.background = 'rgba(20, 20, 30, 0.8)';
+                    nav.style.backdropFilter = 'blur(20px) saturate(180%)';
+                } else {
+                    nav.style.background = 'var(--glass-bg)';
+                }
+            });
         });
     </script>
 </body>

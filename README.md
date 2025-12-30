@@ -1,2 +1,17 @@
-# raccoon
-This is the soft nest of the little raccoon.
+
+# 🦝 Raccoon.Fit
+
+欢迎！这里是热爱编程与浣熊的许严跃的个人小窝。
+
+这个仓库将用于构建并托管我的个人网站 [raccoon.fit](https://raccoon.fit)。
+
+## 🚧 正在建设中...
+
+网站即将上线，它将包含：
+- 我的软件项目展示
+- 技术实验与想法（实验室）
+- 学习与思考的记录
+
+#只是小演示，不一定会有
+
+敬请期待！

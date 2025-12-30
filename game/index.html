@@ -6,6 +6,7 @@
     <title>星空游戏中心</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* 保持原有的CSS样式不变 */
         * {
             margin: 0;
             padding: 0;
@@ -53,6 +54,14 @@
             position: absolute;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-10px) translateX(-10px); }
+            75% { transform: translateY(10px) translateX(15px); }
+            100% { transform: translateY(0) translateX(-5px); }
         }
         
         /* 主容器 */
@@ -1268,19 +1277,6 @@
                 
                 container.appendChild(particle);
             }
-            
-            // 添加CSS动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes float {
-                    0% { transform: translateY(0) translateX(0); }
-                    25% { transform: translateY(-20px) translateX(10px); }
-                    50% { transform: translateY(-10px) translateX(-10px); }
-                    75% { transform: translateY(10px) translateX(15px); }
-                    100% { transform: translateY(0) translateX(-5px); }
-                }
-            `;
-            document.head.appendChild(style);
         }
         
         // 移动端菜单切换
@@ -1314,42 +1310,47 @@
         
         // 搜索框功能
         const searchInput = document.querySelector('.search-box input');
-        searchInput.addEventListener('focus', function() {
-            this.parentElement.style.zIndex = '20';
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            this.parentElement.style.zIndex = '';
-        });
-        
-        // 模拟游戏统计数据更新
-        function updateStats() {
-            const stats = document.querySelectorAll('.stat-value');
-            stats.forEach(stat => {
-                const currentValue = parseInt(stat.textContent.replace(/[^0-9]/g, ''));
-                const increment = Math.floor(Math.random() * 5) + 1;
-                const newValue = currentValue + increment;
-                
-                // 简单动画效果
-                stat.style.transform = 'scale(1.1)';
-                setTimeout(() => {
-                    stat.textContent = stat.textContent.replace(/[0-9]+/g, newValue);
-                    stat.style.transform = 'scale(1)';
-                }, 300);
+        if (searchInput) {
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.zIndex = '20';
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.zIndex = '';
             });
         }
         
-        // 每30秒更新一次统计数据
-        setInterval(updateStats, 30000);
+        // 模拟游戏统计数据更新 - 移除这部分，因为统计部分被注释了
+        // function updateStats() {
+        //     const stats = document.querySelectorAll('.stat-value');
+        //     stats.forEach(stat => {
+        //         const currentValue = parseInt(stat.textContent.replace(/[^0-9]/g, ''));
+        //         const increment = Math.floor(Math.random() * 5) + 1;
+        //         const newValue = currentValue + increment;
+        //         
+        //         // 简单动画效果
+        //         stat.style.transform = 'scale(1.1)';
+        //         setTimeout(() => {
+        //             stat.textContent = stat.textContent.replace(/[0-9]+/g, newValue);
+        //             stat.style.transform = 'scale(1)';
+        //         }, 300);
+        //     });
+        // }
+        
+        // 每30秒更新一次统计数据 - 移除这部分，因为统计部分被注释了
+        // setInterval(updateStats, 30000);
         
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
             
+            // 排行榜部分被注释了，所以移除这行代码
             // 设置当前活跃用户
-            const currentUserRank = document.querySelector('.leaderboard-row:nth-child(5)');
-            currentUserRank.style.background = 'rgba(108, 92, 231, 0.1)';
-            currentUserRank.style.borderLeft = '4px solid var(--primary)';
+            // const currentUserRank = document.querySelector('.leaderboard-row:nth-child(5)');
+            // if (currentUserRank) {
+            //     currentUserRank.style.background = 'rgba(108, 92, 231, 0.1)';
+            //     currentUserRank.style.borderLeft = '4px solid var(--primary)';
+            // }
             
             // 游戏点击事件
             document.querySelectorAll('.play-btn').forEach(btn => {
@@ -1385,15 +1386,27 @@
             });
             
             // 页面加载动画
-            document.querySelectorAll('.stat-card, .game-card, .leaderboard-row').forEach((el, index) => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateY(0)';
-                }, 100 + index * 100);
+            setTimeout(() => {
+                document.querySelectorAll('.stat-card, .game-card, .leaderboard-row').forEach((el, index) => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 100 + index * 100);
+                });
+            }, 100);
+            
+            // 修复: 添加对"查看全部"等链接的点击事件处理
+            document.querySelectorAll('.view-all').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') {
+                        e.preventDefault();
+                        alert('功能开发中，敬请期待！');
+                    }
+                });
             });
         });
     </script>

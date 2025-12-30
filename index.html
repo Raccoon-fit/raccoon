@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raccoon.Fit - 浣熊的个人小窝</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
+    <!-- 内联所有CSS样式，避免外部文件 -->
+    <style>
+        /* 全局样式与变量 */
+        :root {
+            --primary-color: #2C2C2C;      /* 浣熊黑色 */
+            --secondary-color: #8C8C8C;    /* 浣熊灰色 */
+            --accent-color: #FF6B35;       /* 强调色 - 橙色 */
+            --light-color: #F5F5F5;        /* 浅色背景 */
+            --dark-color: #1A1A1A;         /* 深色背景 */
+            --text-dark: #333333;          /* 深色文字 */
+            --text-light: #FFFFFF;         /* 浅色文字 */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 2rem;
+            --spacing-lg: 4rem;
+            --spacing-xl: 6rem;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--light-color);
+        }
+        
+        /* 布局与容器 */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-sm);
+        }
+        
+        /* 标题样式 */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+        }
+        
+        /* 链接样式 */
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--accent-color);
+            color: var(--text-light);
+        }
+        
+        /* 导航栏 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            transition: var(--transition);
+        }
+        
+        .header-scrolled {
+            padding: 0.5rem 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: var(--spacing-md);
+        }
+        
+        .nav-links a {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            padding: var(--spacing-xl) 0 var(--spacing-lg);
+            background: linear-gradient(135deg, var(--light-color) 0%, #e8f4f8 100%);
+            text-align: center;
+            margin-top: 60px;
+        }
+        
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto var(--spacing-md);
+            color: var(--secondary-color);
+        }
+        
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .raccoon-illustration {
+            font-size: 5rem;
+            margin-bottom: var(--spacing-md);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* 项目展示区域 */
+        .section {
+            padding: var(--spacing-xl) 0;
+        }
+        
+        .section-alt {
+            background-color: #f9f9f9;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .project-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .project-img {
+            height: 180px;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .project-content {
+            padding: var(--spacing-md);
+        }
+        
+        .project-content h3 {
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+        }
+        
+        .project-links {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        /* 实验室区域 */
+        .lab-intro {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-lg);
+        }
+        
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .lab-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .lab-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .lab-item h3 {
+            margin-bottom: var(--spacing-xs);
+            display: flex;
+            align-items: center;
+        }
+        
+        .lab-icon {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        /* 关于我区域 */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            align-items: center;
+        }
+        
+        .about-text p {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: var(--spacing-md);
+        }
+        
+        .skill {
+            padding: 0.5rem 1rem;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .raccoon-facts {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        .raccoon-facts h3 {
+            color: white;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        /* 页脚 */
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: var(--spacing-xl) 0 var(--spacing-md);
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin: var(--spacing-md) 0;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+        
+        .copyright {
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                flex-direction: column;
+                align-items: center;
+                padding: var(--spacing-md) 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: var(--transition);
+                z-index: 999;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .nav-links li {
+                margin: var(--spacing-sm) 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+            
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-btns .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#home" class="logo">
+                    <span class="logo-icon">🦝</span>
+                    <span>Raccoon.Fit</span>
+                </a>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+                
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#projects">项目</a></li>
+                    <li><a href="#lab">实验室</a></li>
+                    <li><a href="#about">关于我</a></li>
+                    <li><a href="#contact">联系</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="raccoon-illustration">🦝</div>
+                <h1>欢迎来到浣熊的小窝</h1>
+                <p>这里是 <strong>许严跃</strong> 的数字空间。我是一名热爱编程、充满好奇心的开发者，正在探索数字世界的无限可能。</p>
+                <p>这里是我的个人网站，展示我的软件项目、实验性想法以及学习历程。一切刚刚开始，欢迎常来看看！</p>
+                <div class="hero-btns">
+                    <a href="#projects" class="btn">查看项目</a>
+                    <a href="#lab" class="btn btn-outline">探索实验室</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目展示区域 -->
+    <section class="section" id="projects">
+        <div class="container">
+            <h2>我的项目</h2>
+            <p style="text-align: center; max-width: 700px; margin: 0 auto var(--spacing-md);">以下是我开发的一些软件项目，涵盖Web开发、工具应用等多个领域。每个项目都是学习与实践的结晶。</p>
+            
+            <div class="projects-grid">
+                <!-- 项目1 -->
+                <div class="project-card">
+                    <div class="project-img" style="background-color: #3a506b;">
+                        <span>📱</span>
+                    </div>
+                    <div class="project-content">
+                        <h3>智能待办清单</h3>
+                        <p>一个基于React的智能任务管理应用，支持标签分类、优先级排序和进度追踪，数据本地存储。</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">CSS3</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="btn">查看演示</a>
+                            <a href="#" class="btn btn-outline">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 项目2 -->
+                <div class="project-card">
+                    <div class="project-img" style="background-color: #1c2541;">
+                        <span>🌦️</span>
+                    </div>
+                    <div class="project-content">
+                        <h3>天气可视化仪表板</h3>
+                        <p>使用第三方天气API构建的可视化天气应用，支持多城市查询、历史数据对比和动态图表展示。</p>
+                        <div class="project-tags">
+                            <span class="tag">JavaScript</span>
+                            <span class="tag">API</span>
+                            <span class="tag">Chart.js</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="btn">查看演示</a>
+                            <a href="#" class="btn btn-outline">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 项目3 -->
+                <div class="project-card">
+                    <div class="project-img" style="background-color: #5d576b;">
+                        <span>🎨</span>
+                    </div>
+                    <div class="project-content">
+                        <h3>CSS动画画廊</h3>
+                        <p>一个展示CSS动画与创意效果的画廊，包含多种现代交互动画示例，适合学习和获取灵感。</p>
+                        <div class="project-tags">
+                            <span class="tag">CSS3</span>
+                            <span class="tag">动画</span>
+                            <span class="tag">响应式</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="btn">查看演示</a>
+                            <a href="#" class="btn btn-outline">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 实验室区域 -->
+    <section class="section section-alt" id="lab">
+        <div class="container">
+            <h2>浣熊实验室</h2>
+            <p class="lab-intro">这里是实验性想法和进行中项目的空间。我会在这里尝试新技术、探索有趣的概念，并记录学习过程。</p>
+            
+            <div class="lab-grid">
+                <div class="lab-item">
+                    <h3><span class="lab-icon">🔮</span> 想法孵化器</h3>
+                    <p>记录各种灵感和未来可能实现的项目构想，包括一个基于AI的代码助手和互动式学习工具。</p>
+                </div>
+                
+                <div class="lab-item">
+                    <h3><span class="lab-icon">🧪</span> 技术实验</h3>
+                    <p>探索WebGL、Three.js等前沿技术，尝试创建交互式3D可视化组件和动画效果。</p>
+                </div>
+                
+                <div class="lab-item">
+                    <h3><span class="lab-icon">📊</span> 数据可视化</h3>
+                    <p>使用D3.js和Chart.js创建数据可视化项目，将复杂数据转化为直观的图表和图形。</p>
+                </div>
+                
+                <div class="lab-item">
+                    <h3><span class="lab-icon">🛠️</span> 工具开发</h3>
+                    <p>开发提高工作效率的小工具，如Markdown增强编辑器、代码片段管理器和API测试工具。</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: var(--spacing-lg);">
+                <p>实验室内容会持续更新，欢迎关注我的GitHub获取最新动态！</p>
+                <a href="https://github.com" target="_blank" class="btn" style="margin-top: var(--spacing-sm);">访问我的GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我区域 -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2>关于我</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>你好！我是<strong>・是小浣熊哦・</strong>，一名对编程充满热情的年轻开发者。</p>
+                    <p>我热爱探索新技术，享受从零开始构建产品的过程。对我来说，编程不仅是解决问题的手段，更是创造价值的艺术。</p>
+                    <p>我选择<b>浣熊</b>作为我的个人品牌形象，是因为欣赏它们聪明、适应力强且富有好奇心的特质——这些正是我在技术学习路上所追求的品质。</p>
+                    <p>目前，我正在深入学习Web开发、数据结构与算法，并积极探索人工智能的应用。我相信持续学习和实践是成长的最佳路径。</p>
+                    
+                    <h3 style="margin-top: var(--spacing-md);">技术栈</h3>
+                    <div class="skills-list">
+                        <span class="skill">HTML/CSS</span>
+                        <span class="skill">JavaScript</span>
+                        <span class="skill">React</span>
+                        <span class="skill">Node.js</span>
+                        <span class="skill">Python</span>
+                        <span class="skill">Git</span>
+                        <span class="skill">Next.js</span>
+                        <span class="skill">Vercel</span>
+                    </div>
+                </div>
+                
+                <div class="raccoon-facts">
+                    <h3>为什么是浣熊？</h3>
+                    <p>浣熊以其灵活、聪明和适应性强而闻名。它们能够解决复杂问题，使用工具，并且在各种环境中都能茁壮成长。</p>
+                    <p>对我来说，这些特质象征着优秀开发者应具备的能力：解决问题、适应新技术，以及在不断变化的技术环境中持续成长。</p>
+                    <p>我的网站命名为 <strong>Raccoon.Fit</strong>，寓意着通过持续学习与实践，让自己不断"适应"和"匹配"技术发展的需求。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚/联系区域 -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span>🦝</span> Raccoon.Fit
+                </div>
+                
+                <p>欢迎与我联系，一起交流技术、分享想法！</p>
+                
+                <div class="footer-links">
+                    <a href="mailto:example@example.com">邮箱联系</a>
+                    <a href="https://github.com" target="_blank">GitHub</a>
+                    <a href="https://twitter.com" target="_blank">Twitter</a>
+                    <a href="#home">回到顶部</a>
+                </div>
+                
+                <div class="copyright">
+                    <p>© 2025 ・是小浣熊哦・. 保留所有权利.</p>
+                    <p>本网站由 🦝 设计与开发 | 最后更新: 2025年12月</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 内联JavaScript，避免外部文件 -->
+    <script>
+        // 移动端菜单切换
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+            const header = document.getElementById('header');
+            
+            // 移动端菜单切换
+            mobileMenuBtn.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+            });
+            
+            // 点击导航链接后关闭移动端菜单
+            const navItems = document.querySelectorAll('.nav-links a');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.textContent = '☰';
+                });
+            });
+            
+            // 滚动时改变导航栏样式
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('header-scrolled');
+                } else {
+                    header.classList.remove('header-scrolled');
+                }
+            });
+            
+            // 平滑滚动到锚点
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // 控制台欢迎信息
+            console.log('%c🦝 欢迎来到 Raccoon.Fit！', 'font-size: 18px; font-weight: bold; color: #FF6B35;');
+            console.log('%c这是一个年轻开发者的数字小窝，一切都在不断进化中。', 'color: #8C8C8C;');
+        });
+    </script>
+</body>
+</html>

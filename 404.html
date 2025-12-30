@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷失在星空 | 404</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0e17 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 800 800"><circle cx="%rand%" cy="%rand%" r="1" fill="white" opacity="0.8"/></svg>') fixed;
+            color: #e0e9ff;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px #4fc3f7;
+        }
+        p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        a {
+            color: #4fc3f7;
+            text-decoration: none;
+            border: 1px solid;
+            padding: 12px 24px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        a:hover {
+            background: rgba(79, 195, 247, 0.1);
+            box-shadow: 0 0 15px #4fc3f7;
+        }
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    <h1>404</h1>
+    <p>你似乎迷失在了星际旅途中<br>让我们带你返回地球家园</p>
+    <a href="/">返回首页</a>
+
+    <script>
+        // 动态生成星空背景
+        const container = document.getElementById('stars');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.backgroundColor = 'white';
+            star.style.borderRadius = '50%';
+            star.style.opacity = Math.random();
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animation = `twinkle ${Math.random() * 5 + 3}s infinite alternate`;
+            container.appendChild(star);
+        }
+
+        // 添加闪烁动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes twinkle {
+                0% { opacity: 0.2; }
+                100% { opacity: 0.8; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,4767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>太空探险家 - 复杂版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        :root {
+            /* 主色调 */
+            --primary: #6c5ce7;
+            --primary-dark: #5b4fcf;
+            --primary-light: #a29bfe;
+            --secondary: #00cec9;
+            --secondary-dark: #00b0b0;
+            --secondary-light: #81ecec;
+            --accent: #fd79a8;
+            --accent-dark: #e84393;
+            --accent-light: #fab1a0;
+            
+            /* 背景色 */
+            --dark: #0a0e1a;
+            --dark-light: #1a1f33;
+            --darker: #050811;
+            --darkest: #020408;
+            
+            /* 文本色 */
+            --light: #ffffff;
+            --light-gray: #b2bec3;
+            --gray: #636e72;
+            
+            /* 资源色 */
+            --fuel: #ff9f43;
+            --mineral: #00cec9;
+            --energy: #fdcb6e;
+            --oxygen: #74b9ff;
+            --crystal: #9b59b6;
+            --food: #00b894;
+            
+            /* UI 元素 */
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --info: #0984e3;
+            
+            /* 边框和阴影 */
+            --border-color: rgba(108, 92, 231, 0.3);
+            --glow-color: rgba(108, 92, 231, 0.5);
+            --card-bg: rgba(20, 25, 45, 0.8);
+            --modal-bg: rgba(10, 14, 26, 0.95);
+            
+            /* 字体 */
+            --font-main: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            --font-mono: 'Courier New', 'Consolas', monospace;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            background: radial-gradient(ellipse at center, var(--dark) 0%, var(--darker) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 星空背景 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+        
+        .star.small {
+            width: 1px;
+            height: 1px;
+        }
+        
+        .star.medium {
+            width: 2px;
+            height: 2px;
+        }
+        
+        .star.large {
+            width: 3px;
+            height: 3px;
+        }
+        
+        /* 游戏容器 */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 10px;
+            gap: 10px;
+        }
+        
+        /* 游戏头部 */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .game-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .game-title h1 {
+            font-size: 24px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .game-title .version {
+            font-size: 12px;
+            color: var(--light-gray);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--glow-color);
+        }
+        
+        .back-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 资源显示栏 */
+        .resources-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .resource-item {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .resource-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .resource-icon.fuel {
+            background: linear-gradient(135deg, var(--fuel), #ff7f00);
+        }
+        
+        .resource-icon.mineral {
+            background: linear-gradient(135deg, var(--mineral), #008b8b);
+        }
+        
+        .resource-icon.energy {
+            background: linear-gradient(135deg, var(--energy), #f39c12);
+        }
+        
+        .resource-icon.oxygen {
+            background: linear-gradient(135deg, var(--oxygen), #3498db);
+        }
+        
+        .resource-icon.crystal {
+            background: linear-gradient(135deg, var(--crystal), #8e44ad);
+        }
+        
+        .resource-info {
+            flex: 1;
+        }
+        
+        .resource-name {
+            font-size: 12px;
+            color: var(--light-gray);
+        }
+        
+        .resource-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* 主游戏区域 */
+        .main-game-area {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        /* 地图区域 */
+        .map-container {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .map-info {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .map-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--secondary-light);
+        }
+        
+        .map-info p {
+            font-size: 12px;
+            color: var(--light-gray);
+        }
+        
+        /* 右侧面板 */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* 飞船状态 */
+        .ship-status {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+        }
+        
+        .ship-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .ship-header h3 {
+            font-size: 16px;
+            color: var(--secondary-light);
+        }
+        
+        .ship-name {
+            font-size: 14px;
+            color: var(--light-gray);
+        }
+        
+        .ship-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .stat-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .stat-fill.health {
+            background: linear-gradient(to right, var(--danger), var(--warning), var(--success));
+        }
+        
+        .stat-fill.shield {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .stat-fill.fuel {
+            background: linear-gradient(to right, var(--fuel), #ff7f00);
+        }
+        
+        /* 任务面板 */
+        .mission-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .mission-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .mission-header h3 {
+            font-size: 16px;
+            color: var(--secondary-light);
+        }
+        
+        .mission-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .mission-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .mission-item.active {
+            border-left-color: var(--success);
+        }
+        
+        .mission-item.completed {
+            border-left-color: var(--light-gray);
+            opacity: 0.7;
+        }
+        
+        .mission-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .mission-desc {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-bottom: 8px;
+        }
+        
+        .mission-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        /* 底部控制栏 */
+        .bottom-panel {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+        
+        /* 控制按钮组 */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 12px 5px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--glow-color);
+        }
+        
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        
+        .control-btn i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .control-btn.scan {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+        }
+        
+        .control-btn.build {
+            background: linear-gradient(135deg, var(--success), #00a085);
+        }
+        
+        .control-btn.research {
+            background: linear-gradient(135deg, var(--crystal), #8e44ad);
+        }
+        
+        .control-btn.trade {
+            background: linear-gradient(135deg, var(--warning), #f39c12);
+        }
+        
+        /* 信息面板 */
+        .info-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+        }
+        
+        .info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .info-header h3 {
+            font-size: 16px;
+            color: var(--secondary-light);
+        }
+        
+        .info-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--light-gray);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .info-event {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-event:last-child {
+            border-bottom: none;
+        }
+        
+        .event-time {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        
+        /* 模态窗口 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--modal-bg);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--light-gray);
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* 扫描模态窗口 */
+        .scan-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .scan-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .scan-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .scan-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .scan-icon.planet {
+            background: linear-gradient(135deg, #ff9f43, #e17055);
+        }
+        
+        .scan-icon.asteroid {
+            background: linear-gradient(135deg, #636e72, #2d3436);
+        }
+        
+        .scan-icon.station {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+        
+        .scan-icon.wreckage {
+            background: linear-gradient(135deg, #d63031, #c0392b);
+        }
+        
+        .scan-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .scan-desc {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-bottom: 10px;
+        }
+        
+        .scan-resources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .resource-tag {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        
+        .scan-actions {
+            margin-top: 10px;
+        }
+        
+        .btn-small {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-small:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* 建筑模态窗口 */
+        .build-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .build-option {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .build-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .build-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .build-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .build-desc {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-bottom: 10px;
+        }
+        
+        .build-cost {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .cost-item {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .build-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* 研究模态窗口 */
+        .tech-tree {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .tech-category {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .tech-category h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tech-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--gray);
+        }
+        
+        .tech-item.researched {
+            border-left-color: var(--success);
+        }
+        
+        .tech-item.available {
+            border-left-color: var(--primary);
+        }
+        
+        .tech-item.locked {
+            border-left-color: var(--gray);
+            opacity: 0.5;
+        }
+        
+        .tech-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .tech-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .tech-level {
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .tech-desc {
+            font-size: 12px;
+            color: var(--light-gray);
+            margin-bottom: 8px;
+        }
+        
+        .tech-progress {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* 交易模态窗口 */
+        .trade-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .trade-column {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .trade-column h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .trade-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .trade-item {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .trade-item-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .trade-item-info {
+            flex: 1;
+        }
+        
+        .trade-item-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .trade-item-price {
+            font-size: 12px;
+            color: var(--light-gray);
+        }
+        
+        .trade-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .trade-amount {
+            width: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+        /* 星球详细信息模态窗口 */
+        .planet-details {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        .planet-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .planet-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .planet-stats {
+            width: 100%;
+        }
+        
+        .planet-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .planet-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .main-game-area {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 300px;
+            }
+            
+            .right-panel {
+                flex-direction: row;
+            }
+            
+            .ship-status, .mission-panel {
+                flex: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .resources-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bottom-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .right-panel {
+                flex-direction: column;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .game-title h1 {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .resources-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .scan-results, .build-options, .tech-tree {
+                grid-template-columns: 1fr;
+            }
+            
+            .trade-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* 动画 */
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes scan {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .scan-animation {
+            animation: scan 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- 游戏主容器 -->
+    <div class="game-container">
+        <!-- 游戏头部 -->
+        <div class="game-header">
+            <div class="game-title">
+                <button class="back-btn" id="backBtn">
+                    <i class="fas fa-arrow-left"></i> 返回
+                </button>
+                <h1><i class="fas fa-rocket"></i> 太空探险家</h1>
+                <span class="version">v2.0 复杂版</span>
+            </div>
+            
+            <div class="game-time">
+                <span id="gameTime">第 1 天 00:00:00</span>
+            </div>
+        </div>
+        
+        <!-- 资源显示栏 -->
+        <div class="resources-bar" id="resourcesBar">
+            <!-- 资源项将通过JS动态生成 -->
+        </div>
+        
+        <!-- 主游戏区域 -->
+        <div class="main-game-area">
+            <!-- 地图区域 -->
+            <div class="map-container">
+                <canvas id="gameCanvas"></canvas>
+                
+                <div class="map-info">
+                    <h3>当前区域: <span id="currentRegion">太阳系内环</span></h3>
+                    <p>坐标: <span id="currentCoords">X: 0, Y: 0</span></p>
+                </div>
+            </div>
+            
+            <!-- 右侧面板 -->
+            <div class="right-panel">
+                <!-- 飞船状态 -->
+                <div class="ship-status">
+                    <div class="ship-header">
+                        <h3><i class="fas fa-space-shuttle"></i> 飞船状态</h3>
+                        <span class="ship-name" id="shipName">探索者号</span>
+                    </div>
+                    
+                    <div class="ship-stats">
+                        <!-- 飞船状态将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 任务面板 -->
+                <div class="mission-panel">
+                    <div class="mission-header">
+                        <h3><i class="fas fa-tasks"></i> 任务列表</h3>
+                        <span class="mission-count" id="missionCount">0/5</span>
+                    </div>
+                    
+                    <div class="mission-list" id="missionList">
+                        <!-- 任务将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部控制栏 -->
+        <div class="bottom-panel">
+            <!-- 控制按钮组 -->
+            <div class="controls">
+                <button class="control-btn" id="scanBtn">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>扫描</span>
+                </button>
+                <button class="control-btn build" id="buildBtn">
+                    <i class="fas fa-hammer"></i>
+                    <span>建造</span>
+                </button>
+                <button class="control-btn research" id="researchBtn">
+                    <i class="fas fa-flask"></i>
+                    <span>研究</span>
+                </button>
+                <button class="control-btn trade" id="tradeBtn">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>交易</span>
+                </button>
+                <button class="control-btn" id="inventoryBtn">
+                    <i class="fas fa-box-open"></i>
+                    <span>仓库</span>
+                </button>
+                <button class="control-btn" id="crewBtn">
+                    <i class="fas fa-users"></i>
+                    <span>船员</span>
+                </button>
+                <button class="control-btn" id="galaxyBtn">
+                    <i class="fas fa-globe-americas"></i>
+                    <span>星图</span>
+                </button>
+                <button class="control-btn" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span>设置</span>
+                </button>
+            </div>
+            
+            <!-- 信息面板 -->
+            <div class="info-panel">
+                <div class="info-header">
+                    <h3><i class="fas fa-info-circle"></i> 系统信息</h3>
+                    <button class="btn-small" id="clearLogBtn">清空</button>
+                </div>
+                
+                <div class="info-content" id="logContent">
+                    <!-- 日志将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 扫描模态窗口 -->
+    <div class="modal" id="scanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-satellite-dish"></i> 空间扫描</h2>
+                <button class="close-modal" data-modal="scanModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="scan-results" id="scanResults">
+                    <!-- 扫描结果将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" id="deepScanBtn">深度扫描 (消耗 50 能量)</button>
+                <button class="btn-small" data-modal="scanModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 建造模态窗口 -->
+    <div class="modal" id="buildModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-hammer"></i> 建筑管理</h2>
+                <button class="close-modal" data-modal="buildModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="build-options" id="buildOptions">
+                    <!-- 建筑选项将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" data-modal="buildModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 研究模态窗口 -->
+    <div class="modal" id="researchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-flask"></i> 科技研究</h2>
+                <button class="close-modal" data-modal="researchModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="tech-tree" id="techTree">
+                    <!-- 科技树将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" data-modal="researchModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 交易模态窗口 -->
+    <div class="modal" id="tradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-exchange-alt"></i> 星际贸易</h2>
+                <button class="close-modal" data-modal="tradeModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="trade-container">
+                    <div class="trade-column">
+                        <h3>你的货物</h3>
+                        <div class="trade-items" id="playerGoods">
+                            <!-- 玩家货物将通过JS动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <div class="trade-column">
+                        <h3>空间站货物</h3>
+                        <div class="trade-items" id="stationGoods">
+                            <!-- 空间站货物将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div style="flex: 1;">
+                    <span id="tradeInfo">信用点: <span id="creditsAmount">1000</span></span>
+                </div>
+                <button class="btn-small" id="refreshMarketBtn">刷新市场</button>
+                <button class="btn-small" data-modal="tradeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 星球详细信息模态窗口 -->
+    <div class="modal" id="planetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="planetModalTitle">行星详情</h2>
+                <button class="close-modal" data-modal="planetModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="planet-details" id="planetDetails">
+                    <!-- 星球详情将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" id="landOnPlanetBtn">登陆行星</button>
+                <button class="btn-small" id="orbitPlanetBtn">进入轨道</button>
+                <button class="btn-small" data-modal="planetModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 仓库模态窗口 -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-box-open"></i> 飞船仓库</h2>
+                <button class="close-modal" data-modal="inventoryModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="inventoryContent">
+                    <!-- 仓库内容将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" data-modal="inventoryModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 船员模态窗口 -->
+    <div class="modal" id="crewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-users"></i> 船员管理</h2>
+                <button class="close-modal" data-modal="crewModal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="crewContent">
+                    <!-- 船员内容将通过JS动态生成 -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-small" data-modal="crewModal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏脚本 -->
+    <script>
+        // 游戏状态变量
+        const game = {
+            // 游戏状态
+            isRunning: false,
+            gameTime: 0, // 游戏时间（秒）
+            day: 1,
+            
+            // 资源
+            resources: {
+                fuel: { amount: 1000, max: 2000, name: "燃料", icon: "fas fa-gas-pump", color: "fuel" },
+                minerals: { amount: 500, max: 1000, name: "矿物", icon: "fas fa-gem", color: "mineral" },
+                energy: { amount: 750, max: 1500, name: "能量", icon: "fas fa-bolt", color: "energy" },
+                oxygen: { amount: 100, max: 200, name: "氧气", icon: "fas fa-wind", color: "oxygen" },
+                food: { amount: 50, max: 100, name: "食物", icon: "fas fa-apple-alt", color: "food" },
+                crystals: { amount: 0, max: 100, name: "能量水晶", icon: "fas fa-crystal", color: "crystal" },
+                credits: { amount: 1000, max: 10000, name: "信用点", icon: "fas fa-coins", color: "warning" }
+            },
+            
+            // 飞船状态
+            ship: {
+                name: "探索者号",
+                health: 100,
+                maxHealth: 100,
+                shield: 50,
+                maxShield: 100,
+                fuel: 1000,
+                maxFuel: 2000,
+                cargo: 250,
+                maxCargo: 500,
+                speed: 1.0,
+                scannerRange: 100,
+                weapons: 1,
+                defenses: 1
+            },
+            
+            // 位置和地图
+            position: { x: 0, y: 0 },
+            currentRegion: "太阳系内环",
+            regions: [],
+            discoveredObjects: [],
+            selectedPlanet: null,
+            
+            // 任务
+            missions: [],
+            activeMissions: 0,
+            completedMissions: 0,
+            
+            // 科技
+            technologies: {},
+            researchedTechs: [],
+            researchingTech: null,
+            
+            // 建筑
+            buildings: {},
+            
+            // 船员
+            crew: [],
+            maxCrew: 5,
+            
+            // 仓库
+            inventory: {},
+            
+            // 日志
+            logs: [],
+            maxLogs: 20
+        };
+        
+        // Canvas 相关
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let canvasWidth, canvasHeight;
+        
+        // 游戏对象
+        const gameObjects = {
+            stars: [],
+            planets: [],
+            asteroids: [],
+            spaceStations: [],
+            wreckages: [],
+            player: null
+        };
+        
+        // 初始化函数
+        function init() {
+            // 设置Canvas尺寸
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 创建星空背景
+            createStarBackground();
+            
+            // 初始化游戏世界
+            initGameWorld();
+            
+            // 初始化UI
+            initUI();
+            
+            // 初始化任务
+            initMissions();
+            
+            // 初始化科技树
+            initTechnologies();
+            
+            // 初始化建筑
+            initBuildings();
+            
+            // 初始化贸易市场
+            initTradeMarket();
+            
+            // 添加初始日志
+            addLog("系统", "游戏初始化完成。欢迎来到太空探险家！", "info");
+            addLog("任务", "新任务: 探索太阳系内环区域", "mission");
+            
+            // 开始游戏循环
+            game.isRunning = true;
+            requestAnimationFrame(gameLoop);
+            
+            // 开始游戏时间
+            setInterval(updateGameTime, 1000);
+        }
+        
+        // 调整Canvas大小
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvasWidth = canvas.width = container.clientWidth;
+            canvasHeight = canvas.height = container.clientHeight;
+            
+            // 重新绘制
+            draw();
+        }
+        
+        // 创建星空背景
+        function createStarBackground() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            
+            // 创建HTML星星
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 3;
+                const starType = size < 1 ? 'small' : size < 2 ? 'medium' : 'large';
+                
+                star.className = `star ${starType}`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = 0.3 + Math.random() * 0.7;
+                
+                // 添加动画
+                const duration = 10 + Math.random() * 20;
+                const delay = Math.random() * 5;
+                star.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 初始化游戏世界
+        function initGameWorld() {
+            // 创建星球
+            const planets = [
+                { id: 1, name: "地球", type: "terrestrial", x: 300, y: 300, size: 40, color: "#3498db", resources: { minerals: 100, energy: 50, oxygen: 200 } },
+                { id: 2, name: "火星", type: "desert", x: 500, y: 200, size: 30, color: "#e74c3c", resources: { minerals: 150, energy: 30, crystals: 10 } },
+                { id: 3, name: "木星", type: "gasGiant", x: 700, y: 400, size: 80, color: "#f39c12", resources: { fuel: 300, energy: 100 } },
+                { id: 4, name: "土星", type: "gasGiant", x: 400, y: 500, size: 70, color: "#e67e22", resources: { fuel: 250, crystals: 5 } },
+                { id: 5, name: "月球", type: "rocky", x: 350, y: 320, size: 15, color: "#bdc3c7", resources: { minerals: 200, oxygen: 50 } },
+                { id: 6, name: "金星", type: "volcanic", x: 200, y: 400, size: 35, color: "#d35400", resources: { minerals: 80, energy: 100, crystals: 20 } },
+                { id: 7, name: "水星", type: "rocky", x: 150, y: 250, size: 20, color: "#7f8c8d", resources: { minerals: 300, energy: 20 } }
+            ];
+            
+            gameObjects.planets = planets.map(p => ({
+                ...p,
+                discovered: p.id === 1, // 只有地球初始被发现
+                orbit: Math.random() * Math.PI * 2,
+                orbitSpeed: 0.001 + Math.random() * 0.003
+            }));
+            
+            // 创建小行星带
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 400 + Math.random() * 200;
+                const x = 500 + Math.cos(angle) * distance;
+                const y = 300 + Math.sin(angle) * distance;
+                
+                gameObjects.asteroids.push({
+                    id: 100 + i,
+                    name: `小行星 ${i+1}`,
+                    type: "asteroid",
+                    x: x,
+                    y: y,
+                    size: 5 + Math.random() * 10,
+                    color: "#95a5a6",
+                    resources: { minerals: 10 + Math.random() * 40, crystals: Math.random() > 0.8 ? 1 : 0 },
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02
+                });
+            }
+            
+            // 创建空间站
+            gameObjects.spaceStations.push({
+                id: 200,
+                name: "国际空间站",
+                type: "station",
+                x: 320,
+                y: 280,
+                size: 25,
+                color: "#74b9ff",
+                tradeGoods: ["燃料", "矿物", "能量", "食物"],
+                prices: { fuel: 10, minerals: 15, energy: 20, food: 30 }
+            });
+            
+            // 创建残骸
+            for (let i = 0; i < 5; i++) {
+                gameObjects.wreckages.push({
+                    id: 300 + i,
+                    name: `残骸 ${i+1}`,
+                    type: "wreckage",
+                    x: 600 + Math.random() * 200,
+                    y: 100 + Math.random() * 200,
+                    size: 15 + Math.random() * 10,
+                    color: "#c0392b",
+                    resources: { minerals: 5 + Math.random() * 20, fuel: 10 + Math.random() * 30, crystals: Math.random() > 0.7 ? 1 : 0 },
+                    salvageable: true
+                });
+            }
+            
+            // 初始化玩家
+            gameObjects.player = {
+                x: 320,
+                y: 320,
+                size: 20,
+                color: "#6c5ce7",
+                rotation: 0,
+                targetX: null,
+                targetY: null,
+                speed: 2,
+                isMoving: false
+            };
+            
+            // 设置玩家位置
+            game.position.x = gameObjects.player.x;
+            game.position.y = gameObjects.player.y;
+        }
+        
+        // 初始化UI
+        function initUI() {
+            // 初始化资源显示
+            updateResourcesDisplay();
+            
+            // 初始化飞船状态显示
+            updateShipStatusDisplay();
+            
+            // 更新坐标显示
+            updatePositionDisplay();
+            
+            // 设置返回按钮
+            document.getElementById('backBtn').addEventListener('click', function() {
+                if (confirm('确定要返回游戏中心吗？未保存的进度将会丢失。')) {
+                    window.location.href = 'game_center.html';
+                }
+            });
+            
+            // 设置模态窗口
+            setupModals();
+            
+            // 设置控制按钮
+            setupControlButtons();
+            
+            // 设置日志清空按钮
+            document.getElementById('clearLogBtn').addEventListener('click', function() {
+                game.logs = [];
+                updateLogDisplay();
+            });
+        }
+        
+        // 初始化任务
+        function initMissions() {
+            const missions = [
+                {
+                    id: 1,
+                    title: "探索太阳系",
+                    description: "扫描并发现至少3个行星",
+                    type: "exploration",
+                    target: 3,
+                    progress: 1, // 地球已经被发现
+                    reward: { credits: 500, experience: 100 },
+                    status: "active"
+                },
+                {
+                    id: 2,
+                    title: "资源收集",
+                    description: "收集100单位矿物",
+                    type: "collection",
+                    target: 100,
+                    progress: 0,
+                    reward: { credits: 300, minerals: 50 },
+                    status: "active"
+                },
+                {
+                    id: 3,
+                    title: "燃料补给",
+                    description: "确保飞船燃料充足（至少800单位）",
+                    type: "maintenance",
+                    target: 800,
+                    progress: game.resources.fuel.amount,
+                    reward: { credits: 200, fuel: 100 },
+                    status: "active"
+                },
+                {
+                    id: 4,
+                    title: "首次交易",
+                    description: "在空间站完成一次交易",
+                    type: "trade",
+                    target: 1,
+                    progress: 0,
+                    reward: { credits: 400, experience: 50 },
+                    status: "active"
+                },
+                {
+                    id: 5,
+                    title: "科技研究",
+                    description: "研究一项新技术",
+                    type: "research",
+                    target: 1,
+                    progress: 0,
+                    reward: { credits: 600, crystals: 5 },
+                    status: "active"
+                }
+            ];
+            
+            game.missions = missions;
+            game.activeMissions = missions.filter(m => m.status === "active").length;
+            updateMissionsDisplay();
+        }
+        
+        // 初始化科技树
+        function initTechnologies() {
+            const technologies = {
+                propulsion: {
+                    name: "推进技术",
+                    description: "提高飞船移动速度",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 100, energy: 50 },
+                        { minerals: 200, energy: 100, crystals: 1 },
+                        { minerals: 400, energy: 200, crystals: 2 },
+                        { minerals: 800, energy: 400, crystals: 5 },
+                        { minerals: 1600, energy: 800, crystals: 10 }
+                    ],
+                    effectPerLevel: [1.2, 1.4, 1.6, 1.8, 2.0],
+                    researched: false
+                },
+                energy: {
+                    name: "能量技术",
+                    description: "提高能量生产和存储",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 50, energy: 100 },
+                        { minerals: 100, energy: 200 },
+                        { minerals: 200, energy: 400, crystals: 2 },
+                        { minerals: 400, energy: 800, crystals: 4 },
+                        { minerals: 800, energy: 1600, crystals: 8 }
+                    ],
+                    effectPerLevel: [1.2, 1.4, 1.6, 1.8, 2.0],
+                    researched: false
+                },
+                scanning: {
+                    name: "扫描技术",
+                    description: "提高扫描范围和精度",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 80, energy: 80 },
+                        { minerals: 160, energy: 160, crystals: 1 },
+                        { minerals: 320, energy: 320, crystals: 3 },
+                        { minerals: 640, energy: 640, crystals: 6 },
+                        { minerals: 1280, energy: 1280, crystals: 12 }
+                    ],
+                    effectPerLevel: [1.3, 1.6, 1.9, 2.2, 2.5],
+                    researched: false
+                },
+                weapons: {
+                    name: "武器技术",
+                    description: "提高飞船武器系统",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 150, energy: 50 },
+                        { minerals: 300, energy: 100, crystals: 2 },
+                        { minerals: 600, energy: 200, crystals: 4 },
+                        { minerals: 1200, energy: 400, crystals: 8 },
+                        { minerals: 2400, energy: 800, crystals: 16 }
+                    ],
+                    effectPerLevel: [1, 2, 3, 4, 5],
+                    researched: false
+                },
+                shields: {
+                    name: "护盾技术",
+                    description: "提高飞船护盾强度",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 100, energy: 100 },
+                        { minerals: 200, energy: 200, crystals: 1 },
+                        { minerals: 400, energy: 400, crystals: 3 },
+                        { minerals: 800, energy: 800, crystals: 6 },
+                        { minerals: 1600, energy: 1600, crystals: 12 }
+                    ],
+                    effectPerLevel: [1.2, 1.4, 1.6, 1.8, 2.0],
+                    researched: false
+                }
+            };
+            
+            game.technologies = technologies;
+        }
+        
+        // 初始化建筑
+        function initBuildings() {
+            const buildings = {
+                refinery: {
+                    name: "矿物精炼厂",
+                    description: "从原始矿物中提取可用资源",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 100, energy: 50 },
+                        { minerals: 200, energy: 100 },
+                        { minerals: 400, energy: 200, crystals: 1 },
+                        { minerals: 800, energy: 400, crystals: 2 },
+                        { minerals: 1600, energy: 800, crystals: 5 }
+                    ],
+                    production: { minerals: 10 },
+                    powerConsumption: 5
+                },
+                solarPanel: {
+                    name: "太阳能板",
+                    description: "从恒星辐射中收集能量",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 50, energy: 20 },
+                        { minerals: 100, energy: 40 },
+                        { minerals: 200, energy: 80, crystals: 1 },
+                        { minerals: 400, energy: 160, crystals: 2 },
+                        { minerals: 800, energy: 320, crystals: 4 }
+                    ],
+                    production: { energy: 20 },
+                    powerConsumption: 0
+                },
+                greenhouse: {
+                    name: "生态温室",
+                    description: "生产食物和氧气",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 80, energy: 40, water: 20 },
+                        { minerals: 160, energy: 80, water: 40 },
+                        { minerals: 320, energy: 160, water: 80, crystals: 1 },
+                        { minerals: 640, energy: 320, water: 160, crystals: 2 },
+                        { minerals: 1280, energy: 640, water: 320, crystals: 4 }
+                    ],
+                    production: { food: 5, oxygen: 10 },
+                    powerConsumption: 10
+                },
+                laboratory: {
+                    name: "科研实验室",
+                    description: "加快科技研究速度",
+                    level: 0,
+                    maxLevel: 5,
+                    costPerLevel: [
+                        { minerals: 150, energy: 100, crystals: 1 },
+                        { minerals: 300, energy: 200, crystals: 2 },
+                        { minerals: 600, energy: 400, crystals: 4 },
+                        { minerals: 1200, energy: 800, crystals: 8 },
+                        { minerals: 2400, energy: 1600, crystals: 16 }
+                    ],
+                    production: { research: 10 },
+                    powerConsumption: 20
+                }
+            };
+            
+            game.buildings = buildings;
+        }
+        
+        // 初始化贸易市场
+        function initTradeMarket() {
+            // 初始化玩家货物
+            game.inventory = {
+                fuel: { amount: 100, price: 10 },
+                minerals: { amount: 50, price: 15 },
+                energy: { amount: 25, price: 20 },
+                food: { amount: 10, price: 30 },
+                crystals: { amount: 5, price: 100 }
+            };
+            
+            // 初始化空间站货物
+            game.stationGoods = {
+                fuel: { amount: 1000, price: 12 },
+                minerals: { amount: 500, price: 18 },
+                energy: { amount: 250, price: 25 },
+                food: { amount: 100, price: 35 },
+                crystals: { amount: 20, price: 120 },
+                weapons: { amount: 10, price: 500 },
+                shields: { amount: 5, price: 800 }
+            };
+        }
+        
+        // 设置模态窗口
+        function setupModals() {
+            // 关闭按钮
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal');
+                    closeModal(modalId);
+                });
+            });
+            
+            // 点击模态背景关闭
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this.id);
+                    }
+                });
+            });
+            
+            // 扫描模态
+            document.getElementById('scanBtn').addEventListener('click', function() {
+                openModal('scanModal');
+                performScan();
+            });
+            
+            document.getElementById('deepScanBtn').addEventListener('click', function() {
+                if (game.resources.energy.amount >= 50) {
+                    game.resources.energy.amount -= 50;
+                    updateResourcesDisplay();
+                    performDeepScan();
+                } else {
+                    addLog("扫描", "能量不足，无法进行深度扫描", "warning");
+                }
+            });
+            
+            // 建造模态
+            document.getElementById('buildBtn').addEventListener('click', function() {
+                openModal('buildModal');
+                updateBuildModal();
+            });
+            
+            // 研究模态
+            document.getElementById('researchBtn').addEventListener('click', function() {
+                openModal('researchModal');
+                updateResearchModal();
+            });
+            
+            // 交易模态
+            document.getElementById('tradeBtn').addEventListener('click', function() {
+                openModal('tradeModal');
+                updateTradeModal();
+            });
+            
+            document.getElementById('refreshMarketBtn').addEventListener('click', function() {
+                refreshMarketPrices();
+                updateTradeModal();
+                addLog("贸易", "市场已刷新", "info");
+            });
+            
+            // 其他模态
+            document.getElementById('inventoryBtn').addEventListener('click', function() {
+                openModal('inventoryModal');
+                updateInventoryModal();
+            });
+            
+            document.getElementById('crewBtn').addEventListener('click', function() {
+                openModal('crewModal');
+                updateCrewModal();
+            });
+            
+            document.getElementById('galaxyBtn').addEventListener('click', function() {
+                addLog("系统", "星图功能开发中", "info");
+            });
+            
+            document.getElementById('settingsBtn').addEventListener('click', function() {
+                addLog("系统", "设置功能开发中", "info");
+            });
+        }
+        
+        // 设置控制按钮
+        function setupControlButtons() {
+            // 星球点击事件
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // 检查是否点击了星球
+                for (const planet of gameObjects.planets) {
+                    const distance = Math.sqrt((x - planet.x) * (x - planet.x) + (y - planet.y) * (y - planet.y));
+                    if (distance <= planet.size) {
+                        selectPlanet(planet);
+                        return;
+                    }
+                }
+                
+                // 检查是否点击了小行星
+                for (const asteroid of gameObjects.asteroids) {
+                    const distance = Math.sqrt((x - asteroid.x) * (x - asteroid.x) + (y - asteroid.y) * (y - asteroid.y));
+                    if (distance <= asteroid.size) {
+                        selectAsteroid(asteroid);
+                        return;
+                    }
+                }
+                
+                // 检查是否点击了空间站
+                for (const station of gameObjects.spaceStations) {
+                    const distance = Math.sqrt((x - station.x) * (x - station.x) + (y - station.y) * (y - station.y));
+                    if (distance <= station.size) {
+                        selectStation(station);
+                        return;
+                    }
+                }
+                
+                // 如果没有点击任何物体，设置移动目标
+                gameObjects.player.targetX = x;
+                gameObjects.player.targetY = y;
+                gameObjects.player.isMoving = true;
+                
+                addLog("导航", `设置新目标: (${Math.round(x)}, ${Math.round(y)})`, "nav");
+            });
+        }
+        
+        // 选择星球
+        function selectPlanet(planet) {
+            game.selectedPlanet = planet;
+            
+            // 打开星球详情模态
+            document.getElementById('planetModalTitle').innerHTML = `<i class="fas fa-globe"></i> ${planet.name}`;
+            
+            // 更新星球详情
+            const planetDetails = document.getElementById('planetDetails');
+            planetDetails.innerHTML = `
+                <div class="planet-visual">
+                    <div class="planet-image" style="background: ${planet.color}; box-shadow: 0 0 20px ${planet.color}80;"></div>
+                    <div class="planet-stats">
+                        <div class="planet-stat">
+                            <span>类型:</span>
+                            <span>${getPlanetTypeName(planet.type)}</span>
+                        </div>
+                        <div class="planet-stat">
+                            <span>大小:</span>
+                            <span>${planet.size} 单位</span>
+                        </div>
+                        <div class="planet-stat">
+                            <span>距离:</span>
+                            <span>${Math.round(getDistance(gameObjects.player.x, gameObjects.player.y, planet.x, planet.y))} 单位</span>
+                        </div>
+                        <div class="planet-stat">
+                            <span>状态:</span>
+                            <span>${planet.discovered ? '已发现' : '未发现'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>资源</h3>
+                    <div class="planet-resources">
+                        ${Object.entries(planet.resources || {}).map(([resource, amount]) => `
+                            <div class="resource-tag" style="background: var(--${resource === 'crystals' ? 'crystal' : resource});">
+                                ${getResourceName(resource)}: ${amount}
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <h3>描述</h3>
+                    <p>${getPlanetDescription(planet)}</p>
+                    
+                    <div class="planet-actions" id="planetActions">
+                        ${planet.discovered ? `
+                            <button class="btn-small" onclick="landOnPlanet(${planet.id})">登陆</button>
+                            <button class="btn-small" onclick="orbitPlanet(${planet.id})">轨道飞行</button>
+                            <button class="btn-small" onclick="scanPlanet(${planet.id})">详细扫描</button>
+                            <button class="btn-small" onclick="collectResources(${planet.id})">收集资源</button>
+                        ` : `
+                            <button class="btn-small" onclick="discoverPlanet(${planet.id})">发现行星</button>
+                        `}
+                    </div>
+                </div>
+            `;
+            
+            openModal('planetModal');
+            
+            // 设置移动目标
+            gameObjects.player.targetX = planet.x;
+            gameObjects.player.targetY = planet.y;
+            gameObjects.player.isMoving = true;
+            
+            addLog("导航", `前往 ${planet.name}`, "nav");
+        }
+        
+        // 选择小行星
+        function selectAsteroid(asteroid) {
+            addLog("扫描", `发现小行星: ${asteroid.name}`, "scan");
+            
+            // 设置移动目标
+            gameObjects.player.targetX = asteroid.x;
+            gameObjects.player.targetY = asteroid.y;
+            gameObjects.player.isMoving = true;
+            
+            // 检查是否在采集范围内
+            setTimeout(() => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, asteroid.x, asteroid.y);
+                if (distance < 50) {
+                    mineAsteroid(asteroid.id);
+                }
+            }, 1000);
+        }
+        
+        // 选择空间站
+        function selectStation(station) {
+            addLog("导航", `到达 ${station.name}`, "nav");
+            
+            // 设置移动目标
+            gameObjects.player.targetX = station.x;
+            gameObjects.player.targetY = station.y;
+            gameObjects.player.isMoving = true;
+            
+            // 自动打开贸易面板
+            setTimeout(() => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, station.x, station.y);
+                if (distance < 50) {
+                    openModal('tradeModal');
+                    updateTradeModal();
+                }
+            }, 1500);
+        }
+        
+        // 打开模态窗口
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        // 关闭模态窗口
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // 执行扫描
+        function performScan() {
+            const scanResults = document.getElementById('scanResults');
+            scanResults.innerHTML = '';
+            
+            // 查找附近的物体
+            const nearbyObjects = [];
+            
+            // 检查行星
+            gameObjects.planets.forEach(planet => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, planet.x, planet.y);
+                if (distance <= game.ship.scannerRange * 100) {
+                    nearbyObjects.push({
+                        type: 'planet',
+                        object: planet,
+                        distance: distance
+                    });
+                    
+                    // 标记为已发现
+                    if (!planet.discovered) {
+                        planet.discovered = true;
+                        addLog("发现", `发现新的行星: ${planet.name}`, "discovery");
+                        
+                        // 更新任务进度
+                        updateMissionProgress('exploration', 1);
+                    }
+                }
+            });
+            
+            // 检查小行星
+            gameObjects.asteroids.forEach(asteroid => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, asteroid.x, asteroid.y);
+                if (distance <= game.ship.scannerRange * 100) {
+                    nearbyObjects.push({
+                        type: 'asteroid',
+                        object: asteroid,
+                        distance: distance
+                    });
+                }
+            });
+            
+            // 检查空间站
+            gameObjects.spaceStations.forEach(station => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, station.x, station.y);
+                if (distance <= game.ship.scannerRange * 100) {
+                    nearbyObjects.push({
+                        type: 'station',
+                        object: station,
+                        distance: distance
+                    });
+                }
+            });
+            
+            // 检查残骸
+            gameObjects.wreckages.forEach(wreckage => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, wreckage.x, wreckage.y);
+                if (distance <= game.ship.scannerRange * 100) {
+                    nearbyObjects.push({
+                        type: 'wreckage',
+                        object: wreckage,
+                        distance: distance
+                    });
+                }
+            });
+            
+            // 显示扫描结果
+            if (nearbyObjects.length === 0) {
+                scanResults.innerHTML = '<p style="text-align: center; color: var(--light-gray);">没有发现任何物体</p>';
+            } else {
+                nearbyObjects.forEach((item, index) => {
+                    const element = document.createElement('div');
+                    element.className = 'scan-item scan-animation';
+                    element.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const typeIcon = item.type === 'planet' ? 'fas fa-globe' :
+                                    item.type === 'asteroid' ? 'fas fa-circle' :
+                                    item.type === 'station' ? 'fas fa-satellite' :
+                                    'fas fa-times-circle';
+                    
+                    const typeName = item.type === 'planet' ? '行星' :
+                                    item.type === 'asteroid' ? '小行星' :
+                                    item.type === 'station' ? '空间站' :
+                                    '残骸';
+                    
+                    element.innerHTML = `
+                        <div class="scan-icon ${item.type}">
+                            <i class="${typeIcon}"></i>
+                        </div>
+                        <div class="scan-name">${item.object.name}</div>
+                        <div class="scan-desc">${typeName} - 距离: ${Math.round(item.distance)} 单位</div>
+                        <div class="scan-resources">
+                            ${item.object.resources ? Object.keys(item.object.resources).map(resource => 
+                                `<span class="resource-tag">${getResourceName(resource)}</span>`
+                            ).join('') : ''}
+                        </div>
+                        <div class="scan-actions">
+                            <button class="btn-small" onclick="selectObject('${item.type}', ${item.object.id})">选择</button>
+                        </div>
+                    `;
+                    
+                    scanResults.appendChild(element);
+                });
+            }
+            
+            addLog("扫描", `发现 ${nearbyObjects.length} 个物体`, "scan");
+        }
+        
+        // 执行深度扫描
+        function performDeepScan() {
+            const scanResults = document.getElementById('scanResults');
+            scanResults.innerHTML = '';
+            
+            // 扩大扫描范围
+            const extendedRange = game.ship.scannerRange * 200;
+            
+            // 查找附近的物体（包括隐藏的）
+            const nearbyObjects = [];
+            
+            // 检查所有行星
+            gameObjects.planets.forEach(planet => {
+                const distance = getDistance(gameObjects.player.x, gameObjects.player.y, planet.x, planet.y);
+                if (distance <= extendedRange) {
+                    nearbyObjects.push({
+                        type: 'planet',
+                        object: planet,
+                        distance: distance
+                    });
+                    
+                    // 深度扫描自动发现
+                    if (!planet.discovered) {
+                        planet.discovered = true;
+                        addLog("深度扫描", `发现新的行星: ${planet.name}`, "discovery");
+                        
+                        // 额外奖励
+                        game.resources.credits.amount += 100;
+                        updateMissionProgress('exploration', 1);
+                    }
+                }
+            });
+            
+            // 检查小行星（发现更多）
+            for (let i = 0; i < 20; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 300 + Math.random() * 300;
+                const x = gameObjects.player.x + Math.cos(angle) * distance;
+                const y = gameObjects.player.y + Math.sin(angle) * distance;
+                
+                const asteroid = {
+                    id: 1000 + i,
+                    name: `富矿小行星 ${i+1}`,
+                    type: "asteroid",
+                    x: x,
+                    y: y,
+                    size: 8 + Math.random() * 8,
+                    color: "#3498db",
+                    resources: { minerals: 50 + Math.random() * 100, crystals: Math.random() > 0.5 ? 1 : 0 },
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02
+                };
+                
+                gameObjects.asteroids.push(asteroid);
+                nearbyObjects.push({
+                    type: 'asteroid',
+                    object: asteroid,
+                    distance: distance
+                });
+            }
+            
+            // 发现隐藏的空间站
+            if (!gameObjects.spaceStations.find(s => s.id === 201)) {
+                const hiddenStation = {
+                    id: 201,
+                    name: "黑市空间站",
+                    type: "station",
+                    x: gameObjects.player.x + 200,
+                    y: gameObjects.player.y - 200,
+                    size: 30,
+                    color: "#9b59b6",
+                    tradeGoods: ["能量水晶", "高级武器", "护盾发生器"],
+                    prices: { crystals: 80, weapons: 1000, shields: 1500 }
+                };
+                
+                gameObjects.spaceStations.push(hiddenStation);
+                nearbyObjects.push({
+                    type: 'station',
+                    object: hiddenStation,
+                    distance: 200
+                });
+                
+                addLog("深度扫描", "发现隐藏的黑市空间站", "discovery");
+            }
+            
+            // 显示扫描结果
+            if (nearbyObjects.length === 0) {
+                scanResults.innerHTML = '<p style="text-align: center; color: var(--light-gray);">深度扫描没有发现新物体</p>';
+            } else {
+                nearbyObjects.forEach((item, index) => {
+                    const element = document.createElement('div');
+                    element.className = 'scan-item scan-animation';
+                    element.style.animationDelay = `${index * 0.05}s`;
+                    
+                    const typeIcon = item.type === 'planet' ? 'fas fa-globe' :
+                                    item.type === 'asteroid' ? 'fas fa-circle' :
+                                    item.type === 'station' ? 'fas fa-satellite' :
+                                    'fas fa-times-circle';
+                    
+                    const typeName = item.type === 'planet' ? '行星' :
+                                    item.type === 'asteroid' ? '小行星' :
+                                    item.type === 'station' ? '空间站' :
+                                    '残骸';
+                    
+                    // 详细资源信息
+                    let resourceInfo = '';
+                    if (item.object.resources) {
+                        resourceInfo = Object.entries(item.object.resources).map(([resource, amount]) => 
+                            `<span class="resource-tag" style="background: var(--${resource === 'crystals' ? 'crystal' : resource});">
+                                ${getResourceName(resource)}: ${Math.round(amount)}
+                            </span>`
+                        ).join('');
+                    }
+                    
+                    element.innerHTML = `
+                        <div class="scan-icon ${item.type}">
+                            <i class="${typeIcon}"></i>
+                        </div>
+                        <div class="scan-name">${item.object.name} <span style="font-size: 10px; color: var(--success);">(深度扫描)</span></div>
+                        <div class="scan-desc">${typeName} - 距离: ${Math.round(item.distance)} 单位</div>
+                        <div class="scan-resources">
+                            ${resourceInfo}
+                        </div>
+                        <div class="scan-actions">
+                            <button class="btn-small" onclick="selectObject('${item.type}', ${item.object.id})">选择</button>
+                            ${item.type === 'asteroid' ? '<button class="btn-small" onclick="mineAsteroid(' + item.object.id + ')">采矿</button>' : ''}
+                        </div>
+                    `;
+                    
+                    scanResults.appendChild(element);
+                });
+            }
+            
+            addLog("深度扫描", `发现 ${nearbyObjects.length} 个新物体`, "scan");
+        }
+        
+        // 选择物体
+        function selectObject(type, id) {
+            let object;
+            
+            switch(type) {
+                case 'planet':
+                    object = gameObjects.planets.find(p => p.id === id);
+                    if (object) selectPlanet(object);
+                    break;
+                case 'asteroid':
+                    object = gameObjects.asteroids.find(a => a.id === id);
+                    if (object) selectAsteroid(object);
+                    break;
+                case 'station':
+                    object = gameObjects.spaceStations.find(s => s.id === id);
+                    if (object) selectStation(object);
+                    break;
+            }
+            
+            closeModal('scanModal');
+        }
+        
+        // 更新建造模态
+        function updateBuildModal() {
+            const buildOptions = document.getElementById('buildOptions');
+            buildOptions.innerHTML = '';
+            
+            Object.entries(game.buildings).forEach(([key, building]) => {
+                const element = document.createElement('div');
+                element.className = 'build-option';
+                
+                const canBuild = building.level < building.maxLevel;
+                const cost = building.costPerLevel[building.level] || building.costPerLevel[building.costPerLevel.length - 1];
+                
+                element.innerHTML = `
+                    <div class="build-header">
+                        <div class="build-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <div>
+                            <div class="build-name">${building.name} 等级 ${building.level}</div>
+                            <div style="font-size: 12px; color: var(--light-gray);">最大等级: ${building.maxLevel}</div>
+                        </div>
+                    </div>
+                    <div class="build-desc">${building.description}</div>
+                    
+                    <div class="build-cost">
+                        ${Object.entries(cost).map(([resource, amount]) => {
+                            const hasEnough = game.resources[resource]?.amount >= amount;
+                            return `
+                                <div class="cost-item" style="color: ${hasEnough ? 'white' : 'var(--danger)'};">
+                                    <i class="fas fa-${getResourceIcon(resource)}"></i>
+                                    ${amount} ${getResourceName(resource)}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="build-stats">
+                        <div style="font-size: 12px; color: var(--light-gray); margin-bottom: 5px;">
+                            ${building.production ? '生产: ' + Object.entries(building.production).map(([res, amount]) => 
+                                `${amount} ${getResourceName(res)}/分钟`
+                            ).join(', ') : ''}
+                        </div>
+                        <div style="font-size: 12px; color: var(--light-gray);">
+                            能耗: ${building.powerConsumption} 能量/分钟
+                        </div>
+                    </div>
+                    
+                    <div class="build-actions">
+                        ${canBuild ? `
+                            <button class="btn-small" onclick="upgradeBuilding('${key}')" 
+                                ${!canAfford(cost) ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                升级
+                            </button>
+                        ` : `
+                            <button class="btn-small" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                已满级
+                            </button>
+                        `}
+                        <button class="btn-small" onclick="showBuildingInfo('${key}')">详情</button>
+                    </div>
+                `;
+                
+                buildOptions.appendChild(element);
+            });
+        }
+        
+        // 升级建筑
+        function upgradeBuilding(buildingKey) {
+            const building = game.buildings[buildingKey];
+            if (!building || building.level >= building.maxLevel) return;
+            
+            const cost = building.costPerLevel[building.level];
+            if (!canAfford(cost)) {
+                addLog("建造", "资源不足，无法升级建筑", "warning");
+                return;
+            }
+            
+            // 扣除资源
+            Object.entries(cost).forEach(([resource, amount]) => {
+                if (game.resources[resource]) {
+                    game.resources[resource].amount -= amount;
+                }
+            });
+            
+            // 升级建筑
+            building.level++;
+            
+            // 应用建筑效果
+            applyBuildingEffects(buildingKey, building.level);
+            
+            // 更新显示
+            updateResourcesDisplay();
+            updateBuildModal();
+            
+            addLog("建造", `${building.name} 升级到等级 ${building.level}`, "success");
+            
+            // 检查任务
+            if (building.level === 1) {
+                updateMissionProgress('build', 1);
+            }
+        }
+        
+        // 应用建筑效果
+        function applyBuildingEffects(buildingKey, level) {
+            const building = game.buildings[buildingKey];
+            
+            switch(buildingKey) {
+                case 'refinery':
+                    // 矿物精炼效率提高
+                    break;
+                case 'solarPanel':
+                    // 能量生产提高
+                    game.resources.energy.max += 100 * level;
+                    break;
+                case 'greenhouse':
+                    // 食物和氧气生产
+                    break;
+                case 'laboratory':
+                    // 研究速度提高
+                    break;
+            }
+        }
+        
+        // 更新研究模态
+        function updateResearchModal() {
+            const techTree = document.getElementById('techTree');
+            techTree.innerHTML = '';
+            
+            Object.entries(game.technologies).forEach(([key, tech]) => {
+                const element = document.createElement('div');
+                element.className = 'tech-category';
+                
+                const canResearch = tech.level < tech.maxLevel && !tech.researched;
+                const cost = tech.costPerLevel[tech.level];
+                const isResearching = game.researchingTech === key;
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                if (tech.researched) {
+                    statusClass = 'researched';
+                    statusText = '已研究';
+                } else if (canResearch) {
+                    statusClass = 'available';
+                    statusText = '可研究';
+                } else {
+                    statusClass = 'locked';
+                    statusText = '锁定';
+                }
+                
+                element.innerHTML = `
+                    <h3><i class="fas fa-microchip"></i> ${tech.name}</h3>
+                    
+                    <div class="tech-item ${statusClass}">
+                        <div class="tech-header">
+                            <div class="tech-name">${tech.name} 等级 ${tech.level}/${tech.maxLevel}</div>
+                            <div class="tech-level">${statusText}</div>
+                        </div>
+                        
+                        <div class="tech-desc">${tech.description}</div>
+                        
+                        ${cost ? `
+                            <div class="tech-cost" style="margin-bottom: 8px;">
+                                ${Object.entries(cost).map(([resource, amount]) => {
+                                    const hasEnough = game.resources[resource]?.amount >= amount;
+                                    return `
+                                        <span style="font-size: 11px; margin-right: 5px; color: ${hasEnough ? 'white' : 'var(--danger)'};">
+                                            <i class="fas fa-${getResourceIcon(resource)}"></i> ${amount}
+                                        </span>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="tech-progress">
+                            ${isResearching ? `
+                                <div style="flex: 1; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; margin-right: 10px; overflow: hidden;">
+                                    <div id="researchProgressBar" style="height: 100%; width: 50%; background: linear-gradient(to right, var(--primary), var(--secondary)); border-radius: 3px;"></div>
+                                </div>
+                                <button class="btn-small" onclick="cancelResearch('${key}')" style="font-size: 11px; padding: 3px 8px;">取消</button>
+                            ` : canResearch ? `
+                                <button class="btn-small" onclick="startResearch('${key}')" 
+                                    ${!canAfford(cost) ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                    开始研究
+                                </button>
+                            ` : tech.researched ? `
+                                <span style="font-size: 12px; color: var(--success);">已研究</span>
+                            ` : `
+                                <span style="font-size: 12px; color: var(--light-gray);">需要前置研究</span>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 10px; font-size: 12px; color: var(--light-gray);">
+                        效果: ${tech.effectPerLevel ? `等级 ${tech.level}: ${tech.effectPerLevel[tech.level-1] || tech.effectPerLevel[0]}x` : ''}
+                    </div>
+                `;
+                
+                techTree.appendChild(element);
+            });
+        }
+        
+        // 开始研究
+        function startResearch(techKey) {
+            const tech = game.technologies[techKey];
+            if (!tech || tech.researched || game.researchingTech) return;
+            
+            const cost = tech.costPerLevel[tech.level];
+            if (!canAfford(cost)) {
+                addLog("研究", "资源不足，无法开始研究", "warning");
+                return;
+            }
+            
+            // 扣除资源
+            Object.entries(cost).forEach(([resource, amount]) => {
+                if (game.resources[resource]) {
+                    game.resources[resource].amount -= amount;
+                }
+            });
+            
+            // 开始研究
+            game.researchingTech = techKey;
+            
+            // 模拟研究时间
+            const researchTime = 30000; // 30秒
+            
+            addLog("研究", `开始研究 ${tech.name} (等级 ${tech.level+1})`, "research");
+            
+            // 更新研究进度
+            const startTime = Date.now();
+            const researchInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = (elapsed / researchTime) * 100;
+                
+                const progressBar = document.getElementById('researchProgressBar');
+                if (progressBar) {
+                    progressBar.style.width = `${Math.min(progress, 100)}%`;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(researchInterval);
+                    completeResearch(techKey);
+                }
+            }, 100);
+            
+            // 保存计时器引用
+            tech.researchInterval = researchInterval;
+            
+            updateResourcesDisplay();
+            updateResearchModal();
+        }
+        
+        // 完成研究
+        function completeResearch(techKey) {
+            const tech = game.technologies[techKey];
+            if (!tech) return;
+            
+            tech.level++;
+            tech.researched = true;
+            game.researchingTech = null;
+            
+            // 应用科技效果
+            applyTechEffect(techKey, tech.level);
+            
+            addLog("研究", `${tech.name} 研究完成 (等级 ${tech.level})`, "success");
+            
+            // 更新任务进度
+            updateMissionProgress('research', 1);
+            
+            updateResearchModal();
+        }
+        
+        // 取消研究
+        function cancelResearch(techKey) {
+            const tech = game.technologies[techKey];
+            if (!tech || !tech.researchInterval) return;
+            
+            clearInterval(tech.researchInterval);
+            game.researchingTech = null;
+            
+            addLog("研究", `取消研究 ${tech.name}`, "warning");
+            
+            updateResearchModal();
+        }
+        
+        // 应用科技效果
+        function applyTechEffect(techKey, level) {
+            const tech = game.technologies[techKey];
+            const effect = tech.effectPerLevel[level-1];
+            
+            switch(techKey) {
+                case 'propulsion':
+                    gameObjects.player.speed = 2 * effect;
+                    addLog("系统", `飞船速度提升到 ${gameObjects.player.speed.toFixed(1)}x`, "upgrade");
+                    break;
+                case 'energy':
+                    game.resources.energy.max = Math.floor(game.resources.energy.max * effect);
+                    addLog("系统", `能量容量提升到 ${game.resources.energy.max}`, "upgrade");
+                    break;
+                case 'scanning':
+                    game.ship.scannerRange = 100 * effect;
+                    addLog("系统", `扫描范围提升到 ${game.ship.scannerRange.toFixed(0)} 单位`, "upgrade");
+                    break;
+                case 'weapons':
+                    game.ship.weapons = effect;
+                    addLog("系统", `武器系统升级到等级 ${game.ship.weapons}`, "upgrade");
+                    break;
+                case 'shields':
+                    game.ship.maxShield = 100 * effect;
+                    addLog("系统", `护盾容量提升到 ${game.ship.maxShield}`, "upgrade");
+                    break;
+            }
+            
+            updateShipStatusDisplay();
+        }
+        
+        // 更新交易模态
+        function updateTradeModal() {
+            // 更新信用点显示
+            document.getElementById('creditsAmount').textContent = game.resources.credits.amount;
+            
+            // 更新玩家货物
+            const playerGoods = document.getElementById('playerGoods');
+            playerGoods.innerHTML = '';
+            
+            Object.entries(game.inventory).forEach(([item, data]) => {
+                if (data.amount > 0) {
+                    const element = document.createElement('div');
+                    element.className = 'trade-item';
+                    element.innerHTML = `
+                        <div class="trade-item-icon" style="background: linear-gradient(135deg, var(--${item === 'crystals' ? 'crystal' : item}), var(--${item === 'crystals' ? 'crystal' : item}-dark));">
+                            <i class="fas fa-${getResourceIcon(item)}"></i>
+                        </div>
+                        <div class="trade-item-info">
+                            <div class="trade-item-name">${getResourceName(item)}</div>
+                            <div class="trade-item-price">${data.amount} 单位</div>
+                        </div>
+                        <div class="trade-actions">
+                            <input type="number" class="trade-amount" id="sellAmount_${item}" min="1" max="${data.amount}" value="1">
+                            <button class="btn-small" onclick="sellItem('${item}')" style="font-size: 11px; padding: 5px 8px;">卖出 (${data.price})</button>
+                        </div>
+                    `;
+                    playerGoods.appendChild(element);
+                }
+            });
+            
+            // 更新空间站货物
+            const stationGoods = document.getElementById('stationGoods');
+            stationGoods.innerHTML = '';
+            
+            Object.entries(game.stationGoods).forEach(([item, data]) => {
+                if (data.amount > 0) {
+                    const element = document.createElement('div');
+                    element.className = 'trade-item';
+                    element.innerHTML = `
+                        <div class="trade-item-icon" style="background: linear-gradient(135deg, var(--${item === 'crystals' ? 'crystal' : item}), var(--${item === 'crystals' ? 'crystal' : item}-dark));">
+                            <i class="fas fa-${getResourceIcon(item)}"></i>
+                        </div>
+                        <div class="trade-item-info">
+                            <div class="trade-item-name">${getResourceName(item)}</div>
+                            <div class="trade-item-price">${data.price} 信用点/单位</div>
+                        </div>
+                        <div class="trade-actions">
+                            <input type="number" class="trade-amount" id="buyAmount_${item}" min="1" max="${Math.min(data.amount, 100)}" value="1">
+                            <button class="btn-small" onclick="buyItem('${item}')" style="font-size: 11px; padding: 5px 8px;">购买</button>
+                        </div>
+                    `;
+                    stationGoods.appendChild(element);
+                }
+            });
+        }
+        
+        // 卖出物品
+        function sellItem(item) {
+            const amountInput = document.getElementById(`sellAmount_${item}`);
+            const amount = parseInt(amountInput.value) || 1;
+            
+            if (amount < 1) return;
+            
+            const itemData = game.inventory[item];
+            if (!itemData || itemData.amount < amount) {
+                addLog("贸易", "物品数量不足", "warning");
+                return;
+            }
+            
+            const totalPrice = amount * itemData.price;
+            
+            // 更新库存
+            itemData.amount -= amount;
+            game.resources.credits.amount += totalPrice;
+            
+            // 更新空间站库存
+            if (!game.stationGoods[item]) {
+                game.stationGoods[item] = { amount: 0, price: itemData.price };
+            }
+            game.stationGoods[item].amount += amount;
+            
+            addLog("贸易", `卖出 ${amount} 单位 ${getResourceName(item)}，获得 ${totalPrice} 信用点`, "trade");
+            
+            // 更新任务进度
+            updateMissionProgress('trade', 1);
+            
+            updateResourcesDisplay();
+            updateTradeModal();
+        }
+        
+        // 购买物品
+        function buyItem(item) {
+            const amountInput = document.getElementById(`buyAmount_${item}`);
+            const amount = parseInt(amountInput.value) || 1;
+            
+            if (amount < 1) return;
+            
+            const itemData = game.stationGoods[item];
+            if (!itemData || itemData.amount < amount) {
+                addLog("贸易", "空间站库存不足", "warning");
+                return;
+            }
+            
+            const totalCost = amount * itemData.price;
+            
+            if (game.resources.credits.amount < totalCost) {
+                addLog("贸易", "信用点不足", "warning");
+                return;
+            }
+            
+            // 更新库存
+            game.resources.credits.amount -= totalCost;
+            itemData.amount -= amount;
+            
+            // 更新玩家库存
+            if (!game.inventory[item]) {
+                game.inventory[item] = { amount: 0, price: itemData.price };
+            }
+            game.inventory[item].amount += amount;
+            
+            addLog("贸易", `购买 ${amount} 单位 ${getResourceName(item)}，花费 ${totalCost} 信用点`, "trade");
+            
+            // 更新任务进度
+            updateMissionProgress('trade', 1);
+            
+            updateResourcesDisplay();
+            updateTradeModal();
+        }
+        
+        // 刷新市场价格
+        function refreshMarketPrices() {
+            // 随机调整价格
+            Object.keys(game.stationGoods).forEach(item => {
+                const change = (Math.random() - 0.5) * 0.2; // ±10%
+                game.stationGoods[item].price = Math.max(1, Math.round(game.stationGoods[item].price * (1 + change)));
+            });
+            
+            // 更新玩家库存价格
+            Object.keys(game.inventory).forEach(item => {
+                if (game.stationGoods[item]) {
+                    game.inventory[item].price = Math.round(game.stationGoods[item].price * 0.8); // 玩家卖出价是买入价的80%
+                }
+            });
+        }
+        
+        // 更新仓库模态
+        function updateInventoryModal() {
+            const inventoryContent = document.getElementById('inventoryContent');
+            
+            let inventoryHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3><i class="fas fa-box"></i> 飞船仓库</h3>
+                    <div style="font-size: 12px; color: var(--light-gray); margin-bottom: 10px;">
+                        已用空间: ${calculateUsedCargo()}/${game.ship.cargo} 单位
+                    </div>
+                    <div class="progress-bar" style="height: 10px; margin-bottom: 20px;">
+                        <div class="progress-fill" style="width: ${(calculateUsedCargo() / game.ship.cargo) * 100}%"></div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+            `;
+            
+            // 显示所有库存物品
+            Object.entries(game.inventory).forEach(([item, data]) => {
+                if (data.amount > 0) {
+                    inventoryHTML += `
+                        <div class="inventory-item" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <div class="resource-icon ${item}" style="width: 40px; height: 40px; font-size: 18px; margin-right: 10px;">
+                                    <i class="fas fa-${getResourceIcon(item)}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 16px;">${getResourceName(item)}</div>
+                                    <div style="font-size: 12px; color: var(--light-gray);">${data.amount} 单位</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 12px;">价值: ${data.price} 信用点/单位</span>
+                                <button class="btn-small" onclick="useItem('${item}', 1)" style="font-size: 11px; padding: 5px 8px;">使用</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 显示资源
+            Object.entries(game.resources).forEach(([key, resource]) => {
+                if (resource.amount > 0 && key !== 'credits') {
+                    inventoryHTML += `
+                        <div class="inventory-item" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <div class="resource-icon ${key}" style="width: 40px; height: 40px; font-size: 18px; margin-right: 10px;">
+                                    <i class="${resource.icon}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 16px;">${resource.name}</div>
+                                    <div style="font-size: 12px; color: var(--light-gray);">${resource.amount}/${resource.max} 单位</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="progress-bar" style="flex: 1; margin-right: 10px;">
+                                    <div class="progress-fill" style="width: ${(resource.amount / resource.max) * 100}%; background: var(--${resource.color});"></div>
+                                </div>
+                                <span style="font-size: 12px; color: var(--light-gray);">${Math.round((resource.amount / resource.max) * 100)}%</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            inventoryHTML += `</div>`;
+            
+            inventoryContent.innerHTML = inventoryHTML;
+        }
+        
+        // 计算已用货舱空间
+        function calculateUsedCargo() {
+            let used = 0;
+            Object.values(game.inventory).forEach(item => {
+                used += item.amount;
+            });
+            return used;
+        }
+        
+        // 使用物品
+        function useItem(item, amount) {
+            if (!game.inventory[item] || game.inventory[item].amount < amount) {
+                addLog("仓库", "物品数量不足", "warning");
+                return;
+            }
+            
+            switch(item) {
+                case 'food':
+                    // 食物恢复船员生命
+                    game.inventory[item].amount -= amount;
+                    addLog("仓库", `使用了 ${amount} 单位食物`, "info");
+                    break;
+                case 'weapons':
+                    // 武器提升攻击力
+                    game.inventory[item].amount -= amount;
+                    game.ship.weapons += amount;
+                    addLog("仓库", `安装了武器，攻击力提升到 ${game.ship.weapons}`, "upgrade");
+                    break;
+                case 'shields':
+                    // 护盾提升防御
+                    game.inventory[item].amount -= amount;
+                    game.ship.maxShield += 20 * amount;
+                    addLog("仓库", `安装了护盾发生器，护盾容量提升到 ${game.ship.maxShield}`, "upgrade");
+                    break;
+                default:
+                    addLog("仓库", `无法使用 ${getResourceName(item)}`, "warning");
+                    return;
+            }
+            
+            updateShipStatusDisplay();
+            updateInventoryModal();
+        }
+        
+        // 更新船员模态
+        function updateCrewModal() {
+            const crewContent = document.getElementById('crewContent');
+            
+            if (game.crew.length === 0) {
+                crewContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-users" style="font-size: 48px; color: var(--light-gray); margin-bottom: 20px;"></i>
+                        <h3 style="margin-bottom: 10px;">暂无船员</h3>
+                        <p style="color: var(--light-gray); margin-bottom: 20px;">招募船员来帮助你管理飞船</p>
+                        <button class="btn-small" onclick="recruitCrew()" style="padding: 10px 20px;">
+                            <i class="fas fa-user-plus"></i> 招募船员
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let crewHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3><i class="fas fa-users"></i> 船员管理</h3>
+                    <div>
+                        <span style="font-size: 12px; color: var(--light-gray); margin-right: 10px;">
+                            ${game.crew.length}/${game.maxCrew} 船员
+                        </span>
+                        <button class="btn-small" onclick="recruitCrew()" ${game.crew.length >= game.maxCrew ? 'disabled style="opacity: 0.5;"' : ''}>
+                            <i class="fas fa-user-plus"></i> 招募
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+            `;
+            
+            game.crew.forEach((member, index) => {
+                crewHTML += `
+                    <div class="crew-member" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); 
+                                    display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-right: 10px;">
+                                ${member.name.charAt(0)}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 16px;">${member.name}</div>
+                                <div style="font-size: 12px; color: var(--light-gray);">${member.role}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                                <span>技能等级</span>
+                                <span>${member.skill}/10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${member.skill * 10}%;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                            <span>生命值</span>
+                            <span>${member.health}/${member.maxHealth}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(member.health / member.maxHealth) * 100}%; background: linear-gradient(to right, var(--danger), var(--warning), var(--success));"></div>
+                        </div>
+                        
+                        <div style="margin-top: 10px; display: flex; gap: 5px;">
+                            <button class="btn-small" onclick="assignTask(${index}, 'pilot')" style="font-size: 11px; padding: 5px 8px; flex: 1;">驾驶</button>
+                            <button class="btn-small" onclick="assignTask(${index}, 'engineer')" style="font-size: 11px; padding: 5px 8px; flex: 1;">维修</button>
+                            <button class="btn-small" onclick="assignTask(${index}, 'research')" style="font-size: 11px; padding: 5px 8px; flex: 1;">研究</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            crewHTML += `</div>`;
+            
+            crewContent.innerHTML = crewHTML;
+        }
+        
+        // 招募船员
+        function recruitCrew() {
+            if (game.crew.length >= game.maxCrew) {
+                addLog("船员", "船员已满，无法招募更多", "warning");
+                return;
+            }
+            
+            if (game.resources.credits.amount < 500) {
+                addLog("船员", "信用点不足，招募船员需要 500 信用点", "warning");
+                return;
+            }
+            
+            const names = ["张三", "李四", "王五", "赵六", "钱七", "孙八", "周九", "吴十"];
+            const roles = ["飞行员", "工程师", "科学家", "医生", "安全官"];
+            
+            const newCrew = {
+                name: names[Math.floor(Math.random() * names.length)],
+                role: roles[Math.floor(Math.random() * roles.length)],
+                skill: 1 + Math.floor(Math.random() * 5),
+                health: 100,
+                maxHealth: 100,
+                task: null
+            };
+            
+            game.crew.push(newCrew);
+            game.resources.credits.amount -= 500;
+            
+            addLog("船员", `招募了新的船员: ${newCrew.name} (${newCrew.role})`, "success");
+            
+            updateResourcesDisplay();
+            updateCrewModal();
+        }
+        
+        // 分配任务
+        function assignTask(crewIndex, task) {
+            const crewMember = game.crew[crewIndex];
+            if (!crewMember) return;
+            
+            crewMember.task = task;
+            
+            let taskName = "";
+            switch(task) {
+                case 'pilot':
+                    taskName = "驾驶飞船";
+                    gameObjects.player.speed *= 1.1; // 增加10%速度
+                    break;
+                case 'engineer':
+                    taskName = "维修飞船";
+                    // 自动修复
+                    setInterval(() => {
+                        if (game.ship.health < game.ship.maxHealth) {
+                            game.ship.health = Math.min(game.ship.maxHealth, game.ship.health + 1);
+                            updateShipStatusDisplay();
+                        }
+                    }, 10000); // 每10秒修复1点
+                    break;
+                case 'research':
+                    taskName = "科学研究";
+                    // 研究速度提升
+                    break;
+            }
+            
+            addLog("船员", `${crewMember.name} 被分配到 ${taskName} 任务`, "info");
+        }
+        
+        // 登陆行星
+        function landOnPlanet(planetId) {
+            const planet = gameObjects.planets.find(p => p.id === planetId);
+            if (!planet) return;
+            
+            closeModal('planetModal');
+            
+            addLog("登陆", `正在登陆 ${planet.name}...`, "nav");
+            
+            // 模拟登陆过程
+            setTimeout(() => {
+                addLog("登陆", `成功登陆 ${planet.name}！`, "success");
+                
+                // 收集行星资源
+                if (planet.resources) {
+                    Object.entries(planet.resources).forEach(([resource, amount]) => {
+                        if (game.resources[resource]) {
+                            const collected = Math.min(amount, 50); // 每次最多收集50
+                            game.resources[resource].amount += collected;
+                            planet.resources[resource] -= collected;
+                            
+                            if (collected > 0) {
+                                addLog("资源", `收集了 ${collected} 单位 ${getResourceName(resource)}`, "resource");
+                                
+                                // 更新任务进度
+                                if (resource === 'minerals') {
+                                    updateMissionProgress('collection', collected);
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                updateResourcesDisplay();
+                
+                // 随机事件
+                const events = [
+                    "发现古代遗迹，获得科技点数",
+                    "遭遇外星生物，船员受伤",
+                    "找到稀有矿物",
+                    "遭遇沙尘暴，飞船受损"
+                ];
+                
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                addLog("探索", randomEvent, "event");
+                
+            }, 2000);
+        }
+        
+        // 进入轨道
+        function orbitPlanet(planetId) {
+            const planet = gameObjects.planets.find(p => p.id === planetId);
+            if (!planet) return;
+            
+            closeModal('planetModal');
+            
+            addLog("轨道", `进入 ${planet.name} 轨道`, "nav");
+            
+            // 进入轨道可以持续收集资源
+            const orbitInterval = setInterval(() => {
+                if (getDistance(gameObjects.player.x, gameObjects.player.y, planet.x, planet.y) > 100) {
+                    clearInterval(orbitInterval);
+                    return;
+                }
+                
+                // 收集轨道资源
+                if (planet.resources && Math.random() > 0.7) {
+                    Object.entries(planet.resources).forEach(([resource, amount]) => {
+                        if (game.resources[resource] && amount > 0) {
+                            const collected = 1;
+                            game.resources[resource].amount += collected;
+                            planet.resources[resource] -= collected;
+                            
+                            updateResourcesDisplay();
+                        }
+                    });
+                }
+            }, 5000);
+        }
+        
+        // 详细扫描行星
+        function scanPlanet(planetId) {
+            const planet = gameObjects.planets.find(p => p.id === planetId);
+            if (!planet) return;
+            
+            if (game.resources.energy.amount < 20) {
+                addLog("扫描", "能量不足，无法扫描行星", "warning");
+                return;
+            }
+            
+            game.resources.energy.amount -= 20;
+            
+            addLog("扫描", `对 ${planet.name} 进行详细扫描...`, "scan");
+            
+            setTimeout(() => {
+                const resources = planet.resources ? Object.entries(planet.resources).map(([r, a]) => 
+                    `${getResourceName(r)}: ${a}`
+                ).join(', ') : "无资源";
+                
+                addLog("扫描", `${planet.name} 详细扫描结果: ${resources}`, "scan");
+                updateResourcesDisplay();
+            }, 1000);
+        }
+        
+        // 收集行星资源
+        function collectResources(planetId) {
+            const planet = gameObjects.planets.find(p => p.id === planetId);
+            if (!planet || !planet.resources) return;
+            
+            let totalCollected = 0;
+            Object.entries(planet.resources).forEach(([resource, amount]) => {
+                if (game.resources[resource] && amount > 0) {
+                    const canCollect = Math.min(amount, 10); // 每次最多10
+                    const canStore = game.resources[resource].max - game.resources[resource].amount;
+                    const collected = Math.min(canCollect, canStore);
+                    
+                    if (collected > 0) {
+                        game.resources[resource].amount += collected;
+                        planet.resources[resource] -= collected;
+                        totalCollected += collected;
+                        
+                        // 更新任务进度
+                        if (resource === 'minerals') {
+                            updateMissionProgress('collection', collected);
+                        }
+                    }
+                }
+            });
+            
+            if (totalCollected > 0) {
+                addLog("资源", `从 ${planet.name} 收集了 ${totalCollected} 单位资源`, "resource");
+                updateResourcesDisplay();
+            } else {
+                addLog("资源", "无法收集更多资源", "warning");
+            }
+        }
+        
+        // 发现行星
+        function discoverPlanet(planetId) {
+            const planet = gameObjects.planets.find(p => p.id === planetId);
+            if (!planet) return;
+            
+            planet.discovered = true;
+            closeModal('planetModal');
+            
+            addLog("发现", `发现了新的行星: ${planet.name}！`, "discovery");
+            
+            // 发现奖励
+            game.resources.credits.amount += 200;
+            
+            // 更新任务进度
+            updateMissionProgress('exploration', 1);
+            
+            updateResourcesDisplay();
+        }
+        
+        // 开采小行星
+        function mineAsteroid(asteroidId) {
+            const asteroid = gameObjects.asteroids.find(a => a.id === asteroidId);
+            if (!asteroid) return;
+            
+            const distance = getDistance(gameObjects.player.x, gameObjects.player.y, asteroid.x, asteroid.y);
+            if (distance > 50) {
+                addLog("采矿", "距离太远，无法采矿", "warning");
+                return;
+            }
+            
+            if (game.resources.energy.amount < 10) {
+                addLog("采矿", "能量不足，无法采矿", "warning");
+                return;
+            }
+            
+            game.resources.energy.amount -= 10;
+            
+            addLog("采矿", `正在开采 ${asteroid.name}...`, "resource");
+            
+            setTimeout(() => {
+                if (!asteroid.resources) {
+                    addLog("采矿", "小行星已枯竭", "warning");
+                    return;
+                }
+                
+                let totalMined = 0;
+                Object.entries(asteroid.resources).forEach(([resource, amount]) => {
+                    if (amount > 0 && game.resources[resource]) {
+                        const mined = Math.min(amount, 5 + Math.floor(Math.random() * 10));
+                        game.resources[resource].amount += mined;
+                        asteroid.resources[resource] -= mined;
+                        totalMined += mined;
+                        
+                        // 更新任务进度
+                        if (resource === 'minerals') {
+                            updateMissionProgress('collection', mined);
+                        }
+                    }
+                });
+                
+                if (totalMined > 0) {
+                    addLog("采矿", `开采了 ${totalMined} 单位资源`, "resource");
+                    
+                    // 检查小行星是否枯竭
+                    const totalResources = Object.values(asteroid.resources).reduce((a, b) => a + b, 0);
+                    if (totalResources <= 0) {
+                        // 移除枯竭的小行星
+                        const index = gameObjects.asteroids.indexOf(asteroid);
+                        if (index > -1) {
+                            gameObjects.asteroids.splice(index, 1);
+                            addLog("采矿", "小行星已完全枯竭", "info");
+                        }
+                    }
+                } else {
+                    addLog("采矿", "开采失败", "warning");
+                }
+                
+                updateResourcesDisplay();
+            }, 1500);
+        }
+        
+        // 更新资源显示
+        function updateResourcesDisplay() {
+            const resourcesBar = document.getElementById('resourcesBar');
+            resourcesBar.innerHTML = '';
+            
+            Object.entries(game.resources).forEach(([key, resource]) => {
+                const element = document.createElement('div');
+                element.className = 'resource-item';
+                
+                element.innerHTML = `
+                    <div class="resource-icon ${resource.color}">
+                        <i class="${resource.icon}"></i>
+                    </div>
+                    <div class="resource-info">
+                        <div class="resource-name">${resource.name}</div>
+                        <div class="resource-amount">${Math.round(resource.amount)}/${resource.max}</div>
+                    </div>
+                `;
+                
+                resourcesBar.appendChild(element);
+            });
+        }
+        
+        // 更新飞船状态显示
+        function updateShipStatusDisplay() {
+            const shipStats = document.querySelector('.ship-stats');
+            shipStats.innerHTML = '';
+            
+            const stats = [
+                { label: "生命值", value: game.ship.health, max: game.ship.maxHealth, fillClass: "health" },
+                { label: "护盾", value: game.ship.shield, max: game.ship.maxShield, fillClass: "shield" },
+                { label: "燃料", value: game.ship.fuel, max: game.ship.maxFuel, fillClass: "fuel" },
+                { label: "武器", value: game.ship.weapons, max: 5, isBar: false },
+                { label: "防御", value: game.ship.defenses, max: 5, isBar: false },
+                { label: "速度", value: gameObjects.player.speed.toFixed(1), isBar: false }
+            ];
+            
+            stats.forEach(stat => {
+                const element = document.createElement('div');
+                element.className = 'stat-item';
+                
+                if (stat.isBar === false) {
+                    element.innerHTML = `
+                        <div class="stat-label">${stat.label}</div>
+                        <div class="stat-value">${stat.value}</div>
+                    `;
+                } else {
+                    const percentage = (stat.value / stat.max) * 100;
+                    element.innerHTML = `
+                        <div class="stat-label">${stat.label}</div>
+                        <div class="stat-value">${stat.value}/${stat.max}</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill ${stat.fillClass}" style="width: ${percentage}%"></div>
+                        </div>
+                    `;
+                }
+                
+                shipStats.appendChild(element);
+            });
+        }
+        
+        // 更新任务显示
+        function updateMissionsDisplay() {
+            const missionList = document.getElementById('missionList');
+            const missionCount = document.getElementById('missionCount');
+            
+            missionList.innerHTML = '';
+            
+            let activeCount = 0;
+            let completedCount = 0;
+            
+            game.missions.forEach(mission => {
+                if (mission.status === 'completed') {
+                    completedCount++;
+                } else if (mission.status === 'active') {
+                    activeCount++;
+                }
+                
+                const element = document.createElement('div');
+                element.className = `mission-item ${mission.status}`;
+                
+                const percentage = mission.target > 0 ? (mission.progress / mission.target) * 100 : 0;
+                
+                element.innerHTML = `
+                    <div class="mission-title">${mission.title}</div>
+                    <div class="mission-desc">${mission.description}</div>
+                    <div class="mission-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span style="font-size: 12px;">${mission.progress}/${mission.target}</span>
+                    </div>
+                `;
+                
+                missionList.appendChild(element);
+            });
+            
+            missionCount.textContent = `${completedCount}/${game.missions.length}`;
+        }
+        
+        // 更新任务进度
+        function updateMissionProgress(type, amount) {
+            let updated = false;
+            
+            game.missions.forEach(mission => {
+                if (mission.status === 'active' && mission.type === type) {
+                    mission.progress += amount;
+                    if (mission.progress >= mission.target) {
+                        mission.progress = mission.target;
+                        mission.status = 'completed';
+                        completeMission(mission);
+                        updated = true;
+                    }
+                }
+            });
+            
+            if (updated) {
+                updateMissionsDisplay();
+            }
+        }
+        
+        // 完成任务
+        function completeMission(mission) {
+            addLog("任务", `任务完成: ${mission.title}！`, "success");
+            
+            // 给予奖励
+            if (mission.reward) {
+                let rewardText = "奖励: ";
+                const rewards = [];
+                
+                Object.entries(mission.reward).forEach(([type, amount]) => {
+                    switch(type) {
+                        case 'credits':
+                            game.resources.credits.amount += amount;
+                            rewards.push(`${amount} 信用点`);
+                            break;
+                        case 'experience':
+                            // 经验值系统
+                            rewards.push(`${amount} 经验值`);
+                            break;
+                        case 'minerals':
+                            game.resources.minerals.amount += amount;
+                            rewards.push(`${amount} 矿物`);
+                            break;
+                        case 'fuel':
+                            game.resources.fuel.amount += amount;
+                            rewards.push(`${amount} 燃料`);
+                            break;
+                        case 'crystals':
+                            game.resources.crystals.amount += amount;
+                            rewards.push(`${amount} 能量水晶`);
+                            break;
+                    }
+                });
+                
+                rewardText += rewards.join(', ');
+                addLog("奖励", rewardText, "reward");
+                
+                updateResourcesDisplay();
+            }
+            
+            // 检查是否有新任务
+            checkForNewMissions();
+        }
+        
+        // 检查新任务
+        function checkForNewMissions() {
+            const completedMissions = game.missions.filter(m => m.status === 'completed').length;
+            
+            // 当完成3个任务时，解锁新任务
+            if (completedMissions === 3 && game.missions.length < 7) {
+                const newMission = {
+                    id: 6,
+                    title: "建立基地",
+                    description: "建造3个不同的建筑",
+                    type: "build",
+                    target: 3,
+                    progress: 0,
+                    reward: { credits: 1000, experience: 200 },
+                    status: "active"
+                };
+                
+                game.missions.push(newMission);
+                addLog("任务", "新任务可用: 建立基地", "mission");
+                updateMissionsDisplay();
+            }
+        }
+        
+        // 更新位置显示
+        function updatePositionDisplay() {
+            document.getElementById('currentCoords').textContent = 
+                `X: ${Math.round(gameObjects.player.x)}, Y: ${Math.round(gameObjects.player.y)}`;
+        }
+        
+        // 更新日志显示
+        function updateLogDisplay() {
+            const logContent = document.getElementById('logContent');
+            logContent.innerHTML = '';
+            
+            // 显示最新的日志
+            const recentLogs = game.logs.slice(-5).reverse();
+            
+            recentLogs.forEach(log => {
+                const element = document.createElement('div');
+                element.className = 'info-event';
+                
+                const time = new Date(log.timestamp).toLocaleTimeString('zh-CN', { 
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                let icon = 'fas fa-info-circle';
+                let color = 'var(--info)';
+                
+                switch(log.type) {
+                    case 'warning':
+                        icon = 'fas fa-exclamation-triangle';
+                        color = 'var(--warning)';
+                        break;
+                    case 'error':
+                        icon = 'fas fa-times-circle';
+                        color = 'var(--danger)';
+                        break;
+                    case 'success':
+                        icon = 'fas fa-check-circle';
+                        color = 'var(--success)';
+                        break;
+                    case 'resource':
+                        icon = 'fas fa-gem';
+                        color = 'var(--mineral)';
+                        break;
+                    case 'scan':
+                        icon = 'fas fa-satellite';
+                        color = 'var(--secondary)';
+                        break;
+                    case 'nav':
+                        icon = 'fas fa-map-marker-alt';
+                        color = 'var(--primary)';
+                        break;
+                    case 'discovery':
+                        icon = 'fas fa-globe-americas';
+                        color = 'var(--accent)';
+                        break;
+                    case 'trade':
+                        icon = 'fas fa-exchange-alt';
+                        color = 'var(--warning)';
+                        break;
+                    case 'research':
+                        icon = 'fas fa-flask';
+                        color = 'var(--crystal)';
+                        break;
+                    case 'mission':
+                        icon = 'fas fa-flag';
+                        color = 'var(--success)';
+                        break;
+                    case 'reward':
+                        icon = 'fas fa-trophy';
+                        color = 'var(--warning)';
+                        break;
+                    case 'upgrade':
+                        icon = 'fas fa-wrench';
+                        color = 'var(--secondary)';
+                        break;
+                    case 'event':
+                        icon = 'fas fa-star';
+                        color = 'var(--accent)';
+                        break;
+                }
+                
+                element.innerHTML = `
+                    <div style="display: flex; align-items: flex-start;">
+                        <i class="${icon}" style="color: ${color}; margin-right: 8px; margin-top: 2px;"></i>
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                <span style="font-weight: 500;">${log.category}</span>
+                                <span class="event-time">${time}</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--light-gray);">${log.message}</div>
+                        </div>
+                    </div>
+                `;
+                
+                logContent.appendChild(element);
+            });
+        }
+        
+        // 添加日志
+        function addLog(category, message, type = 'info') {
+            const log = {
+                timestamp: new Date(),
+                category: category,
+                message: message,
+                type: type
+            };
+            
+            game.logs.push(log);
+            
+            // 保持日志数量不超过最大值
+            if (game.logs.length > game.maxLogs) {
+                game.logs.shift();
+            }
+            
+            updateLogDisplay();
+        }
+        
+        // 更新游戏时间
+        function updateGameTime() {
+            if (!game.isRunning) return;
+            
+            game.gameTime++;
+            
+            // 每60秒为1游戏分钟
+            const hours = Math.floor(game.gameTime / 3600);
+            const minutes = Math.floor((game.gameTime % 3600) / 60);
+            const seconds = game.gameTime % 60;
+            
+            document.getElementById('gameTime').textContent = 
+                `第 ${game.day} 天 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // 每24游戏小时为1天
+            if (hours >= 24) {
+                game.day++;
+                game.gameTime = 0;
+                addLog("系统", `新的一天开始了 (第 ${game.day} 天)`, "info");
+                
+                // 每日资源生产
+                produceDailyResources();
+            }
+        }
+        
+        // 每日资源生产
+        function produceDailyResources() {
+            // 建筑生产资源
+            Object.values(game.buildings).forEach(building => {
+                if (building.level > 0 && building.production) {
+                    Object.entries(building.production).forEach(([resource, amount]) => {
+                        if (game.resources[resource]) {
+                            const dailyProduction = amount * building.level;
+                            game.resources[resource].amount = Math.min(
+                                game.resources[resource].max,
+                                game.resources[resource].amount + dailyProduction
+                            );
+                            addLog("生产", `${building.name} 生产了 ${dailyProduction} 单位 ${getResourceName(resource)}`, "resource");
+                        }
+                    });
+                }
+            });
+            
+            updateResourcesDisplay();
+        }
+        
+        // 计算距离
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+        }
+        
+        // 获取资源名称
+        function getResourceName(key) {
+            const names = {
+                fuel: "燃料",
+                minerals: "矿物",
+                energy: "能量",
+                oxygen: "氧气",
+                food: "食物",
+                crystals: "能量水晶",
+                credits: "信用点"
+            };
+            
+            return names[key] || key;
+        }
+        
+        // 获取资源图标
+        function getResourceIcon(key) {
+            const icons = {
+                fuel: "gas-pump",
+                minerals: "gem",
+                energy: "bolt",
+                oxygen: "wind",
+                food: "apple-alt",
+                crystals: "crystal",
+                credits: "coins"
+            };
+            
+            return icons[key] || "box";
+        }
+        
+        // 获取行星类型名称
+        function getPlanetTypeName(type) {
+            const names = {
+                terrestrial: "类地行星",
+                desert: "沙漠行星",
+                gasGiant: "气态巨行星",
+                rocky: "岩石行星",
+                volcanic: "火山行星"
+            };
+            
+            return names[type] || type;
+        }
+        
+        // 获取行星描述
+        function getPlanetDescription(planet) {
+            const descriptions = {
+                terrestrial: "适合生命存在的行星，有丰富的水和大气。",
+                desert: "干旱的沙漠世界，有稀薄的大气层。",
+                gasGiant: "巨大的气态行星，有强大的磁场和风暴。",
+                rocky: "贫瘠的岩石行星，几乎没有大气。",
+                volcanic: "地质活动活跃的行星，有大量火山。"
+            };
+            
+            return descriptions[planet.type] || "未知类型的行星。";
+        }
+        
+        // 检查是否能支付
+        function canAfford(cost) {
+            if (!cost) return true;
+            
+            for (const [resource, amount] of Object.entries(cost)) {
+                if (game.resources[resource] && game.resources[resource].amount < amount) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // 游戏主循环
+        function gameLoop() {
+            if (!game.isRunning) return;
+            
+            // 清空Canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 绘制背景
+            drawBackground();
+            
+            // 更新游戏对象
+            updateGameObjects();
+            
+            // 绘制游戏对象
+            drawGameObjects();
+            
+            // 绘制UI元素
+            drawUI();
+            
+            // 继续游戏循环
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 绘制背景
+        function drawBackground() {
+            // 绘制深色背景
+            ctx.fillStyle = '#0a0e1a';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // 绘制远处的星星
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 100; i++) {
+                const x = (i * 53) % canvasWidth;
+                const y = (i * 37) % canvasHeight;
+                const size = 1;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // 绘制网格
+            ctx.strokeStyle = 'rgba(108, 92, 231, 0.1)';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 50;
+            for (let x = 0; x < canvasWidth; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+            
+            for (let y = 0; y < canvasHeight; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvasWidth, y);
+                ctx.stroke();
+            }
+        }
+        
+        // 更新游戏对象
+        function updateGameObjects() {
+            // 更新玩家位置
+            const player = gameObjects.player;
+            
+            if (player.isMoving && player.targetX !== null && player.targetY !== null) {
+                const dx = player.targetX - player.x;
+                const dy = player.targetY - player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > player.speed) {
+                    player.x += (dx / distance) * player.speed;
+                    player.y += (dy / distance) * player.speed;
+                    player.rotation = Math.atan2(dy, dx);
+                    
+                    // 消耗燃料
+                    if (distance > 10 && game.gameTime % 60 === 0) { // 每60帧消耗一次
+                        game.resources.fuel.amount = Math.max(0, game.resources.fuel.amount - 1);
+                        updateResourcesDisplay();
+                    }
+                } else {
+                    player.x = player.targetX;
+                    player.y = player.targetY;
+                    player.isMoving = false;
+                }
+                
+                // 更新游戏位置
+                game.position.x = player.x;
+                game.position.y = player.y;
+                updatePositionDisplay();
+            }
+            
+            // 更新行星轨道
+            gameObjects.planets.forEach(planet => {
+                planet.orbit += planet.orbitSpeed;
+            });
+            
+            // 更新小行星旋转
+            gameObjects.asteroids.forEach(asteroid => {
+                asteroid.rotation += asteroid.rotationSpeed;
+            });
+        }
+        
+        // 绘制游戏对象
+        function drawGameObjects() {
+            // 绘制小行星
+            gameObjects.asteroids.forEach(asteroid => {
+                ctx.save();
+                ctx.translate(asteroid.x, asteroid.y);
+                ctx.rotate(asteroid.rotation);
+                
+                // 绘制小行星主体
+                ctx.fillStyle = asteroid.color;
+                ctx.beginPath();
+                
+                // 创建不规则形状
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const radius = asteroid.size * (0.7 + Math.random() * 0.3);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.fill();
+                
+                // 绘制小行星细节
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.arc(-asteroid.size * 0.3, -asteroid.size * 0.3, asteroid.size * 0.2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // 绘制小行星名称
+                if (getDistance(gameObjects.player.x, gameObjects.player.y, asteroid.x, asteroid.y) < 100) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(asteroid.name, asteroid.x, asteroid.y - asteroid.size - 5);
+                }
+            });
+            
+            // 绘制行星
+            gameObjects.planets.forEach(planet => {
+                // 绘制行星轨道
+                if (planet.discovered) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.arc(planet.x, planet.y, planet.size + 20, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+                
+                // 绘制行星
+                ctx.save();
+                ctx.translate(planet.x, planet.y);
+                ctx.rotate(planet.orbit);
+                
+                // 行星主体
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, planet.size);
+                gradient.addColorStop(0, planet.color);
+                gradient.addColorStop(1, darkenColor(planet.color, 0.5));
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, planet.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 行星细节
+                if (planet.type === 'gasGiant') {
+                    // 气态行星的条纹
+                    ctx.strokeStyle = darkenColor(planet.color, 0.3);
+                    ctx.lineWidth = 2;
+                    
+                    for (let i = -planet.size; i < planet.size; i += 10) {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, planet.size, i * 0.1, (i + 5) * 0.1);
+                        ctx.stroke();
+                    }
+                } else if (planet.type === 'terrestrial') {
+                    // 类地行星的云层
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.beginPath();
+                    ctx.arc(-planet.size * 0.3, planet.size * 0.2, planet.size * 0.4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+                
+                // 绘制行星名称
+                if (planet.discovered || getDistance(gameObjects.player.x, gameObjects.player.y, planet.x, planet.y) < 150) {
+                    ctx.fillStyle = planet.discovered ? 'white' : 'rgba(255, 255, 255, 0.5)';
+                    ctx.font = planet.discovered ? '12px Arial' : '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(planet.name + (planet.discovered ? '' : ' (未发现)'), planet.x, planet.y - planet.size - 10);
+                }
+            });
+            
+            // 绘制空间站
+            gameObjects.spaceStations.forEach(station => {
+                ctx.save();
+                ctx.translate(station.x, station.y);
+                
+                // 空间站主体
+                ctx.fillStyle = station.color;
+                ctx.beginPath();
+                
+                // 绘制空间站结构
+                ctx.rect(-station.size, -station.size * 0.3, station.size * 2, station.size * 0.6);
+                ctx.rect(-station.size * 0.3, -station.size, station.size * 0.6, station.size * 2);
+                
+                // 中心圆盘
+                ctx.arc(0, 0, station.size * 0.5, 0, Math.PI * 2);
+                
+                ctx.fill();
+                
+                // 太阳能板
+                ctx.fillStyle = '#fdcb6e';
+                ctx.fillRect(-station.size * 1.5, -station.size * 0.1, station.size * 0.8, station.size * 0.2);
+                ctx.fillRect(station.size * 0.7, -station.size * 0.1, station.size * 0.8, station.size * 0.2);
+                
+                ctx.restore();
+                
+                // 绘制空间站名称
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(station.name, station.x, station.y - station.size - 10);
+            });
+            
+            // 绘制残骸
+            gameObjects.wreckages.forEach(wreckage => {
+                ctx.save();
+                ctx.translate(wreckage.x, wreckage.y);
+                
+                ctx.fillStyle = wreckage.color;
+                
+                // 绘制残骸碎片
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(wreckage.size, wreckage.size * 0.5);
+                ctx.lineTo(wreckage.size * 0.5, wreckage.size);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-wreckage.size * 0.5, wreckage.size);
+                ctx.lineTo(-wreckage.size, wreckage.size * 0.3);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+                
+                // 绘制残骸名称
+                if (getDistance(gameObjects.player.x, gameObjects.player.y, wreckage.x, wreckage.y) < 100) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(wreckage.name, wreckage.x, wreckage.y - wreckage.size - 5);
+                }
+            });
+            
+            // 绘制玩家飞船
+            const player = gameObjects.player;
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.rotation);
+            
+            // 飞船主体
+            const shipGradient = ctx.createLinearGradient(-player.size, 0, player.size, 0);
+            shipGradient.addColorStop(0, '#6c5ce7');
+            shipGradient.addColorStop(0.5, '#a29bfe');
+            shipGradient.addColorStop(1, '#6c5ce7');
+            
+            ctx.fillStyle = shipGradient;
+            ctx.beginPath();
+            ctx.moveTo(player.size, 0);
+            ctx.lineTo(-player.size, player.size * 0.6);
+            ctx.lineTo(-player.size, -player.size * 0.6);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 飞船细节
+            ctx.fillStyle = '#dfe6e9';
+            ctx.beginPath();
+            ctx.arc(player.size * 0.3, 0, player.size * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 引擎火焰
+            if (player.isMoving) {
+                const flameSize = player.size * 0.8;
+                const flameGradient = ctx.createLinearGradient(-player.size, 0, -player.size - flameSize, 0);
+                flameGradient.addColorStop(0, '#ff9800');
+                flameGradient.addColorStop(0.5, '#ff5722');
+                flameGradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = flameGradient;
+                ctx.beginPath();
+                ctx.moveTo(-player.size, player.size * 0.3);
+                ctx.lineTo(-player.size - flameSize, 0);
+                ctx.lineTo(-player.size, -player.size * 0.3);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // 飞船发光效果
+            ctx.shadowColor = '#6c5ce7';
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            
+            ctx.restore();
+            
+            // 绘制移动目标
+            if (player.targetX !== null && player.targetY !== null) {
+                ctx.strokeStyle = 'rgba(108, 92, 231, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                
+                ctx.beginPath();
+                ctx.moveTo(player.x, player.y);
+                ctx.lineTo(player.targetX, player.targetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // 目标点
+                ctx.fillStyle = 'rgba(108, 92, 231, 0.3)';
+                ctx.beginPath();
+                ctx.arc(player.targetX, player.targetY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#6c5ce7';
+                ctx.beginPath();
+                ctx.arc(player.targetX, player.targetY, 5, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // 绘制扫描范围
+            if (document.getElementById('scanModal').classList.contains('active')) {
+                ctx.strokeStyle = 'rgba(0, 206, 201, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, game.ship.scannerRange * 100, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // 绘制深度扫描范围
+                ctx.strokeStyle = 'rgba(0, 206, 201, 0.1)';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, game.ship.scannerRange * 200, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+        
+        // 绘制UI元素
+        function drawUI() {
+            // 绘制燃料警告
+            if (game.resources.fuel.amount < 200) {
+                ctx.fillStyle = 'rgba(255, 159, 67, 0.3)';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('燃料不足！', canvasWidth / 2, 30);
+                
+                // 闪烁效果
+                if (Math.floor(Date.now() / 500) % 2 === 0) {
+                    ctx.strokeStyle = '#ff9f43';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(canvasWidth / 2, 30, 15, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            
+            // 绘制氧气警告
+            if (game.resources.oxygen.amount < 30) {
+                ctx.fillStyle = 'rgba(116, 185, 255, 0.3)';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('氧气不足！', canvasWidth / 2, 60);
+            }
+            
+            // 绘制任务标记
+            game.missions.forEach((mission, index) => {
+                if (mission.status === 'active') {
+                    const x = canvasWidth - 100;
+                    const y = 100 + index * 25;
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(x - 5, y - 15, 200, 20);
+                    
+                    ctx.fillStyle = '#00cec9';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(mission.title, x, y);
+                    
+                    // 任务进度条
+                    const progressWidth = 190 * (mission.progress / mission.target);
+                    ctx.fillStyle = 'rgba(0, 206, 201, 0.3)';
+                    ctx.fillRect(x, y + 5, progressWidth, 3);
+                }
+            });
+            
+            // 绘制当前选中的星球
+            if (game.selectedPlanet) {
+                const planet = game.selectedPlanet;
+                const distance = getDistance(player.x, player.y, planet.x, planet.y);
+                
+                ctx.strokeStyle = '#6c5ce7';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.arc(planet.x, planet.y, planet.size + 10, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // 绘制距离信息
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(planet.x - 50, planet.y - planet.size - 40, 100, 20);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`距离: ${Math.round(distance)} 单位`, planet.x, planet.y - planet.size - 25);
+            }
+            
+            // 绘制资源收集提示
+            if (gameObjects.player.isMoving) {
+                const nearbyAsteroids = gameObjects.asteroids.filter(asteroid => {
+                    const distance = getDistance(player.x, player.y, asteroid.x, asteroid.y);
+                    return distance < 50;
+                });
+                
+                if (nearbyAsteroids.length > 0) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(canvasWidth - 150, 50, 140, 30);
+                    
+                    ctx.fillStyle = '#00cec9';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('按M键采矿', canvasWidth - 80, 70);
+                }
+            }
+        }
+        
+        // 工具函数：加深颜色
+        function darkenColor(color, factor) {
+            // 从hex颜色字符串中提取RGB值
+            const hex = color.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            
+            // 加深颜色
+            const newR = Math.floor(r * (1 - factor));
+            const newG = Math.floor(g * (1 - factor));
+            const newB = Math.floor(b * (1 - factor));
+            
+            // 转回hex
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', function(e) {
+            const player = gameObjects.player;
+            const moveDistance = 10;
+            
+            switch(e.key.toLowerCase()) {
+                case 'w':
+                case 'arrowup':
+                    player.targetY = player.y - moveDistance;
+                    player.isMoving = true;
+                    break;
+                case 's':
+                case 'arrowdown':
+                    player.targetY = player.y + moveDistance;
+                    player.isMoving = true;
+                    break;
+                case 'a':
+                case 'arrowleft':
+                    player.targetX = player.x - moveDistance;
+                    player.isMoving = true;
+                    break;
+                case 'd':
+                case 'arrowright':
+                    player.targetX = player.x + moveDistance;
+                    player.isMoving = true;
+                    break;
+                case ' ':
+                    // 空格键扫描
+                    if (!document.getElementById('scanModal').classList.contains('active')) {
+                        openModal('scanModal');
+                        performScan();
+                    }
+                    break;
+                case 'm':
+                    // M键采矿
+                    const nearbyAsteroids = gameObjects.asteroids.filter(asteroid => {
+                        const distance = getDistance(player.x, player.y, asteroid.x, asteroid.y);
+                        return distance < 50;
+                    });
+                    
+                    if (nearbyAsteroids.length > 0) {
+                        mineAsteroid(nearbyAsteroids[0].id);
+                    }
+                    break;
+                case 'escape':
+                    // ESC键关闭所有模态
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                    break;
+            }
+        });
+        
+        // 自动保存功能
+        function saveGame() {
+            const saveData = {
+                resources: game.resources,
+                ship: game.ship,
+                position: game.position,
+                missions: game.missions,
+                technologies: game.technologies,
+                buildings: game.buildings,
+                inventory: game.inventory,
+                credits: game.resources.credits.amount,
+                gameTime: game.gameTime,
+                day: game.day
+            };
+            
+            localStorage.setItem('spaceExplorerSave', JSON.stringify(saveData));
+            addLog("系统", "游戏已自动保存", "info");
+        }
+        
+        // 加载游戏
+        function loadGame() {
+            const saveData = localStorage.getItem('spaceExplorerSave');
+            if (!saveData) return false;
+            
+            try {
+                const data = JSON.parse(saveData);
+                
+                // 加载资源
+                Object.keys(data.resources).forEach(key => {
+                    if (game.resources[key]) {
+                        game.resources[key].amount = data.resources[key].amount;
+                    }
+                });
+                
+                // 加载飞船状态
+                Object.assign(game.ship, data.ship);
+                
+                // 加载位置
+                Object.assign(game.position, data.position);
+                gameObjects.player.x = data.position.x;
+                gameObjects.player.y = data.position.y;
+                
+                // 加载任务
+                game.missions = data.missions;
+                
+                // 加载科技
+                Object.assign(game.technologies, data.technologies);
+                
+                // 加载建筑
+                Object.assign(game.buildings, data.buildings);
+                
+                // 加载仓库
+                game.inventory = data.inventory;
+                
+                // 加载游戏时间
+                game.gameTime = data.gameTime || 0;
+                game.day = data.day || 1;
+                
+                addLog("系统", "游戏加载成功", "success");
+                return true;
+            } catch (e) {
+                console.error("加载游戏失败:", e);
+                addLog("系统", "加载游戏失败，开始新游戏", "error");
+                return false;
+            }
+        }
+        
+        // 每30秒自动保存
+        setInterval(saveGame, 30000);
+        
+        // 添加键盘快捷键说明
+        function showKeyboardShortcuts() {
+            addLog("帮助", "键盘快捷键: WASD/方向键移动, 空格键扫描, M键采矿, ESC关闭窗口", "info");
+        }
+        
+        // 显示游戏提示
+        function showGameTips() {
+            const tips = [
+                "提示: 使用扫描功能发现新的行星和资源",
+                "提示: 建造建筑可以自动生产资源",
+                "提示: 研究科技可以提升飞船能力",
+                "提示: 在空间站交易可以获得信用点",
+                "提示: 招募船员可以帮助你管理飞船",
+                "提示: 完成任务可以获得丰厚奖励",
+                "提示: 注意监控燃料和氧气水平",
+                "提示: 深度扫描可以发现隐藏的物体"
+            ];
+            
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            addLog("提示", randomTip, "info");
+        }
+        
+        // 每5分钟显示一个提示
+        setInterval(showGameTips, 300000);
+        
+        // 游戏事件系统
+        function startRandomEvents() {
+            setInterval(() => {
+                if (!game.isRunning) return;
+                
+                const events = [
+                    {
+                        name: "太阳风暴",
+                        chance: 0.1,
+                        effect: () => {
+                            addLog("事件", "太阳风暴来袭！飞船系统受损", "warning");
+                            game.ship.health -= 10;
+                            updateShipStatusDisplay();
+                        }
+                    },
+                    {
+                        name: "小行星雨",
+                        chance: 0.15,
+                        effect: () => {
+                            addLog("事件", "遭遇小行星雨，收集了一些矿物", "event");
+                            game.resources.minerals.amount += 20;
+                            updateResourcesDisplay();
+                        }
+                    },
+                    {
+                        name: "外星信号",
+                        chance: 0.05,
+                        effect: () => {
+                            addLog("事件", "接收到神秘的外星信号，获得科技点数", "discovery");
+                            // 可以增加研究速度或解锁新科技
+                        }
+                    },
+                    {
+                        name: "燃料泄露",
+                        chance: 0.08,
+                        effect: () => {
+                            addLog("事件", "检测到燃料泄露！", "warning");
+                            game.resources.fuel.amount -= 50;
+                            updateResourcesDisplay();
+                        }
+                    },
+                    {
+                        name: "发现资源",
+                        chance: 0.2,
+                        effect: () => {
+                            addLog("事件", "在附近发现丰富的资源", "resource");
+                            // 在玩家附近生成小行星
+                            const angle = Math.random() * Math.PI * 2;
+                            const distance = 100 + Math.random() * 100;
+                            const x = player.x + Math.cos(angle) * distance;
+                            const y = player.y + Math.sin(angle) * distance;
+                            
+                            const newAsteroid = {
+                                id: 10000 + Math.floor(Math.random() * 1000),
+                                name: "富矿小行星",
+                                type: "asteroid",
+                                x: x,
+                                y: y,
+                                size: 8 + Math.random() * 8,
+                                color: "#3498db",
+                                resources: { minerals: 50 + Math.random() * 100, crystals: Math.random() > 0.7 ? 1 : 0 },
+                                rotation: Math.random() * Math.PI * 2,
+                                rotationSpeed: (Math.random() - 0.5) * 0.02
+                            };
+                            
+                            gameObjects.asteroids.push(newAsteroid);
+                        }
+                    }
+                ];
+                
+                events.forEach(event => {
+                    if (Math.random() < event.chance) {
+                        event.effect();
+                    }
+                });
+            }, 60000); // 每分钟检查一次事件
+        }
+        
+        // 成就系统
+        const achievements = {
+            firstDiscovery: {
+                name: "首次发现",
+                description: "发现第一个新行星",
+                unlocked: false,
+                check: () => {
+                    const discoveredPlanets = gameObjects.planets.filter(p => p.discovered && p.id !== 1).length;
+                    return discoveredPlanets >= 1;
+                },
+                reward: { credits: 500 }
+            },
+            masterMiner: {
+                name: "采矿大师",
+                description: "收集1000单位矿物",
+                unlocked: false,
+                check: () => {
+                    // 需要跟踪总收集量
+                    return false;
+                },
+                reward: { minerals: 200 }
+            },
+            techResearcher: {
+                name: "科技研究者",
+                description: "研究5项科技",
+                unlocked: false,
+                check: () => {
+                    const researchedCount = Object.values(game.technologies).filter(t => t.researched).length;
+                    return researchedCount >= 5;
+                },
+                reward: { crystals: 10 }
+            },
+            wealthyTrader: {
+                name: "富有商人",
+                description: "拥有10000信用点",
+                unlocked: false,
+                check: () => game.resources.credits.amount >= 10000,
+                reward: { credits: 1000 }
+            },
+            masterExplorer: {
+                name: "探索大师",
+                description: "发现所有行星",
+                unlocked: false,
+                check: () => {
+                    return gameObjects.planets.every(p => p.discovered);
+                },
+                reward: { credits: 5000, crystals: 25 }
+            }
+        };
+        
+        function checkAchievements() {
+            Object.keys(achievements).forEach(key => {
+                const achievement = achievements[key];
+                if (!achievement.unlocked && achievement.check()) {
+                    achievement.unlocked = true;
+                    unlockAchievement(key);
+                }
+            });
+        }
+        
+        function unlockAchievement(achievementKey) {
+            const achievement = achievements[achievementKey];
+            if (!achievement) return;
+            
+            addLog("成就", `成就解锁: ${achievement.name}！`, "reward");
+            
+            // 给予奖励
+            if (achievement.reward) {
+                Object.entries(achievement.reward).forEach(([type, amount]) => {
+                    if (game.resources[type]) {
+                        game.resources[type].amount += amount;
+                    }
+                });
+                updateResourcesDisplay();
+            }
+        }
+        
+        // 每30秒检查成就
+        setInterval(checkAchievements, 30000);
+        
+        // 游戏教程
+        function startTutorial() {
+            setTimeout(() => {
+                addLog("教程", "欢迎来到太空探险家！使用WASD或方向键移动你的飞船", "info");
+            }, 1000);
+            
+            setTimeout(() => {
+                addLog("教程", "点击行星可以查看详细信息并进行交互", "info");
+            }, 5000);
+            
+            setTimeout(() => {
+                addLog("教程", "点击扫描按钮可以发现周围的物体", "info");
+            }, 10000);
+            
+            setTimeout(() => {
+                addLog("教程", "注意监控你的资源，特别是燃料和氧气", "info");
+            }, 15000);
+        }
+        
+        // 性能优化：对象池
+        class ObjectPool {
+            constructor(createFn, resetFn) {
+                this.createFn = createFn;
+                this.resetFn = resetFn;
+                this.pool = [];
+                this.active = [];
+            }
+            
+            get() {
+                let obj;
+                if (this.pool.length > 0) {
+                    obj = this.pool.pop();
+                } else {
+                    obj = this.createFn();
+                }
+                this.active.push(obj);
+                return obj;
+            }
+            
+            release(obj) {
+                const index = this.active.indexOf(obj);
+                if (index > -1) {
+                    this.active.splice(index, 1);
+                    this.resetFn(obj);
+                    this.pool.push(obj);
+                }
+            }
+            
+            releaseAll() {
+                this.active.forEach(obj => {
+                    this.resetFn(obj);
+                    this.pool.push(obj);
+                });
+                this.active = [];
+            }
+        }
+        
+        // 粒子系统
+        class ParticleSystem {
+            constructor() {
+                this.particles = [];
+                this.pool = new ObjectPool(
+                    () => ({
+                        x: 0, y: 0,
+                        vx: 0, vy: 0,
+                        life: 0, maxLife: 0,
+                        color: '#ffffff',
+                        size: 1
+                    }),
+                    (p) => {
+                        p.x = p.y = p.vx = p.vy = 0;
+                        p.life = p.maxLife = 0;
+                    }
+                );
+            }
+            
+            emit(x, y, count, color = '#ffffff') {
+                for (let i = 0; i < count; i++) {
+                    const particle = this.pool.get();
+                    particle.x = x;
+                    particle.y = y;
+                    particle.vx = (Math.random() - 0.5) * 4;
+                    particle.vy = (Math.random() - 0.5) * 4;
+                    particle.life = particle.maxLife = 30 + Math.random() * 30;
+                    particle.color = color;
+                    particle.size = 1 + Math.random() * 3;
+                }
+            }
+            
+            update() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    
+                    if (p.life <= 0) {
+                        this.pool.release(p);
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+            
+            draw(ctx) {
+                this.particles.forEach(p => {
+                    const alpha = p.life / p.maxLife;
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        // 创建粒子系统实例
+        const particleSystem = new ParticleSystem();
+        
+        // 游戏初始化完成
+        window.addEventListener('DOMContentLoaded', function() {
+            // 尝试加载保存的游戏
+            if (!loadGame()) {
+                // 开始新游戏
+                init();
+                startTutorial();
+            } else {
+                // 继续游戏
+                resizeCanvas();
+                createStarBackground();
+                initUI();
+                updateMissionsDisplay();
+                updateResourcesDisplay();
+                updateShipStatusDisplay();
+                updatePositionDisplay();
+                game.isRunning = true;
+                requestAnimationFrame(gameLoop);
+                setInterval(updateGameTime, 1000);
+                
+                addLog("系统", "继续游戏", "info");
+            }
+            
+            // 显示键盘快捷键
+            setTimeout(showKeyboardShortcuts, 3000);
+            
+            // 开始随机事件
+            startRandomEvents();
+            
+            // 添加CSS动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.3; }
+                    50% { opacity: 1; }
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+                
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                    20%, 40%, 60%, 80% { transform: translateX(2px); }
+                }
+                
+                .shake { animation: shake 0.5s; }
+                .pulse { animation: pulse 1s infinite; }
+            `;
+            document.head.appendChild(style);
+            
+            // 添加游戏统计
+            setInterval(() => {
+                const stats = {
+                    planetsDiscovered: gameObjects.planets.filter(p => p.discovered).length,
+                    asteroidsMined: gameObjects.asteroids.filter(a => a.resources && 
+                        Object.values(a.resources).reduce((s, v) => s + v, 0) <= 0).length,
+                    totalResources: Object.values(game.resources).reduce((s, r) => s + r.amount, 0),
+                    playTime: Math.floor(game.gameTime / 60) + "分钟"
+                };
+                
+                // 可以显示在控制台或添加到日志
+                if (Math.random() < 0.01) { // 1%的几率记录统计
+                    addLog("统计", `已发现 ${stats.planetsDiscovered} 个行星，游戏时间 ${stats.playTime}`, "info");
+                }
+            }, 60000); // 每分钟更新一次统计
+            
+            // 添加游戏难度调整
+            function adjustDifficulty() {
+                // 根据游戏进度增加难度
+                const difficulty = Math.min(game.day / 10, 5); // 最多5倍难度
+                
+                // 调整资源消耗
+                const baseFuelConsumption = 1;
+                game.fuelConsumption = baseFuelConsumption * (1 + difficulty * 0.2);
+                
+                // 调整事件频率
+                game.eventFrequency = 0.1 + difficulty * 0.05;
+                
+                addLog("系统", `游戏难度调整: ${difficulty.toFixed(1)}x`, "info");
+            }
+            
+            // 每天调整难度
+            setInterval(adjustDifficulty, 60000);
+        });
+        
+        // 导出函数供全局使用
+        window.selectPlanet = selectPlanet;
+        window.selectAsteroid = selectAsteroid;
+        window.selectStation = selectStation;
+        window.selectObject = selectObject;
+        window.landOnPlanet = landOnPlanet;
+        window.orbitPlanet = orbitPlanet;
+        window.scanPlanet = scanPlanet;
+        window.collectResources = collectResources;
+        window.discoverPlanet = discoverPlanet;
+        window.mineAsteroid = mineAsteroid;
+        window.upgradeBuilding = upgradeBuilding;
+        window.showBuildingInfo = function(key) {
+            addLog("建筑", `${game.buildings[key].name} 详情: ${game.buildings[key].description}`, "info");
+        };
+        window.startResearch = startResearch;
+        window.cancelResearch = cancelResearch;
+        window.sellItem = sellItem;
+        window.buyItem = buyItem;
+        window.useItem = useItem;
+        window.recruitCrew = recruitCrew;
+        window.assignTask = assignTask;
+        
+        // 添加调试命令
+        window.debug = {
+            addResources: function(resource, amount) {
+                if (game.resources[resource]) {
+                    game.resources[resource].amount += amount;
+                    updateResourcesDisplay();
+                    addLog("调试", `添加了 ${amount} 单位 ${getResourceName(resource)}`, "info");
+                }
+            },
+            completeMission: function(id) {
+                const mission = game.missions.find(m => m.id === id);
+                if (mission) {
+                    mission.progress = mission.target;
+                    mission.status = 'completed';
+                    completeMission(mission);
+                    updateMissionsDisplay();
+                }
+            },
+            unlockAllTech: function() {
+                Object.keys(game.technologies).forEach(key => {
+                    game.technologies[key].researched = true;
+                    game.technologies[key].level = game.technologies[key].maxLevel;
+                });
+                addLog("调试", "已解锁所有科技", "info");
+            },
+            teleport: function(x, y) {
+                gameObjects.player.x = x;
+                gameObjects.player.y = y;
+                gameObjects.player.targetX = x;
+                gameObjects.player.targetY = y;
+                gameObjects.player.isMoving = false;
+                updatePositionDisplay();
+                addLog("调试", `传送到 (${x}, ${y})`, "info");
+            }
+        };
+        
+        console.log("太空探险家 v2.0 已加载完成！");
+        console.log("调试命令: debug.addResources(resource, amount)");
+        console.log("调试命令: debug.completeMission(id)");
+        console.log("调试命令: debug.unlockAllTech()");
+        console.log("调试命令: debug.teleport(x, y)");
+    </script>
+</body>
+</html>
+

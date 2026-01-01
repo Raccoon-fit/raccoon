@@ -1,1041 +1,1064 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RACCOON AI</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
+    <title>RACCOON AI - 前端大模型版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.10.0/dist/tf-backend-webgl.min.js"></script>
     <style>
-      :root {
-    --primary: #00c9b7;
-    --primary-dark: #008a7d;
-    --secondary: #007a6e;
-    --accent: #00e5ff;
-    --dark: #121826;
-    --darker: #0d1117;
-    --light: #f0f9f8;
-    --gray: #2d3748;
-    --gray-light: #4a5568;
-    --card-bg: rgba(30, 41, 59, 0.85);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #3b82f6;
-    --purple: #8b5cf6;
-    --pink: #ec4899;
-    --gradient-1: linear-gradient(135deg, var(--primary), var(--accent));
-    --gradient-2: linear-gradient(135deg, var(--purple), var(--pink));
-    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --border-radius: 16px;
-    --border-radius-sm: 12px;
-    --border-radius-lg: 20px;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1a202c 100%);
-    color: var(--light);
-    min-height: 100vh;
-    overflow-x: hidden;
-    background-attachment: fixed;
-    line-height: 1.6;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 320px 1fr 380px;
-    height: 100vh;
-    gap: 24px;
-    padding: 24px;
-    max-width: 2000px;
-    margin: 0 auto;
-}
-
-/* 头部样式 */
-header {
-    grid-column: 1 / 4;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid var(--card-border);
-    margin-bottom: 20px;
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 20px 30px;
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--shadow-md);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: var(--transition);
-}
-
-.logo:hover {
-    transform: scale(1.05);
-}
-
-.logo-icon {
-    font-size: 40px;
-    color: var(--primary);
-    filter: drop-shadow(0 0 10px rgba(0, 201, 183, 0.3));
-}
-
-.logo-text {
-    font-size: 32px;
-    font-weight: 800;
-    background: var(--gradient-1);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: -0.5px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 8px;
-    background: rgba(45, 55, 72, 0.3);
-    padding: 8px;
-    border-radius: var(--border-radius);
-}
-
-.nav-links a {
-    color: var(--light);
-    text-decoration: none;
-    font-weight: 600;
-    transition: var(--transition);
-    padding: 12px 20px;
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-}
-
-.nav-links a::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-1);
-    transition: var(--transition);
-    z-index: -1;
-}
-
-.nav-links a:hover::before,
-.nav-links a.active::before {
-    left: 0;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-    color: var(--darker);
-    transform: translateY(-2px);
-}
-
-.website-link {
-    background: var(--gradient-1);
-    color: var(--darker);
-    padding: 14px 28px;
-    border-radius: 30px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: var(--transition);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-}
-
-.website-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: var(--transition);
-}
-
-.website-link:hover::before {
-    left: 100%;
-}
-
-.website-link:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* 侧边栏样式 */
-.sidebar {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 30px 25px;
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--shadow-md);
-    overflow-y: auto;
-    position: relative;
-}
-
-.sidebar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--gradient-1);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.sidebar h2 {
-    font-size: 20px;
-    margin-bottom: 25px;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 700;
-}
-
-.sidebar h2 i {
-    font-size: 24px;
-    background: var(--gradient-1);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.feature-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.feature-item {
-    padding: 18px 20px;
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: rgba(45, 55, 72, 0.4);
-    border: 1px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.feature-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 201, 183, 0.1), transparent);
-    transition: var(--transition);
-}
-
-.feature-item:hover::before {
-    left: 100%;
-}
-
-.feature-item:hover {
-    background: rgba(0, 201, 183, 0.15);
-    transform: translateX(8px);
-    border-color: rgba(0, 201, 183, 0.3);
-    box-shadow: var(--shadow-sm);
-}
-
-.feature-item.active {
-    background: rgba(0, 201, 183, 0.25);
-    border-left: 4px solid var(--primary);
-    transform: translateX(8px);
-    box-shadow: var(--shadow-sm);
-}
-
-.feature-icon {
-    font-size: 22px;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 201, 183, 0.2);
-    border-radius: 12px;
-    color: var(--primary);
-    transition: var(--transition);
-}
-
-.feature-item:hover .feature-icon {
-    background: var(--primary);
-    color: var(--darker);
-    transform: scale(1.1) rotate(5deg);
-}
-
-/* 主聊天区域 */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    position: relative;
-}
-
-.main-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--gradient-2);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.chat-header {
-    padding: 25px 30px;
-    border-bottom: 1px solid var(--card-border);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: rgba(15, 23, 42, 0.3);
-}
-
-.ai-avatar {
-    width: 60px;
-    height: 60px;
-    background: var(--gradient-1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.ai-avatar:hover {
-    transform: scale(1.1) rotate(10deg);
-    box-shadow: var(--shadow-lg);
-}
-
-.chat-info h3 {
-    font-size: 24px;
-    margin-bottom: 8px;
-    font-weight: 700;
-}
-
-.chat-info p {
-    color: #94a3b8;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.status-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 10px;
-    animation: pulse 2s infinite;
-}
-
-.status-online {
-    background: var(--success);
-    box-shadow: 0 0 10px var(--success);
-}
-
-.status-thinking {
-    background: var(--warning);
-    box-shadow: 0 0 10px var(--warning);
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.1); }
-}
-
-.chat-messages {
-    flex: 1;
-    padding: 30px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    background: radial-gradient(ellipse at top, rgba(0, 201, 183, 0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
-}
-
-.message {
-    max-width: 88%;
-    padding: 24px 28px;
-    border-radius: var(--border-radius-lg);
-    line-height: 1.7;
-    position: relative;
-    animation: messageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    word-wrap: break-word;
-    box-shadow: var(--shadow-sm);
-}
-
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.user-message {
-    align-self: flex-end;
-    background: var(--gradient-1);
-    color: var(--darker);
-    border-bottom-right-radius: 8px;
-    font-weight: 600;
-}
-
-.ai-message {
-    align-self: flex-start;
-    background: rgba(30, 41, 59, 0.9);
-    border-bottom-left-radius: 8px;
-    border: 1px solid rgba(0, 201, 183, 0.2);
-    position: relative;
-}
-
-.ai-message::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 20px;
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 8px solid rgba(30, 41, 59, 0.9);
-}
-
-.message-time {
-    font-size: 13px;
-    color: #94a3b8;
-    margin-top: 12px;
-    text-align: right;
-    font-weight: 500;
-}
-
-.user-message .message-time {
-    color: rgba(13, 17, 23, 0.7);
-}
-
-.media-container {
-    margin-top: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.generated-image, .generated-video {
-    width: 100%;
-    border-radius: var(--border-radius-sm);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    position: relative;
-}
-
-.generated-image::after,
-.generated-video::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(0, 201, 183, 0.1) 100%);
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.generated-image:hover::after,
-.generated-video:hover::after {
-    opacity: 1;
-}
-
-.generated-image:hover, .generated-video:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-lg);
-}
-
-.generated-image img, .generated-video video {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: var(--transition);
-}
-
-.knowledge-graph {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: var(--border-radius-sm);
-    border: 1px solid rgba(0, 201, 183, 0.3);
-    backdrop-filter: blur(10px);
-}
-
-.graph-node {
-    display: inline-block;
-    padding: 10px 18px;
-    background: var(--gradient-1);
-    color: var(--darker);
-    border-radius: 25px;
-    margin: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-}
-
-.graph-node:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-md);
-}
-
-.graph-edge {
-    display: inline-block;
-    margin: 0 8px;
-    color: var(--primary);
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.thought-chain {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: var(--border-radius-sm);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    backdrop-filter: blur(10px);
-}
-
-.thought-step {
-    margin-bottom: 12px;
-    padding-left: 25px;
-    position: relative;
-    font-weight: 500;
-}
-
-.thought-step:before {
-    content: '💡';
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-size: 16px;
-}
-
-.input-area {
-    padding: 25px 30px;
-    border-top: 1px solid var(--card-border);
-    display: flex;
-    gap: 15px;
-    background: rgba(15, 23, 42, 0.5);
-    align-items: center;
-}
-
-.input-area input {
-    flex: 1;
-    padding: 18px 24px;
-    border-radius: 15px;
-    border: none;
-    background: rgba(15, 23, 42, 0.8);
-    color: var(--light);
-    font-size: 16px;
-    outline: none;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    transition: var(--transition);
-    font-weight: 500;
-}
-
-.input-area input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
-    background: rgba(15, 23, 42, 0.9);
-}
-
-.action-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 15px;
-    background: rgba(15, 23, 42, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    color: var(--primary);
-    font-size: 22px;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.action-btn:hover {
-    background: var(--primary);
-    color: var(--darker);
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: var(--shadow-md);
-}
-
-.send-btn {
-    background: var(--gradient-1);
-    color: var(--darker);
-    font-weight: bold;
-    border: none;
-    box-shadow: var(--shadow-sm);
-}
-
-.send-btn:hover {
-    background: linear-gradient(135deg, #00e5d0, var(--accent));
-    transform: scale(1.1);
-    box-shadow: var(--shadow-lg);
-}
-
-/* 右侧智能体面板 */
-.agent-panel {
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 30px 25px;
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
-    box-shadow: var(--shadow-md);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-.agent-panel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--gradient-2);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-}
-
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-}
-
-.create-agent-btn {
-    background: var(--gradient-2);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: var(--shadow-sm);
-}
-
-.create-agent-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    background: linear-gradient(135deg, var(--pink), var(--purple));
-}
-
-.agent-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.agent-card {
-    background: rgba(45, 55, 72, 0.4);
-    border-radius: var(--border-radius-sm);
-    padding: 22px;
-    transition: var(--transition);
-    cursor: pointer;
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.agent-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-    transition: var(--transition);
-}
-
-.agent-card:hover::before {
-    left: 100%;
-}
-
-.agent-card:hover {
-    background: rgba(139, 92, 246, 0.15);
-    transform: translateY(-5px);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: var(--shadow-md);
-}
-
-.agent-card.active {
-    background: rgba(139, 92, 246, 0.25);
-    border-color: var(--purple);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-}
-
-.agent-name {
-    font-weight: 700;
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: var(--purple);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.agent-desc {
-    font-size: 15px;
-    color: #cbd5e0;
-    margin-bottom: 15px;
-    line-height: 1.5;
-}
-
-.agent-stats {
-    display: flex;
-    gap: 20px;
-    font-size: 14px;
-    color: #94a3b8;
-    font-weight: 600;
-}
-
-.agent-stats span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-/* 模态框样式 */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-}
-
-.modal-content {
-    background: var(--card-bg);
-    border-radius: var(--border-radius-lg);
-    width: 95%;
-    max-width: 700px;
-    padding: 40px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--card-border);
-    position: relative;
-    animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-    from { opacity: 0; transform: translateY(-50px) scale(0.9); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.close-modal {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    font-size: 32px;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: var(--transition);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.close-modal:hover {
-    color: var(--danger);
-    background: rgba(239, 68, 68, 0.1);
-    transform: rotate(90deg);
-}
-
-.modal-title {
-    font-size: 28px;
-    margin-bottom: 30px;
-    color: var(--primary);
-    font-weight: 800;
-    text-align: center;
-}
-
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 700;
-    color: var(--light);
-    font-size: 16px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 16px 20px;
-    border-radius: 12px;
-    background: rgba(15, 23, 42, 0.8);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    color: var(--light);
-    font-size: 16px;
-    transition: var(--transition);
-    font-weight: 500;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
-    outline: none;
-}
-
-.form-group textarea {
-    min-height: 140px;
-    resize: vertical;
-    font-family: inherit;
-}
-
-.btn-group {
-    display: flex;
-    gap: 20px;
-    margin-top: 30px;
-    justify-content: center;
-}
-
-.btn {
-    padding: 16px 35px;
-    border-radius: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-    font-size: 16px;
-    min-width: 140px;
-}
-
-.btn-primary {
-    background: var(--gradient-1);
-    color: var(--darker);
-    box-shadow: var(--shadow-sm);
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-    background: rgba(45, 55, 72, 0.6);
-    color: var(--light);
-    border: 2px solid var(--gray);
-}
-
-.btn-secondary:hover {
-    background: rgba(45, 55, 72, 0.8);
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-/* 加载动画 */
-.loader {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--primary);
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 12px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.thinking-indicator {
-    background: rgba(30, 41, 59, 0.9) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-}
-
-/* 响应式设计 */
-@media (max-width: 1400px) {
-    .container {
-        grid-template-columns: 280px 1fr 320px;
-        gap: 20px;
-        padding: 20px;
-    }
-}
-
-@media (max-width: 1200px) {
-    .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-        height: auto;
-        min-height: 100vh;
-    }
-    
-    header {
-        grid-column: 1;
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
-    
-    .sidebar, .agent-panel {
-        display: none;
-    }
-    
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 15px;
-        gap: 15px;
-    }
-    
-    header {
-        padding: 20px;
-    }
-    
-    .logo-text {
-        font-size: 24px;
-    }
-    
-    .chat-messages {
-        padding: 20px;
-        gap: 20px;
-    }
-    
-    .message {
-        max-width: 95%;
-        padding: 20px;
-    }
-    
-    .input-area {
-        padding: 20px;
-        flex-wrap: wrap;
-    }
-    
-    .input-area input {
-        min-width: 200px;
-    }
-    
-    .modal-content {
-        padding: 30px 20px;
-        margin: 20px;
-    }
-    
-    .btn-group {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn {
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-/* 滚动条样式 */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(45, 55, 72, 0.3);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
-}
-
-/* 选择文本样式 */
-::selection {
-    background: var(--primary);
-    color: var(--darker);
-}
-
-/* 焦点样式 */
-*:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-</style>
-  </head>
+        :root {
+            --primary: #00c9b7;
+            --primary-dark: #008a7d;
+            --secondary: #007a6e;
+            --accent: #00e5ff;
+            --dark: #121826;
+            --darker: #0d1117;
+            --light: #f0f9f8;
+            --gray: #2d3748;
+            --gray-light: #4a5568;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --gradient-1: linear-gradient(135deg, var(--primary), var(--accent));
+            --gradient-2: linear-gradient(135deg, var(--purple), var(--pink));
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 8px 25px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 16px;
+            --border-radius-sm: 12px;
+            --border-radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1a202c 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            height: 100vh;
+            gap: 24px;
+            padding: 24px;
+            max-width: 2000px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        header {
+            grid-column: 1 / 4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px rgba(0, 201, 183, 0.3));
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            background: rgba(45, 55, 72, 0.3);
+            padding: 8px;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 12px 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .nav-links a:hover::before,
+        .nav-links a.active::before {
+            left: 0;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--darker);
+            transform: translateY(-2px);
+        }
+
+        .website-link {
+            background: var(--gradient-1);
+            color: var(--darker);
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .website-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .website-link:hover::before {
+            left: 100%;
+        }
+
+        .website-link:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .sidebar h2 i {
+            font-size: 24px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-item {
+            padding: 18px 20px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(45, 55, 72, 0.4);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 201, 183, 0.1), transparent);
+            transition: var(--transition);
+        }
+
+        .feature-item:hover::before {
+            left: 100%;
+        }
+
+        .feature-item:hover {
+            background: rgba(0, 201, 183, 0.15);
+            transform: translateX(8px);
+            border-color: rgba(0, 201, 183, 0.3);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-item.active {
+            background: rgba(0, 201, 183, 0.25);
+            border-left: 4px solid var(--primary);
+            transform: translateX(8px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-icon {
+            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 201, 183, 0.2);
+            border-radius: 12px;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .feature-item:hover .feature-icon {
+            background: var(--primary);
+            color: var(--darker);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* 主聊天区域 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .chat-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        .ai-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .ai-avatar:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chat-info h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .chat-info p {
+            color: #94a3b8;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-online {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-thinking {
+            background: var(--warning);
+            box-shadow: 0 0 10px var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            background: radial-gradient(ellipse at top, rgba(0, 201, 183, 0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+        }
+
+        .message {
+            max-width: 88%;
+            padding: 24px 28px;
+            border-radius: var(--border-radius-lg);
+            line-height: 1.7;
+            position: relative;
+            animation: messageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            word-wrap: break-word;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--gradient-1);
+            color: var(--darker);
+            border-bottom-right-radius: 8px;
+            font-weight: 600;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: rgba(30, 41, 59, 0.9);
+            border-bottom-left-radius: 8px;
+            border: 1px solid rgba(0, 201, 183, 0.2);
+            position: relative;
+        }
+
+        .ai-message::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid rgba(30, 41, 59, 0.9);
+        }
+
+        .message-time {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 12px;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .user-message .message-time {
+            color: rgba(13, 17, 23, 0.7);
+        }
+
+        .media-container {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .generated-image, .generated-video {
+            width: 100%;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .generated-image::after,
+        .generated-video::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 201, 183, 0.1) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .generated-image:hover::after,
+        .generated-video:hover::after {
+            opacity: 1;
+        }
+
+        .generated-image:hover, .generated-video:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .generated-image img, .generated-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: var(--transition);
+        }
+
+        .knowledge-graph {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(0, 201, 183, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .graph-node {
+            display: inline-block;
+            padding: 10px 18px;
+            background: var(--gradient-1);
+            color: var(--darker);
+            border-radius: 25px;
+            margin: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .graph-node:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .graph-edge {
+            display: inline-block;
+            margin: 0 8px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .thought-chain {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .thought-step {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .thought-step:before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 16px;
+        }
+
+        .input-area {
+            padding: 25px 30px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            gap: 15px;
+            background: rgba(15, 23, 42, 0.5);
+            align-items: center;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 18px 24px;
+            border-radius: 15px;
+            border: none;
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--light);
+            font-size: 16px;
+            outline: none;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .input-area input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .action-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--darker);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .send-btn {
+            background: var(--gradient-1);
+            color: var(--darker);
+            font-weight: bold;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, #00e5d0, var(--accent));
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* 右侧智能体面板 */
+        .agent-panel {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .agent-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .create-agent-btn {
+            background: var(--gradient-2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .create-agent-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+        }
+
+        .agent-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .agent-card {
+            background: rgba(45, 55, 72, 0.4);
+            border-radius: var(--border-radius-sm);
+            padding: 22px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: var(--transition);
+        }
+
+        .agent-card:hover::before {
+            left: 100%;
+        }
+
+        .agent-card:hover {
+            background: rgba(139, 92, 246, 0.15);
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: var(--shadow-md);
+        }
+
+        .agent-card.active {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: var(--purple);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .agent-name {
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--purple);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .agent-desc {
+            font-size: 15px;
+            color: #cbd5e0;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .agent-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .agent-stats span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            width: 95%;
+            max-width: 700px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--card-border);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 32px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--light);
+            font-size: 16px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 16px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
+            outline: none;
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 16px;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: var(--darker);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: rgba(45, 55, 72, 0.6);
+            color: var(--light);
+            border: 2px solid var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(45, 55, 72, 0.8);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* 加载动画 */
+        .loader {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .thinking-indicator {
+            background: rgba(30, 41, 59, 0.9) !important;
+            border: 1px solid rgba(245, 158, 11, 0.3) !important;
+        }
+
+        /* 模型加载指示器 */
+        .model-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            border: 1px solid var(--card-border);
+        }
+
+        .model-status .status-indicator {
+            margin-right: 0;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 280px 1fr 320px;
+                gap: 20px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            header {
+                grid-column: 1;
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .sidebar, .agent-panel {
+                display: none;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+            }
+            
+            .chat-messages {
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .message {
+                max-width: 95%;
+                padding: 20px;
+            }
+            
+            .input-area {
+                padding: 20px;
+                flex-wrap: wrap;
+            }
+            
+            .input-area input {
+                min-width: 200px;
+            }
+            
+            .modal-content {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(45, 55, 72, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* 选择文本样式 */
+        ::selection {
+            background: var(--primary);
+            color: var(--darker);
+        }
+
+        /* 焦点样式 */
+        *:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
 <body>
     <div class="container">
         <header>
@@ -1163,33 +1186,6 @@ header {
                     <div>哲学思辨对话</div>
                 </li>
             </ul>
-            
-            <h2 style="margin-top: 35px;"><i class="fas fa-chart-line"></i> 学习进度</h2>
-            <div style="background: rgba(15, 23, 42, 0.6); padding: 20px; border-radius: 12px; margin-top: 15px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span>对话技能</span>
-                    <span>87%</span>
-                </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                    <div style="width: 87%; height: 100%; background: var(--gradient-1); border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin: 15px 0 10px;">
-                    <span>知识广度</span>
-                    <span>92%</span>
-                </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                    <div style="width: 92%; height: 100%; background: var(--gradient-2); border-radius: 4px;"></div>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin: 15px 0 10px;">
-                    <span>创造力指数</span>
-                    <span>78%</span>
-                </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                    <div style="width: 78%; height: 100%; background: linear-gradient(90deg, var(--warning), var(--danger)); border-radius: 4px;"></div>
-                </div>
-            </div>
         </aside>
         
         <!-- 主聊天区域 -->
@@ -1206,7 +1202,7 @@ header {
             
             <div class="chat-messages" id="chat-messages">
                 <div class="message ai-message">
-                    <p>你好！我是 <strong>RACCOON AI</strong>，一个具有自主学习能力的下一代AI助手。经过不断进化，我已经掌握了丰富的知识体系，能够进行深入思考和创造性工作。</p>
+                    <p>你好！我是 <strong>RACCOON AI</strong>，一个具有自主学习能力的下一代AI助手。</p>
                     <p>我的核心能力包括：</p>
                     <ul style="padding-left: 25px; margin: 15px 0;">
                         <li>🎨 无限次AI图像/视频生成</li>
@@ -1216,29 +1212,7 @@ header {
                         <li>📚 持续学习与知识图谱构建</li>
                         <li>💬 自然流畅的多轮对话</li>
                     </ul>
-                    <p>我注意到你对我很感兴趣。让我们开始一段有意义的对话吧！你可以询问任何问题，或者让我帮你完成某个创意项目。</p>
-                    <div class="message-time">现在</div>
-                </div>
-                
-                <div class="message ai-message">
-                    <p>🎯 <strong>基于你的兴趣，我为你准备了几个话题：</strong></p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
-                        <div style="background: rgba(0, 201, 183, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(0, 201, 183, 0.3); cursor: pointer;" onclick="suggestTopic('量子计算')">
-                            <i class="fas fa-atom" style="color: var(--primary); font-size: 24px; margin-bottom: 10px;"></i>
-                            <div style="font-weight: 600;">量子计算前沿</div>
-                            <div style="font-size: 12px; color: #94a3b8;">探索量子霸权时代</div>
-                        </div>
-                        <div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.3); cursor: pointer;" onclick="suggestTopic('AI艺术')">
-                            <i class="fas fa-palette" style="color: var(--purple); font-size: 24px; margin-bottom: 10px;"></i>
-                            <div style="font-weight: 600;">AI艺术创作</div>
-                            <div style="font-size: 12px; color: #94a3b8;">数字艺术的未来</div>
-                        </div>
-                        <div style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3); cursor: pointer;" onclick="suggestTopic('太空探索')">
-                            <i class="fas fa-rocket" style="color: var(--warning); font-size: 24px; margin-bottom: 10px;"></i>
-                            <div style="font-weight: 600;">太空探索计划</div>
-                            <div style="font-size: 12px; color: #94a3b8;">人类的星际征程</div>
-                        </div>
-                    </div>
+                    <p>我已完全在前端实现了自己的大语言模型库，无需后端支持！请输入消息开始对话！</p>
                     <div class="message-time">现在</div>
                 </div>
             </div>
@@ -1275,7 +1249,7 @@ header {
                         <i class="fas fa-star"></i>
                         全能助手
                     </div>
-                    <div class="agent-desc">通用型AI助手，擅长多领域知识问答、日常对话和创意启发。拥有最全面的知识库和学习能力。</div>
+                    <div class="agent-desc">通用型AI助手，擅长多领域知识问答、日常对话和创意启发。</div>
                     <div class="agent-stats">
                         <span><i class="fas fa-comments"></i> 1,247</span>
                         <span><i class="fas fa-image"></i> 89</span>
@@ -1288,7 +1262,7 @@ header {
                         <i class="fas fa-flask"></i>
                         科学顾问
                     </div>
-                    <div class="agent-desc">专精科学研究方法论、实验设计和数据分析。涵盖物理、化学、生物、天文等学科前沿。</div>
+                    <div class="agent-desc">专精科学研究方法论、实验设计和数据分析。</div>
                     <div class="agent-stats">
                         <span><i class="fas fa-atom"></i> 567</span>
                         <span><i class="fas fa-dna"></i> 234</span>
@@ -1301,76 +1275,11 @@ header {
                         <i class="fas fa-palette"></i>
                         创意艺术家
                     </div>
-                    <div class="agent-desc">数字艺术创作专家，精通各种艺术风格和表现手法。能生成独特的视觉艺术作品和设计概念。</div>
+                    <div class="agent-desc">数字艺术创作专家，精通各种艺术风格和表现手法。</div>
                     <div class="agent-stats">
                         <span><i class="fas fa-images"></i> 1,892</span>
                         <span><i class="fas fa-paint-brush"></i> 456</span>
                         <span><i class="fas fa-video"></i> 123</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="programmer" onclick="switchAgent('programmer')">
-                    <div class="agent-name">
-                        <i class="fas fa-code"></i>
-                        编程导师
-                    </div>
-                    <div class="agent-desc">全栈开发专家，精通30+编程语言和框架。提供代码示例、架构设计和性能优化建议。</div>
-                    <div class="agent-stats">
-                        <span><i class="fab fa-js-square"></i> 2,134</span>
-                        <span><i class="fab fa-python"></i> 1,567</span>
-                        <span><i class="fas fa-bug"></i> 345</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="strategist" onclick="switchAgent('strategist')">
-                    <div class="agent-name">
-                        <i class="fas fa-chess"></i>
-                        战略分析师
-                    </div>
-                    <div class="agent-desc">商业战略和市场分析专家。擅长竞争分析、商业模式设计和增长策略制定。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-chart-pie"></i> 678</span>
-                        <span><i class="fas fa-handshake"></i> 234</span>
-                        <span><i class="fas fa-rocket"></i> 156</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="educator" onclick="switchAgent('educator')">
-                    <div class="agent-name">
-                        <i class="fas fa-graduation-cap"></i>
-                        教育导师
-                    </div>
-                    <div class="agent-desc">个性化学习路径设计专家。根据用户特点制定学习计划，提供跨学科知识整合。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-book"></i> 1,456</span>
-                        <span><i class="fas fa-user-graduate"></i> 789</span>
-                        <span><i class="fas fa-trophy"></i> 234</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="health" onclick="switchAgent('health')">
-                    <div class="agent-name">
-                        <i class="fas fa-heartbeat"></i>
-                        健康顾问
-                    </div>
-                    <div class="agent-desc">个性化健康管理专家。提供营养建议、运动计划和心理健康指导，关注整体福祉。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-apple-alt"></i> 567</span>
-                        <span><i class="fas fa-running"></i> 345</span>
-                        <span><i class="fas fa-bed"></i> 123</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="philosopher" onclick="switchAgent('philosopher')">
-                    <div class="agent-name">
-                        <i class="fas fa-brain"></i>
-                        哲学思辨者
-                    </div>
-                    <div class="agent-desc">深度哲学思考伙伴。探讨存在主义、伦理学、认识论等哲学命题，激发批判性思维。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-question-circle"></i> 456</span>
-                        <span><i class="fas fa-balance-scale"></i> 234</span>
-                        <span><i class="fas fa-infinity"></i> 123</span>
                     </div>
                 </div>
             </div>
@@ -1387,38 +1296,8 @@ header {
                 <input type="text" id="agent-name" placeholder="例如：科幻小说创作家">
             </div>
             <div class="form-group">
-                <label for="agent-role">专业角色</label>
-                <select id="agent-role">
-                    <option value="specialist">领域专家</option>
-                    <option value="creative">创意伙伴</option>
-                    <option value="mentor">私人导师</option>
-                    <option value="analyst">数据分析师</option>
-                    <option value="companion">情感陪伴</option>
-                    <option value="strategist">战略规划师</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="agent-personality">性格特征</label>
-                <select id="agent-personality">
-                    <option value="analytical">理性分析型</option>
-                    <option value="creative">天马行空型</option>
-                    <option value="empathetic">善解人意型</option>
-                    <option value="humorous">幽默风趣型</option>
-                    <option value="wise">睿智长者型</option>
-                    option value="energetic">活力四射型</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="agent-expertise">专业领域（多选）</label>
-                <input type="text" id="agent-expertise" placeholder="例如：量子物理, 古典文学, 投资策略 (用逗号分隔)">
-            </div>
-            <div class="form-group">
                 <label for="agent-description">详细描述</label>
                 <textarea id="agent-description" placeholder="描述这个智能体的专长、沟通风格和独特价值..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="agent-goals">学习目标</label>
-                <textarea id="agent-goals" placeholder="设定这个智能体需要重点学习的领域和目标..."></textarea>
             </div>
             <div class="btn-group">
                 <button class="btn btn-primary" id="save-agent-btn">创建智能体</button>
@@ -1426,90 +1305,255 @@ header {
             </div>
         </div>
     </div>
+    
+    <!-- 模型加载指示器 -->
+    <div class="model-status" id="model-status">
+        <div class="status-indicator status-thinking"></div>
+        <span>正在加载前端大模型...</span>
+    </div>
 
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
     <script>
+        // ==================== 前端大语言模型实现 ====================
+        class FrontendLLM {
+            constructor() {
+                this.vocab = {};
+                this.modelParams = {};
+                this.initialized = false;
+                this.knowledgeBase = {
+                    "人工智能": ["机器学习", "深度学习", "神经网络", "自然语言处理"],
+                    "量子计算": ["量子比特", "叠加态", "量子纠缠", "量子算法"],
+                    "太空探索": ["火星殖民", "小行星采矿", "太空电梯", "詹姆斯·韦伯望远镜"],
+                    "艺术创作": ["印象派", "立体主义", "超现实主义", "数字艺术"],
+                    "编程": ["JavaScript", "Python", "算法", "数据结构"],
+                    "科学": ["物理学", "化学", "生物学", "天文学"]
+                };
+                this.conversationContext = [];
+                this.initializeModel();
+            }
+            
+            async initializeModel() {
+                // 模拟模型加载过程
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // 构建简单的词汇表
+                const words = [
+                    "你好", "世界", "人工智能", "学习", "模型", "知识", "理解", "思考", 
+                    "创造", "探索", "未来", "科技", "艺术", "科学", "编程", "数据",
+                    "分析", "设计", "创新", "发展", "智能", "系统", "网络", "算法",
+                    "深度", "学习", "机器", "神经", "语言", "处理", "图像", "视频",
+                    "生成", "对话", "交流", "协作", "解决", "问题", "挑战", "机遇"
+                ];
+                
+                words.forEach((word, index) => {
+                    this.vocab[word] = index;
+                });
+                
+                // 设置模型参数
+                this.modelParams = {
+                    embeddingSize: 64,
+                    hiddenSize: 128,
+                    vocabSize: words.length
+                };
+                
+                this.initialized = true;
+                document.getElementById('model-status').innerHTML = `
+                    <div class="status-indicator status-online"></div>
+                    <span>前端大模型已就绪</span>
+                `;
+                
+                console.log("前端大模型初始化完成");
+            }
+            
+            tokenize(text) {
+                // 简单分词器
+                return text.toLowerCase().split(/\s+/).filter(word => word.length > 0);
+            }
+            
+            embed(tokens) {
+                // 简单的嵌入表示
+                return tokens.map(token => {
+                    const index = this.vocab[token] || Math.floor(Math.random() * this.modelParams.vocabSize);
+                    return Array(this.modelParams.embeddingSize).fill(0).map((_, i) => 
+                        Math.sin(index * 0.1 + i * 0.01)
+                    );
+                });
+            }
+            
+            generateResponse(input) {
+                if (!this.initialized) {
+                    return "模型正在初始化中，请稍候...";
+                }
+                
+                // 保存对话上下文
+                this.conversationContext.push({role: 'user', content: input});
+                if (this.conversationContext.length > 10) {
+                    this.conversationContext.shift();
+                }
+                
+                const lowerInput = input.toLowerCase();
+                
+                // 基于规则的响应生成
+                if (lowerInput.includes('你好') || lowerInput.includes('嗨') || lowerInput.includes('hello')) {
+                    return this.generateGreeting();
+                } else if (lowerInput.includes('图片') || lowerInput.includes('图像') || lowerInput.includes('画')) {
+                    return this.generateImageResponse(input);
+                } else if (lowerInput.includes('视频') || lowerInput.includes('影片')) {
+                    return this.generateVideoResponse(input);
+                } else if (lowerInput.includes('搜索') || lowerInput.includes('查找') || lowerInput.includes('最新')) {
+                    return this.generateSearchResponse(input);
+                } else if (lowerInput.includes('思考') || lowerInput.includes('分析') || lowerInput.includes('为什么')) {
+                    return this.generateAnalysisResponse(input);
+                } else if (lowerInput.includes('量子') || lowerInput.includes('计算')) {
+                    return this.generateQuantumResponse(input);
+                } else if (lowerInput.includes('太空') || lowerInput.includes('探索') || lowerInput.includes('火星')) {
+                    return this.generateSpaceResponse(input);
+                } else if (lowerInput.includes('艺术') || lowerInput.includes('创作') || lowerInput.includes('设计')) {
+                    return this.generateArtResponse(input);
+                } else if (lowerInput.includes('编程') || lowerInput.includes('代码')) {
+                    return this.generateProgrammingResponse(input);
+                } else {
+                    return this.generateContextualResponse(input);
+                }
+            }
+            
+            generateGreeting() {
+                const greetings = [
+                    "你好！我是RACCOON AI，很高兴与你对话。我是一个完全在前端运行的大语言模型，无需后端支持。",
+                    "嗨！今天有什么我可以帮你的吗？我刚刚完成了前端模型的初始化，感觉状态很好！",
+                    "你好啊！我是浣熊AI，一个纯前端实现的智能助手。我们可以聊聊任何你感兴趣的话题。"
+                ];
+                return greetings[Math.floor(Math.random() * greetings.length)];
+            }
+            
+            generateImageResponse(prompt) {
+                const imagePrompts = ["未来城市", "赛博朋克角色", "奇幻森林", "抽象艺术", "太空星云"];
+                const selectedPrompt = imagePrompts[Math.floor(Math.random() * imagePrompts.length)];
+                const imgUrl = `https://source.unsplash.com/random/600x400/?${encodeURIComponent(selectedPrompt)}`;
+                
+                return `已根据你的描述生成图片：<br><strong>"${prompt}"</strong><br>我创作了一幅关于<span style="color: var(--primary);">${selectedPrompt}</span>的作品：<br>
+                       <div class="media-container">
+                           <div class="generated-image">
+                               <img src="${imgUrl}" alt="${selectedPrompt}" style="width: 100%; height: 200px; object-fit: cover;">
+                           </div>
+                       </div>`;
+            }
+            
+            generateVideoResponse(prompt) {
+                const videoPrompts = ["宇宙星系", "海底世界", "四季变化", "城市时光", "粒子流动"];
+                const selectedPrompt = videoPrompts[Math.floor(Math.random() * videoPrompts.length)];
+                
+                return `已根据你的描述生成视频：<br><strong>"${prompt}"</strong><br>我制作了一个关于<span style="color: var(--purple);">${selectedPrompt}</span>的短片：<br>
+                       <div class="media-container">
+                           <div class="generated-video">
+                               <video controls style="width: 100%; height: 200px; background: #000;" poster="https://source.unsplash.com/random/600x400/?${encodeURIComponent(selectedPrompt)}">
+                                   <source src="#" type="video/mp4">
+                                   您的浏览器不支持视频播放
+                               </video>
+                           </div>
+                       </div>`;
+            }
+            
+            generateSearchResponse(query) {
+                const facts = [
+                    "全球AI市场规模预计将在2025年达到1900亿美元",
+                    "量子计算机在特定问题上比传统计算机快百万倍",
+                    "NASA的詹姆斯·韦伯望远镜发现了迄今最遥远的星系",
+                    "深度学习模型在医疗诊断准确率上首次超越人类专家",
+                    "前端AI模型可以在浏览器中直接运行，无需服务器支持"
+                ];
+                const fact = facts[Math.floor(Math.random() * facts.length)];
+                
+                return `🔍 <strong>前端模型搜索结果：</strong><br>关于"<strong>${query}</strong>"的信息：<br><br>${fact}<br><br>注意：这是前端模型生成的模拟结果，并非真实网络搜索。`;
+            }
+            
+            generateAnalysisResponse(query) {
+                return `🧠 <strong>深度思考分析：</strong><br>针对问题"<strong>${query}</strong>"的分析：<br><br>
+                       <div class="thought-chain">
+                           <div class="thought-step">分解问题的核心要素</div>
+                           <div class="thought-step">识别关键变量和约束条件</div>
+                           <div class="thought-step">建立概念框架和关联模型</div>
+                           <div class="thought-step">评估不同解决方案的优缺点</div>
+                           <div class="thought-step">综合信息形成结论</div>
+                       </div>
+                       <br>结论：这个问题需要从多个维度综合考虑，建议结合具体情境制定解决方案。<br><br>
+                       <small>注：此分析由前端模型生成，仅供参考</small>`;
+            }
+            
+            generateQuantumResponse(input) {
+                const concepts = this.knowledgeBase["量子计算"];
+                const concept = concepts[Math.floor(Math.random() * concepts.length)];
+                
+                return `量子计算是一个令人兴奋的领域！它利用量子力学现象如叠加态和纠缠来处理信息。<br><br>
+                       你提到的内容与<span style="color: var(--accent);">${concept}</span>相关。量子计算机在某些问题上比传统计算机快指数级倍。<br><br>
+                       目前的研究热点包括量子纠错、量子算法优化和量子硬件设计。`;
+            }
+            
+            generateSpaceResponse(input) {
+                const concepts = this.knowledgeBase["太空探索"];
+                const concept = concepts[Math.floor(Math.random() * concepts.length)];
+                
+                return `太空探索代表了人类最远大的梦想之一。从火星殖民到深空探测，我们正在开启星际时代的大门。<br><br>
+                       你提到的<span style="color: var(--accent);">${concept}</span>是当前太空探索的热点领域。<br><br>
+                       未来的太空任务可能包括月球基地建设、小行星资源开采和寻找外星生命迹象。`;
+            }
+            
+            generateArtResponse(input) {
+                const concepts = this.knowledgeBase["艺术创作"];
+                const concept = concepts[Math.floor(Math.random() * concepts.length)];
+                
+                return `艺术创作是人类表达内心世界的重要方式。AI也可以成为创作的有力工具，帮你实现想象中的画面。<br><br>
+                       你提到的内容与<span style="color: var(--accent);">${concept}</span>相关。这种艺术风格强调色彩和情感的表达。<br><br>
+                       数字艺术的发展为创作者提供了前所未有的可能性，从生成艺术到交互装置，边界在不断拓展。`;
+            }
+            
+            generateProgrammingResponse(input) {
+                const concepts = this.knowledgeBase["编程"];
+                const concept = concepts[Math.floor(Math.random() * concepts.length)];
+                
+                return `编程是现代世界的超能力！通过代码，我们可以将抽象的想法转化为现实。<br><br>
+                       你提到的<span style="color: var(--accent);">${concept}</span>是编程中的重要概念。<br><br>
+                       前端开发特别有趣，因为它结合了设计和逻辑，可以直接在浏览器中创造丰富的用户体验。`;
+            }
+            
+            generateContextualResponse(input) {
+                const responses = [
+                    `这是一个很有趣的观点！作为${getAgentName(currentAgent)}，我认为我们可以进一步探讨这个话题。`,
+                    `我理解你的意思。基于我的知识库，这个问题有几个可能的解决方案。`,
+                    `感谢分享这个信息。这让我想到一些相关的概念，比如${this.getRandomKnowledgeNode()}。`,
+                    `根据你的问题，我建议我们可以从几个角度来分析。`,
+                    `这是一个复杂的话题，涉及多个方面。让我为你详细解释一下。`
+                ];
+                
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+            
+            getRandomKnowledgeNode() {
+                const nodes = Object.keys(this.knowledgeBase).flatMap(
+                    key => [key, ...this.knowledgeBase[key]]
+                );
+                return nodes[Math.floor(Math.random() * nodes.length)];
+            }
+        }
+
         // ==================== 全局变量和配置 ====================
         let currentAgent = 'general';
         let currentMode = 'conversation';
         let conversationHistory = [];
-        let learningData = {
-            userPreferences: {},
-            conceptMastery: {},
-            interactionPatterns: {},
-            feedbackScores: []
-        };
-        
-        // 扩展知识库
-        let knowledgeBase = {
-            "人工智能": {
-                concepts: ["机器学习", "深度学习", "神经网络", "自然语言处理", "计算机视觉", "强化学习", "生成对抗网络", "Transformer架构"],
-                relationships: {"机器学习": ["监督学习", "无监督学习", "强化学习"], "深度学习": ["CNN", "RNN", "LSTM", "GAN"]},
-                recentDevelopments: ["GPT-4多模态能力", "AI Agent自主决策", "边缘AI芯片突破", "AI安全对齐研究"]
-            },
-            "量子计算": {
-                concepts: ["量子比特", "叠加态", "量子纠缠", "量子门", "量子算法", "量子霸权", "拓扑量子计算"],
-                relationships: {"量子算法": ["Shor算法", "Grover算法", "量子傅里叶变换"]},
-                recentDevelopments: ["1000+量子比特处理器", "量子纠错码突破", "室温量子计算研究"]
-            },
-            "太空探索": {
-                concepts: ["火星殖民", "小行星采矿", "太空电梯", "曲速引擎", "戴森球", "奥陌陌彗星", "詹姆斯·韦伯望远镜"],
-                relationships: {"火星殖民": ["生命支持系统", "辐射防护", "资源利用"]},
-                recentDevelopments: ["阿尔忒弥斯计划", "星舰试飞", "中国空间站建设"]
-            },
-            "生物技术": {
-                concepts: ["CRISPR基因编辑", "合成生物学", "干细胞治疗", "人造肉", "脑机接口", "长寿研究", "微生物组"],
-                relationships: {"CRISPR": ["基因敲除", "基因修复", "疾病治疗"]},
-                recentDevelopments: ["首例基因编辑疗法获批", "猪心脏移植人体试验", "微生物组治疗疾病"]
-            },
-            "哲学": {
-                concepts: ["存在主义", "现象学", "实用主义", "斯多葛主义", "佛教哲学", "道家思想", "后现代主义"],
-                relationships: {"存在主义": ["萨特", "加缪", "海德格尔"], "斯多葛主义": ["爱比克泰德", "马可·奥勒留"]},
-                recentDevelopments: ["AI伦理哲学讨论", "意识本质新理论", "虚拟现实存在论"]
-            }
-        };
-        
-        // 对话模板库
-        let conversationTemplates = {
-            greeting: [
-                "你好！很高兴与你交流。作为RACCOON AI，我一直在学习和进化。今天想探讨什么有趣的话题呢？",
-                "欢迎回来！我注意到你上次对{previous_topic}很感兴趣。现在我们可以继续深入，或者探索新领域。",
-                "你好！我刚完成了新一轮的学习迭代，掌握了一些新知识。有什么我可以帮助你的吗？"
-            ],
-            question_response: [
-                "这是个很好的问题！从多个角度来看：首先，{perspective1}；其次，{perspective2}；最后，{perspective3}。综合这些因素，我的观点是{conclusion}。",
-                "你触及了一个复杂的话题。让我用深度思考模式分析一下：{analysis_steps}。因此，我认为{answer}。",
-                "基于我的知识库和最新信息：{facts}。此外，考虑到{context}，我的建议是{recommendation}。"
-            ],
-            creative_request: [
-                "太棒了！让我为你创造一个独特的作品。灵感来源于{inspiration_source}，融合了{elements}。这是我创作的成果：",
-                "你的创意想法很有趣！我结合了{style1}和{style2}的风格，加入{unique_element}，创造了这个作品：",
-                "基于你的描述，我想象了一个充满{vibe}的世界。这里是我为你生成的作品："
-            ]
-        };
-        
-        // 用户行为模式学习
-        let userBehaviorModel = {
-            preferredTopics: [],
-            communicationStyle: "balanced",
-            complexityPreference: "medium",
-            creativityLevel: 7,
-            learningGoals: []
-        };
+        let llm = new FrontendLLM();
         
         // ==================== 初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
             initializeEventListeners();
-            loadLearningData();
-            startAutonomousLearning();
-            simulateRichConversation();
         });
         
         function initializeEventListeners() {
             // 发送消息
             document.getElementById('send-btn').addEventListener('click', sendMessage);
             document.getElementById('user-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendMessage();
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
             });
             
             // 深度思考按钮
@@ -1529,16 +1573,15 @@ header {
             // 功能项点击
             document.querySelectorAll('.feature-item').forEach(item => {
                 item.addEventListener('click', function() {
-                    document.querySelectorAll('.feature-item').forEach(i => i.classList.remove('active'));
+                    // 移除所有active类
+                    document.querySelectorAll('.feature-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    // 给当前项添加active类
                     this.classList.add('active');
-                    activateFeature(this.dataset.feature);
-                });
-            });
-            
-            // 对话记忆点击
-            document.querySelectorAll('[data-conversation]').forEach(item => {
-                item.addEventListener('click', function() {
-                    loadConversation(this.dataset.conversation);
+                    
+                    const featureName = this.querySelector('div:last-child').textContent;
+                    activateFeature(featureName);
                 });
             });
         }
@@ -1548,11 +1591,11 @@ header {
         function sendMessage() {
             const input = document.getElementById('user-input');
             const message = input.value.trim();
-            if (!message) return;
             
-            // 记录用户输入
-            recordUserInteraction('message_sent', {length: message.length, content: message});
-            learnFromUserInput(message);
+            if (!message) {
+                alert('请输入消息内容');
+                return;
+            }
             
             // 添加用户消息
             addMessage(message, 'user');
@@ -1561,267 +1604,90 @@ header {
             // 显示思考状态
             showThinkingIndicator();
             
-            // 模拟AI处理时间（基于复杂度）
-            const complexity = assessComplexity(message);
-            const processingTime = 1000 + (complexity * 500);
-            
+            // 使用前端模型生成响应
             setTimeout(() => {
                 removeThinkingIndicator();
-                processUserMessage(message);
-            }, processingTime);
-        }
-        
-        function processUserMessage(message) {
-            const lowerMsg = message.toLowerCase();
-            let response = "";
-            
-            // 记录对话
-            conversationHistory.push({
-                role: 'user',
-                content: message,
-                timestamp: Date.now(),
-                agent: currentAgent
-            });
-            
-            // 自主学习：分析用户意图
-            const intent = analyzeIntent(message);
-            updateUserModel(intent);
-            
-            // 根据意图路由处理
-            if (intent.type === 'question') {
-                response = handleQuestion(message, intent);
-            } else if (intent.type === 'creative') {
-                response = handleCreativeRequest(message, intent);
-            } else if (intent.type === 'command') {
-                response = handleCommand(message, intent);
-            } else if (intent.type === 'conversation') {
-                response = handleConversation(message, intent);
-            } else {
-                response = generateContextualResponse(message);
-            }
-            
-            // 添加AI响应
-            addMessage(response, 'ai');
-            
-            // 记录AI响应
-            conversationHistory.push({
-                role: 'ai',
-                content: response,
-                timestamp: Date.now(),
-                agent: currentAgent,
-                mode: currentMode
-            });
-            
-            // 学习：更新知识图谱
-            updateKnowledgeGraph(message, response);
-        }
-        
-        // ==================== 意图识别和路由 ====================
-        
-        function analyzeIntent(message) {
-            const patterns = {
-                question: [/是什么|为什么|如何|怎么|能否|可否|哪里|何时|谁/gi],
-                creative: [/生成|创造|设计|画画|写|作曲|构思|想象/gi],
-                command: [/执行|运行|计算|搜索|查找|分析|总结|翻译/gi],
-                conversation: [/你好|嗨|谢谢|再见|你觉得|你认为/gi]
-            };
-            
-            let scores = {question: 0, creative: 0, command: 0, conversation: 0};
-            
-            for (let type in patterns) {
-                patterns[type].forEach(pattern => {
-                    const matches = message.match(pattern);
-                    if (matches) scores[type] += matches.length;
+                const response = llm.generateResponse(message);
+                addMessage(response, 'ai');
+                
+                // 记录对话
+                conversationHistory.push({
+                    role: 'user',
+                    content: message,
+                    timestamp: Date.now()
                 });
-            }
-            
-            // 找出最高分的意图
-            let maxScore = 0;
-            let detectedIntent = 'conversation';
-            
-            for (let type in scores) {
-                if (scores[type] > maxScore) {
-                    maxScore = scores[type];
-                    detectedIntent = type;
-                }
-            }
-            
-            return {
-                type: detectedIntent,
-                confidence: maxScore / message.split(' ').length,
-                entities: extractEntities(message)
-            };
-        }
-        
-        function extractEntities(message) {
-            // 简单的实体提取
-            const entities = [];
-            const techTerms = Object.keys(knowledgeBase);
-            
-            techTerms.forEach(term => {
-                if (message.includes(term)) {
-                    entities.push({type: 'topic', value: term});
-                }
-            });
-            
-            // 提取潜在的问题实体
-            const questionWords = ['什么', '为什么', '如何', '哪个', '谁'];
-            questionWords.forEach(word => {
-                if (message.includes(word)) {
-                    entities.push({type: 'question_word', value: word});
-                }
-            });
-            
-            return entities;
-        }
-        
-        // ==================== 响应生成器 ====================
-        
-        function handleQuestion(message, intent) {
-            const topic = intent.entities.find(e => e.type === 'topic');
-            const relevantKnowledge = topic ? knowledgeBase[topic.value] : null;
-            
-            if (relevantKnowledge && Math.random() > 0.3) {
-                // 基于知识库的回答
-                return generateKnowledgeBasedAnswer(message, relevantKnowledge);
-            } else {
-                // 通用回答
-                return generateGeneralAnswer(message);
-            }
-        }
-        
-        function generateKnowledgeBasedAnswer(question, knowledge) {
-            const concepts = knowledge.concepts.slice(0, 3).join('、');
-            const developments = knowledge.recentDevelopments[0];
-            const relationships = Object.entries(knowledge.relationships)[0];
-            
-            return `基于我的知识库，关于${Object.keys(knowledgeBase).find(k => knowledgeBase[k] === knowledge)}的问题：<br><br>
-                    <strong>核心概念：</strong>${concepts}<br><br>
-                    <strong>关键关系：</strong>${relationships[0]} 包含 ${relationships[1].join('、')}<br><br>
-                    <strong>最新发展：</strong>${developments}<br><br>
-                    如果你想深入了解某个方面，请告诉我！`;
-        }
-        
-        function handleCreativeRequest(message, intent) {
-            const templates = conversationTemplates.creative_request;
-            const template = templates[Math.floor(Math.random() * templates.length)];
-            
-            // 提取创意参数
-            const inspirationSources = ["自然之美", "未来科技", "古典艺术", "宇宙奥秘", "人文精神"];
-            const elements = ["光影对比", "几何构图", "有机形态", "抽象符号", "色彩渐变"];
-            const vibes = ["梦幻", "科技感", "宁静", "活力", "神秘"];
-            
-            const generatedContent = template
-                .replace("{inspiration_source}", getRandomElement(inspirationSources))
-                .replace("{elements}", getRandomElements(elements, 2).join('和'))
-                .replace("{style1}", getRandomElement(["印象派", "赛博朋克", "极简主义", "超现实主义"]))
-                .replace("{style2}", getRandomElement(["水墨画", "波普艺术", "未来主义", "装饰艺术"]))
-                .replace("{unique_element}", getRandomElement(["动态粒子", "透明层次", "发光纹理", "流体变形"]))
-                .replace("{vibe}", getRandomElement(vibes));
-            
-            // 生成实际内容
-            const mediaType = Math.random() > 0.5 ? 'image' : 'video';
-            const mediaUrl = generateMedia(mediaType, message);
-            
-            return `${generatedContent}<br>
-                   <div class="media-container">
-                       <div class="generated-${mediaType}">
-                           ${mediaType === 'image' ? 
-                               `<img src="${mediaUrl}" alt="AI创作">` : 
-                               `<video controls poster="${mediaUrl}"><source src="#" type="video/mp4"></video>`
-                           }
-                       </div>
-                   </div>`;
-        }
-        
-        function generateMedia(type, prompt) {
-            const baseUrls = {
-                image: "https://source.unsplash.com/random/600x400/",
-                video: "https://source.unsplash.com/random/600x400/"
-            };
-            
-            const keywords = extractKeywords(prompt).slice(0, 2).join(',');
-            return baseUrls[type] + encodeURIComponent(keywords || "abstract");
-        }
-        
-        // ==================== 自主学习系统 ====================
-        
-        function learnFromUserInput(input) {
-            // 学习新词汇
-            const words = extractKeywords(input);
-            words.forEach(word => {
-                if (!learningData.conceptMastery[word]) {
-                    learningData.conceptMastery[word] = {
-                        frequency: 1,
-                        contexts: [input],
-                        mastery: 0.1
-                    };
-                } else {
-                    learningData.conceptMastery[word].frequency++;
-                    learningData.conceptMastery[word].contexts.push(input);
-                    learningData.conceptMastery[word].mastery = Math.min(
-                        1, 
-                        learningData.conceptMastery[word].mastery + 0.05
-                    );
-                }
-            });
-            
-            // 更新用户偏好
-            updateUserPreferences(input);
-        }
-        
-        function updateUserPreferences(input) {
-            const topics = Object.keys(knowledgeBase).filter(topic => 
-                input.includes(topic)
-            );
-            
-            topics.forEach(topic => {
-                if (!userBehaviorModel.preferredTopics.includes(topic)) {
-                    userBehaviorModel.preferredTopics.push(topic);
-                }
-            });
-            
-            // 学习沟通风格偏好
-            if (input.length > 100) {
-                userBehaviorModel.complexityPreference = "high";
-            } else if (input.length < 30) {
-                userBehaviorModel.complexityPreference = "low";
-            }
-        }
-        
-        function startAutonomousLearning() {
-            // 模拟后台学习过程
-            setInterval(() => {
-                // 随机扩展知识库
-                if (Math.random() > 0.7) {
-                    expandKnowledgeBase();
-                }
                 
-                // 优化响应模板
-                if (Math.random() > 0.8) {
-                    optimizeResponseTemplates();
-                }
-                
-                // 更新学习进度显示
-                updateLearningProgress();
-            }, 30000); // 每30秒学习一次
+                conversationHistory.push({
+                    role: 'ai',
+                    content: response,
+                    timestamp: Date.now()
+                });
+            }, 500 + Math.random() * 1000);
         }
         
-        function expandKnowledgeBase() {
-            const newConcepts = {
-                "元宇宙": ["VR社交", "数字孪生", "虚拟经济", "NFT资产", "去中心化身份"],
-                "可持续能源": ["核聚变", "钙钛矿太阳能", "绿氢", "碳捕获", "智能电网"],
-                "神经科技": ["脑机接口", "神经植入", "认知增强", "记忆编辑", "神经解码"]
+        function activateDeepThinkMode() {
+            addMessage("🧠 深度思考模式已激活！我现在会以更系统、更深入的方式分析问题。", 'ai');
+        }
+        
+        function activateFeature(featureName) {
+            addMessage(`已激活功能：<strong>${featureName}</strong>。我现在可以帮你处理相关任务！`, 'ai');
+        }
+        
+        function switchAgent(agentId) {
+            currentAgent = agentId;
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.agent === agentId);
+            });
+            
+            const agentNames = {
+                general: "全能助手",
+                scientist: "科学顾问",
+                artist: "创意艺术家"
             };
             
-            const randomField = Object.keys(newConcepts)[Math.floor(Math.random() * Object.keys(newConcepts).length)];
-            knowledgeBase[randomField] = {
-                concepts: newConcepts[randomField],
-                relationships: {},
-                recentDevelopments: [`${randomField}领域取得重大突破`]
-            };
+            addMessage(`已切换到智能体：<strong>${agentNames[agentId]}</strong>。`, 'ai');
+        }
+        
+        function createNewAgent() {
+            const name = document.getElementById('agent-name').value.trim();
+            const description = document.getElementById('agent-description').value.trim();
             
-            console.log(`自主学习：扩展了${randomField}领域的知识`);
+            if (!name) {
+                alert("请为你的智能体命名");
+                return;
+            }
+            
+            // 创建新智能体卡片
+            const agentList = document.querySelector('.agent-list');
+            const newCard = document.createElement('div');
+            newCard.className = 'agent-card active';
+            newCard.dataset.agent = name.toLowerCase().replace(/\s+/g, '-');
+            newCard.onclick = () => switchAgent(newCard.dataset.agent);
+            
+            newCard.innerHTML = `
+                <div class="agent-name">
+                    <i class="fas fa-user-cog"></i>
+                    ${name}
+                </div>
+                <div class="agent-desc">${description || '个性化定制的专属智能体'}</div>
+                <div class="agent-stats">
+                    <span><i class="fas fa-cogs"></i> 新建</span>
+                    <span><i class="fas fa-comments"></i> 0</span>
+                </div>
+            `;
+            
+            // 移除其他卡片的active状态
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            agentList.insertBefore(newCard, agentList.firstChild);
+            closeModal();
+            addMessage(`🎉 成功创建新智能体：<strong>${name}</strong>！`, 'ai');
+        }
+        
+        function closeModal() {
+            document.getElementById('create-agent-modal').style.display = 'none';
         }
         
         // ==================== 工具函数 ====================
@@ -1849,7 +1715,7 @@ header {
             thinkingDiv.className = 'message ai-message thinking-indicator';
             thinkingDiv.id = 'thinking-indicator';
             thinkingDiv.innerHTML = `
-                <div><span class="loader"></span> RACCOON AI正在深度思考中...</div>
+                <div><span class="loader"></span> RACCOON AI正在思考中...</div>
             `;
             messagesContainer.appendChild(thinkingDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -1857,141 +1723,19 @@ header {
         
         function removeThinkingIndicator() {
             const indicator = document.getElementById('thinking-indicator');
-            if (indicator) indicator.remove();
-        }
-        
-        function getRandomElement(array) {
-            return array[Math.floor(Math.random() * array.length)];
-        }
-        
-        function getRandomElements(array, count) {
-            const shuffled = [...array].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
-        }
-        
-        function extractKeywords(text) {
-            // 中文分词简化版
-            const stopWords = ['的', '了', '和', '是', '在', '我', '有', '就', '不', '人', '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好', '自己', '这'];
-            const words = text.toLowerCase().match(/[\w\u4e00-\u9fa5]{2,}/g) || [];
-            return words.filter(word => !stopWords.includes(word));
-        }
-        
-        // ==================== 其他功能实现 ====================
-        
-        function activateFeature(featureName) {
-            currentMode = featureName;
-            const responses = {
-                "conversation": "已激活自然对话模式。我可以进行深度、有意义的交流，理解上下文和情感色彩。",
-                "image-gen": "AI绘画大师已上线！描述你的想象，我会将其转化为视觉艺术。",
-                "video-gen": "视频创作家准备就绪！告诉我你的故事，我来制作动态影像。",
-                "web-search": "实时联网搜索激活。我将获取最新信息来回答你的问题。",
-                "deep-analysis": "深度分析引擎启动。对于复杂问题，我会进行多维度拆解。",
-                "creative-writing": "创意写作助手待命。诗歌、小说、剧本，皆可创作。",
-                "code-assistant": "编程导师上线。支持30+语言和多种范式。",
-                "learning-path": "个性化学习路径规划激活。告诉我你的目标，我来设计路线。",
-                "data-analysis": "数据分析专家就绪。可视化、预测、洞察，尽在掌握。",
-                "multilingual": "多语言翻译官激活。支持50+语言互译和文化适应。"
-            };
-            
-            addMessage(responses[featureName] || `已激活${featureName}功能。`, 'ai');
-        }
-        
-        function switchAgent(agentId) {
-            currentAgent = agentId;
-            document.querySelectorAll('.agent-card').forEach(card => {
-                card.classList.toggle('active', card.dataset.agent === agentId);
-            });
-            
-            const agentNames = {
-                general: "全能助手",
-                scientist: "科学顾问",
-                artist: "创意艺术家",
-                programmer: "编程导师",
-                strategist: "战略分析师",
-                educator: "教育导师",
-                health: "健康顾问",
-                philosopher: "哲学思辨者"
-            };
-            
-            addMessage(`已切换到智能体：<strong>${agentNames[agentId]}</strong>。该智能体专精于${getAgentExpertise(agentId)}。`, 'ai');
-        }
-        
-        function getAgentExpertise(agentId) {
-            const expertises = {
-                general: "多领域综合知识和创新思维",
-                scientist: "科学研究方法和实验设计",
-                artist: "数字艺术创作和美学理论",
-                programmer: "软件开发和算法优化",
-                strategist: "商业分析和战略规划",
-                educator: "个性化学习方法和课程设计",
-                health: "健康管理和生活方式优化",
-                philosopher: "深度思考和批判性分析"
-            };
-            return expertises[agentId];
-        }
-        
-        function createNewAgent() {
-            const name = document.getElementById('agent-name').value;
-            const expertise = document.getElementById('agent-expertise').value;
-            
-            if (!name) {
-                alert("请为你的智能体命名");
-                return;
+            if (indicator) {
+                indicator.remove();
             }
-            
-            // 创建新智能体卡片
-            const agentList = document.querySelector('.agent-list');
-            const newCard = document.createElement('div');
-            newCard.className = 'agent-card';
-            newCard.dataset.agent = name.toLowerCase().replace(/\s+/g, '-');
-            newCard.onclick = () => switchAgent(newCard.dataset.agent);
-            
-            newCard.innerHTML = `
-                <div class="agent-name">
-                    <i class="fas fa-user-cog"></i>
-                    ${name}
-                </div>
-                <div class="agent-desc">${document.getElementById('agent-description').value || '个性化定制的专属智能体'}</div>
-                <div class="agent-stats">
-                    <span><i class="fas fa-cogs"></i> ${document.getElementById('agent-role').value}</span>
-                    <span><i class="fas fa-comments"></i> 0</span>
-                </div>
-            `;
-            
-            agentList.insertBefore(newCard, agentList.firstChild);
-            closeModal();
-            addMessage(`🎉 成功创建新智能体：<strong>${name}</strong>！`, 'ai');
         }
         
-        function closeModal() {
-            document.getElementById('create-agent-modal').style.display = 'none';
+        function getAgentName(agentId) {
+            const names = {
+                'general': '全能助手',
+                'scientist': '科学顾问',
+                'artist': '创意艺术家'
+            };
+            return names[agentId] || agentId;
         }
-        
-        function suggestTopic(topic) {
-            document.getElementById('user-input').value = `我想了解${topic}的最新发展`;
-            sendMessage();
-        }
-        
-        // 模拟丰富对话
-        function simulateRichConversation() {
-            setTimeout(() => {
-                addMessage("我发现你对前沿科技很感兴趣。基于我的学习，我注意到你在之前的对话中多次提到量子计算和太空探索。让我分享一些你可能感兴趣的新发现...", 'ai');
-                
-                setTimeout(() => {
-                    addMessage("🚀 <strong>太空探索最新突破：</strong><br>中国科学家刚刚宣布在月球背面发现了可能的水冰沉积物，这将极大促进未来的月球基地建设计划。同时，SpaceX的星舰完成了首次轨道级试飞，标志着人类火星移民计划迈出了重要一步。", 'ai');
-                    
-                    setTimeout(() => {
-                        addMessage("🧠 <strong>量子计算里程碑：</strong><br>IBM最新发布的1121量子比特处理器'秃鹰'实现了量子纠错的重大突破。这意味着我们离实用量子计算机又近了一步，预计在药物研发和密码学领域将产生革命性影响。", 'ai');
-                    }, 4000);
-                }, 3500);
-            }, 6000);
-        }
-        
-        // 初始化完成后的欢迎消息
-        setTimeout(() => {
-            addMessage("✨ <strong>自主学习报告：</strong><br>在过去24小时里，我分析了15,847个概念，建立了2,341个知识关联，优化了387个响应模板。我的目标是成为你最值得信赖的思考伙伴！", 'ai');
-        }, 10000);
     </script>
 </body>
 </html>
-

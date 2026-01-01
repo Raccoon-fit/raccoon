@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -23,6 +22,7 @@
             --new-year-red: #ff3366;
             --new-year-gold: #ffcc00;
             --wechat-green: #07C160;
+            --qq-blue: #12B7F5;
         }
         
         /* 重置与基础样式 */
@@ -58,68 +58,48 @@
             border-radius: 24px;
         }
         
-        /* 灵动岛弹窗样式 */
-        .wechat-dynamic-island {
+        /* 浏览器检测弹窗样式 */
+        .browser-dynamic-island {
             position: fixed;
             top: 1rem;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
             z-index: 2000;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, rgba(7, 193, 96, 0.9), rgba(7, 193, 96, 0.7));
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 100px;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 10px 30px rgba(7, 193, 96, 0.3);
+            justify-content: center;
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        .wechat-dynamic-island.show {
+        .browser-dynamic-island.wechat {
+            background: linear-gradient(135deg, rgba(7, 193, 96, 0.9), rgba(7, 193, 96, 0.7));
+            box-shadow: 0 10px 30px rgba(7, 193, 96, 0.3);
+        }
+        
+        .browser-dynamic-island.qq {
+            background: linear-gradient(135deg, rgba(18, 183, 245, 0.9), rgba(18, 183, 245, 0.7));
+            box-shadow: 0 10px 30px rgba(18, 183, 245, 0.3);
+        }
+        
+        .browser-dynamic-island.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
         
-        .wechat-icon {
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--wechat-green);
-        }
-        
-        .wechat-message {
+        .browser-message {
             color: white;
             font-size: 0.875rem;
             font-weight: 500;
             white-space: nowrap;
-        }
-        
-        .wechat-close {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 0 0.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s ease;
-        }
-        
-        .wechat-close:hover {
-            color: white;
+            text-align: center;
         }
         
         /* 粒子背景 */
@@ -658,12 +638,12 @@
                 max-width: 90%;
             }
             
-            .wechat-dynamic-island {
+            .browser-dynamic-island {
                 padding: 0.6rem 1.2rem;
                 max-width: 95%;
             }
             
-            .wechat-message {
+            .browser-message {
                 font-size: 0.8rem;
                 white-space: normal;
                 max-width: 200px;
@@ -729,11 +709,14 @@
     </style>
 </head>
 <body>
-    <!-- 灵动岛弹窗 -->
-    <div class="wechat-dynamic-island" id="wechatDynamicIsland">
-        <div class="wechat-icon">W</div>
-        <div class="wechat-message">您当前正在使用微信浏览</div>
-        <button class="wechat-close" id="wechatClose">×</button>
+    <!-- 微信检测弹窗 -->
+    <div class="browser-dynamic-island wechat" id="wechatTip">
+        <div class="browser-message">您当前正在使用微信浏览</div>
+    </div>
+    
+    <!-- QQ检测弹窗 -->
+    <div class="browser-dynamic-island qq" id="qqTip">
+        <div class="browser-message">您当前正在使用QQ浏览</div>
     </div>
     
     <!-- 粒子背景 -->
@@ -983,35 +966,45 @@
         // 检测微信浏览器
         function isWeChatBrowser() {
             const ua = navigator.userAgent;
-            // 检测是否包含"WeChat"字符串
-            return ua.indexOf('WeChat') > -1 || ua.indexOf('wechat') > -1;
+            // 检测是否包含"MicroMessenger"字符串
+            return ua.indexOf('MicroMessenger') > -1;
         }
         
-        // 显示灵动岛弹窗
-        function showWeChatDynamicIsland() {
-            const island = document.getElementById('wechatDynamicIsland');
+        // 检测QQ浏览器
+        function isQQBrowser() {
+            const ua = navigator.userAgent;
+            // 检测是否包含"QQ/"或"MQQBrowser"字符串
+            return ua.indexOf('QQ/') > -1 || ua.indexOf('MQQBrowser') > -1;
+        }
+        
+        // 显示微信弹窗
+        function showWeChatTip() {
+            const tip = document.getElementById('wechatTip');
             
             // 显示弹窗
             setTimeout(() => {
-                island.classList.add('show');
+                tip.classList.add('show');
             }, 1000);
             
-            // 5秒后自动隐藏
+            // 8秒后自动隐藏
             setTimeout(() => {
-                hideWeChatDynamicIsland();
+                tip.classList.remove('show');
             }, 8000);
-            
-            // 点击关闭按钮隐藏
-            document.getElementById('wechatClose').addEventListener('click', hideWeChatDynamicIsland);
         }
         
-        // 隐藏灵动岛弹窗
-        function hideWeChatDynamicIsland() {
-            const island = document.getElementById('wechatDynamicIsland');
-            island.classList.remove('show');
+        // 显示QQ弹窗
+        function showQQTip() {
+            const tip = document.getElementById('qqTip');
             
-            // 移除事件监听器
-            document.getElementById('wechatClose').removeEventListener('click', hideWeChatDynamicIsland);
+            // 显示弹窗
+            setTimeout(() => {
+                tip.classList.add('show');
+            }, 1000);
+            
+            // 8秒后自动隐藏
+            setTimeout(() => {
+                tip.classList.remove('show');
+            }, 8000);
         }
         
         // 粒子背景
@@ -1288,9 +1281,11 @@
         
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 检测微信浏览器并显示提示
+            // 检测浏览器类型并显示对应的提示
             if (isWeChatBrowser()) {
-                showWeChatDynamicIsland();
+                showWeChatTip();
+            } else if (isQQBrowser()) {
+                showQQTip();
             }
             
             initParticles();
@@ -1308,6 +1303,7 @@
             console.log('%c高级数字创意空间已加载', 'color: #A1A1AA;');
             console.log('%c当前浏览器UA:', 'color: #A1A1AA;', navigator.userAgent);
             console.log('%c微信浏览器检测:', 'color: #A1A1AA;', isWeChatBrowser() ? '检测到微信浏览器' : '非微信浏览器');
+            console.log('%cQQ浏览器检测:', 'color: #A1A1AA;', isQQBrowser() ? '检测到QQ浏览器' : '非QQ浏览器');
             
             // 导航栏滚动效果
             window.addEventListener('scroll', () => {
@@ -1323,3 +1319,4 @@
     </script>
 </body>
 </html>
+

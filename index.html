@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -21,6 +22,7 @@
             --spacing-unit: 1rem;
             --new-year-red: #ff3366;
             --new-year-gold: #ffcc00;
+            --wechat-green: #07C160;
         }
         
         /* 重置与基础样式 */
@@ -54,6 +56,70 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
+        }
+        
+        /* 灵动岛弹窗样式 */
+        .wechat-dynamic-island {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            z-index: 2000;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, rgba(7, 193, 96, 0.9), rgba(7, 193, 96, 0.7));
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(7, 193, 96, 0.3);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 90%;
+        }
+        
+        .wechat-dynamic-island.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .wechat-icon {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--wechat-green);
+        }
+        
+        .wechat-message {
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .wechat-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+        
+        .wechat-close:hover {
+            color: white;
         }
         
         /* 粒子背景 */
@@ -591,6 +657,17 @@
             .new-year-image {
                 max-width: 90%;
             }
+            
+            .wechat-dynamic-island {
+                padding: 0.6rem 1.2rem;
+                max-width: 95%;
+            }
+            
+            .wechat-message {
+                font-size: 0.8rem;
+                white-space: normal;
+                max-width: 200px;
+            }
         }
         
         /* 动画 */
@@ -652,6 +729,13 @@
     </style>
 </head>
 <body>
+    <!-- 灵动岛弹窗 -->
+    <div class="wechat-dynamic-island" id="wechatDynamicIsland">
+        <div class="wechat-icon">W</div>
+        <div class="wechat-message">您当前正在使用微信浏览</div>
+        <button class="wechat-close" id="wechatClose">×</button>
+    </div>
+    
     <!-- 粒子背景 -->
     <canvas id="particles"></canvas>
     
@@ -896,6 +980,40 @@
     </footer>
 
     <script>
+        // 检测微信浏览器
+        function isWeChatBrowser() {
+            const ua = navigator.userAgent;
+            // 检测是否包含"WeChat"字符串
+            return ua.indexOf('WeChat') > -1 || ua.indexOf('wechat') > -1;
+        }
+        
+        // 显示灵动岛弹窗
+        function showWeChatDynamicIsland() {
+            const island = document.getElementById('wechatDynamicIsland');
+            
+            // 显示弹窗
+            setTimeout(() => {
+                island.classList.add('show');
+            }, 1000);
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                hideWeChatDynamicIsland();
+            }, 8000);
+            
+            // 点击关闭按钮隐藏
+            document.getElementById('wechatClose').addEventListener('click', hideWeChatDynamicIsland);
+        }
+        
+        // 隐藏灵动岛弹窗
+        function hideWeChatDynamicIsland() {
+            const island = document.getElementById('wechatDynamicIsland');
+            island.classList.remove('show');
+            
+            // 移除事件监听器
+            document.getElementById('wechatClose').removeEventListener('click', hideWeChatDynamicIsland);
+        }
+        
         // 粒子背景
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
@@ -1170,6 +1288,11 @@
         
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
+            // 检测微信浏览器并显示提示
+            if (isWeChatBrowser()) {
+                showWeChatDynamicIsland();
+            }
+            
             initParticles();
             animateParticles();
             animateFireworks();
@@ -1183,6 +1306,8 @@
             // 控制台欢迎信息
             console.log('%cRaccoon.Fit', 'font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #2DD4BF, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;');
             console.log('%c高级数字创意空间已加载', 'color: #A1A1AA;');
+            console.log('%c当前浏览器UA:', 'color: #A1A1AA;', navigator.userAgent);
+            console.log('%c微信浏览器检测:', 'color: #A1A1AA;', isWeChatBrowser() ? '检测到微信浏览器' : '非微信浏览器');
             
             // 导航栏滚动效果
             window.addEventListener('scroll', () => {
@@ -1198,4 +1323,3 @@
     </script>
 </body>
 </html>
-

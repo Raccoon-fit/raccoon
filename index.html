@@ -26,6 +26,22 @@
             --qq-blue: #12B7F5;
         }
         
+        /* 简易模式配色 */
+        .simple-mode {
+            --deep-space: #ffffff;
+            --space-gray: #f5f5f5;
+            --cosmic-silver: #e0e0e0;
+            --nebula-blue: #666666;
+            --quantum-teal: #333333;
+            --starlight: #000000;
+            --moon-dust: #666666;
+            --aurora-purple: #555555;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --new-year-red: #cc0000;
+            --new-year-gold: #ff9900;
+        }
+        
         /* 重置与基础样式 */
         * {
             margin: 0;
@@ -48,6 +64,13 @@
                 radial-gradient(circle at 20% 30%, rgba(74, 111, 165, 0.08) 0%, transparent 40%),
                 radial-gradient(circle at 80% 70%, rgba(45, 212, 191, 0.05) 0%, transparent 40%),
                 radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 40%);
+            transition: all 0.3s ease;
+        }
+        
+        /* 简易模式下的背景 */
+        .simple-mode body {
+            background-image: none;
+            background-color: #ffffff;
         }
         
         /* 玻璃态效果 */
@@ -57,6 +80,16 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        /* 简易模式下移除玻璃效果 */
+        .simple-mode .glass {
+            background: var(--glass-bg);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         /* 浏览器检测弹窗样式 */
@@ -90,17 +123,44 @@
             box-shadow: 0 10px 30px rgba(18, 183, 245, 0.3);
         }
         
-        .browser-dynamic-island.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        
         .browser-message {
             color: white;
             font-size: 0.875rem;
             font-weight: 500;
             white-space: nowrap;
             text-align: center;
+        }
+        
+        /* 简易模式切换按钮 */
+        .mode-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1500;
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--starlight);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .mode-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .mode-toggle.simple {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--starlight);
         }
         
         /* 粒子背景 */
@@ -112,6 +172,12 @@
             height: 100%;
             z-index: -2;
             pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 简易模式下隐藏粒子 */
+        .simple-mode #particles {
+            opacity: 0;
         }
         
         /* 烟花画布 */
@@ -123,6 +189,12 @@
             height: 100%;
             z-index: -1;
             pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 简易模式下隐藏烟花 */
+        .simple-mode #fireworks {
+            opacity: 0;
         }
         
         /* 导航栏 - 高级设计 */
@@ -138,6 +210,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s ease;
         }
         
         .nav-container {
@@ -165,6 +238,11 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .logo-icon {
+            background: linear-gradient(135deg, var(--quantum-teal), var(--nebula-blue));
         }
         
         .nav-menu {
@@ -202,6 +280,15 @@
             width: 100%;
         }
         
+        /* 简易模式下简化导航链接 */
+        .simple-mode .nav-link:after {
+            display: none;
+        }
+        
+        .simple-mode .nav-link:hover {
+            color: var(--quantum-teal);
+        }
+        
         /* 时钟样式 */
         .clock-container {
             display: flex;
@@ -213,6 +300,7 @@
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .clock {
@@ -235,6 +323,7 @@
             background: var(--new-year-red);
             box-shadow: 0 0 10px var(--new-year-red);
             animation: pulse 2s infinite;
+            transition: all 0.3s ease;
         }
         
         @keyframes pulse {
@@ -250,6 +339,7 @@
             align-items: center;
             padding: 8rem 2rem 4rem;
             position: relative;
+            transition: all 0.3s ease;
         }
         
         .hero-content {
@@ -269,6 +359,13 @@
             font-size: 0.875rem;
             font-weight: 500;
             margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .hero-badge {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--quantum-teal);
         }
         
         .hero-title {
@@ -280,6 +377,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .hero-title {
+            background: linear-gradient(135deg, #333333 0%, #666666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .hero-subtitle {
@@ -288,6 +393,7 @@
             max-width: 600px;
             margin: 0 auto 3rem;
             line-height: 1.7;
+            transition: all 0.3s ease;
         }
         
         /* 新年图片样式 */
@@ -300,6 +406,13 @@
             border: 2px solid rgba(255, 255, 255, 0.1);
             position: relative;
             animation: float 6s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .new-year-image {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            animation: none;
         }
         
         .new-year-image img {
@@ -321,6 +434,12 @@
             right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--new-year-red), var(--new-year-gold), var(--new-year-red));
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .new-year-image::before {
+            background: linear-gradient(90deg, var(--new-year-red), var(--new-year-gold));
+            height: 2px;
         }
         
         /* 高级按钮 */
@@ -368,10 +487,41 @@
             transform: translateY(-2px);
         }
         
+        /* 简易模式下简化按钮 */
+        .simple-mode .btn {
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .simple-mode .btn-primary {
+            background: var(--quantum-teal);
+            color: white;
+            box-shadow: none;
+        }
+        
+        .simple-mode .btn-primary:hover {
+            background: var(--nebula-blue);
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .simple-mode .btn-secondary {
+            background: transparent;
+            color: var(--starlight);
+            border: 1px solid var(--cosmic-silver);
+        }
+        
+        .simple-mode .btn-secondary:hover {
+            background: var(--space-gray);
+            transform: none;
+        }
+        
         /* 章节样式 */
         .section {
             padding: 6rem 2rem;
             position: relative;
+            transition: all 0.3s ease;
         }
         
         .section-title {
@@ -380,6 +530,11 @@
             margin-bottom: 3rem;
             text-align: center;
             color: var(--starlight);
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .section-title {
+            color: #333333;
         }
         
         .section-subtitle {
@@ -388,6 +543,11 @@
             max-width: 600px;
             margin: 0 auto 4rem;
             font-size: 1.125rem;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .section-subtitle {
+            color: #666666;
         }
         
         /* 项目卡片 - 高级设计 */
@@ -436,6 +596,12 @@
             font-size: 1.5rem;
             margin-bottom: 1.5rem;
             background: linear-gradient(135deg, rgba(45, 212, 191, 0.1), rgba(74, 111, 165, 0.1));
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .project-icon {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
         }
         
         .project-title {
@@ -443,12 +609,22 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--starlight);
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .project-title {
+            color: #333333;
         }
         
         .project-description {
             color: var(--moon-dust);
             margin-bottom: 1.5rem;
             line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .project-description {
+            color: #666666;
         }
         
         .project-tags {
@@ -464,6 +640,13 @@
             border-radius: 100px;
             font-size: 0.75rem;
             color: var(--quantum-teal);
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .tag {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333333;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         /* 实验室网格 */
@@ -483,6 +666,7 @@
             font-size: 2rem;
             margin-bottom: 1rem;
             opacity: 0.8;
+            transition: all 0.3s ease;
         }
         
         /* 关于我区域 */
@@ -499,12 +683,22 @@
             font-size: 1.75rem;
             margin-bottom: 1.5rem;
             color: var(--starlight);
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .about-content h3 {
+            color: #333333;
         }
         
         .about-text {
             color: var(--moon-dust);
             margin-bottom: 2rem;
             line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .about-text {
+            color: #666666;
         }
         
         /* 技能展示 */
@@ -518,6 +712,11 @@
             margin-bottom: 0.5rem;
             color: var(--starlight);
             font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .skill-label {
+            color: #333333;
         }
         
         .meter-bar {
@@ -525,6 +724,11 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .meter-bar {
+            background: rgba(0, 0, 0, 0.1);
         }
         
         .meter-fill {
@@ -535,10 +739,15 @@
             transition: width 1.5s ease-out;
         }
         
+        .simple-mode .meter-fill {
+            background: var(--quantum-teal);
+        }
+        
         /* 页脚 */
         .footer {
             padding: 4rem 2rem 2rem;
             text-align: center;
+            transition: all 0.3s ease;
         }
         
         .footer-content {
@@ -572,11 +781,20 @@
             color: var(--quantum-teal);
         }
         
+        .simple-mode .footer-link:hover {
+            color: var(--nebula-blue);
+        }
+        
         .copyright {
             color: var(--moon-dust);
             font-size: 0.875rem;
             margin-top: 2rem;
             opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .simple-mode .copyright {
+            color: #666666;
         }
         
         /* 响应式设计 */
@@ -649,6 +867,13 @@
                 white-space: normal;
                 max-width: 200px;
             }
+            
+            .mode-toggle {
+                top: 0.5rem;
+                right: 0.5rem;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
         }
         
         /* 动画 */
@@ -659,6 +884,11 @@
         
         .floating {
             animation: float 6s ease-in-out infinite;
+        }
+        
+        /* 简易模式下禁用浮动动画 */
+        .simple-mode .floating {
+            animation: none;
         }
         
         /* 滚动条美化 */
@@ -679,6 +909,20 @@
             background: linear-gradient(var(--quantum-teal), var(--aurora-purple));
         }
         
+        /* 简易模式下简化滚动条 */
+        .simple-mode ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .simple-mode ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+        
+        .simple-mode ::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 4px;
+        }
+        
         /* 跨年特效 */
         .new-year-effect {
             position: fixed;
@@ -691,6 +935,10 @@
             opacity: 0;
             z-index: 5;
             transition: opacity 1s ease;
+        }
+        
+        .simple-mode .new-year-effect {
+            display: none;
         }
         
         .countdown {
@@ -707,6 +955,10 @@
             pointer-events: none;
             transition: opacity 0.5s ease;
         }
+        
+        .simple-mode .countdown {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -719,6 +971,12 @@
     <div class="browser-dynamic-island qq" id="qqTip">
         <div class="browser-message">您当前正在使用QQ浏览</div>
     </div>
+    
+    <!-- 简易模式切换按钮 -->
+    <button class="mode-toggle" id="modeToggle">
+        <span>🌙</span>
+        <span>简易模式</span>
+    </button>
     
     <!-- 粒子背景 -->
     <canvas id="particles"></canvas>
@@ -967,14 +1225,12 @@
         // 检测微信浏览器
         function isWeChatBrowser() {
             const ua = navigator.userAgent;
-            // 检测是否包含"MicroMessenger"字符串
             return ua.indexOf('MicroMessenger') > -1;
         }
         
         // 检测QQ浏览器
         function isQQBrowser() {
             const ua = navigator.userAgent;
-            // 检测是否包含"QQ/"或"MQQBrowser"字符串
             return ua.indexOf('QQ/') > -1 || ua.indexOf('MQQBrowser') > -1;
         }
         
@@ -982,12 +1238,10 @@
         function showWeChatTip() {
             const tip = document.getElementById('wechatTip');
             
-            // 显示弹窗
             setTimeout(() => {
                 tip.classList.add('show');
             }, 1000);
             
-            // 8秒后自动隐藏
             setTimeout(() => {
                 tip.classList.remove('show');
             }, 8000);
@@ -997,15 +1251,43 @@
         function showQQTip() {
             const tip = document.getElementById('qqTip');
             
-            // 显示弹窗
             setTimeout(() => {
                 tip.classList.add('show');
             }, 1000);
             
-            // 8秒后自动隐藏
             setTimeout(() => {
                 tip.classList.remove('show');
             }, 8000);
+        }
+        
+        // 简易模式切换功能
+        let isSimpleMode = false;
+        
+        function toggleSimpleMode() {
+            const body = document.body;
+            const modeToggle = document.getElementById('modeToggle');
+            
+            isSimpleMode = !isSimpleMode;
+            
+            if (isSimpleMode) {
+                body.classList.add('simple-mode');
+                modeToggle.innerHTML = '<span>☀️</span><span>标准模式</span>';
+                modeToggle.classList.add('simple');
+                localStorage.setItem('simpleMode', 'true');
+            } else {
+                body.classList.remove('simple-mode');
+                modeToggle.innerHTML = '<span>🌙</span><span>简易模式</span>';
+                modeToggle.classList.remove('simple');
+                localStorage.setItem('simpleMode', 'false');
+            }
+        }
+        
+        // 检查本地存储的模式设置
+        function checkSavedMode() {
+            const savedMode = localStorage.getItem('simpleMode');
+            if (savedMode === 'true') {
+                toggleSimpleMode();
+            }
         }
         
         // 粒子背景
@@ -1289,6 +1571,12 @@
                 showQQTip();
             }
             
+            // 绑定简易模式切换按钮
+            document.getElementById('modeToggle').addEventListener('click', toggleSimpleMode);
+            
+            // 检查保存的模式设置
+            checkSavedMode();
+            
             initParticles();
             animateParticles();
             animateFireworks();
@@ -1305,6 +1593,7 @@
             console.log('%c当前浏览器UA:', 'color: #A1A1AA;', navigator.userAgent);
             console.log('%c微信浏览器检测:', 'color: #A1A1AA;', isWeChatBrowser() ? '检测到微信浏览器' : '非微信浏览器');
             console.log('%cQQ浏览器检测:', 'color: #A1A1AA;', isQQBrowser() ? '检测到QQ浏览器' : '非QQ浏览器');
+            console.log('%c简易模式功能已启用', 'color: #A1A1AA;', '点击右上角按钮切换模式');
             
             // 导航栏滚动效果
             window.addEventListener('scroll', () => {
@@ -1320,4 +1609,3 @@
     </script>
 </body>
 </html>
-

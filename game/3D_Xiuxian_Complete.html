@@ -1,33 +1,44 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>3D修仙游戏 - 修仙问道</title>
     <style>
-        /* 基础样式 */
+        /* 基础样式 - 响应式设计 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
-        body {
-            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            touch-action: none;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #0a0a1a;
             color: #e0e0ff;
             user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         #gameContainer {
             width: 100vw;
             height: 100vh;
             position: relative;
+            overflow: hidden;
         }
         
         #gameCanvas {
             display: block;
+            width: 100%;
+            height: 100%;
             background: #000;
         }
         
@@ -45,29 +56,31 @@
             align-items: center;
             z-index: 1000;
             transition: opacity 0.5s;
+            padding: 20px;
         }
         
         .game-title {
-            font-size: 4rem;
+            font-size: clamp(2rem, 8vw, 4rem);
             color: #fff;
             text-shadow: 0 0 20px #6a6aff, 0 0 40px #4a4aaa;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             font-weight: bold;
-            letter-spacing: 5px;
+            letter-spacing: 3px;
+            text-align: center;
         }
         
         .game-subtitle {
-            font-size: 1.5rem;
+            font-size: clamp(0.8rem, 3vw, 1.5rem);
             color: #a0a0ff;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         
         .loading-bar-container {
-            width: 400px;
-            height: 25px;
+            width: min(80%, 400px);
+            height: 20px;
             background: rgba(20, 20, 40, 0.8);
-            border-radius: 12px;
-            margin-top: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
             overflow: hidden;
             border: 2px solid #3a3a8a;
         }
@@ -97,26 +110,30 @@
         }
         
         .loading-text {
-            margin-top: 15px;
-            font-size: 1.2rem;
+            margin-top: 12px;
+            font-size: clamp(0.8rem, 2.5vw, 1.2rem);
             color: #aaaaff;
         }
         
         .tip-container {
             position: absolute;
-            bottom: 50px;
-            width: 600px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
             text-align: center;
             color: #8888cc;
-            font-size: 1.1rem;
+            font-size: clamp(0.7rem, 2vw, 1.1rem);
+            padding: 0 15px;
         }
         
         /* UI系统样式 */
         .ui-panel {
-            background: rgba(10, 10, 30, 0.85);
+            background: rgba(10, 10, 30, 0.9);
             border: 2px solid #3a3a8a;
             border-radius: 10px;
-            padding: 15px;
+            padding: 10px;
             box-shadow: 0 0 20px rgba(100, 100, 255, 0.2);
             backdrop-filter: blur(5px);
             pointer-events: all;
@@ -125,9 +142,9 @@
         .ui-header {
             color: #a0a0ff;
             border-bottom: 1px solid #3a3a8a;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-            font-size: 18px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            font-size: clamp(12px, 3vw, 18px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -138,10 +155,12 @@
             color: #e0e0ff;
             border: 1px solid #4a4aaa;
             border-radius: 5px;
-            padding: 8px 15px;
+            padding: 6px 12px;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: clamp(11px, 2.5vw, 14px);
+            min-height: 36px;
+            min-width: 44px;
         }
         
         .ui-button:hover {
@@ -150,7 +169,7 @@
         }
         
         .ui-button:active {
-            transform: translateY(1px);
+            transform: scale(0.95);
         }
         
         .ui-button-red {
@@ -158,31 +177,23 @@
             border: 1px solid #aa3a3a;
         }
         
-        .ui-button-red:hover {
-            background: linear-gradient(to bottom, #aa3a3a, #7a1a1a);
-        }
-        
         .ui-button-green {
             background: linear-gradient(to bottom, #1a8a1a, #0a5a0a);
             border: 1px solid #3aaa3a;
         }
         
-        .ui-button-green:hover {
-            background: linear-gradient(to bottom, #3aaa3a, #1a7a1a);
-        }
-        
         .stat-bar {
-            height: 20px;
+            height: clamp(14px, 3vw, 20px);
             background: rgba(20, 20, 40, 0.8);
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            margin: 5px 0;
+            margin: 4px 0;
             position: relative;
         }
         
         .stat-fill {
             height: 100%;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: width 0.3s;
         }
         
@@ -195,150 +206,138 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: clamp(9px, 2vw, 12px);
             color: #fff;
             text-shadow: 1px 1px 1px #000;
         }
         
-        .hp-fill {
-            background: linear-gradient(90deg, #8a1a1a, #ff3a3a, #ff6a6a);
-        }
+        .hp-fill { background: linear-gradient(90deg, #8a1a1a, #ff3a3a, #ff6a6a); }
+        .mp-fill { background: linear-gradient(90deg, #1a3a8a, #3a6aff, #6a8aff); }
+        .xp-fill { background: linear-gradient(90deg, #1a8a1a, #3aff3a, #6aff6a); }
         
-        .mp-fill {
-            background: linear-gradient(90deg, #1a3a8a, #3a6aff, #6a8aff);
-        }
-        
-        .xp-fill {
-            background: linear-gradient(90deg, #1a8a1a, #3aff3a, #6aff6a);
-        }
-        
-        /* 布局面板样式 */
+        /* 布局面板 */
         #playerInfo {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 280px;
-        }
-        
-        .player-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #3a3a8a, #6a6aff);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            margin-right: 15px;
+            top: 10px;
+            left: 10px;
+            width: calc(100% - 20px);
+            max-width: 200px;
+            z-index: 10;
         }
         
         .player-basic-info {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .player-avatar {
+            width: clamp(40px, 10vw, 60px);
+            height: clamp(40px, 10vw, 60px);
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3a3a8a, #6a6aff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(18px, 5vw, 30px);
+            margin-right: 8px;
         }
         
         .player-name {
-            font-size: 20px;
+            font-size: clamp(14px, 3.5vw, 20px);
             font-weight: bold;
             color: #fff;
         }
         
         .player-level {
-            font-size: 16px;
+            font-size: clamp(12px, 3vw, 16px);
             color: #ffaa00;
-            margin-top: 5px;
+            margin-top: 2px;
         }
         
         .player-stats {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 8px;
         }
         
         .stat-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 3px 0;
             border-bottom: 1px solid rgba(100, 100, 200, 0.2);
+            font-size: clamp(10px, 2.5vw, 14px);
         }
         
-        .stat-name {
-            color: #aaaaff;
-        }
-        
-        .stat-value {
-            color: #fff;
-            font-weight: bold;
-        }
+        .stat-name { color: #aaaaff; }
+        .stat-value { color: #fff; font-weight: bold; }
         
         #minimap {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            height: 200px;
-            overflow: hidden;
+            top: 10px;
+            right: 10px;
+            width: clamp(80px, 20vw, 150px);
+            height: clamp(80px, 20vw, 150px);
+            z-index: 10;
         }
         
         .minimap-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: clamp(10px, 2.5vw, 14px);
         }
         
         .minimap-canvas-container {
             width: 100%;
-            height: 150px;
+            height: calc(100% - 25px);
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid #3a3a8a;
             border-radius: 5px;
             overflow: hidden;
         }
         
-        #minimapCanvas {
-            width: 100%;
-            height: 100%;
-        }
+        #minimapCanvas { width: 100%; height: 100%; }
         
         #skillsPanel {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 400px;
+            bottom: 10px;
+            left: 10px;
+            /* 不要设置right，让技能栏只占左边部分，避免被右下角视角摇杆遮挡 */
+            max-width: calc(100% - 140px); /* 留出空间给右下角摇杆 */
+            width: auto;
+            z-index: 10;
         }
         
         .skill-bar {
             display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
+            justify-content: space-around;
+            margin-top: 8px;
+            gap: 6px;
         }
         
         .skill-slot {
-            width: 60px;
-            height: 60px;
-            background: rgba(30, 30, 60, 0.7);
+            width: clamp(45px, 12vw, 60px);
+            height: clamp(45px, 12vw, 60px);
+            background: rgba(30, 30, 60, 0.9);
             border: 2px solid #4a4aaa;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: clamp(16px, 4vw, 24px);
             position: relative;
             cursor: pointer;
+            touch-action: manipulation;
         }
         
-        .skill-slot:hover {
-            border-color: #6a6aff;
-            background: rgba(50, 50, 100, 0.9);
-        }
-        
-        .skill-slot.active {
-            border-color: #ffaa00;
-            box-shadow: 0 0 10px #ffaa00;
-        }
+        .skill-slot:hover { border-color: #6a6aff; background: rgba(50, 50, 100, 0.9); }
+        .skill-slot:active { transform: scale(0.95); }
+        .skill-slot.active { border-color: #ffaa00; box-shadow: 0 0 10px #ffaa00; }
         
         .skill-cooldown {
             position: absolute;
@@ -350,7 +349,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
+            font-size: clamp(12px, 3vw, 18px);
             color: #fff;
             border-radius: 8px;
         }
@@ -358,18 +357,166 @@
         .skill-key {
             position: absolute;
             bottom: 2px;
-            right: 5px;
-            font-size: 12px;
+            right: 4px;
+            font-size: clamp(9px, 2vw, 12px);
             color: #aaa;
         }
         
-        #questPanel {
+        /* 虚拟摇杆系统 - 双摇杆布局 */
+        .joystick-container {
             position: absolute;
-            top: 20px;
-            left: 320px;
-            width: 300px;
-            max-height: 300px;
-            overflow-y: auto;
+            z-index: 15;
+            display: none;
+        }
+        
+        /* 移动摇杆 - 左下角，在操作栏上方 */
+        #moveJoystickContainer {
+            bottom: 130px;
+            left: 20px;
+            width: 120px;
+            height: 120px;
+        }
+        
+        /* 视角摇杆 - 右下角 */
+        #cameraJoystickContainer {
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .joystick-base {
+            width: 100%;
+            height: 100%;
+            background: rgba(60, 60, 100, 0.4);
+            border: 2px solid rgba(100, 100, 200, 0.5);
+            border-radius: 50%;
+            position: relative;
+            touch-action: none;
+        }
+        
+        .joystick-handle {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6a6aff, #4a4aaa);
+            border: 2px solid rgba(150, 150, 255, 0.8);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(100, 100, 255, 0.5);
+            transition: transform 0.05s;
+            pointer-events: none;
+        }
+        
+        .joystick-handle.active {
+            background: linear-gradient(135deg, #8a8aff, #6a6aff);
+            box-shadow: 0 0 20px rgba(150, 150, 255, 0.8);
+        }
+        
+        /* 移动摇杆特殊样式 */
+        #moveJoystickContainer .joystick-handle {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #4aff9a, #2a8a5a);
+            border-color: rgba(100, 255, 150, 0.8);
+            box-shadow: 0 0 15px rgba(100, 255, 150, 0.5);
+        }
+        
+        #moveJoystickContainer .joystick-handle.active {
+            background: linear-gradient(135deg, #6affaa, #4aff9a);
+            box-shadow: 0 0 25px rgba(100, 255, 150, 0.8);
+        }
+        
+        /* 视角摇杆特殊样式 */
+        #cameraJoystickContainer .joystick-handle {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffaa4a, #aa6a2a);
+            border-color: rgba(255, 170, 100, 0.8);
+            box-shadow: 0 0 15px rgba(255, 170, 100, 0.5);
+        }
+        
+        #cameraJoystickContainer .joystick-handle.active {
+            background: linear-gradient(135deg, #ffcc6a, #ffaa4a);
+            box-shadow: 0 0 25px rgba(255, 170, 100, 0.8);
+        }
+        
+        .joystick-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: #aaaaff;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(100, 100, 255, 0.5);
+        }
+        
+        /* 摇杆区域指示 */
+        .joystick-zone {
+            position: absolute;
+            bottom: 0;
+            height: 50%;
+            width: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+        
+        #moveJoystickContainer .joystick-zone {
+            background: linear-gradient(to top, rgba(100, 255, 150, 0.3), transparent);
+        }
+        
+        #cameraJoystickContainer .joystick-zone {
+            background: linear-gradient(to top, rgba(255, 170, 100, 0.3), transparent);
+        }
+        
+        /* 移动端底部操作栏 */
+        #mobileActionBar {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 130px;
+            z-index: 15;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        
+        .mobile-action-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: rgba(30, 30, 60, 0.9);
+            border: 2px solid #4a4aaa;
+            border-radius: 8px;
+            color: #fff;
+            font-size: clamp(9px, 2.5vw, 12px);
+            text-align: center;
+            cursor: pointer;
+            touch-action: manipulation;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mobile-action-btn:active {
+            transform: scale(0.95);
+            background: rgba(50, 50, 100, 0.9);
+        }
+        
+        /* 面板样式 */
+        #questPanel, #dialoguePanel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 350px;
+            max-height: 60vh;
+            display: none;
+            z-index: 100;
         }
         
         .quest-item {
@@ -388,95 +535,79 @@
         .quest-title {
             font-weight: bold;
             color: #a0a0ff;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             display: flex;
             justify-content: space-between;
+            font-size: clamp(12px, 3vw, 16px);
         }
         
-        .quest-level {
-            color: #ffaa00;
-            font-size: 12px;
-        }
+        .quest-level { color: #ffaa00; font-size: clamp(10px, 2.5vw, 12px); }
+        .quest-description { font-size: clamp(10px, 2.5vw, 12px); color: #aaa; margin-bottom: 4px; }
+        .quest-progress { font-size: clamp(10px, 2.5vw, 12px); color: #6aff6a; }
+        .quest-reward { font-size: clamp(10px, 2.5vw, 12px); color: #ffaa00; margin-top: 4px; }
         
-        .quest-description {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 5px;
-        }
+        .dialogue-speaker { font-size: clamp(14px, 3.5vw, 18px); color: #ffaa00; margin-bottom: 8px; }
+        .dialogue-text { font-size: clamp(12px, 3vw, 16px); line-height: 1.4; margin-bottom: 12px; min-height: 40px; }
         
-        .quest-progress {
-            font-size: 12px;
-            color: #6aff6a;
-        }
-        
-        .quest-reward {
-            font-size: 12px;
-            color: #ffaa00;
-            margin-top: 5px;
-        }
-        
-        #dialoguePanel {
-            position: absolute;
-            bottom: 20px;
-            width: 600px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-        }
-        
-        .dialogue-speaker {
-            font-size: 18px;
-            color: #ffaa00;
-            margin-bottom: 10px;
-        }
-        
-        .dialogue-text {
-            font-size: 16px;
-            line-height: 1.4;
-            margin-bottom: 15px;
-            min-height: 60px;
-        }
-        
-        .dialogue-options {
-            display: flex;
-            flex-direction: column;
-        }
+        .dialogue-options { display: flex; flex-direction: column; gap: 6px; }
         
         .dialogue-option {
-            background: rgba(30, 30, 60, 0.7);
+            background: rgba(30, 30, 60, 0.9);
             border: 1px solid #4a4aaa;
             border-radius: 5px;
             padding: 10px;
-            margin-top: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: clamp(12px, 3vw, 14px);
+            min-height: 44px;
+            touch-action: manipulation;
         }
         
-        .dialogue-option:hover {
-            background: rgba(50, 50, 100, 0.9);
-            border-color: #6a6aff;
-        }
+        .dialogue-option:hover { background: rgba(50, 50, 100, 0.9); border-color: #6a6aff; }
+        .dialogue-option:active { transform: scale(0.98); }
         
-        #inventoryPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 700px;
-            height: 500px;
+        /* 全屏弹窗 */
+        #inventoryPanel, #craftingPanel, #characterPanel, #mapPanel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 200;
             display: none;
+            padding: 10px;
+        }
+        
+        .panel-content {
+            background: rgba(10, 10, 30, 0.95);
+            border: 2px solid #3a3a8a;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            margin: 5vh auto;
+            overflow: hidden;
         }
         
         .inventory-tabs {
             display: flex;
+            flex-wrap: wrap;
             border-bottom: 1px solid #3a3a8a;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            gap: 5px;
         }
         
         .inventory-tab {
-            padding: 8px 20px;
+            padding: 8px 15px;
             cursor: pointer;
             border-radius: 5px 5px 0 0;
+            font-size: clamp(11px, 2.5vw, 14px);
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .inventory-tab.active {
@@ -486,17 +617,15 @@
         
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            margin-top: 15px;
-            height: 300px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
             overflow-y: auto;
             padding: 5px;
+            max-height: 50vh;
         }
         
         .inventory-slot {
-            width: 60px;
-            height: 60px;
+            aspect-ratio: 1;
             background: rgba(30, 30, 60, 0.7);
             border: 1px solid #4a4aaa;
             border-radius: 5px;
@@ -505,86 +634,62 @@
             align-items: center;
             position: relative;
             cursor: pointer;
+            touch-action: manipulation;
+            min-height: 44px;
         }
         
-        .inventory-slot:hover {
-            background: rgba(50, 50, 100, 0.9);
-            border-color: #6a6aff;
-        }
+        .inventory-slot:hover { background: rgba(50, 50, 100, 0.9); border-color: #6a6aff; }
+        .inventory-slot:active { transform: scale(0.95); }
         
         .item-icon {
-            width: 50px;
-            height: 50px;
+            width: 80%;
+            height: 80%;
             background: rgba(100, 100, 200, 0.3);
             border-radius: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: clamp(16px, 4vw, 24px);
         }
         
         .item-count {
             position: absolute;
             bottom: 2px;
-            right: 5px;
-            font-size: 12px;
+            right: 4px;
+            font-size: clamp(9px, 2vw, 12px);
             color: #fff;
             text-shadow: 1px 1px 1px #000;
         }
         
-        .item-quality-common { border-color: #aaa; }
-        .item-quality-uncommon { border-color: #1a8a1a; }
-        .item-quality-rare { border-color: #3a6aff; }
-        .item-quality-epic { border-color: #8a3aff; }
-        .item-quality-legendary { border-color: #ffaa00; }
-        
-        #craftingPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 600px;
-            display: none;
-        }
-        
         .crafting-area {
             display: grid;
-            grid-template-columns: 1fr 100px 1fr;
-            gap: 20px;
-            height: 300px;
-            margin-top: 20px;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            margin-top: 15px;
         }
         
         .crafting-input, .crafting-output {
             background: rgba(20, 20, 40, 0.7);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
+            min-height: 100px;
         }
         
         .crafting-arrow {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 40px;
+            font-size: clamp(20px, 5vw, 40px);
             color: #6a6aff;
-        }
-        
-        #characterPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 700px;
-            height: 500px;
-            display: none;
         }
         
         .character-stats {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 15px;
+            max-height: 60vh;
+            overflow-y: auto;
         }
         
         .stat-row {
@@ -593,44 +698,35 @@
             padding: 8px;
             background: rgba(30, 30, 60, 0.5);
             border-radius: 5px;
-        }
-        
-        #mapPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 500px;
-            display: none;
+            font-size: clamp(12px, 3vw, 14px);
         }
         
         .map-container {
             width: 100%;
-            height: 400px;
+            height: 50vh;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 5px;
             margin-top: 10px;
             overflow: hidden;
         }
         
-        #worldMapCanvas {
-            width: 100%;
-            height: 100%;
-        }
+        #worldMapCanvas { width: 100%; height: 100%; }
         
         .notification {
             position: absolute;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 20, 40, 0.9);
+            background: rgba(20, 20, 40, 0.95);
             border: 1px solid #4a4aaa;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 10px 20px;
             display: none;
             z-index: 50;
             animation: fadeInOut 3s;
+            font-size: clamp(12px, 3vw, 14px);
+            max-width: 90%;
+            text-align: center;
         }
         
         @keyframes fadeInOut {
@@ -643,26 +739,22 @@
         .damage-text {
             position: absolute;
             color: #ff3333;
-            font-size: 20px;
+            font-size: clamp(14px, 4vw, 20px);
             font-weight: bold;
             text-shadow: 2px 2px 2px #000;
             pointer-events: none;
             z-index: 40;
             animation: floatUp 1s;
+            white-space: nowrap;
         }
         
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-50px); }
+            100% { opacity: 0; transform: translateY(-30px); }
         }
         
-        .heal-text {
-            color: #33ff33;
-        }
-        
-        .xp-text {
-            color: #ffff33;
-        }
+        .heal-text { color: #33ff33; }
+        .xp-text { color: #ffff33; }
         
         /* 主菜单 */
         #mainMenu {
@@ -671,32 +763,36 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 500;
+            padding: 20px;
         }
         
         .menu-title {
-            font-size: 4rem;
+            font-size: clamp(2rem, 10vw, 4rem);
             color: #fff;
             text-shadow: 0 0 20px #6a6aff;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
         
         .menu-options {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 300px;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
         }
         
         .menu-button {
-            padding: 15px;
-            font-size: 1.5rem;
+            padding: 12px 20px;
+            font-size: clamp(14px, 4vw, 1.5rem);
             text-align: center;
+            min-height: 48px;
         }
         
         .settings-panel {
@@ -704,44 +800,53 @@
             border: 2px solid #3a3a8a;
             border-radius: 10px;
             padding: 20px;
-            width: 500px;
+            width: 90%;
+            max-width: 500px;
             display: none;
+            z-index: 600;
         }
         
         .settings-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 15px 0;
+            margin: 12px 0;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
-        .slider-container {
-            width: 200px;
+        .settings-slider { width: 100%; max-width: 200px; height: 30px; }
+        
+        /* 媒体查询 */
+        @media (min-width: 768px) {
+            .inventory-grid { grid-template-columns: repeat(8, 1fr); }
+            #mobileActionBar, #moveJoystickContainer, #cameraJoystickContainer { display: none !important; }
         }
         
-        .settings-slider {
-            width: 100%;
+        @media (hover: none) {
+            .ui-button:hover { background: linear-gradient(to bottom, #3a3a8a, #2a2a5a); }
+            .inventory-slot:hover { background: rgba(30, 30, 60, 0.7); border-color: #4a4aaa; }
+            .skill-slot:hover { border-color: #4a4aaa; background: rgba(30, 30, 60, 0.7); }
         }
     </style>
-</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script></head>
 <body>
     <div id="gameContainer">
-        <!-- 游戏主画布 -->
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" width="402" height="760" style="width: 402px; height: 760px;"></canvas>
         
         <!-- 加载界面 -->
-        <div id="loadingScreen">
+        <div id="loadingScreen" style="opacity: 0; display: none;">
             <div class="game-title">修仙问道</div>
             <div class="game-subtitle">Immortal Cultivation Journey</div>
             <div class="loading-bar-container">
-                <div class="loading-bar" id="loadingBar"></div>
+                <div class="loading-bar" id="loadingBar" style="width: 100%;"></div>
             </div>
-            <div class="loading-text" id="loadingText">正在初始化游戏引擎...</div>
-            <div class="tip-container" id="tipContainer"></div>
+            <div class="loading-text" id="loadingText">游戏加载完成！</div>
+            <div class="tip-container" id="tipContainer">提示: 炼器可增强你的实力，一件好的法宝可越级挑战</div>
         </div>
         
         <!-- 主菜单 -->
-        <div id="mainMenu">
+        <div id="mainMenu" style="display: flex;">
             <div class="menu-title">修仙问道</div>
             <div class="menu-options">
                 <button class="ui-button menu-button" id="continueButton">继续游戏</button>
@@ -752,9 +857,8 @@
             </div>
         </div>
         
-        <!-- 游戏UI界面 -->
+        <!-- 游戏UI -->
         <div id="uiOverlay">
-            <!-- 玩家信息面板 -->
             <div id="playerInfo" class="ui-panel">
                 <div class="player-basic-info">
                     <div class="player-avatar">道</div>
@@ -763,7 +867,6 @@
                         <div class="player-level" id="playerLevel">炼气期 一层</div>
                     </div>
                 </div>
-                
                 <div class="stat-bar">
                     <div class="stat-fill hp-fill" id="hpBar" style="width: 100%"></div>
                     <div class="stat-text" id="hpText">100/100</div>
@@ -776,31 +879,17 @@
                     <div class="stat-fill xp-fill" id="xpBar" style="width: 0%"></div>
                     <div class="stat-text" id="xpText">0/100</div>
                 </div>
-                
                 <div class="player-stats">
-                    <div class="stat-item">
-                        <span class="stat-name">攻击力</span>
-                        <span class="stat-value" id="attackValue">10</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">防御力</span>
-                        <span class="stat-value" id="defenseValue">5</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">灵力</span>
-                        <span class="stat-value" id="spiritValue">15</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-name">神识</span>
-                        <span class="stat-value" id="mindValue">8</span>
-                    </div>
+                    <div class="stat-item"><span class="stat-name">攻</span><span class="stat-value" id="attackValue">10</span></div>
+                    <div class="stat-item"><span class="stat-name">防</span><span class="stat-value" id="defenseValue">5</span></div>
+                    <div class="stat-item"><span class="stat-name">灵</span><span class="stat-value" id="spiritValue">15</span></div>
+                    <div class="stat-item"><span class="stat-name">神</span><span class="stat-value" id="mindValue">8</span></div>
                 </div>
             </div>
             
-            <!-- 小地图面板 -->
             <div id="minimap" class="ui-panel">
-                <div class="ui-header minimap-header">
-                    <span>九州地图</span>
+                <div class="minimap-header">
+                    <span>地图</span>
                     <button class="ui-button" id="toggleMapButton">全图</button>
                 </div>
                 <div class="minimap-canvas-container">
@@ -808,133 +897,179 @@
                 </div>
             </div>
             
-            <!-- 技能面板 -->
             <div id="skillsPanel" class="ui-panel">
-                <div class="ui-header">道法神通</div>
+                <div class="ui-header">道法</div>
                 <div class="skill-bar">
-                    <div class="skill-slot" data-skill="0">
-                        <div class="skill-icon">火</div>
-                        <div class="skill-key">1</div>
-                    </div>
-                    <div class="skill-slot" data-skill="1">
-                        <div class="skill-icon">冰</div>
-                        <div class="skill-key">2</div>
-                    </div>
-                    <div class="skill-slot" data-skill="2">
-                        <div class="skill-icon">雷</div>
-                        <div class="skill-key">3</div>
-                    </div>
-                    <div class="skill-slot" data-skill="3">
-                        <div class="skill-icon">风</div>
-                        <div class="skill-key">4</div>
-                    </div>
-                    <div class="skill-slot" data-skill="4">
-                        <div class="skill-icon">土</div>
-                        <div class="skill-key">5</div>
-                    </div>
-                    <div class="skill-slot" data-skill="5">
-                        <div class="skill-icon">木</div>
-                        <div class="skill-key">6</div>
-                    </div>
+                    <div class="skill-slot" data-skill="0"><div class="skill-icon">🔥</div><div class="skill-key">1</div></div>
+                    <div class="skill-slot" data-skill="1"><div class="skill-icon">❄️</div><div class="skill-key">2</div></div>
+                    <div class="skill-slot" data-skill="2"><div class="skill-icon">⚡</div><div class="skill-key">3</div></div>
+                    <div class="skill-slot" data-skill="3"><div class="skill-icon">💨</div><div class="skill-key">4</div></div>
+                    <div class="skill-slot" data-skill="4"><div class="skill-icon">🪨</div><div class="skill-key">5</div></div>
+                    <div class="skill-slot" data-skill="5"><div class="skill-icon">🌿</div><div class="skill-key">6</div></div>
                 </div>
             </div>
             
-            <!-- 任务面板 -->
+            <!-- 虚拟摇杆系统 -->
+            <!-- 移动摇杆 - 左下角 -->
+            <div id="moveJoystickContainer" class="joystick-container" style="display: block;">
+                <div class="joystick-base" id="moveJoystickBase">
+                    <div class="joystick-zone"></div>
+                    <div class="joystick-handle" id="moveJoystickHandle"></div>
+                </div>
+                <div class="joystick-label">移动</div>
+            </div>
+            
+            <!-- 视角摇杆 - 右下角
+            <div id="cameraJoystickContainer" class="joystick-container" style="display: block;">
+                <div class="joystick-base" id="cameraJoystickBase">
+                    <div class="joystick-zone"></div>
+                    <div class="joystick-handle" id="cameraJoystickHandle"></div>
+                </div>
+                <div class="joystick-label">视角</div>
+            </div>
+            -->
+           
+            
+            <!-- 移动端底部操作栏 -->
+            <div id="mobileActionBar" style="display: flex;">
+                <div class="mobile-action-btn" id="mobileInventoryBtn">背包</div>
+                <div class="mobile-action-btn" id="mobileCharacterBtn">角色</div>
+                <div class="mobile-action-btn" id="mobileQuestBtn">任务</div>
+                <div class="mobile-action-btn" id="mobileCraftBtn">制作</div>
+            </div>
+            
             <div id="questPanel" class="ui-panel">
-                <div class="ui-header">修炼任务</div>
-                <div id="questList">
-                    <!-- 任务将通过JS动态添加 -->
+                <div class="ui-header">
+                    <span>修炼任务</span>
+                    <button class="ui-button" id="closeQuestButton">关闭</button>
                 </div>
+                <div id="questList"><div class="quest-item active">
+                        <div class="quest-title">
+                            <span>初入修仙界</span>
+                            <span class="quest-level">进行中</span>
+                        </div>
+                        <div class="quest-description">找到神秘老人，了解修仙界的基本情况</div>
+                        <div class="quest-progress">0/1</div>
+                        <div class="quest-reward">奖励: 50经验 基础修炼法诀</div>
+                    </div><div class="quest-item ">
+                        <div class="quest-title">
+                            <span>妖兽讨伐</span>
+                            <span class="quest-level">未接取</span>
+                        </div>
+                        <div class="quest-description">击败3只妖兽，证明你的实力</div>
+                        <div class="quest-progress">0/3</div>
+                        <div class="quest-reward">奖励: 100经验 回春丹</div>
+                    <button class="ui-button ui-button-green" style="margin-top: 5px;">接受</button></div><div class="quest-item ">
+                        <div class="quest-title">
+                            <span>采集灵草</span>
+                            <span class="quest-level">未接取</span>
+                        </div>
+                        <div class="quest-description">采集5株灵草，用于炼制丹药</div>
+                        <div class="quest-progress">0/5</div>
+                        <div class="quest-reward">奖励: 80经验 炼丹入门</div>
+                    <button class="ui-button ui-button-green" style="margin-top: 5px;">接受</button></div></div>
             </div>
             
-            <!-- 对话面板 -->
             <div id="dialoguePanel" class="ui-panel">
                 <div class="dialogue-speaker" id="dialogueSpeaker">神秘老人</div>
                 <div class="dialogue-text" id="dialogueText">少年，我看你骨骼清奇，是修炼的好材料...</div>
-                <div class="dialogue-options" id="dialogueOptions">
-                    <!-- 选项将通过JS动态添加 -->
-                </div>
+                <div class="dialogue-options" id="dialogueOptions"></div>
             </div>
             
-            <!-- 背包面板 -->
-            <div id="inventoryPanel" class="ui-panel">
-                <div class="ui-header">
-                    <span>乾坤袋</span>
-                    <button class="ui-button" id="closeInventoryButton">关闭</button>
-                </div>
-                <div class="inventory-tabs">
-                    <div class="inventory-tab active" data-tab="all">全部</div>
-                    <div class="inventory-tab" data-tab="weapon">法器</div>
-                    <div class="inventory-tab" data-tab="armor">防具</div>
-                    <div class="inventory-tab" data-tab="potion">丹药</div>
-                    <div class="inventory-tab" data-tab="material">材料</div>
-                </div>
-                <div class="inventory-grid" id="inventoryGrid">
-                    <!-- 物品将通过JS动态添加 -->
-                </div>
-            </div>
-            
-            <!-- 制作面板 -->
-            <div id="craftingPanel" class="ui-panel">
-                <div class="ui-header">
-                    <span>炼丹炼器</span>
-                    <button class="ui-button" id="closeCraftingButton">关闭</button>
-                </div>
-                <div class="crafting-area">
-                    <div class="crafting-input" id="craftingInput">
-                        <h3>材料</h3>
+            <div id="inventoryPanel">
+                <div class="panel-content">
+                    <div class="ui-header">
+                        <span>乾坤袋</span>
+                        <button class="ui-button" id="closeInventoryButton">关闭</button>
                     </div>
-                    <div class="crafting-arrow">→</div>
-                    <div class="crafting-output" id="craftingOutput">
-                        <h3>成果</h3>
+                    <div class="inventory-tabs">
+                        <div class="inventory-tab active" data-tab="all">全部</div>
+                        <div class="inventory-tab" data-tab="weapon">法器</div>
+                        <div class="inventory-tab" data-tab="armor">防具</div>
+                        <div class="inventory-tab" data-tab="potion">丹药</div>
+                        <div class="inventory-tab" data-tab="material">材料</div>
+                    </div>
+                    <div class="inventory-grid" id="inventoryGrid"><div class="inventory-slot" data-index="0">
+                        <div class="item-icon">❤️</div>
+                        <div class="item-count">3</div>
+                    </div><div class="inventory-slot" data-index="1">
+                        <div class="item-icon">💧</div>
+                        <div class="item-count">2</div>
+                    </div><div class="inventory-slot" data-index="2">
+                        <div class="item-icon">⚔️</div>
+                        
+                    </div><div class="inventory-slot" data-index="3">
+                        <div class="item-icon">👕</div>
+                        
+                    </div><div class="inventory-slot" data-index="4">
+                        <div class="item-icon">🌿</div>
+                        <div class="item-count">5</div>
+                    </div><div class="inventory-slot" data-index="5">
+                        <div class="item-icon">🔴</div>
+                        <div class="item-count">2</div>
+                    </div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div><div class="inventory-slot"></div></div>
+                </div>
+            </div>
+            
+            <div id="craftingPanel">
+                <div class="panel-content">
+                    <div class="ui-header">
+                        <span>炼丹炼器</span>
+                        <button class="ui-button" id="closeCraftingButton">关闭</button>
+                    </div>
+                    <div class="crafting-area">
+                        <div class="crafting-input" id="craftingInput"><h3>材料</h3></div>
+                        <div class="crafting-arrow">→</div>
+                        <div class="crafting-output" id="craftingOutput"><h3>成果</h3></div>
                     </div>
                 </div>
             </div>
             
-            <!-- 角色面板 -->
-            <div id="characterPanel" class="ui-panel">
-                <div class="ui-header">
-                    <span>修为境界</span>
-                    <button class="ui-button" id="closeCharacterButton">关闭</button>
-                </div>
-                <div class="character-stats" id="characterStats">
-                    <!-- 属性将通过JS动态添加 -->
-                </div>
-            </div>
-            
-            <!-- 地图面板 -->
-            <div id="mapPanel" class="ui-panel">
-                <div class="ui-header">
-                    <span>九州全图</span>
-                    <button class="ui-button" id="closeMapButton">关闭</button>
-                </div>
-                <div class="map-container">
-                    <canvas id="worldMapCanvas"></canvas>
+            <div id="characterPanel">
+                <div class="panel-content">
+                    <div class="ui-header">
+                        <span>修为境界</span>
+                        <button class="ui-button" id="closeCharacterButton">关闭</button>
+                    </div>
+                    <div class="character-stats" id="characterStats"></div>
                 </div>
             </div>
             
-            <!-- 通知区域 -->
+            <div id="mapPanel">
+                <div class="panel-content">
+                    <div class="ui-header">
+                        <span>九州全图</span>
+                        <button class="ui-button" id="closeMapButton">关闭</button>
+                    </div>
+                    <div class="map-container"><canvas id="worldMapCanvas"></canvas></div>
+                </div>
+            </div>
+            
             <div id="notification" class="notification"></div>
         </div>
     </div>
 
     <script>
+        // 检测移动设备
+        const isMobile = () => {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                   (window.innerWidth < 768);
+        };
+        
         // 游戏主类
         class ImmortalCultivationGame {
             constructor() {
-                // 游戏状态
                 this.gameState = 'loading';
                 this.gameTime = 0;
                 this.lastTime = 0;
                 this.deltaTime = 0;
+                this.isMobile = isMobile();
                 
-                // Three.js相关
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
                 this.controls = null;
                 
-                // 游戏对象
                 this.player = null;
                 this.npcs = [];
                 this.enemies = [];
@@ -942,19 +1077,17 @@
                 this.terrain = null;
                 this.skybox = null;
                 
-                // 游戏系统
                 this.inputSystem = new InputSystem();
                 this.uiSystem = new UISystem();
+                this.joystickSystem = new JoystickSystem(this);
                 this.inventorySystem = new InventorySystem(this);
                 this.questSystem = new QuestSystem(this);
                 this.combatSystem = new CombatSystem(this);
                 this.craftingSystem = new CraftingSystem(this);
                 this.dialogueSystem = new DialogueSystem(this);
                 
-                // 技能冷却状态
                 this.skillCooldowns = {};
                 
-                // 游戏数据
                 this.gameData = {
                     player: {
                         name: "无名修士",
@@ -984,7 +1117,8 @@
                             { id: 5, name: "回春术", heal: 20, cost: 10, cooldown: 5, element: "wood" }
                         ],
                         position: { x: 0, y: 0, z: 0 },
-                        rotation: 0
+                        rotation: 0,
+                        cameraRotation: 0
                     },
                     inventory: [],
                     quests: [],
@@ -998,49 +1132,30 @@
                     }
                 };
                 
-                // 初始化游戏
                 this.init();
             }
             
             async init() {
                 console.log("开始初始化修仙游戏...");
-                
-                // 更新加载界面
                 this.updateLoadingProgress(10, "正在初始化Three.js引擎...");
                 
                 try {
-                    // 加载Three.js库
                     await this.loadThreeJS();
                     this.updateLoadingProgress(20, "Three.js加载完成，正在创建场景...");
-                    
-                    // 初始化Three.js场景
                     this.initThreeJS();
                     this.updateLoadingProgress(30, "场景创建完成，正在生成地形...");
-                    
-                    // 创建游戏世界
                     this.createWorld();
                     this.updateLoadingProgress(50, "世界生成完成，正在创建玩家...");
-                    
-                    // 创建玩家角色
                     this.createPlayer();
                     this.updateLoadingProgress(60, "玩家创建完成，正在初始化NPC...");
-                    
-                    // 创建NPC和敌人
                     this.createNPCs();
                     this.updateLoadingProgress(70, "NPC初始化完成，正在加载UI系统...");
-                    
-                    // 初始化UI系统
                     this.uiSystem.init(this);
                     this.updateLoadingProgress(80, "UI系统加载完成，正在初始化游戏系统...");
-                    
-                    // 初始化游戏系统
                     this.initGameSystems();
                     this.updateLoadingProgress(90, "游戏系统初始化完成，正在准备开始...");
-                    
-                    // 加载提示
                     this.loadTips();
                     
-                    // 隐藏加载界面，显示主菜单
                     setTimeout(() => {
                         this.updateLoadingProgress(100, "游戏加载完成！");
                         setTimeout(() => {
@@ -1077,13 +1192,11 @@
                     "心魔是每个修士的大敌，保持道心清明至关重要",
                     "境界突破时会有天劫降临，务必做好充分准备"
                 ];
-                
                 const randomTip = tips[Math.floor(Math.random() * tips.length)];
                 document.getElementById('tipContainer').textContent = "提示: " + randomTip;
             }
             
             async loadThreeJS() {
-                // 如果Three.js未加载，动态加载
                 if (typeof THREE === 'undefined') {
                     return new Promise((resolve, reject) => {
                         const script = document.createElement('script');
@@ -1096,12 +1209,10 @@
             }
             
             initThreeJS() {
-                // 创建场景
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x1a1a3a);
                 this.scene.fog = new THREE.Fog(0x1a1a3a, 50, 200);
                 
-                // 创建相机
                 this.camera = new THREE.PerspectiveCamera(
                     75,
                     window.innerWidth / window.innerHeight,
@@ -1111,7 +1222,6 @@
                 this.camera.position.set(0, 15, 20);
                 this.camera.lookAt(0, 0, 0);
                 
-                // 创建渲染器
                 this.renderer = new THREE.WebGLRenderer({
                     canvas: document.getElementById('gameCanvas'),
                     antialias: true
@@ -1120,7 +1230,6 @@
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 
-                // 添加光源
                 const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
                 this.scene.add(ambientLight);
                 
@@ -1137,46 +1246,34 @@
                 directionalLight.shadow.camera.bottom = -100;
                 this.scene.add(directionalLight);
                 
-                // 添加半球光
                 const hemisphereLight = new THREE.HemisphereLight(0x6060ff, 0x404040, 0.3);
                 this.scene.add(hemisphereLight);
                 
-                // 初始化输入系统
                 this.inputSystem.init(this);
+                this.joystickSystem.init(this);
                 
-                // 窗口调整事件
                 window.addEventListener('resize', () => this.onWindowResize());
             }
             
             createWorld() {
-                // 创建地形
                 this.createTerrain();
-                
-                // 添加环境元素
                 this.addEnvironmentalElements();
-                
-                // 创建天空
                 this.createSky();
             }
             
             createTerrain() {
                 const terrainSize = 500;
                 const segments = 100;
-                
-                // 使用PlaneGeometry创建地形
                 const geometry = new THREE.PlaneGeometry(terrainSize, terrainSize, segments, segments);
                 
-                // 修改顶点高度创建地形起伏
                 const vertices = geometry.attributes.position.array;
                 for (let i = 0; i < vertices.length; i += 3) {
                     const x = vertices[i];
                     const y = vertices[i + 1];
-                    // 使用噪声函数创建自然地形
                     vertices[i + 2] = Math.sin(x * 0.02) * 5 + Math.cos(y * 0.02) * 5;
                 }
                 geometry.computeVertexNormals();
                 
-                // 创建地形材质
                 const material = new THREE.MeshStandardMaterial({
                     color: 0x2a4a2a,
                     roughness: 0.8,
@@ -1188,7 +1285,6 @@
                 this.terrain.receiveShadow = true;
                 this.scene.add(this.terrain);
                 
-                // 添加水面
                 const waterGeometry = new THREE.PlaneGeometry(terrainSize, terrainSize);
                 const waterMaterial = new THREE.MeshStandardMaterial({
                     color: 0x1a3a5a,
@@ -1204,55 +1300,42 @@
             }
             
             addEnvironmentalElements() {
-                // 添加树木
                 for (let i = 0; i < 100; i++) {
                     const tree = this.createTree();
                     const x = (Math.random() - 0.5) * 400;
                     const z = (Math.random() - 0.5) * 400;
-                    
-                    // 避免在出生点附近生成
                     if (Math.abs(x) < 20 && Math.abs(z) < 20) continue;
-                    
                     tree.position.set(x, 0, z);
                     tree.castShadow = true;
                     tree.receiveShadow = true;
                     this.scene.add(tree);
                 }
                 
-                // 添加石头
                 for (let i = 0; i < 50; i++) {
                     const rock = this.createRock();
                     const x = (Math.random() - 0.5) * 400;
                     const z = (Math.random() - 0.5) * 400;
-                    
                     if (Math.abs(x) < 20 && Math.abs(z) < 20) continue;
-                    
                     rock.position.set(x, 0, z);
                     rock.castShadow = true;
                     rock.receiveShadow = true;
                     this.scene.add(rock);
                 }
                 
-                // 添加花朵
                 for (let i = 0; i < 200; i++) {
                     const flower = this.createFlower();
                     const x = (Math.random() - 0.5) * 400;
                     const z = (Math.random() - 0.5) * 400;
-                    
                     if (Math.abs(x) < 20 && Math.abs(z) < 20) continue;
-                    
                     flower.position.set(x, 0, z);
                     this.scene.add(flower);
                 }
                 
-                // 添加发光粒子
                 this.createParticles();
             }
             
             createTree() {
                 const group = new THREE.Group();
-                
-                // 树干
                 const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, 5, 8);
                 const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x4a3020 });
                 const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
@@ -1260,7 +1343,6 @@
                 trunk.castShadow = true;
                 group.add(trunk);
                 
-                // 树冠
                 const leavesGeometry = new THREE.ConeGeometry(3, 6, 8);
                 const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x2a6a2a });
                 const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
@@ -1273,31 +1355,21 @@
             
             createRock() {
                 const geometry = new THREE.DodecahedronGeometry(Math.random() * 2 + 1, 0);
-                const material = new THREE.MeshStandardMaterial({
-                    color: 0x606060,
-                    roughness: 0.9
-                });
+                const material = new THREE.MeshStandardMaterial({ color: 0x606060, roughness: 0.9 });
                 const rock = new THREE.Mesh(geometry, material);
-                rock.rotation.set(
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                );
+                rock.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
                 rock.scale.y = 0.5;
                 return rock;
             }
             
             createFlower() {
                 const group = new THREE.Group();
-                
-                // 花茎
                 const stemGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 4);
                 const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x2a8a2a });
                 const stem = new THREE.Mesh(stemGeometry, stemMaterial);
                 stem.position.y = 0.25;
                 group.add(stem);
                 
-                // 花瓣
                 const petalGeometry = new THREE.SphereGeometry(0.1, 4, 4);
                 const petalColors = [0xff6666, 0xff66ff, 0x66ffff, 0xffff66, 0x66ff66];
                 const petalMaterial = new THREE.MeshStandardMaterial({
@@ -1320,7 +1392,6 @@
                     positions[i * 3] = (Math.random() - 0.5) * 400;
                     positions[i * 3 + 1] = Math.random() * 20;
                     positions[i * 3 + 2] = (Math.random() - 0.5) * 400;
-                    
                     colors[i * 3] = 0.5 + Math.random() * 0.5;
                     colors[i * 3 + 1] = 0.5 + Math.random() * 0.5;
                     colors[i * 3 + 2] = 1;
@@ -1342,14 +1413,10 @@
             
             createSky() {
                 const skyGeometry = new THREE.SphereGeometry(400, 32, 32);
-                const skyMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x0a0a2a,
-                    side: THREE.BackSide
-                });
+                const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x0a0a2a, side: THREE.BackSide });
                 this.skybox = new THREE.Mesh(skyGeometry, skyMaterial);
                 this.scene.add(this.skybox);
                 
-                // 添加星星
                 const starGeometry = new THREE.BufferGeometry();
                 const starCount = 1000;
                 const starPositions = new Float32Array(starCount * 3);
@@ -1358,7 +1425,6 @@
                     const theta = Math.random() * Math.PI * 2;
                     const phi = Math.random() * Math.PI;
                     const radius = 350;
-                    
                     starPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
                     starPositions[i * 3 + 1] = radius * Math.cos(phi);
                     starPositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
@@ -1371,10 +1437,8 @@
             }
             
             createPlayer() {
-                // 创建玩家网格
                 const playerGroup = new THREE.Group();
                 
-                // 身体
                 const bodyGeometry = new THREE.CylinderGeometry(0.4, 0.4, 1.5, 8);
                 const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3a8a });
                 const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
@@ -1382,7 +1446,6 @@
                 body.castShadow = true;
                 playerGroup.add(body);
                 
-                // 头部
                 const headGeometry = new THREE.SphereGeometry(0.35, 8, 8);
                 const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffccaa });
                 const head = new THREE.Mesh(headGeometry, headMaterial);
@@ -1390,7 +1453,6 @@
                 head.castShadow = true;
                 playerGroup.add(head);
                 
-                // 眼睛
                 const eyeGeometry = new THREE.SphereGeometry(0.05, 4, 4);
                 const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
                 const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
@@ -1401,7 +1463,6 @@
                 rightEye.position.set(0.1, 1.75, 0.3);
                 playerGroup.add(rightEye);
                 
-                // 手臂
                 const armGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 4);
                 const armMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3a8a });
                 
@@ -1417,7 +1478,6 @@
                 rightArm.castShadow = true;
                 playerGroup.add(rightArm);
                 
-                // 剑
                 const swordHandleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 4);
                 const swordHandleMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
                 const swordHandle = new THREE.Mesh(swordHandleGeometry, swordHandleMaterial);
@@ -1426,11 +1486,7 @@
                 playerGroup.add(swordHandle);
                 
                 const swordBladeGeometry = new THREE.BoxGeometry(0.08, 1, 0.02);
-                const swordBladeMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xcccccc,
-                    metalness: 0.8,
-                    roughness: 0.2
-                });
+                const swordBladeMaterial = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
                 const swordBlade = new THREE.Mesh(swordBladeGeometry, swordBladeMaterial);
                 swordBlade.position.set(0.5, 0.1, 0.55);
                 swordBlade.rotation.x = Math.PI / 4;
@@ -1438,12 +1494,12 @@
                 playerGroup.add(swordBlade);
                 
                 this.player = playerGroup;
+                // 初始位置 y=0，让 updatePlayerMovement 自动计算地形高度
                 this.player.position.set(0, 0, 0);
                 this.scene.add(this.player);
             }
             
             createNPCs() {
-                // 神秘老人
                 const oldMan = this.createNPC('神秘老人', 0x666666);
                 oldMan.position.set(10, 0, 15);
                 oldMan.userData = {
@@ -1457,7 +1513,6 @@
                 this.npcs.push(oldMan);
                 this.scene.add(oldMan);
                 
-                // 炼丹师
                 const alchemist = this.createNPC('炼丹师', 0x4a3020);
                 alchemist.position.set(-15, 0, 10);
                 alchemist.userData = {
@@ -1470,7 +1525,6 @@
                 this.npcs.push(alchemist);
                 this.scene.add(alchemist);
                 
-                // 武器商人
                 const weaponMerchant = this.createNPC('武器商', 0x8B4513);
                 weaponMerchant.position.set(20, 0, -10);
                 weaponMerchant.userData = {
@@ -1483,14 +1537,11 @@
                 this.npcs.push(weaponMerchant);
                 this.scene.add(weaponMerchant);
                 
-                // 创建敌人
                 this.createEnemies();
             }
             
             createNPC(name, color) {
                 const group = new THREE.Group();
-                
-                // 身体
                 const bodyGeometry = new THREE.CylinderGeometry(0.4, 0.4, 1.5, 8);
                 const bodyMaterial = new THREE.MeshStandardMaterial({ color: color });
                 const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
@@ -1498,7 +1549,6 @@
                 body.castShadow = true;
                 group.add(body);
                 
-                // 头部
                 const headGeometry = new THREE.SphereGeometry(0.35, 8, 8);
                 const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffccaa });
                 const head = new THREE.Mesh(headGeometry, headMaterial);
@@ -1510,19 +1560,16 @@
             }
             
             createEnemies() {
-                // 创建几种不同类型的敌人
                 const enemyTypes = [
                     { name: '妖兽', color: 0x8B0000, health: 50, damage: 5 },
                     { name: '僵尸', color: 0x2F4F4F, health: 30, damage: 3 },
                     { name: '妖怪', color: 0x4B0082, health: 40, damage: 4 }
                 ];
                 
-                // 在世界各处生成敌人
                 for (let i = 0; i < 15; i++) {
                     const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
                     const enemy = this.createEnemy(type);
                     
-                    // 随机位置
                     let x, z;
                     do {
                         x = (Math.random() - 0.5) * 300;
@@ -1545,8 +1592,6 @@
             
             createEnemy(type) {
                 const group = new THREE.Group();
-                
-                // 身体 - 根据类型使用不同形状
                 let bodyGeometry;
                 if (type.name === '妖兽') {
                     bodyGeometry = new THREE.BoxGeometry(2, 2, 3);
@@ -1562,10 +1607,8 @@
                 body.castShadow = true;
                 group.add(body);
                 
-                // 眼睛
                 const eyeGeometry = new THREE.SphereGeometry(0.15, 4, 4);
                 const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-                
                 const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
                 leftEye.position.set(-0.3, 1.5, 0.8);
                 group.add(leftEye);
@@ -1578,17 +1621,18 @@
             }
             
             initGameSystems() {
-                // 初始化背包系统
                 this.inventorySystem.init();
-                
-                // 初始化任务系统
                 this.questSystem.init();
-                
-                // 初始化制作系统
                 this.craftingSystem.init();
-                
-                // 初始化对话系统
                 this.dialogueSystem.init();
+                
+                if (this.isMobile) {
+                    document.getElementById('mobileActionBar').style.display = 'flex';
+                    const moveContainer = document.getElementById('moveJoystickContainer');
+                    const cameraContainer = document.getElementById('cameraJoystickContainer');
+                    if (moveContainer) moveContainer.style.display = 'block';
+                    if (cameraContainer) cameraContainer.style.display = 'block';
+                }
             }
             
             startGame() {
@@ -1598,82 +1642,146 @@
             }
             
             update() {
-                if (this.gameState !== 'playing') return;
+                // 即使不在 playing 状态也继续渲染和更新UI
+                if (this.gameState !== 'playing' && this.gameState !== 'map') return;
                 
-                // 计算时间增量
                 const currentTime = performance.now();
                 this.deltaTime = (currentTime - this.lastTime) / 1000;
                 this.lastTime = currentTime;
                 
-                // 更新玩家移动
-                this.updatePlayerMovement();
+                // 只有在 playing 状态时才更新游戏逻辑
+                if (this.gameState === 'playing') {
+                    this.updatePlayerMovement();
+                    this.updateCameraRotation();
+                    this.updateEnemies();
+                    this.updateCamera();
+                    this.updateSkillCooldowns();
+                }
                 
-                // 更新敌人
-                this.updateEnemies();
-                
-                // 更新相机
-                this.updateCamera();
-                
-                // 更新UI
+                // UI始终更新（小地图等）
                 this.uiSystem.update();
-                
-                // 更新技能冷却
-                this.updateSkillCooldowns();
-                
-                // 渲染场景
                 this.render();
                 
-                // 继续循环
                 requestAnimationFrame(() => this.update());
             }
             
             updatePlayerMovement() {
-                const input = this.inputSystem.getInput();
+                // 获取组合输入（键盘+摇杆）
+                const input = this.joystickSystem.getInput();
                 const speed = 15;
-                const rotationSpeed = 3;
+                let isMoving = false;
                 
-                // 计算移动方向
-                if (input.forward) {
-                    this.player.position.x -= Math.sin(this.player.rotation.y) * speed * this.deltaTime;
-                    this.player.position.z -= Math.cos(this.player.rotation.y) * speed * this.deltaTime;
-                }
-                if (input.backward) {
-                    this.player.position.x += Math.sin(this.player.rotation.y) * speed * 0.5 * this.deltaTime;
-                    this.player.position.z += Math.cos(this.player.rotation.y) * speed * 0.5 * this.deltaTime;
-                }
-                if (input.left) {
-                    this.player.rotation.y += rotationSpeed * this.deltaTime;
-                }
-                if (input.right) {
-                    this.player.rotation.y -= rotationSpeed * this.deltaTime;
+                // 根据当前视角方向移动
+                const moveDirection = this.gameData.player.cameraRotation;
+                
+                // 计算摇杆方向（基于摇杆输入）
+                const joystickForward = -input.y;
+                const joystickRight = input.x;
+                
+                if (Math.abs(joystickForward) > 0.1 || Math.abs(joystickRight) > 0.1) {
+                    // 摇杆输入优先
+                    const magnitude = Math.sqrt(joystickForward * joystickForward + joystickRight * joystickRight);
+                    const normalizedForward = joystickForward / magnitude;
+                    const normalizedRight = joystickRight / magnitude;
+                    const moveSpeed = speed * magnitude * this.deltaTime;
+                    
+                    // 根据摇杆方向和相机旋转计算世界坐标移动
+                    // 摇杆向前推 = 沿相机朝向移动
+                    // 摇杆向右推 = 向右平移
+                    const worldForwardX = -Math.sin(moveDirection);
+                    const worldForwardZ = -Math.cos(moveDirection);
+                    const worldRightX = Math.cos(moveDirection);
+                    const worldRightZ = -Math.sin(moveDirection);
+                    
+                    this.player.position.x += (worldForwardX * normalizedForward + worldRightX * normalizedRight) * moveSpeed;
+                    this.player.position.z += (worldForwardZ * normalizedForward + worldRightZ * normalizedRight) * moveSpeed;
+                    isMoving = true;
+                } else {
+                    // 键盘输入
+                    if (input.forward) {
+                        this.player.position.x -= Math.sin(moveDirection) * speed * this.deltaTime;
+                        this.player.position.z -= Math.cos(moveDirection) * speed * this.deltaTime;
+                        isMoving = true;
+                    }
+                    if (input.backward) {
+                        this.player.position.x += Math.sin(moveDirection) * speed * 0.5 * this.deltaTime;
+                        this.player.position.z += Math.cos(moveDirection) * speed * 0.5 * this.deltaTime;
+                        isMoving = true;
+                    }
+                    if (input.left) {
+                        this.player.position.x -= Math.sin(moveDirection + Math.PI / 2) * speed * this.deltaTime;
+                        this.player.position.z -= Math.cos(moveDirection + Math.PI / 2) * speed * this.deltaTime;
+                        isMoving = true;
+                    }
+                    if (input.right) {
+                        this.player.position.x += Math.sin(moveDirection + Math.PI / 2) * speed * this.deltaTime;
+                        this.player.position.z += Math.cos(moveDirection + Math.PI / 2) * speed * this.deltaTime;
+                        isMoving = true;
+                    }
                 }
                 
-                // 限制移动范围
+                // 边界限制
                 this.player.position.x = Math.max(-200, Math.min(200, this.player.position.x));
                 this.player.position.z = Math.max(-200, Math.min(200, this.player.position.z));
                 
-                // 跳跃
-                if (input.jump) {
-                    this.player.position.y = Math.abs(Math.sin(Date.now() * 0.003)) * 3;
+                // 计算地形高度，将人物绑定在地形表面
+                const terrainHeight = Math.sin(this.player.position.x * 0.02) * 5 + Math.cos(this.player.position.z * 0.02) * 5;
+                const playerModelHeight = 3; // 玩家模型高度
+                this.player.position.y = terrainHeight + playerModelHeight;
+                
+                // 移动时添加简单跳跃动画（在地形高度基础上）
+                if (isMoving) {
+                    const bobOffset = Math.abs(Math.sin(Date.now() * 0.01)) * 0.3;
+                    this.player.position.y += bobOffset;
                 }
                 
-                // 更新游戏数据
                 this.gameData.player.position.x = this.player.position.x;
                 this.gameData.player.position.y = this.player.position.y;
                 this.gameData.player.position.z = this.player.position.z;
-                this.gameData.player.rotation = this.player.rotation.y;
+            }
+            
+            updateCameraRotation() {
+                // 获取视角摇杆输入
+                const cameraJoystick = this.joystickSystem.getCameraJoystick();
+                
+                // 摇杆控制视角旋转
+                if (cameraJoystick.active) {
+                    // 水平移动控制左右旋转
+                    const rotationSpeed = 2.0 * this.deltaTime;
+                    this.gameData.player.cameraRotation += cameraJoystick.x * rotationSpeed;
+                    
+                    // 垂直移动控制俯仰（限制范围）
+                    const camera = this.game.camera;
+                    const baseDistance = 20;
+                    
+                    // 俯仰角度（向上推摇杆时视角向上）
+                    const pitchAngle = cameraJoystick.y * 0.5; // 向上推时 y 为负，视角向上
+                    const cameraHeight = 15 + Math.sin(pitchAngle) * 10; // 高度范围 5-25
+                    
+                    // 更新相机位置（跟随玩家）
+                    const playerX = this.player.position.x;
+                    const playerY = this.player.position.y;
+                    const playerZ = this.player.position.z;
+                    
+                    camera.position.x = playerX + Math.sin(this.gameData.player.cameraRotation) * baseDistance;
+                    camera.position.y = Math.max(5, Math.min(30, cameraHeight));
+                    camera.position.z = playerZ + Math.cos(this.gameData.player.cameraRotation) * baseDistance;
+                    
+                    // 相机看向玩家上方一点的位置
+                    camera.lookAt(playerX, playerY + 2, playerZ);
+                    
+                    this.player.rotation.y = this.gameData.player.cameraRotation;
+                }
             }
             
             updateEnemies() {
                 this.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
                     
-                    // 计算与玩家的距离
                     const dx = this.player.position.x - enemy.position.x;
                     const dz = this.player.position.z - enemy.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
                     
-                    // 如果玩家在附近，追击玩家
                     if (distance < 50) {
                         const speed = 5;
                         const directionX = dx / distance;
@@ -1682,10 +1790,8 @@
                         enemy.position.x += directionX * speed * this.deltaTime;
                         enemy.position.z += directionZ * speed * this.deltaTime;
                         
-                        // 朝向玩家
                         enemy.lookAt(this.player.position.x, enemy.position.y, this.player.position.z);
                         
-                        // 攻击玩家
                         if (distance < 3) {
                             this.combatSystem.enemyAttack(enemy);
                         }
@@ -1694,19 +1800,34 @@
             }
             
             updateCamera() {
-                // 第三人称相机跟随
-                const cameraOffset = new THREE.Vector3(0, 15, 20);
+                const cameraJoystick = this.joystickSystem.getCameraJoystick();
+                
+                // 当使用视角摇杆时，由updateCameraRotation控制相机位置
+                if (cameraJoystick.active) {
+                    return;
+                }
+                
+                // 默认相机跟随模式
+                const baseDistance = 20;
+                const baseHeight = 15;
+                
                 const targetPosition = new THREE.Vector3(
                     this.player.position.x,
                     this.player.position.y,
                     this.player.position.z
                 );
                 
-                // 相机平滑跟随
-                this.camera.position.lerp(
-                    targetPosition.clone().add(cameraOffset),
-                    0.05
+                // 根据当前相机旋转计算偏移
+                const offsetX = Math.sin(this.gameData.player.cameraRotation) * baseDistance;
+                const offsetZ = Math.cos(this.gameData.player.cameraRotation) * baseDistance;
+                
+                const cameraTargetPos = new THREE.Vector3(
+                    targetPosition.x + offsetX,
+                    targetPosition.y + baseHeight,
+                    targetPosition.z + offsetZ
                 );
+                
+                this.camera.position.lerp(cameraTargetPos, 0.05);
                 this.camera.lookAt(targetPosition);
             }
             
@@ -1715,7 +1836,6 @@
                 Object.keys(this.skillCooldowns).forEach(skillId => {
                     if (this.skillCooldowns[skillId] <= now) {
                         delete this.skillCooldowns[skillId];
-                        // 更新UI显示
                         const slot = document.querySelector(`.skill-slot[data-skill="${skillId}"]`);
                         if (slot) {
                             const cooldownEl = slot.querySelector('.skill-cooldown');
@@ -1731,26 +1851,21 @@
                 const skill = this.gameData.player.skills[skillIndex];
                 if (!skill) return;
                 
-                // 检查冷却
                 if (this.skillCooldowns[skillIndex]) {
                     this.showNotification("技能冷却中...", 0xff6666);
                     return;
                 }
                 
-                // 检查MP
                 if (this.gameData.player.mp < skill.cost) {
                     this.showNotification("灵力不足！", 0x6666ff);
                     return;
                 }
                 
-                // 消耗MP
                 this.gameData.player.mp -= skill.cost;
                 this.uiSystem.updatePlayerInfo();
                 
-                // 设置冷却
                 this.skillCooldowns[skillIndex] = Date.now() + skill.cooldown * 1000;
                 
-                // 显示冷却
                 const slot = document.querySelector(`.skill-slot[data-skill="${skillIndex}"]`);
                 if (slot) {
                     let cooldownEl = slot.querySelector('.skill-cooldown');
@@ -1762,49 +1877,31 @@
                     cooldownEl.textContent = skill.cooldown;
                 }
                 
-                // 播放技能特效
                 this.showSkillEffect(skillIndex);
                 
-                // 播放音效
-                this.playSkillSound(skillIndex);
-                
-                // 根据元素类型执行技能
                 switch(skill.element) {
-                    case 'fire':
-                        this.combatSystem.castFireball(skill);
-                        break;
-                    case 'ice':
-                        this.combatSystem.castIceBolt(skill);
-                        break;
-                    case 'lightning':
-                        this.combatSystem.castLightning(skill);
-                        break;
-                    case 'wind':
-                        this.combatSystem.castWindSlash(skill);
-                        break;
-                    case 'earth':
-                        this.combatSystem.castEarthWall(skill);
-                        break;
-                    case 'wood':
-                        this.combatSystem.castHeal(skill);
-                        break;
+                    case 'fire': this.combatSystem.castFireball(skill); break;
+                    case 'ice': this.combatSystem.castIceBolt(skill); break;
+                    case 'lightning': this.combatSystem.castLightning(skill); break;
+                    case 'wind': this.combatSystem.castWindSlash(skill); break;
+                    case 'earth': this.combatSystem.castEarthWall(skill); break;
+                    case 'wood': this.combatSystem.castHeal(skill); break;
                 }
             }
             
             showSkillEffect(skillIndex) {
                 const skillEffects = {
-                    0: { color: 0xFF5500, size: 1 }, // 火
-                    1: { color: 0x00AAFF, size: 0.8 }, // 冰
-                    2: { color: 0xFFDD00, size: 1.2 }, // 雷
-                    3: { color: 0x00FF00, size: 0.7 }, // 风
-                    4: { color: 0x8B4513, size: 1.5 }, // 土
-                    5: { color: 0x00FF00, size: 1 } // 木
+                    0: { color: 0xFF5500, size: 1 },
+                    1: { color: 0x00AAFF, size: 0.8 },
+                    2: { color: 0xFFDD00, size: 1.2 },
+                    3: { color: 0x00FF00, size: 0.7 },
+                    4: { color: 0x8B4513, size: 1.5 },
+                    5: { color: 0x00FF00, size: 1 }
                 };
                 
                 const effect = skillEffects[skillIndex];
                 if (!effect) return;
                 
-                // 创建技能特效
                 const geometry = new THREE.SphereGeometry(effect.size, 16, 16);
                 const material = new THREE.MeshBasicMaterial({
                     color: effect.color,
@@ -1817,7 +1914,6 @@
                 skillMesh.position.y += 2;
                 this.scene.add(skillMesh);
                 
-                // 动画效果
                 let scale = 0.1;
                 const animate = () => {
                     scale += 0.1;
@@ -1835,7 +1931,6 @@
             }
             
             showDamageText(x, y, z, text, color) {
-                // 创建2D文字元素
                 const damageText = document.createElement('div');
                 damageText.className = 'damage-text';
                 damageText.textContent = text;
@@ -1846,7 +1941,6 @@
                 
                 document.getElementById('uiOverlay').appendChild(damageText);
                 
-                // 3D到2D坐标转换
                 const vector = new THREE.Vector3(x, y, z);
                 vector.project(this.camera);
                 
@@ -1856,10 +1950,7 @@
                 damageText.style.left = `${xPos}px`;
                 damageText.style.top = `${yPos}px`;
                 
-                // 移除动画
-                setTimeout(() => {
-                    damageText.remove();
-                }, 1000);
+                setTimeout(() => { damageText.remove(); }, 1000);
             }
             
             showNotification(message, color = 0xFFFFFF) {
@@ -1868,14 +1959,7 @@
                 notification.style.color = `rgb(${(color >> 16) & 255}, ${(color >> 8) & 255}, ${color & 255})`;
                 notification.style.display = 'block';
                 
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 3000);
-            }
-            
-            playSkillSound(skillIndex) {
-                // 在实际游戏中，这里会播放音效
-                console.log(`播放技能 ${skillIndex} 的音效`);
+                setTimeout(() => { notification.style.display = 'none'; }, 3000);
             }
             
             startDialogue(npc) {
@@ -1884,7 +1968,6 @@
             }
             
             render() {
-                // 渲染场景
                 if (this.renderer && this.scene && this.camera) {
                     this.renderer.render(this.scene, this.camera);
                 }
@@ -1896,6 +1979,273 @@
                     this.camera.updateProjectionMatrix();
                     this.renderer.setSize(window.innerWidth, window.innerHeight);
                 }
+            }
+            
+            gainExperience(amount) {
+                this.gameData.player.xp += amount;
+                
+                this.showDamageText(
+                    this.player.position.x,
+                    this.player.position.y + 3,
+                    this.player.position.z,
+                    `+${amount} XP`,
+                    0xFFFF00
+                );
+                
+                if (this.gameData.player.xp >= this.gameData.player.xpToNext) {
+                    this.levelUp();
+                }
+                
+                this.uiSystem.updatePlayerInfo();
+            }
+            
+            levelUp() {
+                this.gameData.player.level++;
+                this.gameData.player.xp -= this.gameData.player.xpToNext;
+                this.gameData.player.xpToNext = Math.floor(this.gameData.player.xpToNext * 1.5);
+                
+                this.gameData.player.maxHp += 20;
+                this.gameData.player.maxMp += 10;
+                this.gameData.player.hp = this.gameData.player.maxHp;
+                this.gameData.player.mp = this.gameData.player.maxMp;
+                this.gameData.player.stats.attack += 2;
+                this.gameData.player.stats.defense += 1;
+                this.gameData.player.stats.spirit += 2;
+                this.gameData.player.stats.mind += 1;
+                this.gameData.player.stats.agility += 1;
+                this.gameData.player.stats.luck += Math.floor(Math.random() * 2);
+                
+                this.updateCultivationRealm();
+                
+                this.showNotification(`恭喜突破到 ${this.gameData.player.cultivation} ${this.gameData.player.realm}`, 0x00FFFF);
+                
+                this.uiSystem.updatePlayerInfo();
+            }
+            
+            updateCultivationRealm() {
+                const realms = [
+                    { level: 1, name: "炼气期", subRealms: ["一层", "二层", "三层", "四层", "五层", "六层", "七层", "八层", "九层", "大圆满"] },
+                    { level: 10, name: "筑基期", subRealms: ["初期", "中期", "后期", "大圆满"] },
+                    { level: 14, name: "金丹期", subRealms: ["初期", "中期", "后期", "大圆满"] },
+                    { level: 18, name: "元婴期", subRealms: ["初期", "中期", "后期", "大圆满"] },
+                    { level: 22, name: "化神期", subRealms: ["初期", "中期", "后期", "大圆满"] }
+                ];
+                
+                for (let i = realms.length - 1; i >= 0; i--) {
+                    if (this.gameData.player.level >= realms[i].level) {
+                        const realmIndex = Math.min(
+                            Math.floor((this.gameData.player.level - realms[i].level) / 2),
+                            realms[i].subRealms.length - 1
+                        );
+                        
+                        this.gameData.player.cultivation = realms[i].name;
+                        this.gameData.player.realm = realms[i].subRealms[realmIndex];
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 虚拟摇杆系统 - 双摇杆实现
+        class JoystickSystem {
+            constructor(game = null) {
+                this.game = game;
+                this.moveJoystick = {
+                    active: false,
+                    x: 0,
+                    y: 0,
+                    touchId: null,
+                    startX: 0,
+                    startY: 0,
+                    baseRect: null
+                };
+                this.cameraJoystick = {
+                    active: false,
+                    x: 0,
+                    y: 0,
+                    touchId: null,
+                    startX: 0,
+                    startY: 0,
+                    baseRect: null
+                };
+                this.moveMaxDistance = 45;
+                this.cameraMaxDistance = 35;
+            }
+            
+            init(game) {
+                this.game = game;
+                
+                const moveContainer = document.getElementById('moveJoystickContainer');
+                const moveBase = document.getElementById('moveJoystickBase');
+                const cameraContainer = document.getElementById('cameraJoystickContainer');
+                const cameraBase = document.getElementById('cameraJoystickBase');
+                
+                if (!moveContainer || !moveBase || !cameraContainer || !cameraBase) {
+                    console.error('摇杆元素未完全找到');
+                    return;
+                }
+                
+                // 仅在移动设备上显示摇杆
+                if (this.game.isMobile) {
+                    moveContainer.style.display = 'block';
+                    cameraContainer.style.display = 'block';
+                }
+                
+                // 移动摇杆事件
+                this.setupJoystickEvents(moveBase, this.moveJoystick, this.moveMaxDistance, 'move');
+                
+                // 视角摇杆事件
+                this.setupJoystickEvents(cameraBase, this.cameraJoystick, this.cameraMaxDistance, 'camera');
+            }
+            
+            setupJoystickEvents(baseElement, joystick, maxDistance, type) {
+                // 触摸事件 - 视角摇杆需要阻止默认行为以避免影响其他元素
+                baseElement.addEventListener('touchstart', (e) => this.onTouchStart(e, joystick, baseElement, maxDistance, type), { passive: false });
+                baseElement.addEventListener('touchmove', (e) => {
+                    e.preventDefault(); // 阻止默认行为防止触摸传播
+                    this.onTouchMove(e, joystick, maxDistance);
+                }, { passive: false });
+                baseElement.addEventListener('touchend', (e) => this.onTouchEnd(e, joystick), { passive: false });
+                baseElement.addEventListener('touchcancel', (e) => this.onTouchEnd(e, joystick), { passive: false });
+                
+                // 鼠标事件（用于测试）
+                baseElement.addEventListener('mousedown', (e) => this.onMouseDown(e, joystick, baseElement, maxDistance, type));
+                document.addEventListener('mousemove', (e) => this.onMouseMove(e, joystick, maxDistance));
+                document.addEventListener('mouseup', (e) => this.onMouseUp(e, joystick));
+            }
+            
+            onTouchStart(e, joystick, baseElement, maxDistance, type) {
+                e.preventDefault();
+                if (joystick.active) return;
+                
+                const touch = e.changedTouches[0];
+                joystick.baseRect = baseElement.getBoundingClientRect();
+                joystick.active = true;
+                joystick.touchId = touch.identifier;
+                joystick.startX = joystick.baseRect.left + joystick.baseRect.width / 2;
+                joystick.startY = joystick.baseRect.top + joystick.baseRect.height / 2;
+                
+                const handleId = type === 'move' ? 'moveJoystickHandle' : 'cameraJoystickHandle';
+                const handle = document.getElementById(handleId);
+                if (handle) {
+                    handle.classList.add('active');
+                    this.updateJoystickPosition(touch.clientX, touch.clientY, joystick, maxDistance, handle);
+                }
+            }
+            
+            onTouchMove(e, joystick, maxDistance) {
+                e.preventDefault();
+                if (!joystick.active) return;
+                
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joystick.touchId) {
+                        const handleId = joystick === this.moveJoystick ? 'moveJoystickHandle' : 'cameraJoystickHandle';
+                        const handle = document.getElementById(handleId);
+                        if (handle) {
+                            this.updateJoystickPosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY, joystick, maxDistance, handle);
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            onTouchEnd(e, joystick) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joystick.touchId) {
+                        this.resetJoystick(joystick);
+                        break;
+                    }
+                }
+            }
+            
+            onMouseDown(e, joystick, baseElement, maxDistance, type) {
+                if (!this.game.isMobile && !joystick.active) {
+                    joystick.baseRect = baseElement.getBoundingClientRect();
+                    joystick.active = true;
+                    joystick.startX = joystick.baseRect.left + joystick.baseRect.width / 2;
+                    joystick.startY = joystick.baseRect.top + joystick.baseRect.height / 2;
+                    
+                    const handleId = type === 'move' ? 'moveJoystickHandle' : 'cameraJoystickHandle';
+                    const handle = document.getElementById(handleId);
+                    if (handle) {
+                        handle.classList.add('active');
+                        this.updateJoystickPosition(e.clientX, e.clientY, joystick, maxDistance, handle);
+                    }
+                }
+            }
+            
+            onMouseMove(e, joystick, maxDistance) {
+                if (joystick.active && !this.game.isMobile) {
+                    const handleId = joystick === this.moveJoystick ? 'moveJoystickHandle' : 'cameraJoystickHandle';
+                    const handle = document.getElementById(handleId);
+                    if (handle) {
+                        this.updateJoystickPosition(e.clientX, e.clientY, joystick, maxDistance, handle);
+                    }
+                }
+            }
+            
+            onMouseUp(e, joystick) {
+                if (joystick.active && !this.game.isMobile) {
+                    this.resetJoystick(joystick);
+                }
+            }
+            
+            updateJoystickPosition(clientX, clientY, joystick, maxDistance, handle) {
+                if (!handle) return;
+                
+                let deltaX = clientX - joystick.startX;
+                let deltaY = clientY - joystick.startY;
+                
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                if (distance > maxDistance) {
+                    const ratio = maxDistance / distance;
+                    deltaX *= ratio;
+                    deltaY *= ratio;
+                }
+                
+                handle.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+                
+                joystick.x = deltaX / maxDistance;
+                joystick.y = deltaY / maxDistance;
+            }
+            
+            resetJoystick(joystick) {
+                const handleId = joystick === this.moveJoystick ? 'moveJoystickHandle' : 'cameraJoystickHandle';
+                const handle = document.getElementById(handleId);
+                if (handle) {
+                    handle.classList.remove('active');
+                    handle.style.transform = 'translate(-50%, -50%)';
+                }
+                joystick.active = false;
+                joystick.x = 0;
+                joystick.y = 0;
+                joystick.touchId = null;
+            }
+            
+            getMoveJoystick() {
+                return this.moveJoystick;
+            }
+            
+            getCameraJoystick() {
+                return this.cameraJoystick;
+            }
+            
+            // 获取组合输入（用于键盘+摇杆）
+            getInput() {
+                const keyboardInput = this.game.inputSystem.getInput();
+                const move = this.moveJoystick;
+                const camera = this.cameraJoystick;
+                
+                return {
+                    forward: keyboardInput.forward || (move.active && move.y < -0.2),
+                    backward: keyboardInput.backward || (move.active && move.y > 0.2),
+                    left: keyboardInput.left || (move.active && move.x < -0.2),
+                    right: keyboardInput.right || (move.active && move.x > 0.2),
+                    cameraX: camera.x,
+                    cameraY: camera.y,
+                    isJoystickInput: move.active
+                };
             }
         }
         
@@ -1910,59 +2260,41 @@
             init(game) {
                 this.game = game;
                 
-                // 键盘事件
                 document.addEventListener('keydown', (e) => this.onKeyDown(e));
                 document.addEventListener('keyup', (e) => this.onKeyUp(e));
-                
-                // 鼠标事件
-                document.addEventListener('mousemove', (e) => this.onMouseMove(e));
-                document.addEventListener('mousedown', (e) => this.onMouseDown(e));
-                document.addEventListener('mouseup', (e) => this.onMouseUp(e));
-                
-                // 防止上下文菜单
                 document.addEventListener('contextmenu', (e) => e.preventDefault());
-                
-                // 窗口失去焦点时重置按键
                 window.addEventListener('blur', () => this.resetKeys());
             }
             
             onKeyDown(e) {
                 this.keys[e.key.toLowerCase()] = true;
                 
-                // 处理快捷键
                 if (this.game.gameState === 'playing') {
-                    // 技能快捷键
                     if (e.key >= '1' && e.key <= '6') {
                         const skillIndex = parseInt(e.key) - 1;
                         this.game.castSkill(skillIndex);
                     }
                     
-                    // 打开背包
                     if (e.key === 'i' || e.key === 'I') {
                         this.game.uiSystem.toggleInventory();
                     }
                     
-                    // 打开角色面板
                     if (e.key === 'c' || e.key === 'C') {
                         this.game.uiSystem.toggleCharacterPanel();
                     }
                     
-                    // 打开地图
                     if (e.key === 'm' || e.key === 'M') {
                         this.game.uiSystem.toggleMap();
                     }
                     
-                    // 打开任务
                     if (e.key === 'q' || e.key === 'Q') {
                         this.game.uiSystem.toggleQuestPanel();
                     }
                     
-                    // 打开制作
                     if (e.key === 'f' || e.key === 'F') {
                         this.game.uiSystem.toggleCrafting();
                     }
                     
-                    // 退出菜单
                     if (e.key === 'Escape') {
                         this.game.uiSystem.toggleMainMenu();
                     }
@@ -1971,19 +2303,6 @@
             
             onKeyUp(e) {
                 this.keys[e.key.toLowerCase()] = false;
-            }
-            
-            onMouseMove(e) {
-                this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            }
-            
-            onMouseDown(e) {
-                this.mouseButtons[e.button] = true;
-            }
-            
-            onMouseUp(e) {
-                this.mouseButtons[e.button] = false;
             }
             
             resetKeys() {
@@ -1998,8 +2317,7 @@
                     left: this.keys['a'] || this.keys['arrowleft'],
                     right: this.keys['d'] || this.keys['arrowright'],
                     jump: this.keys[' '],
-                    interact: this.keys['e'],
-                    attack: this.mouseButtons[0]
+                    interact: this.keys['e']
                 };
             }
         }
@@ -2009,35 +2327,24 @@
             constructor() {
                 this.game = null;
                 this.interactionHint = null;
+                this.mapUpdateInterval = null;
             }
             
             init(game) {
                 this.game = game;
-                
-                // 初始化UI事件
                 this.initEvents();
-                
-                // 更新玩家信息
                 this.updatePlayerInfo();
-                
-                // 初始化任务列表
                 this.initQuests();
-                
-                // 初始化背包
                 this.initInventory();
-                
-                // 初始化技能
                 this.initSkills();
             }
             
             initEvents() {
-                // 主菜单按钮
                 document.getElementById('continueButton').addEventListener('click', () => this.toggleMainMenu());
                 document.getElementById('newGameButton').addEventListener('click', () => this.startNewGame());
                 document.getElementById('settingsButton').addEventListener('click', () => this.showSettings());
                 document.getElementById('aboutButton').addEventListener('click', () => this.showAbout());
                 
-                // 技能点击
                 document.querySelectorAll('.skill-slot').forEach(slot => {
                     slot.addEventListener('click', (e) => {
                         const skillIndex = parseInt(e.currentTarget.dataset.skill);
@@ -2045,7 +2352,6 @@
                     });
                 });
                 
-                // 背包标签
                 document.querySelectorAll('.inventory-tab').forEach(tab => {
                     tab.addEventListener('click', (e) => {
                         document.querySelectorAll('.inventory-tab').forEach(t => t.classList.remove('active'));
@@ -2054,45 +2360,43 @@
                     });
                 });
                 
-                // 关闭按钮
                 document.getElementById('closeInventoryButton').addEventListener('click', () => this.toggleInventory());
                 document.getElementById('closeCharacterButton').addEventListener('click', () => this.toggleCharacterPanel());
                 document.getElementById('closeMapButton').addEventListener('click', () => this.toggleMap());
                 document.getElementById('closeCraftingButton').addEventListener('click', () => this.toggleCrafting());
+                document.getElementById('closeQuestButton').addEventListener('click', () => this.toggleQuestPanel());
                 document.getElementById('toggleMapButton').addEventListener('click', () => this.toggleMap());
+                
+                if (this.game.isMobile) {
+                    document.getElementById('mobileInventoryBtn').addEventListener('click', () => this.toggleInventory());
+                    document.getElementById('mobileCharacterBtn').addEventListener('click', () => this.toggleCharacterPanel());
+                    document.getElementById('mobileQuestBtn').addEventListener('click', () => this.toggleQuestPanel());
+                    document.getElementById('mobileCraftBtn').addEventListener('click', () => this.toggleCrafting());
+                }
             }
             
             update() {
-                // 更新小地图
                 this.updateMinimap();
-                
-                // 更新交互提示
                 this.updateInteractionHint();
             }
             
             updatePlayerInfo() {
                 const player = this.game.gameData.player;
-                
-                // 更新文本
                 document.getElementById('playerName').textContent = player.name;
                 document.getElementById('playerLevel').textContent = `${player.cultivation} ${player.realm}`;
                 
-                // 更新血条
                 const hpPercent = (player.hp / player.maxHp) * 100;
                 document.getElementById('hpBar').style.width = `${hpPercent}%`;
                 document.getElementById('hpText').textContent = `${Math.floor(player.hp)}/${player.maxHp}`;
                 
-                // 更新蓝条
                 const mpPercent = (player.mp / player.maxMp) * 100;
                 document.getElementById('mpBar').style.width = `${mpPercent}%`;
                 document.getElementById('mpText').textContent = `${Math.floor(player.mp)}/${player.maxMp}`;
                 
-                // 更新经验条
                 const xpPercent = (player.xp / player.xpToNext) * 100;
                 document.getElementById('xpBar').style.width = `${xpPercent}%`;
                 document.getElementById('xpText').textContent = `${player.xp}/${player.xpToNext}`;
                 
-                // 更新属性
                 document.getElementById('attackValue').textContent = player.stats.attack;
                 document.getElementById('defenseValue').textContent = player.stats.defense;
                 document.getElementById('spiritValue').textContent = player.stats.spirit;
@@ -2102,25 +2406,18 @@
             updateMinimap() {
                 const canvas = document.getElementById('minimapCanvas');
                 const ctx = canvas.getContext('2d');
-                
                 if (!canvas || !ctx) return;
                 
-                // 设置画布大小
                 canvas.width = canvas.clientWidth;
                 canvas.height = canvas.clientHeight;
-                
-                // 清除画布
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                // 绘制地图背景
                 ctx.fillStyle = '#1a1a3a';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // 绘制网格
                 ctx.strokeStyle = '#3a3a8a';
                 ctx.lineWidth = 1;
-                
-                const gridSize = 20;
+                const gridSize = 15;
                 
                 for (let x = 0; x < canvas.width; x += gridSize) {
                     ctx.beginPath();
@@ -2136,67 +2433,47 @@
                     ctx.stroke();
                 }
                 
-                // 中心点（玩家位置）
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
                 
-                // 绘制玩家
+                // 绘制玩家（考虑当前朝向）
                 ctx.fillStyle = '#00ffff';
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // 绘制玩家方向
                 ctx.strokeStyle = '#00ffff';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.lineTo(
-                    centerX + Math.sin(this.game.player.rotation.y) * 10,
-                    centerY + Math.cos(this.game.player.rotation.y) * 10
+                    centerX + Math.sin(this.game.gameData.player.cameraRotation) * 8,
+                    centerY + Math.cos(this.game.gameData.player.cameraRotation) * 8
                 );
                 ctx.stroke();
                 
-                // 绘制NPC
                 ctx.fillStyle = '#00ff00';
                 this.game.npcs.forEach(npc => {
                     const dx = npc.position.x - this.game.player.position.x;
                     const dz = npc.position.z - this.game.player.position.z;
-                    
-                    // 限制显示范围
                     if (Math.abs(dx) < 50 && Math.abs(dz) < 50) {
-                        const x = centerX + dx;
-                        const y = centerY + dz;
-                        
                         ctx.beginPath();
-                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.arc(centerX + dx, centerY + dz, 2, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
                 
-                // 绘制敌人
                 ctx.fillStyle = '#ff0000';
                 this.game.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
-                    
                     const dx = enemy.position.x - this.game.player.position.x;
                     const dz = enemy.position.z - this.game.player.position.z;
-                    
-                    // 限制显示范围
                     if (Math.abs(dx) < 50 && Math.abs(dz) < 50) {
-                        const x = centerX + dx;
-                        const y = centerY + dz;
-                        
                         ctx.beginPath();
-                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.arc(centerX + dx, centerY + dz, 2, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
-                
-                // 绘制地图边界
-                ctx.strokeStyle = '#ffaa00';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
             }
             
             showInteractionHint(npcName) {
@@ -2206,12 +2483,12 @@
                     this.interactionHint.style.bottom = '100px';
                     this.interactionHint.style.left = '50%';
                     this.interactionHint.style.transform = 'translateX(-50%)';
-                    this.interactionHint.style.background = 'rgba(0, 0, 0, 0.7)';
+                    this.interactionHint.style.background = 'rgba(0, 0, 0, 0.8)';
                     this.interactionHint.style.color = '#fff';
                     this.interactionHint.style.padding = '10px 20px';
                     this.interactionHint.style.borderRadius = '5px';
                     this.interactionHint.style.zIndex = '100';
-                    
+                    this.interactionHint.style.fontSize = '14px';
                     document.getElementById('uiOverlay').appendChild(this.interactionHint);
                 }
                 
@@ -2221,7 +2498,6 @@
             
             updateInteractionHint() {
                 if (this.interactionHint) {
-                    // 检查玩家是否还在NPC附近
                     let showHint = false;
                     let nearestNPC = null;
                     
@@ -2229,7 +2505,6 @@
                         const dx = this.game.player.position.x - npc.position.x;
                         const dz = this.game.player.position.z - npc.position.z;
                         const distance = Math.sqrt(dx * dx + dz * dz);
-                        
                         if (distance < 3) {
                             showHint = true;
                             nearestNPC = npc.userData.name;
@@ -2246,7 +2521,6 @@
             
             toggleMainMenu() {
                 const menu = document.getElementById('mainMenu');
-                
                 if (menu.style.display === 'flex') {
                     menu.style.display = 'none';
                     if (this.game.gameState === 'menu') {
@@ -2261,7 +2535,6 @@
             }
             
             startNewGame() {
-                // 重置游戏数据
                 this.game.gameData = {
                     player: {
                         name: "无名修士",
@@ -2272,14 +2545,7 @@
                         maxHp: 100,
                         mp: 50,
                         maxMp: 50,
-                        stats: {
-                            attack: 10,
-                            defense: 5,
-                            spirit: 15,
-                            mind: 8,
-                            agility: 12,
-                            luck: 5
-                        },
+                        stats: { attack: 10, defense: 5, spirit: 15, mind: 8, agility: 12, luck: 5 },
                         cultivation: "炼气期",
                         realm: "一层",
                         skills: [
@@ -2291,44 +2557,34 @@
                             { id: 5, name: "回春术", heal: 20, cost: 10, cooldown: 5, element: "wood" }
                         ],
                         position: { x: 0, y: 0, z: 0 },
-                        rotation: 0
+                        rotation: 0,
+                        cameraRotation: 0
                     },
                     inventory: [],
                     quests: [],
                     completedQuests: [],
                     discoveredLocations: ["新手村"],
                     gameTime: 0,
-                    settings: {
-                        volume: 0.7,
-                        graphics: "medium",
-                        controls: "keyboard"
-                    }
+                    settings: { volume: 0.7, graphics: "medium", controls: "keyboard" }
                 };
                 
-                // 重置玩家位置
                 this.game.player.position.set(0, 0, 0);
                 this.game.player.rotation.y = 0;
                 
-                // 开始游戏
                 document.getElementById('mainMenu').style.display = 'none';
                 this.game.gameState = 'playing';
                 this.game.lastTime = performance.now();
                 this.game.update();
                 
-                // 显示欢迎消息
                 this.game.showNotification("欢迎来到修仙世界！", 0x00FFFF);
-                
-                // 更新UI
                 this.updatePlayerInfo();
                 this.initQuests();
                 this.initInventory();
             }
             
             showSettings() {
-                // 创建设置面板
                 const settingsPanel = document.createElement('div');
                 settingsPanel.className = 'settings-panel ui-panel';
-                
                 settingsPanel.innerHTML = `
                     <div class="ui-header">大道法则</div>
                     <div class="settings-row">
@@ -2337,17 +2593,14 @@
                     </div>
                     <div class="settings-row">
                         <span>画质</span>
-                        <select>
-                            <option>低</option>
-                            <option selected>中</option>
-                            <option>高</option>
+                        <select style="padding: 8px; border-radius: 5px;">
+                            <option>低</option><option selected>中</option><option>高</option>
                         </select>
                     </div>
                     <div class="settings-row">
                         <span>控制</span>
-                        <select>
-                            <option selected>键盘</option>
-                            <option>鼠标</option>
+                        <select style="padding: 8px; border-radius: 5px;">
+                            <option selected>键盘</option><option>触摸</option>
                         </select>
                     </div>
                     <div style="text-align: center; margin-top: 20px;">
@@ -2355,7 +2608,6 @@
                         <button class="ui-button ui-button-red" id="closeSettings">关闭</button>
                     </div>
                 `;
-                
                 document.getElementById('mainMenu').appendChild(settingsPanel);
                 settingsPanel.style.display = 'block';
                 
@@ -2363,10 +2615,7 @@
                     this.game.showNotification("设置已保存", 0x00FF00);
                     settingsPanel.remove();
                 });
-                
-                document.getElementById('closeSettings').addEventListener('click', () => {
-                    settingsPanel.remove();
-                });
+                document.getElementById('closeSettings').addEventListener('click', () => { settingsPanel.remove(); });
             }
             
             showAbout() {
@@ -2377,12 +2626,12 @@
 • 背包和制作系统
 • NPC交互
 • 实时战斗
+• 虚拟摇杆控制
 • 探索和收集`);
             }
             
             toggleInventory() {
                 const panel = document.getElementById('inventoryPanel');
-                
                 if (panel.style.display === 'block') {
                     panel.style.display = 'none';
                     this.game.gameState = 'playing';
@@ -2395,7 +2644,6 @@
             
             toggleCharacterPanel() {
                 const panel = document.getElementById('characterPanel');
-                
                 if (panel.style.display === 'block') {
                     panel.style.display = 'none';
                     this.game.gameState = 'playing';
@@ -2408,20 +2656,29 @@
             
             toggleMap() {
                 const panel = document.getElementById('mapPanel');
-                
                 if (panel.style.display === 'block') {
                     panel.style.display = 'none';
                     this.game.gameState = 'playing';
+                    // 清除地图更新定时器
+                    if (this.mapUpdateInterval) {
+                        clearInterval(this.mapUpdateInterval);
+                        this.mapUpdateInterval = null;
+                    }
                 } else {
                     panel.style.display = 'block';
                     this.game.gameState = 'map';
+                    // 启动地图更新定时器
+                    this.mapUpdateInterval = setInterval(() => {
+                        if (this.game.gameState === 'map') {
+                            this.updateWorldMap();
+                        }
+                    }, 100);
                     this.updateWorldMap();
                 }
             }
             
             toggleCrafting() {
                 const panel = document.getElementById('craftingPanel');
-                
                 if (panel.style.display === 'block') {
                     panel.style.display = 'none';
                     this.game.gameState = 'playing';
@@ -2433,17 +2690,11 @@
             
             toggleQuestPanel() {
                 const panel = document.getElementById('questPanel');
-                
-                if (panel.style.display === 'block') {
-                    panel.style.display = 'none';
-                } else {
-                    panel.style.display = 'block';
-                }
+                panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
             }
             
             initSkills() {
                 const skillIcons = ['🔥', '❄️', '⚡', '💨', '🪨', '🌿'];
-                
                 document.querySelectorAll('.skill-slot').forEach((slot, index) => {
                     if (skillIcons[index]) {
                         slot.querySelector('.skill-icon').textContent = skillIcons[index];
@@ -2452,10 +2703,6 @@
             }
             
             initQuests() {
-                this.addStarterQuests();
-            }
-            
-            addStarterQuests() {
                 const quests = [
                     {
                         id: 1,
@@ -2495,7 +2742,6 @@
             
             updateQuestList() {
                 const questList = document.getElementById('questList');
-                
                 questList.innerHTML = '';
                 
                 this.game.gameData.quests.forEach(quest => {
@@ -2518,13 +2764,11 @@
                         acceptButton.className = 'ui-button ui-button-green';
                         acceptButton.textContent = '接受';
                         acceptButton.style.marginTop = '5px';
-                        
                         acceptButton.addEventListener('click', () => {
                             quest.status = 'active';
                             this.updateQuestList();
                             this.game.showNotification(`已接受任务: ${quest.title}`, 0x00FF00);
                         });
-                        
                         questElement.appendChild(acceptButton);
                     }
                     
@@ -2533,7 +2777,6 @@
             }
             
             initInventory() {
-                // 添加一些初始物品
                 const initialItems = [
                     { name: "回春丹", type: "potion", effect: "恢复50生命", icon: "❤️", count: 3 },
                     { name: "聚气丹", type: "potion", effect: "恢复30灵力", icon: "💧", count: 2 },
@@ -2549,26 +2792,21 @@
             
             updateInventory() {
                 const grid = document.getElementById('inventoryGrid');
-                
                 grid.innerHTML = '';
                 
                 this.game.gameData.inventory.forEach((item, index) => {
                     const slot = document.createElement('div');
                     slot.className = 'inventory-slot';
                     slot.dataset.index = index;
-                    
                     slot.innerHTML = `
                         <div class="item-icon">${item.icon}</div>
                         ${item.count > 1 ? `<div class="item-count">${item.count}</div>` : ''}
                     `;
-                    
                     slot.addEventListener('click', () => this.useItem(index));
-                    
                     grid.appendChild(slot);
                 });
                 
-                // 添加空槽位
-                for (let i = this.game.gameData.inventory.length; i < 40; i++) {
+                for (let i = this.game.gameData.inventory.length; i < 30; i++) {
                     const slot = document.createElement('div');
                     slot.className = 'inventory-slot';
                     grid.appendChild(slot);
@@ -2577,55 +2815,34 @@
             
             filterInventory(filter) {
                 const grid = document.getElementById('inventoryGrid');
-                const items = this.game.gameData.inventory;
-                
                 grid.innerHTML = '';
                 
-                items.forEach((item, index) => {
+                this.game.gameData.inventory.forEach((item, index) => {
                     if (filter === 'all' || item.type === filter) {
                         const slot = document.createElement('div');
                         slot.className = 'inventory-slot';
                         slot.dataset.index = index;
-                        
                         slot.innerHTML = `
                             <div class="item-icon">${item.icon}</div>
                             ${item.count > 1 ? `<div class="item-count">${item.count}</div>` : ''}
                         `;
-                        
                         slot.addEventListener('click', () => this.useItem(index));
-                        
                         grid.appendChild(slot);
                     }
                 });
-                
-                // 添加空槽位
-                const remainingSlots = 40 - grid.children.length;
-                
-                for (let i = 0; i < remainingSlots; i++) {
-                    const slot = document.createElement('div');
-                    slot.className = 'inventory-slot';
-                    grid.appendChild(slot);
-                }
             }
             
             useItem(index) {
                 const item = this.game.gameData.inventory[index];
-                
                 if (!item) return;
                 
                 switch(item.type) {
                     case 'potion':
                         if (item.name === "回春丹") {
-                            this.game.gameData.player.hp = Math.min(
-                                this.game.gameData.player.maxHp,
-                                this.game.gameData.player.hp + 50
-                            );
+                            this.game.gameData.player.hp = Math.min(this.game.gameData.player.maxHp, this.game.gameData.player.hp + 50);
                             this.game.showNotification("使用回春丹，恢复50生命", 0x00FF00);
                         } else if (item.name === "聚气丹") {
-                            this.game.gameData.player.mp = Math.min(
-                                this.game.gameData.player.maxMp,
-                                this.game.gameData.player.mp + 30
-                            );
+                            this.game.gameData.player.mp = Math.min(this.game.gameData.player.maxMp, this.game.gameData.player.mp + 30);
                             this.game.showNotification("使用聚气丹，恢复30灵力", 0x00AAFF);
                         }
                         break;
@@ -2635,11 +2852,8 @@
                     case 'armor':
                         this.game.showNotification(`装备了 ${item.name}`, 0xFFAA00);
                         break;
-                    default:
-                        this.game.showNotification(`使用了 ${item.name}`, 0xFFFF00);
                 }
                 
-                // 减少数量或移除物品
                 if (item.count > 1) {
                     item.count--;
                 } else {
@@ -2653,7 +2867,6 @@
             updateCharacterPanel() {
                 const stats = this.game.gameData.player.stats;
                 const statsDiv = document.getElementById('characterStats');
-                
                 statsDiv.innerHTML = '';
                 
                 const statCategories = {
@@ -2683,20 +2896,12 @@
                     statList.forEach(stat => {
                         const statRow = document.createElement('div');
                         statRow.className = 'stat-row';
-                        
                         if (stat.max !== undefined) {
                             const percent = (stat.value / stat.max) * 100;
-                            statRow.innerHTML = `
-                                <span>${stat.name}</span>
-                                <span>${Math.floor(stat.value)}/${stat.max} (${Math.floor(percent)}%)</span>
-                            `;
+                            statRow.innerHTML = `<span>${stat.name}</span><span>${Math.floor(stat.value)}/${stat.max} (${Math.floor(percent)}%)</span>`;
                         } else {
-                            statRow.innerHTML = `
-                                <span>${stat.name}</span>
-                                <span>${stat.value}</span>
-                            `;
+                            statRow.innerHTML = `<span>${stat.name}</span><span>${stat.value}</span>`;
                         }
-                        
                         categoryDiv.appendChild(statRow);
                     });
                     
@@ -2707,55 +2912,46 @@
             updateWorldMap() {
                 const canvas = document.getElementById('worldMapCanvas');
                 const ctx = canvas.getContext('2d');
-                
                 if (!canvas || !ctx) return;
                 
-                // 设置画布大小
                 canvas.width = canvas.clientWidth;
                 canvas.height = canvas.clientHeight;
-                
-                // 绘制地图背景
                 ctx.fillStyle = '#0a0a2a';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // 绘制地形
                 const centerX = canvas.width / 2;
                 const centerY = canvas.height / 2;
-                const scale = 2;
+                const scale = 1.5;
                 
-                // 绘制网格
                 ctx.strokeStyle = '#3a3a8a';
                 ctx.lineWidth = 1;
                 
-                for (let x = 0; x < canvas.width; x += 50) {
+                for (let x = 0; x < canvas.width; x += 40) {
                     ctx.beginPath();
                     ctx.moveTo(x, 0);
                     ctx.lineTo(x, canvas.height);
                     ctx.stroke();
                 }
                 
-                for (let y = 0; y < canvas.height; y += 50) {
+                for (let y = 0; y < canvas.height; y += 40) {
                     ctx.beginPath();
                     ctx.moveTo(0, y);
                     ctx.lineTo(canvas.width, y);
                     ctx.stroke();
                 }
                 
-                // 绘制玩家位置
                 const playerX = centerX + this.game.player.position.x * scale;
                 const playerY = centerY + this.game.player.position.z * scale;
                 
                 ctx.fillStyle = '#00ffff';
                 ctx.beginPath();
-                ctx.arc(playerX, playerY, 8, 0, Math.PI * 2);
+                ctx.arc(playerX, playerY, 6, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // 绘制玩家标识
                 ctx.fillStyle = '#00ffff';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = 'bold 10px Arial';
                 ctx.fillText('你', playerX - 4, playerY + 4);
                 
-                // 绘制地点
                 const locations = [
                     { name: "新手村", x: 0, y: 0, type: "village" },
                     { name: "灵兽山", x: 50, y: 30, type: "mountain" },
@@ -2768,7 +2964,6 @@
                     const x = centerX + loc.x * scale;
                     const y = centerY + loc.y * scale;
                     
-                    // 根据类型设置颜色
                     let color = '#ffffff';
                     switch(loc.type) {
                         case 'village': color = '#00ff00'; break;
@@ -2780,19 +2975,13 @@
                     
                     ctx.fillStyle = color;
                     ctx.beginPath();
-                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // 绘制名称
                     ctx.fillStyle = '#ffffff';
                     ctx.font = '10px Arial';
                     ctx.fillText(loc.name, x - 15, y - 10);
                 });
-                
-                // 绘制地图边界
-                ctx.strokeStyle = '#ffaa00';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
             }
         }
         
@@ -2800,72 +2989,43 @@
         class InventorySystem {
             constructor(game) {
                 this.game = game;
-                this.maxSlots = 40;
             }
-            
-            init() {
-                console.log("背包系统已初始化");
-            }
-            
+            init() { console.log("背包系统已初始化"); }
             addItem(item) {
-                // 检查是否已存在相同物品
                 const existingItem = this.game.gameData.inventory.find(i => i.name === item.name);
-                
                 if (existingItem) {
                     existingItem.count++;
                 } else {
                     this.game.gameData.inventory.push({ ...item, count: 1 });
                 }
-                
                 this.game.uiSystem.updateInventory();
             }
-            
             removeItem(itemName, count = 1) {
                 const itemIndex = this.game.gameData.inventory.findIndex(i => i.name === itemName);
-                
                 if (itemIndex > -1) {
                     const item = this.game.gameData.inventory[itemIndex];
-                    
                     if (item.count > count) {
                         item.count -= count;
                     } else {
                         this.game.gameData.inventory.splice(itemIndex, 1);
                     }
-                    
                     this.game.uiSystem.updateInventory();
                     return true;
                 }
-                
                 return false;
             }
-            
             hasItem(itemName, count = 1) {
                 const item = this.game.gameData.inventory.find(i => i.name === itemName);
                 return item && item.count >= count;
-            }
-            
-            getItem(itemName) {
-                return this.game.gameData.inventory.find(i => i.name === itemName);
-            }
-            
-            getAllItems() {
-                return this.game.gameData.inventory;
             }
         }
         
         // 任务系统
         class QuestSystem {
-            constructor(game) {
-                this.game = game;
-            }
-            
-            init() {
-                console.log("任务系统已初始化");
-            }
-            
+            constructor(game) { this.game = game; }
+            init() { console.log("任务系统已初始化"); }
             acceptQuest(questId) {
                 const quest = this.game.gameData.quests.find(q => q.id === questId);
-                
                 if (quest && quest.status === 'inactive') {
                     quest.status = 'active';
                     quest.currentCount = 0;
@@ -2873,194 +3033,87 @@
                     this.game.showNotification(`已接受任务: ${quest.title}`, 0x00FF00);
                     return true;
                 }
-                
                 return false;
             }
-            
             completeQuest(questId) {
                 const quest = this.game.gameData.quests.find(q => q.id === questId);
-                
                 if (quest && quest.status === 'active') {
                     quest.status = 'completed';
                     this.game.gameData.completedQuests.push(quest);
-                    
-                    // 给予奖励
                     this.game.gainExperience(quest.reward.xp);
-                    
-                    quest.reward.items.forEach(item => {
-                        this.game.inventorySystem.addItem(item);
-                    });
-                    
+                    quest.reward.items.forEach(item => { this.game.inventorySystem.addItem(item); });
                     this.game.uiSystem.updateQuestList();
                     this.game.showNotification(`任务完成: ${quest.title}!`, 0x00FF00);
                     return true;
                 }
-                
                 return false;
             }
-            
             updateQuestProgress(target, amount = 1) {
                 let updated = false;
-                
                 this.game.gameData.quests.forEach(quest => {
                     if (quest.status === 'active' && quest.target === target) {
                         quest.currentCount = Math.min(quest.currentCount + amount, quest.targetCount);
                         updated = true;
-                        
-                        // 检查是否完成
                         if (quest.currentCount >= quest.targetCount) {
                             this.game.showNotification(`任务目标完成: ${quest.title}`, 0x00FF00);
                         }
-                        
                         this.game.uiSystem.updateQuestList();
                     }
                 });
-                
                 return updated;
-            }
-            
-            getActiveQuests() {
-                return this.game.gameData.quests.filter(q => q.status === 'active');
             }
         }
         
         // 战斗系统
         class CombatSystem {
-            constructor(game) {
-                this.game = game;
-            }
-            
-            init() {
-                console.log("战斗系统已初始化");
-            }
-            
-            playerAttack(enemy) {
-                if (!enemy || enemy.userData.health <= 0) return;
-                
-                // 计算伤害
-                const damage = this.game.gameData.player.stats.attack;
-                const actualDamage = Math.max(1, damage - Math.random() * 2);
-                
-                // 扣除敌人血量
-                enemy.userData.health -= actualDamage;
-                
-                // 显示伤害
-                this.game.showDamageText(
-                    enemy.position.x,
-                    enemy.position.y + 2,
-                    enemy.position.z,
-                    `-${Math.floor(actualDamage)}`,
-                    0xff3333
-                );
-                
-                // 敌人死亡
-                if (enemy.userData.health <= 0) {
-                    this.enemyDeath(enemy);
-                }
-            }
-            
-            enemyAttack(enemy) {
-                const now = Date.now();
-                
-                // 检查攻击间隔
-                if (now - enemy.userData.lastAttack < 1000) return;
-                
-                enemy.userData.lastAttack = now;
-                
-                // 计算伤害
-                const damage = enemy.userData.damage;
-                const actualDamage = Math.max(1, damage - this.game.gameData.player.stats.defense * 0.5);
-                
-                // 扣除玩家血量
-                this.game.gameData.player.hp -= actualDamage;
-                
-                // 显示伤害
-                this.game.showDamageText(
-                    this.game.player.position.x,
-                    this.game.player.position.y + 2,
-                    this.game.player.position.z,
-                    `-${Math.floor(actualDamage)}`,
-                    0xff0000
-                );
-                
-                // 更新UI
-                this.game.uiSystem.updatePlayerInfo();
-                
-                // 检查玩家是否死亡
-                if (this.game.gameData.player.hp <= 0) {
-                    this.playerDeath();
-                }
-            }
-            
+            constructor(game) { this.game = game; }
+            init() { console.log("战斗系统已初始化"); }
             castFireball(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0xFF5500);
-                
-                // 对范围内敌人造成伤害
                 let hitCount = 0;
                 this.game.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
-                    
                     const dx = this.game.player.position.x - enemy.position.x;
                     const dz = this.game.player.position.z - enemy.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
-                    
                     if (distance < 10) {
                         const damage = skill.damage + this.game.gameData.player.stats.spirit * 0.5;
                         this.attackEnemy(enemy, damage, 0xFF5500);
                         hitCount++;
                     }
                 });
-                
-                if (hitCount === 0) {
-                    this.game.showNotification("没有击中任何敌人", 0xaaaaaa);
-                }
+                if (hitCount === 0) { this.game.showNotification("没有击中任何敌人", 0xaaaaaa); }
             }
-            
             castIceBolt(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0x00AAFF);
-                
-                // 减速效果
                 this.game.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
-                    
                     const dx = this.game.player.position.x - enemy.position.x;
                     const dz = this.game.player.position.z - enemy.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
-                    
                     if (distance < 8) {
                         const damage = skill.damage + this.game.gameData.player.stats.spirit * 0.5;
                         this.attackEnemy(enemy, damage, 0x00AAFF);
                     }
                 });
             }
-            
             castLightning(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0xFFDD00);
-                
-                // 高伤害单体攻击
                 const nearestEnemy = this.findNearestEnemy(20);
-                
                 if (nearestEnemy) {
                     const damage = skill.damage + this.game.gameData.player.stats.spirit;
                     this.attackEnemy(nearestEnemy, damage, 0xFFDD00);
                     this.game.showSkillEffect(2);
-                } else {
-                    this.game.showNotification("没有找到目标", 0xaaaaaa);
-                }
+                } else { this.game.showNotification("没有找到目标", 0xaaaaaa); }
             }
-            
             castWindSlash(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0x00FF00);
-                
-                // 多目标攻击
                 let hitCount = 0;
                 this.game.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
-                    
                     const dx = this.game.player.position.x - enemy.position.x;
                     const dz = this.game.player.position.z - enemy.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
-                    
                     if (distance < 8) {
                         const damage = skill.damage + this.game.gameData.player.stats.spirit * 0.3;
                         this.attackEnemy(enemy, damage, 0x00FF00);
@@ -3068,211 +3121,115 @@
                     }
                 });
             }
-            
             castEarthWall(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0x8B4513);
-                
-                // 增加防御
                 const defenseBonus = 5;
                 this.game.gameData.player.stats.defense += defenseBonus;
                 this.game.showNotification(`防御力增加 ${defenseBonus}`, 0x8B4513);
-                
-                // 5秒后恢复
                 setTimeout(() => {
                     this.game.gameData.player.stats.defense -= defenseBonus;
                     this.game.uiSystem.updatePlayerInfo();
                 }, 5000);
-                
                 this.game.uiSystem.updatePlayerInfo();
             }
-            
             castHeal(skill) {
                 this.game.showNotification(`释放 ${skill.name}!`, 0x00FF00);
-                
-                // 治疗玩家
                 const healAmount = skill.heal + this.game.gameData.player.stats.spirit * 0.5;
-                this.game.gameData.player.hp = Math.min(
-                    this.game.gameData.player.maxHp,
-                    this.game.gameData.player.hp + healAmount
-                );
-                
-                // 显示治疗数字
-                this.game.showDamageText(
-                    this.game.player.position.x,
-                    this.game.player.position.y + 2,
-                    this.game.player.position.z,
-                    `+${Math.floor(healAmount)}`,
-                    0x00FF00
-                );
-                
+                this.game.gameData.player.hp = Math.min(this.game.gameData.player.maxHp, this.game.gameData.player.hp + healAmount);
+                this.game.showDamageText(this.game.player.position.x, this.game.player.position.y + 2, this.game.player.position.z, `+${Math.floor(healAmount)}`, 0x00FF00);
                 this.game.uiSystem.updatePlayerInfo();
             }
-            
             findNearestEnemy(maxDistance) {
                 let nearestEnemy = null;
                 let nearestDistance = maxDistance;
-                
                 this.game.enemies.forEach(enemy => {
                     if (enemy.userData.health <= 0) return;
-                    
                     const dx = this.game.player.position.x - enemy.position.x;
                     const dz = this.game.player.position.z - enemy.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
-                    
                     if (distance < nearestDistance) {
                         nearestDistance = distance;
                         nearestEnemy = enemy;
                     }
                 });
-                
                 return nearestEnemy;
             }
-            
             attackEnemy(enemy, damage, color) {
                 if (enemy.userData.health <= 0) return;
-                
-                // 计算实际伤害
                 const actualDamage = Math.max(1, damage);
                 enemy.userData.health -= actualDamage;
-                
-                // 显示伤害数字
-                this.game.showDamageText(
-                    enemy.position.x,
-                    enemy.position.y + 2,
-                    enemy.position.z,
-                    `-${Math.floor(actualDamage)}`,
-                    color
-                );
-                
-                // 敌人死亡
-                if (enemy.userData.health <= 0) {
-                    this.enemyDeath(enemy);
-                }
+                this.game.showDamageText(enemy.position.x, enemy.position.y + 2, enemy.position.z, `-${Math.floor(actualDamage)}`, color);
+                if (enemy.userData.health <= 0) { this.enemyDeath(enemy); }
             }
-            
             enemyDeath(enemy) {
-                // 移除敌人
                 this.game.scene.remove(enemy);
-                
                 const index = this.game.enemies.indexOf(enemy);
-                if (index > -1) {
-                    this.game.enemies.splice(index, 1);
-                }
-                
-                // 掉落物品
+                if (index > -1) { this.game.enemies.splice(index, 1); }
                 this.dropLoot(enemy);
-                
-                // 给予经验
                 this.game.gainExperience(20);
-                
-                // 更新任务进度
                 this.game.questSystem.updateQuestProgress("击败妖兽");
-                
-                // 显示通知
                 this.game.showNotification(`${enemy.userData.name}已被击败!`, 0x00FF00);
             }
-            
             dropLoot(enemy) {
-                // 随机掉落
                 const lootTypes = [
-                    { type: 'potion', name: '回春丹', effect: '恢复50生命', icon: '❤️' },
-                    { type: 'potion', name: '聚气丹', effect: '恢复30灵力', icon: '💧' },
-                    { type: 'material', name: '妖兽内丹', effect: '炼丹材料', icon: '🔴' },
-                    { type: 'material', name: '灵草', effect: '炼丹材料', icon: '🌿' },
-                    { type: 'weapon', name: '普通飞剑', effect: '攻击+5', icon: '⚔️' }
+                    { type: 'potion', name: '回春丹', icon: '❤️' },
+                    { type: 'potion', name: '聚气丹', icon: '💧' },
+                    { type: 'material', name: '妖兽内丹', icon: '🔴' },
+                    { type: 'material', name: '灵草', icon: '🌿' },
+                    { type: 'weapon', name: '普通飞剑', icon: '⚔️' }
                 ];
-                
-                // 30%几率掉落物品
                 if (Math.random() < 0.3) {
                     const loot = lootTypes[Math.floor(Math.random() * lootTypes.length)];
                     this.game.showNotification(`获得 ${loot.name}`, 0xFFAA00);
                     this.game.inventorySystem.addItem(loot);
                 }
             }
-            
+            enemyAttack(enemy) {
+                const now = Date.now();
+                if (now - enemy.userData.lastAttack < 1000) return;
+                enemy.userData.lastAttack = now;
+                const damage = enemy.userData.damage;
+                const actualDamage = Math.max(1, damage - this.game.gameData.player.stats.defense * 0.5);
+                this.game.gameData.player.hp -= actualDamage;
+                this.game.showDamageText(this.game.player.position.x, this.game.player.position.y + 2, this.game.player.position.z, `-${Math.floor(actualDamage)}`, 0xff0000);
+                this.game.uiSystem.updatePlayerInfo();
+                if (this.game.gameData.player.hp <= 0) { this.playerDeath(); }
+            }
             playerDeath() {
                 this.game.showNotification("你被击败了!", 0xff0000);
-                
-                // 复活
                 this.game.gameData.player.hp = this.game.gameData.player.maxHp;
                 this.game.gameData.player.mp = this.game.gameData.player.maxMp;
-                
-                // 传送回出生点
                 this.game.player.position.set(0, 0, 0);
                 this.game.player.rotation.y = 0;
-                
-                // 更新UI
                 this.game.uiSystem.updatePlayerInfo();
-                
                 this.game.showNotification("已复活", 0x00FF00);
             }
         }
         
         // 制作系统
         class CraftingSystem {
-            constructor(game) {
-                this.game = game;
-                this.recipes = [];
-            }
-            
+            constructor(game) { this.game = game; this.recipes = []; }
             init() {
-                // 初始化配方
                 this.recipes = [
-                    {
-                        name: "回春丹",
-                        inputs: [
-                            { name: "灵草", count: 2 }
-                        ],
-                        output: { name: "回春丹", type: "potion", effect: "恢复50生命", icon: "❤️" }
-                    },
-                    {
-                        name: "聚气丹",
-                        inputs: [
-                            { name: "灵草", count: 3 }
-                        ],
-                        output: { name: "聚气丹", type: "potion", effect: "恢复30灵力", icon: "💧" }
-                    },
-                    {
-                        name: "淬体丹",
-                        inputs: [
-                            { name: "灵草", count: 3 },
-                            { name: "妖兽内丹", count: 1 }
-                        ],
-                        output: { name: "淬体丹", type: "potion", effect: "永久增加体质", icon: "💪" }
-                    }
+                    { name: "回春丹", inputs: [{ name: "灵草", count: 2 }], output: { name: "回春丹", type: "potion", effect: "恢复50生命", icon: "❤️" } },
+                    { name: "聚气丹", inputs: [{ name: "灵草", count: 3 }], output: { name: "聚气丹", type: "potion", effect: "恢复30灵力", icon: "💧" } },
+                    { name: "淬体丹", inputs: [{ name: "灵草", count: 3 }, { name: "妖兽内丹", count: 1 }], output: { name: "淬体丹", type: "potion", effect: "永久增加体质", icon: "💪" } }
                 ];
-                
                 console.log("制作系统已初始化");
             }
-            
-            getRecipes() {
-                return this.recipes;
-            }
-            
             canCraft(recipeName) {
                 const recipe = this.recipes.find(r => r.name === recipeName);
                 if (!recipe) return false;
-                
-                return recipe.inputs.every(input => 
-                    this.game.inventorySystem.hasItem(input.name, input.count)
-                );
+                return recipe.inputs.every(input => this.game.inventorySystem.hasItem(input.name, input.count));
             }
-            
             craft(recipeName) {
                 const recipe = this.recipes.find(r => r.name === recipeName);
                 if (!recipe || !this.canCraft(recipeName)) {
                     this.game.showNotification("材料不足!", 0xff6666);
                     return false;
                 }
-                
-                // 消耗材料
-                recipe.inputs.forEach(input => {
-                    this.game.inventorySystem.removeItem(input.name, input.count);
-                });
-                
-                // 添加产物
+                recipe.inputs.forEach(input => { this.game.inventorySystem.removeItem(input.name, input.count); });
                 this.game.inventorySystem.addItem(recipe.output);
-                
                 this.game.showNotification(`成功炼制 ${recipe.name}!`, 0x00FF00);
                 return true;
             }
@@ -3280,64 +3237,41 @@
         
         // 对话系统
         class DialogueSystem {
-            constructor(game) {
-                this.game = game;
-                this.currentDialogue = null;
-                this.currentIndex = 0;
-            }
-            
-            init() {
-                console.log("对话系统已初始化");
-            }
-            
+            constructor(game) { this.game = game; this.currentDialogue = null; this.currentIndex = 0; }
+            init() { console.log("对话系统已初始化"); }
             startDialogue(npc) {
                 if (!npc.userData.dialogues || npc.userData.dialogues.length === 0) return;
-                
                 this.currentDialogue = npc.userData.dialogues;
                 this.currentIndex = 0;
-                
                 this.showCurrentLine();
                 this.game.uiSystem.showInteractionHint(null);
             }
-            
             showCurrentLine() {
                 if (!this.currentDialogue || this.currentIndex >= this.currentDialogue.length) {
                     this.endDialogue();
                     return;
                 }
-                
                 const line = this.currentDialogue[this.currentIndex];
-                
-                // 更新对话面板
                 document.getElementById('dialoguePanel').style.display = 'block';
                 document.getElementById('dialogueSpeaker').textContent = line.speaker;
                 document.getElementById('dialogueText').textContent = line.text;
-                
-                // 清除旧选项
                 const optionsContainer = document.getElementById('dialogueOptions');
                 optionsContainer.innerHTML = '';
                 
-                // 添加选项
                 if (this.currentIndex < this.currentDialogue.length - 1) {
                     const nextButton = document.createElement('div');
                     nextButton.className = 'dialogue-option';
                     nextButton.textContent = '继续...';
-                    nextButton.addEventListener('click', () => {
-                        this.currentIndex++;
-                        this.showCurrentLine();
-                    });
+                    nextButton.addEventListener('click', () => { this.currentIndex++; this.showCurrentLine(); });
                     optionsContainer.appendChild(nextButton);
                 }
                 
                 const endButton = document.createElement('div');
                 endButton.className = 'dialogue-option';
                 endButton.textContent = '离开';
-                endButton.addEventListener('click', () => {
-                    this.endDialogue();
-                });
+                endButton.addEventListener('click', () => { this.endDialogue(); });
                 optionsContainer.appendChild(endButton);
             }
-            
             endDialogue() {
                 document.getElementById('dialoguePanel').style.display = 'none';
                 this.currentDialogue = null;
@@ -3346,96 +3280,16 @@
             }
         }
         
-        // 扩展游戏主类的增益经验方法
-        ImmortalCultivationGame.prototype.gainExperience = function(amount) {
-            this.gameData.player.xp += amount;
-            
-            // 显示经验获得
-            this.showDamageText(
-                this.player.position.x,
-                this.player.position.y + 3,
-                this.player.position.z,
-                `+${amount} XP`,
-                0xFFFF00
-            );
-            
-            // 检查升级
-            if (this.gameData.player.xp >= this.gameData.player.xpToNext) {
-                this.levelUp();
-            }
-            
-            // 更新UI
-            this.uiSystem.updatePlayerInfo();
-        };
-        
-        // 扩展游戏主类的升级方法
-        ImmortalCultivationGame.prototype.levelUp = function() {
-            this.gameData.player.level++;
-            this.gameData.player.xp -= this.gameData.player.xpToNext;
-            this.gameData.player.xpToNext = Math.floor(this.gameData.player.xpToNext * 1.5);
-            
-            // 提升属性
-            this.gameData.player.maxHp += 20;
-            this.gameData.player.maxMp += 10;
-            this.gameData.player.hp = this.gameData.player.maxHp;
-            this.gameData.player.mp = this.gameData.player.maxMp;
-            this.gameData.player.stats.attack += 2;
-            this.gameData.player.stats.defense += 1;
-            this.gameData.player.stats.spirit += 2;
-            this.gameData.player.stats.mind += 1;
-            this.gameData.player.stats.agility += 1;
-            this.gameData.player.stats.luck += Math.floor(Math.random() * 2);
-            
-            // 更新境界
-            this.updateCultivationRealm();
-            
-            // 显示升级信息
-            this.showNotification(`恭喜突破到 ${this.gameData.player.cultivation} ${this.gameData.player.realm}`, 0x00FFFF);
-            
-            // 更新UI
-            this.uiSystem.updatePlayerInfo();
-        };
-        
-        // 扩展游戏主类的境界更新方法
-        ImmortalCultivationGame.prototype.updateCultivationRealm = function() {
-            const realms = [
-                { level: 1, name: "炼气期", subRealms: ["一层", "二层", "三层", "四层", "五层", "六层", "七层", "八层", "九层", "大圆满"] },
-                { level: 10, name: "筑基期", subRealms: ["初期", "中期", "后期", "大圆满"] },
-                { level: 14, name: "金丹期", subRealms: ["初期", "中期", "后期", "大圆满"] },
-                { level: 18, name: "元婴期", subRealms: ["初期", "中期", "后期", "大圆满"] },
-                { level: 22, name: "化神期", subRealms: ["初期", "中期", "后期", "大圆满"] }
-            ];
-            
-            for (let i = realms.length - 1; i >= 0; i--) {
-                if (this.gameData.player.level >= realms[i].level) {
-                    const realmIndex = Math.min(
-                        Math.floor((this.gameData.player.level - realms[i].level) / 2),
-                        realms[i].subRealms.length - 1
-                    );
-                    
-                    this.gameData.player.cultivation = realms[i].name;
-                    this.gameData.player.realm = realms[i].subRealms[realmIndex];
-                    
-                    break;
-                }
-            }
-        };
-        
-        // 扩展UI系统的快捷键处理
+        // 键盘交互
         const originalKeyDown = InputSystem.prototype.onKeyDown;
         InputSystem.prototype.onKeyDown = function(e) {
             originalKeyDown.call(this, e);
-            
-            // 检查交互键
             if (this.game.gameState === 'playing' && e.key.toLowerCase() === 'e') {
                 this.game.npcs.forEach(npc => {
                     const dx = this.game.player.position.x - npc.position.x;
                     const dz = this.game.player.position.z - npc.position.z;
                     const distance = Math.sqrt(dx * dx + dz * dz);
-                    
-                    if (distance < 3) {
-                        this.game.startDialogue(npc);
-                    }
+                    if (distance < 3) { this.game.startDialogue(npc); }
                 });
             }
         };
@@ -3443,5 +3297,6 @@
         // 启动游戏
         const game = new ImmortalCultivationGame();
     </script>
-</body>
-</html>
+
+
+</body></html>

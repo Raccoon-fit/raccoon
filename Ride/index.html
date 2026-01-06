@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride - 站在开发之巅</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.font.im/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main App -->
+    <div class="app" id="app">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="logo-area">
+                <span class="logo-text">RIDE</span>
+                <span class="logo-dot"></span>
+            </div>
+            
+            <nav class="topbar-nav">
+                <button class="nav-btn mobile-only" id="toggleFilesBtn" title="文件列表">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                    </svg>
+                </button>
+                <button class="nav-btn" id="newFileBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <path d="M14 2v6h6M12 18v-6M9 15h6"/>
+                    </svg>
+                    <span>新建</span>
+                </button>
+                <button class="nav-btn" id="saveFileBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                        <path d="M17 21v-8H7v8M7 3v5h8"/>
+                    </svg>
+                    <span>保存</span>
+                </button>
+                <button class="nav-btn" id="downloadBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                    </svg>
+                    <span>下载</span>
+                </button>
+                <button class="nav-btn primary" id="runBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <span>运行</span>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Side Panel -->
+            <aside class="side-panel" id="sidePanel">
+                <button class="mobile-sidebar-close" id="closeSidebarBtn">×</button>
+                <div class="panel-header">
+                    <span class="panel-title">文件浏览器</span>
+                    <div class="panel-actions">
+                        <button class="panel-btn" id="newFileTreeBtn" title="新建文件">+</button>
+                        <button class="panel-btn" id="refreshFilesBtn" title="刷新">↻</button>
+                    </div>
+                </div>
+                <div class="file-section">
+                    <div class="file-list" id="fileList">
+                        <!-- Files will be loaded here -->
+                    </div>
+                </div>
+                <div class="storage-info">
+                    <div class="storage-bar">
+                        <div class="storage-used" id="storageUsed"></div>
+                    </div>
+                    <span class="storage-text">本地存储空间</span>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <main class="editor-area">
+                <!-- Tabs -->
+                <div class="tabs-container" id="tabsContainer">
+                    <!-- Tabs will be rendered here -->
+                </div>
+
+                <!-- Editor -->
+                <div class="editor-wrapper">
+                    <div class="simple-editor">
+                        <div class="line-numbers" id="lineNumbers">1</div>
+                        <textarea id="codeEditor" spellcheck="false" placeholder="在这里输入代码..."></textarea>
+                    </div>
+                    <div class="editor-status" id="editorStatus">
+                        <span class="status-name" id="currentFileName">main.py</span>
+                        <span class="status-info" id="fileInfo"></span>
+                    </div>
+                </div>
+
+                <!-- Terminal -->
+                <div class="terminal-section" id="terminalSection">
+                    <div class="terminal-header">
+                        <span class="terminal-title">终端</span>
+                        <div class="terminal-actions">
+                            <button class="terminal-btn" id="clearTerminal" title="清空">🗑️</button>
+                            <button class="terminal-btn" id="terminalToggle" title="收起">▼</button>
+                        </div>
+                    </div>
+                    <div class="terminal-body" id="terminalBody">
+                        <div class="terminal-line">
+                            <span class="term-prompt">➜</span>
+                            <span class="term-path">workspace</span>
+                            <span class="term-cursor">_</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+
+    <!-- Custom Modal Dialog -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">新建文件</span>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="modalMessage">请输入文件名：</p>
+                <input type="text" class="modal-input" id="modalInput" placeholder="例如：script.py" autocomplete="off">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" id="modalCancel">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

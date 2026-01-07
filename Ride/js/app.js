@@ -1,3 +1,4 @@
+
 /**
  * Ride IDE - 简洁纯文本代码编辑器
  * 无语法高亮，支持文件管理、本地存储、代码运行
@@ -1033,13 +1034,16 @@ console.log("执行完成!");
         line.className = 'terminal-line ' + (type || '');
         line.innerHTML = '<span>' + escapeHtml(text) + '</span>';
         body.appendChild(line);
-        scrollTerminal();
+
+        // 添加空白行确保最后一行显示完整
+        addTerminalSpacer();
     }
 
     function clearTerminal() {
         const body = document.getElementById('terminalBody');
         if (body) {
             body.innerHTML = '<div class="terminal-line"><span class="term-prompt">➜</span> <span class="term-path">workspace</span> <span class="term-cursor">_</span></div>';
+            addTerminalSpacer();
         }
     }
 
@@ -1060,6 +1064,27 @@ console.log("执行完成!");
         if (body) {
             body.scrollTop = body.scrollHeight;
         }
+    }
+
+    // 添加末尾空白行（确保最后一行内容完整显示）
+    function addTerminalSpacer() {
+        const body = document.getElementById('terminalBody');
+        if (!body) return;
+
+        // 移除旧的空白行
+        const oldSpacer = body.querySelector('.terminal-spacer');
+        if (oldSpacer) {
+            oldSpacer.remove();
+        }
+
+        // 添加新的空白行
+        const spacer = document.createElement('div');
+        spacer.className = 'terminal-spacer';
+        spacer.innerHTML = '&nbsp;';
+        body.appendChild(spacer);
+
+        // 滚动到底部
+        body.scrollTop = body.scrollHeight;
     }
 
     // ===== 工具函数 =====

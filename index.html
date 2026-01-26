@@ -15,13 +15,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         :root {
             --primary: #6366f1;
             --primary-light: #818cf8;
             --primary-dark: #4f46e5;
             --accent: #14b8a6;
             --accent-light: #5eead4;
+            --accent-gradient: linear-gradient(135deg, var(--primary), var(--accent));
             --bg: #fdfcff;
             --bg-secondary: #ffffff;
             --bg-tertiary: #f5f3ff;
@@ -33,9 +34,15 @@
             --shadow-lg: rgba(99, 102, 241, 0.15);
             --radius: 16px;
             --radius-lg: 24px;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
-        
+
         [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-light: #a5b4fc;
+            --primary-dark: #6366f1;
+            --accent: #5eead4;
             --bg: #0f0a1e;
             --bg-secondary: #1a1438;
             --bg-tertiary: #251b42;
@@ -44,25 +51,83 @@
             --text-muted: #64748b;
             --border: rgba(255, 255, 255, 0.1);
             --shadow: rgba(0, 0, 0, 0.3);
+            --glass-bg: rgba(26, 20, 56, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
-        
+
         body {
             font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.7;
             transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
         }
-        
+
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            animation: float 20s infinite linear;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            right: 5%;
+            animation-delay: 0s;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            bottom: 10%;
+            left: 5%;
+            animation-delay: 5s;
+            animation-duration: 25s;
+        }
+
+        .circle-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--primary-light);
+            top: 50%;
+            right: 15%;
+            animation-delay: 10s;
+            animation-duration: 30s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, 20px) rotate(90deg); }
+            50% { transform: translate(0, 40px) rotate(180deg); }
+            75% { transform: translate(-20px, 20px) rotate(270deg); }
+        }
+
         /* 导航栏 */
         .nav {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.85);
+            background: var(--glass-bg);
             backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 10px 28px;
             display: flex;
@@ -70,21 +135,17 @@
             gap: 24px;
             z-index: 1000;
             box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             max-width: 1100px;
             width: calc(100% - 48px);
         }
-        
-        [data-theme="dark"] .nav {
-            background: rgba(26, 20, 56, 0.85);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
-        
+
         .nav.scrolled {
             box-shadow: 0 8px 40px rgba(99, 102, 241, 0.15);
             padding: 8px 24px;
+            backdrop-filter: blur(32px);
         }
-        
+
         .nav-logo {
             display: flex;
             align-items: center;
@@ -95,11 +156,11 @@
             font-size: 16px;
             flex-shrink: 0;
         }
-        
+
         .nav-logo-icon {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -107,11 +168,11 @@
             font-size: 20px;
             transition: transform 0.3s;
         }
-        
+
         .nav-logo:hover .nav-logo-icon {
             transform: rotate(10deg) scale(1.08);
         }
-        
+
         .nav-links {
             display: flex;
             gap: 4px;
@@ -119,7 +180,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .nav-link {
             padding: 8px 14px;
             color: var(--text-secondary);
@@ -131,7 +192,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -139,37 +200,64 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             transition: all 0.3s ease;
             transform: translateX(-50%);
             border-radius: 2px;
         }
-        
+
         .nav-link:hover {
             color: var(--text);
             background: var(--bg-tertiary);
         }
-        
+
         .nav-link:hover::after {
             width: 50%;
         }
-        
+
         .nav-link.active {
             color: var(--primary);
             background: rgba(99, 102, 241, 0.1);
         }
-        
+
         .nav-link.active::after {
             width: 50%;
         }
-        
+
         .nav-actions {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-left: auto;
         }
-        
+
+        /* 新增：官网按钮样式 */
+        .nav-btn-official {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            text-decoration: none;
+        }
+
+        .nav-btn-official:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .nav-btn-official:active {
+            transform: translateY(0);
+        }
+
         .nav-btn {
             padding: 7px 12px;
             background: var(--bg-tertiary);
@@ -185,7 +273,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .nav-btn::before {
             content: '';
             position: absolute;
@@ -198,21 +286,17 @@
             transform: translate(-50%, -50%);
             transition: width 0.4s, height 0.4s;
         }
-        
+
         .nav-btn:hover::before {
             width: 160px;
             height: 160px;
         }
-        
+
         .nav-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px var(--shadow);
         }
-        
-        .nav-btn:active {
-            transform: translateY(0);
-        }
-        
+
         .nav-clock {
             padding: 6px 10px;
             background: rgba(255, 255, 255, 0.5);
@@ -226,11 +310,11 @@
             gap: 6px;
             color: var(--text);
         }
-        
+
         [data-theme="dark"] .nav-clock {
             background: rgba(255, 255, 255, 0.08);
         }
-        
+
         .nav-clock-dot {
             width: 6px;
             height: 6px;
@@ -238,12 +322,12 @@
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 0.5; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
         }
-        
+
         .nav-toggle {
             display: none;
             padding: 8px;
@@ -251,7 +335,7 @@
             border: none;
             cursor: pointer;
         }
-        
+
         .nav-toggle span {
             display: block;
             width: 20px;
@@ -261,20 +345,21 @@
             border-radius: 2px;
             transition: all 0.3s;
         }
-        
+
         /* 主容器 */
         .container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 24px;
         }
-        
+
         /* 英雄区 */
         .hero {
             padding: 140px 24px 100px;
             text-align: center;
+            position: relative;
         }
-        
+
         .hero-badge {
             display: inline-flex;
             align-items: center;
@@ -287,8 +372,9 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 24px;
+            backdrop-filter: blur(10px);
         }
-        
+
         .hero h1 {
             font-size: clamp(36px, 5vw, 52px);
             font-weight: 700;
@@ -299,14 +385,14 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .hero h1 span {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .hero p {
             font-size: 17px;
             color: var(--text-secondary);
@@ -314,28 +400,48 @@
             margin: 0 auto 36px;
             line-height: 1.8;
         }
-        
+
         .hero-image {
             max-width: 440px;
             margin: 0 auto 36px;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+            position: relative;
         }
-        
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--accent-gradient);
+            opacity: 0.2;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
         .hero-image img {
             width: 100%;
             height: auto;
             display: block;
+            border-radius: 20px;
+            transition: transform 0.5s ease;
         }
-        
+
+        .hero-image:hover img {
+            transform: scale(1.02);
+        }
+
         .hero-buttons {
             display: flex;
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -345,85 +451,114 @@
             font-size: 15px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             cursor: pointer;
             border: none;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--accent-gradient);
             color: white;
             box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
         }
-        
+
         .btn-secondary {
             background: var(--bg-secondary);
             color: var(--text);
             border: 1px solid var(--border);
         }
-        
+
         .btn-secondary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px var(--shadow);
         }
-        
+
         /* 区块 */
         .section {
             padding: 80px 24px;
+            position: relative;
         }
-        
+
         .section-light {
             background: var(--bg-secondary);
         }
-        
+
         .section-inner {
             max-width: 1100px;
             margin: 0 auto;
         }
-        
+
         .section-header {
             text-align: center;
             margin-bottom: 48px;
         }
-        
+
         .section-header h2 {
             font-size: 32px;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
         }
-        
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
         .section-header p {
             font-size: 16px;
             color: var(--text-secondary);
         }
-        
+
         /* 项目卡片 */
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 24px;
         }
-        
+
         .project-card {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 28px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .project-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 40px var(--shadow-lg);
-            border-color: var(--primary-light);
-        }
-        
+
         .project-card::before {
             content: '';
             position: absolute;
@@ -431,20 +566,22 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             border-radius: 16px 16px 0 0;
             opacity: 0;
             transition: opacity 0.3s;
         }
-        
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
         .project-card:hover::before {
             opacity: 1;
         }
-        
-        .project-card {
-            position: relative;
-        }
-        
+
         .project-card-icon {
             width: 52px;
             height: 52px;
@@ -456,28 +593,28 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
-        
+
         .project-card h3 {
             font-size: 19px;
             font-weight: 600;
             color: var(--text);
             margin-bottom: 10px;
         }
-        
+
         .project-card p {
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 16px;
             line-height: 1.7;
         }
-        
+
         .project-card-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 20px;
         }
-        
+
         .tag {
             padding: 4px 12px;
             background: var(--bg-tertiary);
@@ -485,50 +622,50 @@
             font-size: 12px;
             color: var(--text-secondary);
         }
-        
+
         .project-card .btn {
             width: 100%;
             justify-content: center;
         }
-        
+
         /* 实验室 */
         .lab-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
-        
+
         .lab-card {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 28px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
-        
+
         .lab-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 32px var(--shadow-lg);
         }
-        
+
         .lab-card-icon {
             font-size: 28px;
             margin-bottom: 16px;
         }
-        
+
         .lab-card h3 {
             font-size: 17px;
             font-weight: 600;
             color: var(--text);
             margin-bottom: 8px;
         }
-        
+
         .lab-card p {
             font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.7;
         }
-        
+
         /* 关于 */
         .about {
             display: grid;
@@ -539,82 +676,93 @@
             margin: 0 auto;
             padding: 0 24px;
         }
-        
+
         .about h3 {
             font-size: 26px;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 20px;
         }
-        
+
         .about p {
             color: var(--text-secondary);
             margin-bottom: 16px;
             line-height: 1.8;
         }
-        
+
         .skills {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .skills h4 {
             font-size: 18px;
             font-weight: 600;
             color: var(--text);
             margin-bottom: 8px;
         }
-        
+
         .skill-item {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        
+
         .skill-header {
             display: flex;
             justify-content: space-between;
             font-size: 14px;
         }
-        
+
         .skill-label {
             color: var(--text);
             font-weight: 500;
         }
-        
+
         .skill-value {
             color: var(--text-muted);
         }
-        
+
         .skill-bar {
             height: 6px;
             background: var(--bg-tertiary);
             border-radius: 3px;
             overflow: hidden;
         }
-        
+
         .skill-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             border-radius: 3px;
             width: 0;
             transition: width 1s ease-out;
         }
-        
+
         /* 页脚 */
         .footer {
             background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             padding: 60px 24px 40px;
             text-align: center;
+            position: relative;
         }
-        
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--accent-gradient);
+        }
+
         .footer-inner {
             max-width: 500px;
             margin: 0 auto;
         }
-        
+
         .footer-logo {
             display: inline-flex;
             align-items: center;
@@ -624,65 +772,68 @@
             color: var(--text);
             margin-bottom: 16px;
         }
-        
+
         .footer-logo-icon {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--accent-gradient);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
         }
-        
+
         .footer p {
             color: var(--text-secondary);
             margin-bottom: 24px;
             font-size: 15px;
         }
-        
+
         .footer-links {
             display: flex;
             gap: 24px;
             justify-content: center;
             margin-bottom: 24px;
         }
-        
+
         .footer-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 14px;
-            transition: color 0.2s;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 8px;
         }
-        
+
         .footer-links a:hover {
             color: var(--primary);
+            background: var(--bg-tertiary);
         }
-        
+
         .footer-copy {
             color: var(--text-muted);
             font-size: 13px;
             padding-top: 24px;
             border-top: 1px solid var(--border);
         }
-        
+
         /* 动画 */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.6s ease;
         }
-        
+
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .delay-1 { transition-delay: 0.1s; }
         .delay-2 { transition-delay: 0.2s; }
         .delay-3 { transition-delay: 0.3s; }
-        
+
         /* 提示 */
         .toast {
             position: fixed;
@@ -704,24 +855,24 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .toast.show {
             opacity: 1;
             visibility: visible;
         }
-        
+
         .toast-wechat {
             background: rgba(7, 193, 96, 0.85);
         }
-        
+
         .toast-qq {
             background: rgba(12, 183, 245, 0.85);
         }
-        
+
         .toast-icon {
             font-size: 16px;
         }
-        
+
         /* 跳过链接 */
         .skip {
             position: absolute;
@@ -734,11 +885,11 @@
             border-radius: 8px;
             z-index: 9999;
         }
-        
+
         .skip:focus {
             top: 10px;
         }
-        
+
         /* 响应式 */
         @media (max-width: 768px) {
             .nav {
@@ -747,17 +898,17 @@
                 gap: 8px;
                 justify-content: space-between;
             }
-            
+
             .nav-logo {
                 font-size: 14px;
             }
-            
+
             .nav-logo-icon {
                 width: 32px;
                 height: 32px;
                 font-size: 18px;
             }
-            
+
             .nav-links {
                 display: none;
                 position: fixed;
@@ -772,117 +923,133 @@
                 box-shadow: 0 20px 60px var(--shadow);
                 border: 1px solid var(--border);
             }
-            
+
             .nav-links.show {
                 display: flex;
             }
-            
+
             .nav-link {
                 padding: 12px 16px;
                 font-size: 15px;
             }
-            
+
             .nav-actions {
                 display: flex;
                 gap: 6px;
             }
-            
+
+            .nav-btn-official {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .nav-btn-official span:last-child {
+                display: none;
+            }
+
             .nav-btn {
                 padding: 6px 10px;
                 font-size: 12px;
             }
-            
+
             .nav-btn span:last-child {
                 display: none;
             }
-            
+
             .nav-clock {
                 padding: 6px 10px;
                 font-size: 12px;
                 gap: 6px;
             }
-            
+
             .nav-toggle {
                 display: block;
                 padding: 8px;
             }
-            
+
             .nav-toggle span {
                 width: 18px;
                 height: 2px;
                 margin: 4px 0;
             }
-            
+
             .hero {
                 padding: 100px 16px 50px;
             }
-            
+
             .hero h1 {
                 font-size: 28px;
             }
-            
+
             .hero p {
                 font-size: 15px;
             }
-            
+
             .hero-image {
                 max-width: 100%;
             }
-            
+
             .hero-buttons {
                 flex-direction: column;
             }
-            
+
             .section {
                 padding: 50px 16px;
             }
-            
+
             .section-header h2 {
                 font-size: 24px;
             }
-            
+
             .projects-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .about {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            
+
             .about h3 {
                 font-size: 22px;
             }
-            
+
             .btn {
                 width: 100%;
                 justify-content: center;
             }
-            
+
             .toast {
                 padding: 10px 20px;
                 font-size: 13px;
             }
         }
-        
+
         /* 滚动条 */
         ::-webkit-scrollbar {
             width: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: var(--bg-tertiary);
         }
-        
+
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(var(--primary), var(--accent));
+            background: var(--accent-gradient);
             border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+    </div>
+
     <a href="#main" class="skip">跳转到主要内容</a>
-    
+
     <!-- 灵动岛提示 -->
     <div class="toast" id="wechatToast">
         <span class="toast-icon">💚</span>
@@ -892,22 +1059,24 @@
         <span class="toast-icon">💙</span>
         <span>您正在使用QQ浏览</span>
     </div>
-    
+
     <!-- 导航 -->
     <nav class="nav" id="nav">
         <a href="#home" class="nav-logo">
             <span class="nav-logo-icon">🦝</span>
             <span>软软的小窝</span>
         </a>
-        
+
         <ul class="nav-links" id="navLinks">
             <li><a href="#home" class="nav-link active">首页</a></li>
             <li><a href="#projects" class="nav-link">项目</a></li>
             <li><a href="#lab" class="nav-link">实验室</a></li>
             <li><a href="#about" class="nav-link">关于</a></li>
         </ul>
-        
+
         <div class="nav-actions">
+            
+            
             <button class="nav-btn" id="themeBtn">
                 <span id="themeIcon">🌙</span>
                 <span>深色</span>
@@ -916,15 +1085,19 @@
                 <span id="clock">00:00:00</span>
                 <span class="nav-clock-dot"></span>
             </div>
+<!-- 新增：官网入口按钮 -->
+            <a href="https://raccoon.fit/mobile" class="nav-btn-official" target="_blank" id="officialBtn">
+                <span>进入官网</span>
+            </a>
         </div>
-        
+
         <button class="nav-toggle" id="navToggle">
             <span></span>
             <span></span>
             <span></span>
         </button>
     </nav>
-    
+
     <!-- 主内容 -->
     <main id="main">
         <!-- 首页 -->
@@ -956,7 +1129,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- 项目 -->
         <section id="projects" class="section section-light">
             <div class="section-inner">
@@ -964,7 +1137,7 @@
                     <h2>精选作品</h2>
                     <p>每个项目都是对技术深度的探索和对用户体验的思考</p>
                 </div>
-                
+
                 <div class="projects-grid">
                     <div class="project-card fade-in delay-1">
                         <div class="project-card-icon">🚴</div>
@@ -976,7 +1149,7 @@
                         </div>
                         <a href="https://raccoon.fit/Ride" class="btn btn-primary" target="_blank">立即体验 ↗</a>
                     </div>
-                    
+
                     <div class="project-card fade-in delay-2">
                         <div class="project-card-icon">📱</div>
                         <h3>MULU</h3>
@@ -987,7 +1160,7 @@
                         </div>
                         <a href="#" class="btn btn-secondary">查看归档</a>
                     </div>
-                    
+
                     <div class="project-card fade-in delay-3">
                         <div class="project-card-icon">📝</div>
                         <h3>灵熊小记</h3>
@@ -998,7 +1171,7 @@
                         </div>
                         <a href="https://link3.cc/training_fengfeng_games" class="btn btn-primary" target="_blank">访问项目 ↗</a>
                     </div>
-                    
+
                     <div class="project-card fade-in delay-1">
                         <div class="project-card-icon">🎮</div>
                         <h3>小游戏库</h3>
@@ -1009,7 +1182,7 @@
                         </div>
                         <a href="https://raccoon.fit/game" class="btn btn-secondary" target="_blank">查看详情 ↗</a>
                     </div>
-                    
+
                     <div class="project-card fade-in delay-2">
                         <div class="project-card-icon">🤖</div>
                         <h3>RACCOON AI</h3>
@@ -1023,7 +1196,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- 实验室 -->
         <section id="lab" class="section">
             <div class="section-inner">
@@ -1031,7 +1204,7 @@
                     <h2>创意实验室</h2>
                     <p>这里存放着正在进行中的实验、原型和创意构思</p>
                 </div>
-                
+
                 <div class="lab-grid">
                     <div class="lab-card fade-in delay-1">
                         <div class="lab-card-icon">🔮</div>
@@ -1051,7 +1224,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- 关于 -->
         <section id="about" class="section section-light">
             <div class="about">
@@ -1069,12 +1242,12 @@
                         Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、
                         追求卓越的技术哲学。
                     </p>
-<a href="me">点这里进入软软的个人主页</a>
+                    <a href="me">点这里进入软软的个人主页</a>
                 </div>
-                
+
                 <div class="skills fade-in delay-2">
                     <h4>技术专长</h4>
-                    
+
                     <div class="skill-item" data-width="85">
                         <div class="skill-header">
                             <span class="skill-label">前端开发</span>
@@ -1084,7 +1257,7 @@
                             <div class="skill-fill"></div>
                         </div>
                     </div>
-                    
+
                     <div class="skill-item" data-width="75">
                         <div class="skill-header">
                             <span class="skill-label">UI/UX 设计</span>
@@ -1094,7 +1267,7 @@
                             <div class="skill-fill"></div>
                         </div>
                     </div>
-                    
+
                     <div class="skill-item" data-width="80">
                         <div class="skill-header">
                             <span class="skill-label">产品思维</span>
@@ -1104,7 +1277,7 @@
                             <div class="skill-fill"></div>
                         </div>
                     </div>
-                    
+
                     <div class="skill-item" data-width="70">
                         <div class="skill-header">
                             <span class="skill-label">创意编程</span>
@@ -1118,7 +1291,7 @@
             </div>
         </section>
     </main>
-    
+
     <!-- 页脚 -->
     <footer id="contact" class="footer">
         <div class="footer-inner">
@@ -1130,6 +1303,7 @@
             <div class="footer-links">
                 <a href="mailto:2051775505@qq.com">邮箱</a>
                 <a href="https://github.com/raccoon-fit" target="_blank">GitHub</a>
+                <a href="https://raccoon.fit" target="_blank">官网</a>
                 <a href="#home">返回顶部</a>
             </div>
             <div class="footer-copy">
@@ -1153,7 +1327,7 @@
                     localStorage.setItem('theme', 'dark');
                 }
                 this.apply();
-                
+
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
                     if (!localStorage.getItem('theme')) {
                         this.dark = e.matches;
@@ -1178,7 +1352,7 @@
                 return this.dark;
             }
         };
-        
+
         // 浏览器检测
         if (/MicroMessenger/i.test(navigator.userAgent)) {
             const t = document.getElementById('wechatToast');
@@ -1187,41 +1361,41 @@
             const t = document.getElementById('qqToast');
             t.classList.add('show');
         }
-        
+
         // 时钟
         function clock() {
             const n = new Date();
             document.getElementById('clock').textContent = 
                 `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}:${n.getSeconds().toString().padStart(2,'0')}`;
         }
-        
+
         // 移动端菜单
         const navToggle = document.getElementById('navToggle');
         const navLinks = document.getElementById('navLinks');
-        
+
         navToggle.addEventListener('click', () => {
             navLinks.classList.toggle('show');
         });
-        
+
         // 点击导航链接后关闭移动端菜单
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('show');
             });
         });
-        
+
         // 导航高亮 - 使用更精确的算法
         const sections = document.querySelectorAll('section[id]');
         const links = document.querySelectorAll('.nav-link');
-        
+
         function updateActiveLink() {
             const scrollPos = window.scrollY + 150; // 偏移量
-            
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.offsetHeight;
                 const sectionId = section.getAttribute('id');
-                
+
                 if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
                     links.forEach(link => {
                         link.classList.remove('active');
@@ -1232,15 +1406,15 @@
                 }
             });
         }
-        
+
         window.addEventListener('scroll', () => {
             document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
             updateActiveLink();
         });
-        
+
         // 初始化时更新一次
         updateActiveLink();
-        
+
         // 滚动动画
         const fo = new IntersectionObserver(e => {
             e.forEach(v => {
@@ -1252,14 +1426,26 @@
             });
         }, { threshold: 0.1 });
         document.querySelectorAll('.fade-in').forEach(f => fo.observe(f));
-        
+
+        // 官网按钮点击效果
+        document.getElementById('officialBtn').addEventListener('click', function(e) {
+            // 添加点击效果
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // 添加访问统计（可选）
+            console.log('访问官网: https://raccoon.fit');
+        });
+
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
             clock();
             setInterval(clock, 1000);
             document.getElementById('themeBtn').addEventListener('click', () => Theme.toggle());
-            
+
             // 平滑滚动
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
@@ -1275,7 +1461,7 @@
                     }
                 });
             });
-            
+
             console.log('%c🦝 软软的小窝', 'font-size:22px;font-weight:bold;background:linear-gradient(135deg,#6366f1,#14b8a6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;');
         });
     </script>

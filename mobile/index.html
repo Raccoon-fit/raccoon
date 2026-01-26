@@ -345,8 +345,8 @@
         <iframe src="https://www.bilibili.com/h5/customer-service?night=1&native.theme=2" 
                 class="chat-iframe" 
                 id="chatIframe"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-storage-access-by-user-activation"
-                allow="camera; microphone; clipboard-write; clipboard-read; autoplay; fullscreen"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation allow-pointer-lock allow-popups-to-escape-sandbox"
+                allow="camera; microphone; clipboard-write; clipboard-read; autoplay; fullscreen; geolocation; payment; usb"
                 referrerpolicy="no-referrer-when-downgrade"
                 style="display: block;">
         </iframe>
@@ -359,31 +359,36 @@
                 name: '哔哩哔哩客服',
                 icon: 'fab fa-bilibili',
                 color: 'var(--accent-pink)',
-                url: 'https://www.bilibili.com/h5/customer-service?night=1&native.theme=2'
+                url: 'https://www.bilibili.com/h5/customer-service?night=1&native.theme=2',
+                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation allow-pointer-lock allow-popups-to-escape-sandbox'
             },
             lingyao: {
                 name: '灵妖劫游戏客服',
                 icon: 'fas fa-dragon',
                 color: 'var(--accent-purple)',
-                url: 'https://www10.53kf.com/m.php?cid=72245965&u_cust_id=4e1f3bb204ace72943fb9aa291971281&custom_channel=leniuzx-71058&u_cust_name=5662062132&kf_sign=TQzNTMTc2OMzNTE3MjU0MTg2MDY1MDAzNzIyNDU5NjU%253D&style=14&arg=10245965'
+                url: 'https://www10.53kf.com/m.php?cid=72245965&u_cust_id=4e1f3bb204ace72943fb9aa291971281&custom_channel=leniuzx-71058&u_cust_name=5662062132&kf_sign=TQzNTMTc2OMzNTE3MjU0MTg2MDY1MDAzNzIyNDU5NjU%253D&style=14&arg=10245965',
+                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals'
             },
             huya: {
                 name: '虎牙直播客服',
                 icon: 'fas fa-broadcast-tower',
                 color: 'var(--accent-orange)',
-                url: 'https://kefu.zbase.huya.com/s/huya/ur/index.html#/helpCenter?product=HYAPP&hid=23503'
+                url: 'https://kefu.zbase.huya.com/s/huya/ur/index.html#/helpCenter?product=HYAPP&hid=23503',
+                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals'
             },
             mimimi: {
                 name: '米姆米姆哈客服',
                 icon: 'fas fa-gamepad',
                 color: 'var(--accent-green)',
-                url: 'https://qiyukf.com/client?k=e05afca5e43f120287b23b1d2c3b68fe'
+                url: 'https://qiyukf.com/client?k=e05afca5e43f120287b23b1d2c3b68fe',
+                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals'
             },
             chaoneng: {
                 name: '超能世界客服',
                 icon: 'fas fa-globe',
                 color: 'var(--accent-red)',
-                url: 'https://club.you03.com/pages/webview/index?src=https%253A%252F%252Fkefu.you03.com%252F%253Fenv%253Dgame%2526pid%253D%2526gameId%253D2131%2526userId%253D%2526token%253D'
+                url: 'https://club.you03.com/pages/webview/index?src=https%253A%252F%252Fkefu.you03.com%252F%253Fenv%253Dgame%2526pid%253D%2526gameId%253D2131%2526userId%253D%2526token%253D',
+                sandbox: 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals'
             }
         };
         
@@ -423,6 +428,9 @@
                 <span>${service.name}</span>
             `;
             selectedOption.className = `selected-option ${serviceId}-option`;
+            
+            // 更新iframe的sandbox属性
+            chatIframe.sandbox = service.sandbox;
             
             // 更新iframe
             chatIframe.src = service.url;
@@ -476,27 +484,30 @@
             
             // 初始化调整高度
             setTimeout(resizeHandler, 100);
+            
+            // 为哔哩哔哩客服添加特殊处理
+            chatIframe.addEventListener('load', function() {
+                if (currentService === 'bilibili') {
+                    // 为哔哩哔哩客服添加点击事件处理
+                    try {
+                        // 尝试注入脚本以处理点击事件
+                        const iframeDoc = chatIframe.contentDocument || chatIframe.contentWindow.document;
+                        if (iframeDoc) {
+                            // 监听iframe内的点击事件
+                            iframeDoc.addEventListener('click', function(e) {
+                                // 让点击事件正常传播
+                                e.stopPropagation();
+                            }, true);
+                        }
+                    } catch (error) {
+                        console.log('无法直接访问iframe内容:', error);
+                    }
+                }
+            });
         }
         
         // 启动应用
         init();
-        
-        // 添加iframe加载完成事件
-        chatIframe.addEventListener('load', function() {
-            console.log('客服页面加载完成');
-        });
-        
-        // 添加iframe错误处理
-        chatIframe.addEventListener('error', function() {
-            console.log('客服页面加载失败，尝试备用方案');
-            
-            // 如果是哔哩哔哩客服，尝试使用备用链接
-            if (currentService === 'bilibili') {
-                // 尝试使用代理或备用链接
-                const backupUrl = 'https://message.bilibili.com/#/reply';
-                chatIframe.src = backupUrl;
-            }
-        });
     </script>
 </body>
 </html>

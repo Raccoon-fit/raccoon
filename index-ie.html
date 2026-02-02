@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html lang="zh-CN" class="ie8"><![endif]-->
+<!--[if IE 9]><html lang="zh-CN" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="zh-CN"><!--<![endif]-->
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="软软的小窝 - 数字创意空间">
+<title>软软的小窝 ✨</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
+<style>
+/* ========================================
+   iOS 26 Ethereal Flow 液态玻璃设计系统 - IE8+ 完美兼容版
+   全部使用IE兼容技术实现
+======================================== */
+
+/* ========================================
+   全局重置 - IE兼容版
+======================================== */
+* { margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    line-height: 1.65;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ========================================
+   液态背景系统 - IE滤镜版
+======================================== */
+.liquid-bg-ie {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1000;
+    overflow: hidden;
+    pointer-events: none;
+    display: none;
+}
+
+.ie8 .liquid-bg-ie,
+.ie9 .liquid-bg-ie {
+    display: block;
+}
+
+.liquid-orb-ie {
+    position: absolute;
+    border-radius: 50%;
+    filter: progid:DXImageTransform.Microsoft.Blur(pixelradius=60);
+    opacity: 0.5;
+}
+
+.orb-ie-1 {
+    width: 600px;
+    height: 600px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=transparent)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=transparent);
+    top: -10%;
+    left: -10%;
+}
+
+.orb-ie-2 {
+    width: 500px;
+    height: 500px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#6366f1, endColorstr=transparent)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#6366f1, endColorstr=transparent);
+    top: 30%;
+    right: -15%;
+}
+
+.orb-ie-3 {
+    width: 400px;
+    height: 400px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#d946ef, endColorstr=transparent)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d946ef, endColorstr=transparent);
+    bottom: -10%;
+    left: 30%;
+}
+
+.orb-ie-4 {
+    width: 350px;
+    height: 350px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#14b8a6, endColorstr=transparent)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#14b8a6, endColorstr=transparent);
+    top: 50%;
+    left: 50%;
+    margin-left: -175px;
+    margin-top: -175px;
+}
+
+.orb-ie-5 {
+    width: 450px;
+    height: 450px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#a855f7, endColorstr=transparent)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#a855f7, endColorstr=transparent);
+    bottom: 20%;
+    right: 10%;
+}
+
+/* IE背景遮罩 */
+.liquid-mask-ie {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0a0a0f;
+    z-index: -999;
+    display: none;
+}
+
+.ie8 .liquid-mask-ie,
+.ie9 .liquid-mask-ie {
+    display: block;
+}
+
+/* 精品玻璃卡片 - IE版 */
+.glass-ie {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.glass-ie:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+}
+
+/* ========================================
+   导航栏 - IE布局
+======================================== */
+.nav-wrap-ie {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: calc(100% - 32px);
+    max-width: 640px;
+}
+
+.nav-bar-ie {
+    display: block;
+    padding: 10px 18px;
+    background: rgba(18,18,26,0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    border-radius: 36px;
+    position: relative;
+    *zoom: 1;
+}
+
+.nav-bar-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.nav-brand-ie {
+    float: left;
+    display: inline;
+    vertical-align: middle;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    margin-right: 20px;
+}
+
+.nav-icon-ie {
+    display: inline-block;
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
+    border-radius: 20px;
+    text-align: center;
+    line-height: 38px;
+    font-size: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.nav-menu-ie {
+    float: left;
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu-ie li {
+    display: inline;
+    float: left;
+    margin: 0 2px;
+}
+
+.nav-link-ie {
+    display: block;
+    padding: 8px 14px;
+    color: rgba(235,235,245,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 9999px;
+    background: transparent;
+}
+
+.nav-link-ie:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+}
+
+.nav-link-ie.active {
+    color: #fff;
+    background: rgba(255,255,255,0.12);
+}
+
+.nav-actions-ie {
+    float: right;
+    display: inline;
+}
+
+.nav-action-btn-ie {
+    display: inline-block;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(235,235,245,0.7);
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 6px;
+}
+
+.nav-action-btn-ie:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.nav-time-ie {
+    display: inline-block;
+    padding: 6px 12px;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    color: rgba(235,235,245,0.7);
+    margin-left: 6px;
+}
+
+.nav-time-dot-ie {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: #f43f5e;
+    border-radius: 50%;
+    margin-right: 6px;
+    *margin-top: 8px;
+}
+
+/* ========================================
+   主内容区域
+======================================== */
+main-ie {
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+section-ie {
+    display: block;
+    padding: 80px 16px;
+}
+
+.container-ie {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Hero 区域 */
+.hero-ie {
+    min-height: 100vh;
+    display: block;
+    text-align: center;
+    padding-top: 120px;
+    padding-bottom: 32px;
+}
+
+.hero-badge-ie {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 9999px;
+    color: #a855f7;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.hero-h1-ie {
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+    background: none;
+    filter: none;
+    color: #fff;
+}
+
+.hero-h1-ie span {
+    color: #d946ef;
+}
+
+.hero-desc-ie {
+    font-size: 16px;
+    color: rgba(235,235,245,0.7);
+    max-width: 540px;
+    margin: 0 auto 32px;
+    line-height: 1.75;
+}
+
+.hero-img-wrap-ie {
+    position: relative;
+    max-width: 440px;
+    margin: 0 auto 32px;
+    display: inline-block;
+}
+
+.hero-img-wrap-ie img {
+    width: 440px;
+    height: auto;
+    display: block;
+    border-radius: 28px;
+    border: 2px solid rgba(139,92,246,0.3);
+}
+
+.hero-btns-ie {
+    display: block;
+    margin-top: 24px;
+}
+
+.btn-ie {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    margin: 0 8px;
+}
+
+.btn-primary-ie {
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#a855f7)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#a855f7);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(139,92,246,0.35);
+    border: none;
+}
+
+.btn-secondary-ie {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* 区块标题 */
+.section-hd-ie {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.section-hd-ie h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.section-hd-ie p {
+    font-size: 14px;
+    color: rgba(235,235,245,0.5);
+}
+
+/* 项目卡片 */
+.projects-grid-ie {
+    display: block;
+    margin: -12px;
+}
+
+.projects-grid-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.project-card-ie {
+    float: left;
+    width: calc(33.333% - 24px);
+    margin: 12px;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border-radius: 28px;
+}
+
+.project-card-ie:hover {
+    transform: translateY(-4px);
+}
+
+.project-ico-ie {
+    width: 52px;
+    height: 52px;
+    background: rgba(139,92,246,0.15);
+    border-radius: 20px;
+    text-align: center;
+    line-height: 52px;
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.project-card-ie h3 {
+    font-size: 19px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.project-card-ie p {
+    font-size: 14px;
+    color: rgba(235,235,245,0.5);
+    margin-bottom: 16px;
+    line-height: 1.7;
+}
+
+.project-tags-ie {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.tag-ie {
+    display: inline-block;
+    padding: 5px 12px;
+    background: rgba(139,92,246,0.08);
+    border: 1px solid rgba(139,92,246,0.15);
+    border-radius: 9999px;
+    font-size: 12px;
+    color: rgba(235,235,245,0.7);
+    margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+/* 实验室卡片 */
+.lab-grid-ie {
+    display: block;
+    margin: -12px;
+}
+
+.lab-grid-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.lab-card-ie {
+    float: left;
+    width: calc(33.333% - 24px);
+    margin: 12px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border-radius: 28px;
+}
+
+.lab-ico-ie {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.lab-card-ie h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.lab-card-ie p {
+    font-size: 13px;
+    color: rgba(235,235,245,0.5);
+    line-height: 1.7;
+}
+
+/* 关于区域 */
+.about-area-ie {
+    display: block;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.about-area-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.about-box-ie {
+    float: left;
+    width: calc(50% - 16px);
+    margin: 0 8px;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border-radius: 28px;
+}
+
+.about-box-ie h3 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.about-box-ie p {
+    font-size: 14px;
+    color: rgba(235,235,245,0.7);
+    margin-bottom: 16px;
+    line-height: 1.8;
+}
+
+.about-box-ie a {
+    color: #a855f7;
+    text-decoration: none;
+}
+
+.about-box-ie a:hover {
+    text-decoration: underline;
+}
+
+.skills-box-ie {
+    float: left;
+    width: calc(50% - 16px);
+    margin: 0 8px;
+    padding: 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    border-left: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border-radius: 28px;
+}
+
+.skills-title-ie {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.skill-item-ie {
+    margin-bottom: 16px;
+}
+
+.skill-hd-ie {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.skill-hd-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.skill-name-ie {
+    float: left;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.skill-num-ie {
+    float: right;
+    font-size: 12px;
+    color: rgba(235,235,245,0.35);
+}
+
+.skill-bar-ie {
+    height: 5px;
+    background: rgba(139,92,246,0.1);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.skill-fill-ie {
+    height: 100%;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
+    width: 0;
+    transition: width 1.2s;
+}
+
+/* 页脚 */
+.footer-ie {
+    display: block;
+    padding: 48px 16px 32px;
+    text-align: center;
+}
+
+.footer-box-ie {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 32px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.footer-logo-ie {
+    display: inline-block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+}
+
+.footer-ico-ie {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
+    border-radius: 20px;
+    text-align: center;
+    line-height: 44px;
+    font-size: 24px;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.footer-ie p {
+    font-size: 14px;
+    color: rgba(235,235,245,0.7);
+    margin-bottom: 16px;
+}
+
+.footer-links-ie {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.footer-links-ie a {
+    display: inline-block;
+    padding: 8px 16px;
+    color: rgba(235,235,245,0.5);
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 9999px;
+}
+
+.footer-links-ie a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+}
+
+.footer-copy-ie {
+    font-size: 12px;
+    color: rgba(235,235,245,0.35);
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+/* 跳过链接 */
+.skip-link-ie {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background: #fff;
+    color: #0a0a0f;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+}
+
+/* ========================================
+   响应式 - IE兼容
+======================================== */
+@media screen and (max-width: 768px) {
+    .project-card-ie {
+        width: calc(100% - 24px);
+        float: none;
+    }
+    
+    .lab-card-ie {
+        width: calc(100% - 24px);
+        float: none;
+    }
+    
+    .about-box-ie,
+    .skills-box-ie {
+        width: calc(100% - 16px);
+        float: none;
+        margin-bottom: 16px;
+    }
+    
+    .nav-menu-ie {
+        display: none;
+    }
+    
+    .nav-bar-ie {
+        text-align: center;
+    }
+    
+    .nav-brand-ie {
+        float: none;
+        display: inline-block;
+    }
+    
+    .nav-actions-ie {
+        float: none;
+        display: inline-block;
+        margin-top: 10px;
+    }
+}
+
+/* 滚动条 - IE */
+html {
+    scrollbar-face-color: #8b5cf6;
+    scrollbar-shadow-color: #d946ef;
+    scrollbar-track-color: transparent;
+}
+
+/* 选择 */
+::selection {
+    background: rgba(139,92,246,0.4);
+    color: #fff;
+}
+</style>
+
+<!--[if IE 8]>
+<style>
+/* IE8特定样式 */
+.liquid-orb-ie { filter: none; }
+.nav-menu-ie li { display: inline; }
+.btn-ie { *display: inline; *zoom: 1; }
+.project-card-ie, .lab-card-ie, .about-box-ie, .skills-box-ie { *width: 300px; }
+</style>
+<![endif]-->
+
+<!--[if IE 9]>
+<style>
+/* IE9特定样式 */
+.liquid-orb-ie { filter: progid:DXImageTransform.Microsoft.Blur(pixelradius=60); }
+</style>
+<![endif]-->
+</head>
+<body>
+    <!-- IE兼容液态背景 -->
+    <div class="liquid-bg-ie">
+        <div class="liquid-orb-ie orb-ie-1"></div>
+        <div class="liquid-orb-ie orb-ie-2"></div>
+        <div class="liquid-orb-ie orb-ie-3"></div>
+        <div class="liquid-orb-ie orb-ie-4"></div>
+        <div class="liquid-orb-ie orb-ie-5"></div>
+    </div>
+    <div class="liquid-mask-ie"></div>
+
+    <!-- 跳过链接 - IE版 -->
+    <a href="#main-ie" class="skip-link-ie" tabindex="1">跳到主要内容</a>
+
+    <!-- 导航 - IE版 -->
+    <div class="nav-wrap-ie">
+        <nav class="nav-bar-ie">
+            <a href="#home-ie" class="nav-brand-ie">
+                <span class="nav-icon-ie">🦝</span>
+                <span>软软的小窝</span>
+            </a>
+
+            <ul class="nav-menu-ie" id="navMenuIe">
+                <li><a href="#home-ie" class="nav-link-ie active">首页</a></li>
+                <li><a href="#projects-ie" class="nav-link-ie">项目</a></li>
+                <li><a href="#lab-ie" class="nav-link-ie">实验室</a></li>
+                <li><a href="#about-ie" class="nav-link-ie">关于</a></li>
+            </ul>
+
+            <div class="nav-actions-ie">
+                <button class="nav-action-btn-ie" id="themeBtnIe">
+                    <span id="themeIconIe">🌙</span>
+                    <span>深色</span>
+                </button>
+                <div class="nav-time-ie">
+                    <span class="nav-time-dot-ie"></span>
+                    <span id="clockIe">00:00:00</span>
+                </div>
+                <a href="https://raccoon.fit/mobile" class="nav-action-btn-ie" target="_blank" id="officialBtnIe">
+                    <span>客服合集</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- 主内容 - IE版 -->
+    <main-ie id="main-ie">
+        <!-- 首页 - IE版 -->
+        <section-ie id="home-ie" class="hero-ie">
+            <div class="container-ie">
+                <div class="hero-badge-ie">
+                    <span>✨</span>
+                    <span>数字创意空间</span>
+                </div>
+                <h1 class="hero-h1-ie">
+                    探索代码的<br><span>无限可能</span>
+                </h1>
+                <p class="hero-desc-ie">
+                    这里是软软的数字空间，一个专注于创造、学习和分享的地方。
+                    通过代码探索未知，用技术解决现实问题。
+                </p>
+                <div class="hero-img-wrap-ie">
+                    <img src="https://raccoon.fit/image/20260101/2026新年快乐.jpg" alt="2026新年快乐" width="440" height="293">
+                </div>
+                <div class="hero-btns-ie">
+                    <a href="#projects-ie" class="btn-ie btn-primary-ie">
+                        <span>🚀</span>
+                        <span>探索项目</span>
+                    </a>
+                    <a href="#contact-ie" class="btn-ie btn-secondary-ie">
+                        <span>💬</span>
+                        <span>联系我</span>
+                    </a>
+                </div>
+            </div>
+        </section-ie>
+
+        <!-- 项目 - IE版 -->
+        <section-ie id="projects-ie">
+            <div class="container-ie">
+                <div class="section-hd-ie">
+                    <h2>精选作品</h2>
+                    <p>每个项目都是对技术深度的探索和对用户体验的思考</p>
+                </div>
+
+                <div class="projects-grid-ie">
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">&lt;/&gt;</div>
+                        <h3>Ride</h3>
+                        <p>站在开发之巅 - 一个强大的在线开发环境，让编码更高效。</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">在线IDE</span>
+                            <span class="tag-ie">开发工具</span>
+                        </div>
+                        <a href="https://raccoon.fit/Ride" class="btn-ie btn-primary-ie" target="_blank">立即体验 ↗</a>
+                    </div>
+
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">&lt;/&gt;</div>
+                        <h3>哔哩哔哩直播流获取</h3>
+                        <p>一键获取哔哩哔哩直播流地址和直播信息</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">直播辅助</span>
+                            <span class="tag-ie">哔哩哔哩</span>
+                        </div>
+                        <a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" class="btn-ie btn-primary-ie" target="_blank">立即体验 ↗</a>
+                    </div>
+
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">📱</div>
+                        <h3>MULU</h3>
+                        <p>一个已归档的移动应用项目，探索了完整的开发流程。</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">React Native</span>
+                            <span class="tag-ie">UI/UX</span>
+                        </div>
+                        <a href="#" class="btn-ie btn-secondary-ie">查看归档</a>
+                    </div>
+
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">📝</div>
+                        <h3>灵熊小记</h3>
+                        <p>你的神奇小伙伴「灵熊」已就位！帮你悄无声息地搞定很多事。</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">Vue.js</span>
+                            <span class="tag-ie">Markdown</span>
+                        </div>
+                        <a href="https://link3.cc/training_fengfeng_games" class="btn-ie btn-primary-ie" target="_blank">访问项目 ↗</a>
+                    </div>
+
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">🎮</div>
+                        <h3>小游戏库</h3>
+                        <p>探索人工智能与前端开发的结合，关注想法的诞生与实现。</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">CSS</span>
+                            <span class="tag-ie">HTML5</span>
+                        </div>
+                        <a href="https://raccoon.fit/game" class="btn-ie btn-secondary-ie" target="_blank">查看详情 ↗</a>
+                    </div>
+
+                    <div class="glass-ie project-card-ie">
+                        <div class="project-ico-ie">🤖</div>
+                        <h3>RACCOON AI</h3>
+                        <p>欢迎体验 RACCOON AI，与智能对话的未来对话。</p>
+                        <div class="project-tags-ie">
+                            <span class="tag-ie">AI</span>
+                            <span class="tag-ie">聊天</span>
+                        </div>
+                        <a href="https://raccoon.fit/ai" class="btn-ie btn-secondary-ie" target="_blank">立即体验 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </section-ie>
+
+        <!-- 实验室 - IE版 -->
+        <section-ie id="lab-ie">
+            <div class="container-ie">
+                <div class="section-hd-ie">
+                    <h2>创意实验室</h2>
+                    <p>这里存放着正在进行中的实验、原型和创意构思</p>
+                </div>
+
+                <div class="lab-grid-ie">
+                    <div class="glass-ie lab-card-ie">
+                        <div class="lab-ico-ie">🔮</div>
+                        <h3>AI 辅助设计</h3>
+                        <p>探索人工智能在设计流程中的应用，尝试自动生成 UI 组件和设计系统。</p>
+                    </div>
+                    <div class="glass-ie lab-card-ie">
+                        <div class="lab-ico-ie">🎨</div>
+                        <h3>交互原型</h3>
+                        <p>创建高级交互动画和微交互，提升数字产品的体验质感。</p>
+                    </div>
+                    <div class="glass-ie lab-card-ie">
+                        <div class="lab-ico-ie">📊</div>
+                        <h3>数据可视化</h3>
+                        <p>将复杂数据转化为直观的视觉故事，探索信息设计的边界。</p>
+                    </div>
+                </div>
+            </div>
+        </section-ie>
+
+        <!-- 关于 - IE版 -->
+        <section-ie id="about-ie">
+            <div class="about-area-ie">
+                <div class="glass-ie about-box-ie">
+                    <h3>关于软软</h3>
+                    <p>
+                        一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，
+                        更是创造美和价值的艺术形式。
+                    </p>
+                    <p>
+                        选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——
+                        这些特质正是技术探索者所需要的核心品质。
+                    </p>
+                    <p>
+                        Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、
+                        追求卓越的技术哲学。
+                    </p>
+                    <a href="me">>> 点这里进入软软的个人主页</a>
+                </div>
+
+                <div class="glass-ie skills-box-ie">
+                    <h4 class="skills-title-ie">技术专长</h4>
+
+                    <div class="skill-item-ie" data-width="85">
+                        <div class="skill-hd-ie">
+                            <span class="skill-name-ie">前端开发</span>
+                            <span class="skill-num-ie">85%</span>
+                        </div>
+                        <div class="skill-bar-ie">
+                            <div class="skill-fill-ie" id="skill-fill-1"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item-ie" data-width="75">
+                        <div class="skill-hd-ie">
+                            <span class="skill-name-ie">UI/UX 设计</span>
+                            <span class="skill-num-ie">75%</span>
+                        </div>
+                        <div class="skill-bar-ie">
+                            <div class="skill-fill-ie" id="skill-fill-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item-ie" data-width="80">
+                        <div class="skill-hd-ie">
+                            <span class="skill-name-ie">产品思维</span>
+                            <span class="skill-num-ie">80%</span>
+                        </div>
+                        <div class="skill-bar-ie">
+                            <div class="skill-fill-ie" id="skill-fill-3"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item-ie" data-width="70">
+                        <div class="skill-hd-ie">
+                            <span class="skill-name-ie">创意编程</span>
+                            <span class="skill-num-ie">70%</span>
+                        </div>
+                        <div class="skill-bar-ie">
+                            <div class="skill-fill-ie" id="skill-fill-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section-ie>
+    </main-ie>
+
+    <!-- 页脚 - IE版 -->
+    <footer-ie id="contact-ie" class="footer-ie">
+        <div class="footer-box-ie">
+            <div class="footer-logo-ie">
+                <span class="footer-ico-ie">🦝</span>
+                <span>软软的小窝</span>
+            </div>
+            <p>探索、创造、成长。欢迎与我联系，交流想法，合作创新。</p>
+            <div class="footer-links-ie">
+                <a href="mailto:2051775505@qq.com">邮箱</a>
+                <a href="https://github.com/raccoon-fit" target="_blank">GitHub</a>
+                <a href="https://raccoon.fit" target="_blank">官网</a>
+                <a href="#home-ie">返回顶部</a>
+            </div>
+            <div class="footer-copy-ie">
+                © 2025-2026 软软. 本网站由浣熊设计与开发
+            </div>
+        </div>
+    </footer-ie>
+
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+
+        // ========================================
+        // IE浏览器检测
+        // ========================================
+        var isIE = false;
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if ((/MSIE/i.test(userAgent) || /Trident/i.test(userAgent)) || (/Edge/i.test(userAgent))) {
+            isIE = true;
+        }
+
+        // ========================================
+        // 主题管理 - IE兼容版
+        // ========================================
+        var Theme = {
+            dark: true,
+            init: function() {
+                try {
+                    var saved = localStorage.getItem('theme');
+                    if (saved) {
+                        this.dark = saved === 'dark';
+                    } else {
+                        this.dark = true;
+                        localStorage.setItem('theme', 'dark');
+                    }
+                    this.apply();
+                } catch (e) {
+                    this.apply();
+                }
+            },
+            toggle: function() {
+                this.dark = !this.dark;
+                try {
+                    localStorage.setItem('theme', this.dark ? 'dark' : 'light');
+                } catch (e) {}
+                this.apply();
+            },
+            apply: function() {
+                var icon = document.getElementById('themeIconIe');
+                var btnText = document.getElementById('themeBtnIe');
+                if (icon) icon.innerHTML = this.dark ? '☀️' : '🌙';
+                if (btnText) {
+                    var spans = btnText.getElementsByTagName('span');
+                    if (spans.length > 1) {
+                        spans[1].innerHTML = this.dark ? '浅色' : '深色';
+                    }
+                }
+            }
+        };
+
+        // ========================================
+        // 时钟 - IE兼容版
+        // ========================================
+        function updateClock() {
+            var clockEl = document.getElementById('clockIe');
+            if (clockEl) {
+                var now = new Date();
+                var hours = now.getHours();
+                var minutes = now.getMinutes();
+                var seconds = now.getSeconds();
+                if (hours < 10) hours = '0' + hours;
+                if (minutes < 10) minutes = '0' + minutes;
+                if (seconds < 10) seconds = '0' + seconds;
+                clockEl.innerHTML = hours + ':' + minutes + ':' + seconds;
+            }
+        }
+
+        // ========================================
+        // 导航交互 - IE兼容版
+        // ========================================
+        function initNavigation() {
+            var navLinks = document.querySelectorAll ? document.querySelectorAll('.nav-link-ie') : document.getElementsByClassName('nav-link-ie');
+            var sections = document.querySelectorAll ? document.querySelectorAll('section-ie') : document.getElementsByTagName('section-ie');
+
+            function updateActiveLink() {
+                var scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                scrollPos = scrollPos + 180;
+
+                for (var i = 0; i < sections.length; i++) {
+                    var section = sections[i];
+                    var sectionTop = section.offsetTop || 0;
+                    var sectionHeight = section.offsetHeight || 0;
+                    var sectionId = section.id || '';
+
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        for (var j = 0; j < navLinks.length; j++) {
+                            var link = navLinks[j];
+                            var href = link.getAttribute('href') || '';
+                            if (href.indexOf('#' + sectionId) !== -1) {
+                                link.className = 'nav-link-ie active';
+                            } else {
+                                link.className = 'nav-link-ie';
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (window.addEventListener) {
+                window.addEventListener('scroll', updateActiveLink, false);
+            } else if (window.attachEvent) {
+                window.attachEvent('onscroll', updateActiveLink);
+            }
+            updateActiveLink();
+        }
+
+        // ========================================
+        // 滚动动画 - IE兼容版
+        // ========================================
+        function initScrollAnimations() {
+            var skills = [
+                { fill: document.getElementById('skill-fill-1'), width: '85%' },
+                { fill: document.getElementById('skill-fill-2'), width: '75%' },
+                { fill: document.getElementById('skill-fill-3'), width: '80%' },
+                { fill: document.getElementById('skill-fill-4'), width: '70%' }
+            ];
+
+            function animateSkills() {
+                for (var i = 0; i < skills.length; i++) {
+                    var skill = skills[i];
+                    if (skill.fill && skill.width) {
+                        skill.fill.style.width = skill.width;
+                    }
+                }
+            }
+
+            setTimeout(animateSkills, 500);
+        }
+
+        // ========================================
+        // 平滑锚点 - IE兼容版
+        // ========================================
+        function initSmoothAnchor() {
+            var anchors = document.getElementsByTagName('a');
+            for (var i = 0; i < anchors.length; i++) {
+                var anchor = anchors[i];
+                var href = anchor.getAttribute('href') || '';
+                if (href.indexOf('#') === 0 && href.length > 1) {
+                    if (anchor.addEventListener) {
+                        anchor.addEventListener('click', function(e) {
+                            e = e || window.event;
+                            if (e.preventDefault) e.preventDefault(); else e.returnValue = false;
+                            var targetId = this.getAttribute('href').substring(1);
+                            var targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                var offsetTop = targetElement.offsetTop - 80;
+                                if (window.scrollTo) {
+                                    window.scrollTo(0, offsetTop);
+                                } else {
+                                    document.documentElement.scrollTop = offsetTop;
+                                    document.body.scrollTop = offsetTop;
+                                }
+                            }
+                        }, false);
+                    } else if (anchor.attachEvent) {
+                        anchor.attachEvent('onclick', function() {
+                            var targetId = this.getAttribute('href').substring(1);
+                            var targetElement = document.getElementById(targetId);
+                            if (targetElement) {
+                                document.documentElement.scrollTop = targetElement.offsetTop - 80;
+                            }
+                            return false;
+                        });
+                    }
+                }
+            }
+        }
+
+        // ========================================
+        // 官网按钮 - IE兼容版
+        // ========================================
+        function initOfficialBtn() {
+            var btn = document.getElementById('officialBtnIe');
+            if (btn) {
+                if (btn.addEventListener) {
+                    btn.addEventListener('click', function() {
+                        var self = this;
+                        self.style.transform = 'scale(0.95)';
+                        setTimeout(function() {
+                            self.style.transform = '';
+                        }, 100);
+                    });
+                } else if (btn.attachEvent) {
+                    btn.attachEvent('onclick', function() {
+                        btn.style.transform = 'scale(0.95)';
+                        setTimeout(function() {
+                            btn.style.transform = '';
+                        }, 100);
+                    });
+                }
+            }
+        }
+
+        // ========================================
+        // 初始化 - IE兼容版
+        // ========================================
+        function init() {
+            Theme.init();
+            updateClock();
+            setInterval(updateClock, 1000);
+            initNavigation();
+            initScrollAnimations();
+            initSmoothAnchor();
+            initOfficialBtn();
+
+            var themeBtn = document.getElementById('themeBtnIe');
+            if (themeBtn) {
+                if (themeBtn.addEventListener) {
+                    themeBtn.addEventListener('click', function() { Theme.toggle(); }, false);
+                } else if (themeBtn.attachEvent) {
+                    themeBtn.attachEvent('onclick', function() { Theme.toggle(); });
+                }
+            }
+
+            try {
+                if (window.console && window.console.log) {
+                    console.log('%c🦝 软软的小窝', 'font-size:20px;font-weight:bold;background:linear-gradient(135deg,#8b5cf6,#d946ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent;');
+                }
+            } catch (e) {}
+        }
+
+        if (document.addEventListener) {
+            document.addEventListener('DOMContentLoaded', init, false);
+        } else if (document.attachEvent) {
+            document.attachEvent('onreadystatechange', function() {
+                if (document.readyState === 'complete') {
+                    init();
+                }
+            });
+        } else {
+            window.onload = init;
+        }
+
+    })();
+    </script>
+</body>
+</html>

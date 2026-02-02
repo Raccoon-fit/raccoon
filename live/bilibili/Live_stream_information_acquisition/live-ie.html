@@ -907,8 +907,48 @@ body {
                 <h3>在线播放</h3>
                 <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
-            <div class="video-container">
-                <video id="videoPlayer" controls></video>
+            <div class="video-container" id="videoWrapper" style="background:#000;position:relative;padding-top:56.25%;">
+                <!-- VLC ActiveX 播放器 (IE原生ActiveX样式) -->
+                <object id="vlcPlayer" width="100%" height="100%" classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                    <param name="AutoPlay" value="true">
+                    <param name="ShowDisplay" value="true">
+                    <param name="Volume" value="100">
+                    <!-- VLC未安装时的提示 -->
+                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:#1a1a2e;color:#fff;display:none;" id="vlcNotInstalled">
+                        <div style="padding:40px 20px;text-align:center;">
+                            <div style="font-size:48px;margin-bottom:20px;">&#9658;</div>
+                            <h3 style="font-size:20px;margin-bottom:16px;">需要安装 VLC 播放器插件</h3>
+                            <p style="font-size:14px;line-height:1.8;margin-bottom:20px;">
+                                您的浏览器缺少播放此视频所需的插件。<br>
+                                Bilibili直播流为 FLV/M3U8 格式，需要 VLC ActiveX 插件支持。
+                            </p>
+                            <a href="https://get.videolan.org/vlc/3.0.20/win32/vlc-3.0.20-win32.exe" target="_blank" style="display:inline-block;background:#e74c3c;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer;text-decoration:none;margin-right:10px;">
+                                <i class="fa fa-download"></i> 下载 VLC 播放器
+                            </a>
+                            <button onclick="copyCurrentStreamUrl()" style="background:#4299e1;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer;">
+                                <i class="fa fa-copy"></i> 复制播放链接
+                            </button>
+                        </div>
+                    </div>
+                </object>
+                
+                <!-- 备用：Windows Media Player ActiveX -->
+                <object id="wmpPlayer" width="100%" height="100%" classid="clsid:6BF52A52-394A-11d3-B153-00C04F79FAA6" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;">
+                    <param name="AutoStart" value="true">
+                    <param name="uiMode" value="full">
+                    <param name="stretchToFit" value="true">
+                    <param name="Volume" value="-1">
+                </object>
+                
+                <!-- 提示信息 -->
+                <div id="playerMessage" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#1a1a2e;color:#fff;display:none;padding:40px 20px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:20px;">&#9888;</div>
+                    <h3 style="font-size:20px;margin-bottom:16px;" id="playerMessageTitle">提示</h3>
+                    <p style="font-size:14px;line-height:1.8;margin-bottom:20px;" id="playerMessageText"></p>
+                    <button onclick="copyCurrentStreamUrl()" style="background:#4299e1;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;cursor:pointer;">
+                        <i class="fa fa-copy"></i> 复制播放链接
+                    </button>
+                </div>
             </div>
             <div class="modal-footer">
                 <p>当前线路：<span id="currentStreamName"></span></p>
@@ -1152,7 +1192,6 @@ body {
             streamName = decodeURIComponent(streamName);
 
             var modal = document.getElementById('videoModal');
-            var videoPlayer = document.getElementById('videoPlayer');
             var currentStreamName = document.getElementById('currentStreamName');
 
             currentStreamName.innerHTML = streamName;
@@ -1166,20 +1205,152 @@ body {
                 currentFlvPlayer = null;
             }
 
-            videoPlayer.pause();
-            videoPlayer.src = url;
+            // 检测当前视频格式
+            var videoFormat = getVideoFormat(url);
             
-            videoPlayer.onloadedmetadata = function() {
-                try {
-                    videoPlayer.play();
-                } catch (e) {
-                    console.log('自动播放失败，请手动播放');
-                }
-            };
+            // 保存当前播放URL供复制使用
+            window.currentStreamUrl = url;
+            
+            // IE浏览器使用ActiveX控件播放
+            if (window.ActiveXObject || 'ActiveXObject' in window) {
+                playWithActiveX(url, videoFormat);
+            } else {
+                // 非IE浏览器使用HTML5 video
+                var videoPlayer = document.getElementById('videoPlayer');
+                var vlcPlayer = document.getElementById('vlcPlayer');
+                var wmpPlayer = document.getElementById('wmpPlayer');
+                var playerMessage = document.getElementById('playerMessage');
+                
+                // 隐藏ActiveX播放器，显示HTML5 video
+                vlcPlayer.style.display = 'none';
+                wmpPlayer.style.display = 'none';
+                playerMessage.style.display = 'none';
+                videoPlayer.style.display = 'block';
+                
+                videoPlayer.pause();
+                videoPlayer.src = url;
+                
+                videoPlayer.onloadedmetadata = function() {
+                    try {
+                        videoPlayer.play();
+                    } catch (e) {
+                        console.log('自动播放失败，请手动播放');
+                    }
+                };
 
-            videoPlayer.onerror = function() {
-                showToast('视频加载失败，请尝试复制链接到本地播放器', false);
-            };
+                videoPlayer.onerror = function() {
+                    showToast('视频加载失败，请尝试复制链接到本地播放器', false);
+                };
+            }
+        };
+
+        // 检测视频格式
+        function getVideoFormat(url) {
+            var lowerUrl = url.toLowerCase();
+            if (lowerUrl.indexOf('.m3u8') !== -1) {
+                return 'm3u8';
+            } else if (lowerUrl.indexOf('.flv') !== -1) {
+                return 'flv';
+            } else if (lowerUrl.indexOf('.mp4') !== -1) {
+                return 'mp4';
+            } else if (lowerUrl.indexOf('.wmv') !== -1) {
+                return 'wmv';
+            } else if (lowerUrl.indexOf('.avi') !== -1) {
+                return 'avi';
+            } else if (lowerUrl.indexOf('.mkv') !== -1) {
+                return 'mkv';
+            } else {
+                return 'unknown';
+            }
+        }
+
+        // 使用ActiveX控件播放视频
+        function playWithActiveX(url, format) {
+            var videoPlayer = document.getElementById('videoPlayer');
+            var vlcPlayer = document.getElementById('vlcPlayer');
+            var wmpPlayer = document.getElementById('wmpPlayer');
+            var vlcNotInstalled = document.getElementById('vlcNotInstalled');
+            var playerMessage = document.getElementById('playerMessage');
+            
+            // 隐藏HTML5 video
+            videoPlayer.style.display = 'none';
+            playerMessage.style.display = 'none';
+            
+            // 优先尝试VLC ActiveX（支持FLV和M3U8）
+            var hasVLC = false;
+            try {
+                // 尝试创建VLC对象
+                var vlc = new ActiveXObject('VideoLAN.VLCPlugin.2');
+                hasVLC = true;
+            } catch (e) {
+                // VLC不存在，尝试WMP
+                try {
+                    var wmp = new ActiveXObject('WMPlayer.OCX');
+                    hasVLC = false;
+                } catch (e2) {
+                    hasVLC = null; // 两者都不存在
+                }
+            }
+            
+            if (hasVLC === true) {
+                // VLC可用
+                vlcPlayer.style.display = 'block';
+                wmpPlayer.style.display = 'none';
+                vlcNotInstalled.style.display = 'none';
+                
+                // 使用VLC播放
+                try {
+                    var vlcObj = document.getElementById('vlcPlayer');
+                    if (vlcObj && vlcObj.play) {
+                        vlcObj.playlist.clear();
+                        vlcObj.playlist.add(url);
+                        vlcObj.playlist.play();
+                    }
+                } catch (e) {
+                    showPlayerMessage('VLC播放失败', '无法使用VLC播放此视频，请尝试复制链接到本地播放器观看。');
+                }
+            } else if (hasVLC === false) {
+                // VLC不可用，但WMP可用
+                if (format === 'flv' || format === 'm3u8') {
+                    // WMP不支持FLV和M3U8
+                    vlcPlayer.style.display = 'block';
+                    wmpPlayer.style.display = 'none';
+                    vlcNotInstalled.style.display = 'block';
+                    showPlayerMessage('格式不支持', 'Windows Media Player 不支持 FLV/M3U8 格式，请安装 VLC 播放器或复制链接到本地观看。');
+                } else {
+                    // 使用WMP播放其他格式
+                    vlcPlayer.style.display = 'none';
+                    wmpPlayer.style.display = 'block';
+                    wmpPlayer.URL = url;
+                }
+            } else {
+                // 两者都不可用
+                vlcPlayer.style.display = 'block';
+                wmpPlayer.style.display = 'none';
+                vlcNotInstalled.style.display = 'none';
+                playerMessage.style.display = 'block';
+                document.getElementById('playerMessageTitle').innerHTML = '需要安装播放器插件';
+                document.getElementById('playerMessageText').innerHTML = '您的浏览器未安装任何支持的视频播放器插件。<br>建议安装 <a href="https://get.videolan.org/vlc/3.0.20/win32/vlc-3.0.20-win32.exe" target="_blank" style="color:#4299e1;">VLC 播放器</a> 以支持 FLV/M3U8 格式。';
+            }
+        }
+
+        // 显示播放器提示信息
+        function showPlayerMessage(title, text) {
+            var playerMessage = document.getElementById('playerMessage');
+            document.getElementById('playerMessageTitle').innerHTML = title;
+            document.getElementById('playerMessageText').innerHTML = text;
+            playerMessage.style.display = 'block';
+        }
+
+        // 复制当前播放链接
+        window.copyCurrentStreamUrl = function() {
+            if (window.currentStreamUrl) {
+                copyToClipboard(window.currentStreamUrl, function() {
+                    showToast('链接已复制到剪贴板');
+                });
+            } else {
+                showError('暂无播放链接');
+            }
         };
 
         // ========================================

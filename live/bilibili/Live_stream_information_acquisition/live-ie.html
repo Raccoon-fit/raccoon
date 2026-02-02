@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html lang="zh-CN" class="ie8"><![endif]-->
+<!--[if IE 9]><html lang="zh-CN" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="zh-CN"><!--<![endif]-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>B站直播流提取器 - Bilibili Live Stream Fetcher</title>
+<style>
+/* ========================================
+   IE兼容样式重置
+======================================== */
+* { margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+    font-family: "Microsoft YaHei", "微软雅黑", "SimHei", "PingFang SC", -apple-system, Arial, sans-serif;
+    background: #667eea;
+    background: -webkit-gradient(linear, left top, right top, from(#667eea), to(#764ba2));
+    background: -ms-linear-gradient(left, #667eea 0%, #764ba2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#667eea, endColorstr=#764ba2);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* ========================================
+   清除浮动
+======================================== */
+.clearfix:after { content: ""; display: table; clear: both; }
+.clearfix { *zoom: 1; }
+
+/* ========================================
+   布局容器
+======================================== */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 16px;
+}
+
+/* ========================================
+   头部样式
+======================================== */
+.header { text-align: center; margin-bottom: 32px; }
+.header-icon {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 16px;
+}
+.header-icon i {
+    font-size: 40px;
+    color: #FA7298;
+}
+.header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+}
+
+/* ========================================
+   卡片样式 - IE滤镜版
+======================================== */
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#F2FFFFFF, endColorstr=#F2FFFFFF)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F2FFFFFF, endColorstr=#F2FFFFFF);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* ========================================
+   输入区域
+======================================== */
+.search-area { margin-bottom: 24px; }
+.search-row {
+    margin-bottom: 16px;
+}
+.search-row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.search-input {
+    float: left;
+    width: 70%;
+    *width: 68%;
+    padding: 16px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+.search-input:focus {
+    border-color: #FA7298;
+}
+
+.search-btn {
+    float: right;
+    width: 28%;
+    *width: 26%;
+    padding: 16px 20px;
+    background: #FA7298;
+    background: -webkit-gradient(linear, left top, left bottom, from(#FA7298), to(#ff9a9e));
+    background: -ms-linear-gradient(top, #FA7298 0%, #ff9a9e 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#FA7298, endColorstr=#ff9a9e);
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(250, 114, 152, 0.4);
+}
+.search-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.quick-links {
+    padding-top: 8px;
+}
+.quick-links span {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    margin-right: 8px;
+}
+.quick-links a {
+    color: #fff;
+    font-size: 14px;
+    margin-right: 12px;
+    text-decoration: none;
+}
+.quick-links a:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   新增：通过链接查看按钮
+======================================== */
+.url-view-btn {
+    display: block;
+    width: 300px;
+    margin: 24px auto 0;
+    padding: 12px 24px;
+    background: #9b59b6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#9b59b6), to(#8e44ad));
+    background: -ms-linear-gradient(top, #9b59b6 0%, #8e44ad 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#9b59b6, endColorstr=#8e44ad);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: medium;
+    cursor: pointer;
+    text-align: center;
+}
+.url-view-btn:hover {
+    background: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(155, 89, 182, 0.4);
+}
+
+/* ========================================
+   错误提示
+======================================== */
+.error-msg {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: none;
+}
+.error-msg.show {
+    display: block;
+}
+.error-msg i {
+    color: #e53e3e;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* ========================================
+   直播间信息
+======================================== */
+.room-info { display: none; }
+.room-info.show {
+    display: block;
+}
+.room-info:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.room-cover {
+    float: left;
+    width: 192px;
+    height: 128px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e0e0e0;
+    position: relative;
+}
+.room-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.live-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #e53e3e;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ff6b6b), to(#ee5a24));
+    background: -ms-linear-gradient(top, #ff6b6b 0%, #ee5a24 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ff6b6b, endColorstr=#ee5a24);
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.offline-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #718096;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.room-details {
+    float: left;
+    width: calc(100% - 220px);
+    *width: 65%;
+    margin-left: 28px;
+}
+
+.room-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.room-meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+.room-meta i {
+    margin-right: 4px;
+    color: #FA7298;
+}
+
+.room-meta span {
+    margin-right: 16px;
+}
+
+.action-btns {
+    margin-top: 16px;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-right: 12px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+}
+
+.action-btn.download {
+    background: #9b59b6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#9b59b6), to(#8e44ad));
+    background: -ms-linear-gradient(top, #9b59b6 0%, #8e44ad 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#9b59b6, endColorstr=#8e44ad);
+}
+
+.action-btn.playlink {
+    background: #3498db;
+    background: -webkit-gradient(linear, left top, left bottom, from(#3498db), to(#2980b9));
+    background: -ms-linear-gradient(top, #3498db 0%, #2980b9 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#3498db, endColorstr=#2980b9);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ========================================
+   直播流列表
+======================================== */
+.stream-list { display: none; }
+.stream-list.show {
+    display: block;
+}
+
+.stream-list h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 12px;
+}
+.stream-list h3 i {
+    color: #FA7298;
+    margin-right: 8px;
+}
+
+.stream-list p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.quality-tabs {
+    margin-bottom: 16px;
+}
+
+.quality-tab {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border-radius: 20px;
+    background: #e0e0e0;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+
+.quality-tab.active {
+    background: #FA7298;
+    color: #fff;
+}
+
+.quality-tab:hover {
+    background: #e0e0e0;
+}
+
+.stream-items {
+    margin: -12px 0;
+}
+
+.stream-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+}
+
+.stream-item:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.stream-name {
+    float: left;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.stream-quality {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: #fce7f3;
+    color: #db2777;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.stream-url-container {
+    clear: both;
+    margin-bottom: 12px;
+}
+
+.stream-url {
+    width: 70%;
+    *width: 68%;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.stream-actions {
+    float: right;
+    *float: none;
+    *display: inline;
+}
+
+.stream-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-left: 8px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+
+.stream-btn.copy {
+    background: #4299e1;
+}
+
+.stream-btn.play {
+    background: #48bb78;
+}
+
+.stream-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ========================================
+   底部
+======================================== */
+.footer {
+    text-align: center;
+    padding: 32px 16px 16px;
+    color: rgba(255,255,255,0.8);
+}
+.footer p {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+.footer p.small {
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+/* ========================================
+   弹窗样式
+======================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#B3000000, endColorstr=#B3000000)";
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#B3000000, endColorstr=#B3000000);
+    z-index: 1000;
+    display: none;
+}
+.modal-overlay.show {
+    display: block;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 16px;
+    max-width: 800px;
+    width: 90%;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #4299e1;
+    background: -webkit-gradient(linear, left top, left bottom, from(#4299e1), to(#3182ce));
+    background: -ms-linear-gradient(top, #4299e1 0%, #3182ce 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#4299e1, endColorstr=#3182ce);
+}
+
+.modal-header h3 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.video-container {
+    background: #000;
+    position: relative;
+    padding-top: 56.25%;
+}
+
+.video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    background: #f7fafc;
+}
+
+.modal-footer p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+.modal-footer p.small {
+    font-size: 12px;
+    color: #888;
+}
+
+/* ========================================
+   Toast提示
+======================================== */
+.toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: #2d3748;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: none;
+}
+.toast.show {
+    display: block;
+    -webkit-animation: slideIn 0.3s ease;
+    animation: slideIn 0.3s ease;
+}
+
+.toast i {
+    margin-right: 8px;
+}
+
+.toast .success {
+    color: #68d391;
+}
+
+.toast .error {
+    color: #fc8181;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   加载动画
+======================================== */
+.loading {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #FA7298;
+    border-radius: 50%;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   播放链接弹窗
+======================================== */
+.playlink-modal .modal-header {
+    background: #9b59b6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#9b59b6), to(#8e44ad));
+    background: -ms-linear-gradient(top, #9b59b6 0%, #8e44ad 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#9b59b6, endColorstr=#8e44ad);
+}
+
+.playlink-modal-content {
+    padding: 24px;
+}
+
+.playlink-quality {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 12px;
+}
+
+.playlink-quality span {
+    color: #4299e1;
+    font-weight: bold;
+}
+
+.playlink-input-row {
+    margin-bottom: 16px;
+}
+
+.playlink-input-row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.playlink-input {
+    float: left;
+    width: 75%;
+    *width: 73%;
+    padding: 12px 16px;
+    background: #f7fafc;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #555;
+}
+
+.playlink-copy-btn {
+    float: right;
+    width: 22%;
+    *width: 20%;
+    padding: 12px 16px;
+    background: #ed64a6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ed64a6), to(#d53f8c));
+    background: -ms-linear-gradient(top, #ed64a6 0%, #d53f8c 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ed64a6, endColorstr=#d53f8c);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+.playlink-copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(237, 100, 166, 0.4);
+}
+
+.playlink-info {
+    background: #ebf8ff;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.playlink-info h4 {
+    font-size: 14px;
+    color: #2b6cb0;
+    margin-bottom: 8px;
+}
+
+.playlink-info ul {
+    font-size: 13px;
+    color: #2c5282;
+    padding-left: 20px;
+}
+
+.playlink-info li {
+    margin-bottom: 4px;
+}
+
+/* ========================================
+   IE特定样式
+======================================== */
+.lte-ie9 .container {
+    width: 900px;
+}
+
+.lte-ie8 * {
+    box-sizing: content-box;
+}
+
+.lte-ie8 .search-input,
+.lte-ie8 .search-btn {
+    height: 24px;
+    line-height: 24px;
+}
+
+/* ========================================
+   响应式
+======================================== */
+@media screen and (max-width: 640px) {
+    .container {
+        padding: 16px;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+
+    .search-input,
+    .search-btn {
+        float: none;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .room-cover {
+        float: none;
+        width: 100%;
+        height: 200px;
+    }
+
+    .room-details {
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        margin-top: 16px;
+    }
+
+    .stream-url {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .stream-actions {
+        float: none;
+        display: block;
+    }
+
+    .stream-btn {
+        margin-bottom: 8px;
+    }
+}
+</style>
+
+<!--[if IE 8]>
+<style>
+/* IE8特定修复 */
+.quality-tab, .action-btn, .stream-btn, .url-view-btn {
+    *display: inline;
+    *zoom: 1;
+}
+</style>
+<![endif]-->
+
+<!--[if IE 9]>
+<style>
+/* IE9特定修复 */
+.search-row {
+    *zoom: 1;
+}
+</style>
+<![endif]-->
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-play-circle"></i>
+            </div>
+            <h1>B站直播流提取器</h1>
+            <p>输入房间号或直播链接，获取可直接播放的直播流地址</p>
+        </div>
+
+        <!-- Search Card -->
+        <div class="card">
+            <div class="search-area">
+                <div class="search-row clearfix">
+                    <input type="text" id="roomInput" class="search-input" placeholder="请输入房间号 (如: 6) 或完整链接" autocomplete="off">
+                    <button id="fetchBtn" class="search-btn" onclick="fetchStream()">
+                        <span id="btnText"><i class="fas fa-search"></i> 获取直播流</span>
+                        <span id="btnLoading" style="display: none;">
+                            <span class="loading"></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 新增：通过链接查看按钮 -->
+            <div class="url-view-btn-wrapper">
+                <button onclick="viewByUrl()" class="url-view-btn">
+                    <i class="fas fa-external-link-alt"></i> 通过直播流链接在线查看
+                </button>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="quick-links clearfix">
+                <span>快捷输入：</span>
+                <a href="javascript:void(0);" onclick="setRoomNumber(1909467159)">峰峰大王(1909467159)</a>
+                <a href="javascript:void(0);" onclick="setRoomNumber(30754733)">黑色小乌鸦(30754733)</a>
+                <a href="javascript:void(0);" onclick="setRoomNumber(1710489335)">黎六六(1710489335)</a>
+                <a href="javascript:void(0);" onclick="setRoomNumber(7689273)">小树(7689273)</a>
+                <a href="javascript:void(0);" onclick="setRoomNumber(1777408088)">鱼非鱼(1777408088)</a>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMsg" class="error-msg">
+            <div class="clearfix">
+                <span style="float: left;"><i class="fas fa-exclamation-circle"></i></span>
+                <span id="errorText" style="float: left; margin-left: 8px;"></span>
+            </div>
+        </div>
+
+        <!-- Room Info Card -->
+        <div id="roomInfo" class="card room-info">
+            <div class="room-info clearfix">
+                <div class="room-cover">
+                    <img id="roomCover" src="" alt="直播间封面">
+                    <div id="liveStatus" class="live-badge" style="display: none;">
+                        <i class="fas fa-broadcast-tower"></i>直播中
+                    </div>
+                    <div id="offlineStatus" class="offline-badge" style="display: none;">
+                        未开播
+                    </div>
+                </div>
+                <div class="room-details">
+                    <h2 id="roomTitle" class="room-title"></h2>
+                    <div class="room-meta">
+                        <span><i class="fas fa-user"></i><span id="roomAnchor"></span></span>
+                        <span><i class="fas fa-id-card"></i>房间号: <span id="roomId"></span></span>
+                    </div>
+                    <div class="room-meta">
+                        <span><i class="fas fa-eye"></i><span id="roomOnline"></span></span>
+                        <span id="areaInfo"></span>
+                    </div>
+                    <div class="action-btns">
+                        <button id="downloadCoverBtn" onclick="downloadCover()" class="action-btn download">
+                            <i class="fas fa-image"></i> 下载封面
+                        </button>
+                        <button id="getPlayLinkBtn" onclick="getPlayLink()" class="action-btn playlink">
+                            <i class="fas fa-link"></i> 获取播放链接
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stream List -->
+        <div id="streamList" class="card stream-list">
+            <h3><i class="fas fa-link"></i>可用直播流地址</h3>
+            <p>提示：点击"复制"复制链接，点击"播放"在线观看，或使用PotPlayer/VLC播放</p>
+
+            <div id="qualityTabs" class="quality-tabs"></div>
+
+            <div id="streamUrls" class="stream-items">
+                <!-- Stream items will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>本工具仅供学习研究使用，请勿用于商业用途</p>
+            <p class="small">Powered by Bilibili Live API</p>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>在线播放</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="video-container">
+                <video id="videoPlayer" controls></video>
+            </div>
+            <div class="modal-footer">
+                <p>当前线路：<span id="currentStreamName"></span></p>
+                <p class="small">提示：如播放失败，请复制链接到本地播放器（如PotPlayer、VLC）观看</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastText">操作成功</span>
+    </div>
+
+    <!-- Play Link Modal -->
+    <div id="playLinkModal" class="modal-overlay playlink-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-link"></i>播放链接</h3>
+                <span class="modal-close" onclick="closePlayLinkModal()">&times;</span>
+            </div>
+            <div class="playlink-modal-content">
+                <p class="playlink-quality">清晰度：<span id="playLinkQuality"></span></p>
+                <div class="playlink-input-row clearfix">
+                    <input type="text" readonly id="playLinkUrl" class="playlink-input">
+                    <button onclick="copyPlayLinkFromModal()" class="playlink-copy-btn">
+                        <i class="fas fa-copy"></i> 复制
+                    </button>
+                </div>
+                <div class="playlink-info">
+                    <h4><i class="fas fa-info-circle"></i>使用说明</h4>
+                    <ul>
+                        <li>复制链接后，可在PotPlayer、VLC等播放器中打开</li>
+                        <li>或使用下载工具（如IDM、FDM）下载直播录制</li>
+                        <li>链接具有时效性，建议需要时重新获取</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome兼容版 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script type="text/javascript">
+    (function() {
+        'use strict';
+
+        // ========================================
+        // 全局变量
+        // ========================================
+        var currentFlvPlayer = null;
+        var allStreamData = {};
+        var currentQuality = 0;
+
+        // CORS 代理列表（按优先级排序）
+        var CORS_PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+
+        // ========================================
+        // 工具函数
+        // ========================================
+        
+        // 设置房间号
+        function setRoomNumber(roomId) {
+            document.getElementById('roomInput').value = roomId;
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            var errorDiv = document.getElementById('errorMsg');
+            document.getElementById('errorText').innerHTML = message;
+            errorDiv.className = 'error-msg show';
+
+            // 5秒后自动隐藏
+            setTimeout(function() {
+                errorDiv.className = 'error-msg';
+            }, 5000);
+        }
+
+        // 显示Toast
+        function showToast(message, isSuccess) {
+            isSuccess = isSuccess !== false;
+            var toast = document.getElementById('toast');
+            var toastText = document.getElementById('toastText');
+            
+            toastText.innerHTML = message;
+            toast.className = 'toast show';
+
+            setTimeout(function() {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // 设置加载状态
+        function setLoading(loading) {
+            var btn = document.getElementById('fetchBtn');
+            var btnText = document.getElementById('btnText');
+            var btnLoading = document.getElementById('btnLoading');
+
+            btn.disabled = loading;
+
+            if (loading) {
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-block';
+            } else {
+                btnText.style.display = 'inline-block';
+                btnLoading.style.display = 'none';
+            }
+        }
+
+        // 解析房间号
+        function parseRoomId(input) {
+            // 匹配纯数字
+            if (/^\d+$/.test(input)) {
+                return input;
+            }
+
+            // 匹配URL中的roomId
+            var urlMatch = input.match(/live\.bilibili\.com\/(\d+)/);
+            if (urlMatch) {
+                return urlMatch[1];
+            }
+
+            return null;
+        }
+
+        // 数字格式化
+        function formatNumber(num) {
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + '万';
+            }
+            return num.toString();
+        }
+
+        // 复制到剪贴板（兼容IE）
+        function copyToClipboard(text, callback) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    if (callback) callback();
+                })['catch'](function() {
+                    fallbackCopyToClipboard(text, callback);
+                });
+            } else {
+                fallbackCopyToClipboard(text, callback);
+            }
+        }
+
+        // 降级复制方案
+        function fallbackCopyToClipboard(text, callback) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                if (callback) callback();
+            } catch (err) {
+                // 如果自动复制失败，选中文字让用户手动复制
+                alert('请手动复制以下链接：\n' + text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ========================================
+        // HTTP请求 - IE兼容版
+        // ========================================
+        
+        // 通过代理发送请求
+        function proxyRequest(url, callback, maxRetries) {
+            maxRetries = maxRetries || 3;
+            var attempt = 0;
+
+            function tryRequest(proxyIndex) {
+                if (proxyIndex >= CORS_PROXIES.length) {
+                    callback(null, new Error('所有代理服务都不可用'));
+                    return;
+                }
+
+                var proxy = CORS_PROXIES[proxyIndex];
+                var proxyUrl = proxy + encodeURIComponent(url);
+                
+                var xhr = null;
+                if (window.XMLHttpRequest) {
+                    xhr = new XMLHttpRequest();
+                } else {
+                    try {
+                        xhr = new ActiveXObject('Microsoft.XMLHTTP');
+                    } catch (e) {
+                        callback(null, new Error('浏览器不支持XMLHttpRequest'));
+                        return;
+                    }
+                }
+
+                xhr.open('GET', proxyUrl, true);
+                xhr.timeout = 10000;
+                xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                if (data && typeof data === 'object') {
+                                    callback(data);
+                                } else {
+                                    tryRequest(proxyIndex + 1);
+                                }
+                            } catch (e) {
+                                tryRequest(proxyIndex + 1);
+                            }
+                        } else {
+                            tryRequest(proxyIndex + 1);
+                        }
+                    }
+                };
+
+                xhr.onerror = function() {
+                    tryRequest(proxyIndex + 1);
+                };
+
+                xhr.ontimeout = function() {
+                    tryRequest(proxyIndex + 1);
+                };
+
+                xhr.send();
+            }
+
+            tryRequest(0);
+        }
+
+        // 获取房间信息
+        function getRoomInfo(roomId, callback) {
+            var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + roomId;
+            
+            proxyRequest(apiUrl, function(data, error) {
+                if (error) {
+                    callback(null, error);
+                    return;
+                }
+
+                if (data && data.code === 0) {
+                    callback(data.data);
+                } else {
+                    callback(null, new Error(data ? data.message : '获取房间信息失败'));
+                }
+            });
+        }
+
+        // 获取直播流地址
+        function getStreamUrl(roomId, callback) {
+            var qualities = [0, 1, 2, 3, 4];
+            var streamData = {};
+            var completed = 0;
+            var hasError = false;
+
+            function checkComplete() {
+                completed++;
+                if (completed === qualities.length || hasError) {
+                    var keys = Object.keys(streamData);
+                    if (keys.length > 0) {
+                        callback(streamData);
+                    } else {
+                        callback(null, new Error('获取直播流地址失败'));
+                    }
+                }
+            }
+
+            qualities.forEach(function(qn) {
+                var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=' + roomId + '&quality=' + qn + '&platform=web';
+                
+                proxyRequest(apiUrl, function(data, error) {
+                    if (hasError) return;
+                    
+                    if (error) {
+                        checkComplete();
+                        return;
+                    }
+
+                    if (data && data.code === 0 && data.data && data.data.durl) {
+                        var desc = '清晰度 ' + qn;
+                        if (data.data.quality_description) {
+                            var qDesc = null;
+                            for (var i = 0; i < data.data.quality_description.length; i++) {
+                                if (data.data.quality_description[i].qn === qn) {
+                                    qDesc = data.data.quality_description[i];
+                                    break;
+                                }
+                            }
+                            if (qDesc) {
+                                desc = qDesc.desc;
+                            }
+                        }
+                        
+                        streamData[qn] = {
+                            quality: qn,
+                            desc: desc,
+                            durl: data.data.durl
+                        };
+                    }
+                    checkComplete();
+                });
+            });
+        }
+
+        // ========================================
+        // 核心功能函数
+        // ========================================
+
+        // 新增：通过链接查看直播
+        function viewByUrl() {
+            var url = prompt('请输入直播流链接（支持FLV/M3U8格式）:');
+            if (!url) return;
+
+            if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+                showError('请输入有效的HTTP/HTTPS链接');
+                return;
+            }
+
+            playVideo(url, '自定义链接');
+        }
+
+        // 主获取函数
+        function fetchStream() {
+            var input = document.getElementById('roomInput').value.trim();
+
+            if (!input) {
+                showError('请输入房间号或直播链接');
+                return;
+            }
+
+            var roomId = parseRoomId(input);
+            if (!roomId) {
+                showError('房间号格式不正确，请输入数字或正确的直播链接');
+                return;
+            }
+
+            // 重置UI
+            document.getElementById('errorMsg').className = 'error-msg';
+            document.getElementById('roomInfo').className = 'card room-info';
+            document.getElementById('streamList').className = 'card stream-list';
+
+            setLoading(true);
+
+            // 获取房间信息
+            getRoomInfo(roomId, function(roomInfo, error) {
+                if (error) {
+                    showError(error.message || '获取房间信息失败');
+                    setLoading(false);
+                    return;
+                }
+
+                // 显示房间信息
+                displayRoomInfo(roomInfo);
+
+                // 检查开播状态
+                if (roomInfo.live_status !== 1) {
+                    var statusText = roomInfo.live_status === 0 ? '空闲' : '轮播';
+                    showError('当前直播间未开播 (状态: ' + statusText + ')');
+                    setLoading(false);
+                    return;
+                }
+
+                // 获取直播流地址
+                getStreamUrl(roomId, function(streamData, error2) {
+                    if (error2) {
+                        showError(error2.message || '获取直播流地址失败');
+                        setLoading(false);
+                        return;
+                    }
+
+                    allStreamData = streamData;
+                    
+                    // 获取第一个可用的清晰度
+                    var keys = Object.keys(streamData);
+                    if (keys.length > 0) {
+                        currentQuality = parseInt(keys[0]);
+                    }
+
+                    // 显示直播流列表
+                    displayStreamList();
+                    setLoading(false);
+                });
+            });
+        }
+
+        // 下载封面图
+        function downloadCover() {
+            var coverImg = document.getElementById('roomCover');
+            var coverSrc = coverImg.src;
+            var title = document.getElementById('roomTitle').innerHTML;
+
+            if (!coverSrc || coverSrc.indexOf('placeholder') !== -1) {
+                showError('暂无封面图可下载');
+                return;
+            }
+
+            showToast('正在下载封面...');
+
+            var xhr = null;
+            if (window.XMLHttpRequest) {
+                xhr = new XMLHttpRequest();
+            } else {
+                try {
+                    xhr = new ActiveXObject('Microsoft.XMLHTTP');
+                } catch (e) {
+                    showError('您的浏览器不支持下载功能');
+                    return;
+                }
+            }
+
+            xhr.open('GET', coverSrc, true);
+            xhr.responseType = 'blob';
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var blob = xhr.response;
+                    var blobUrl = URL.createObjectURL(blob);
+
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    var fileName = title + '_' + document.getElementById('roomId').innerHTML + '.jpg';
+                    link.download = fileName;
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    URL.revokeObjectURL(blobUrl);
+                    showToast('封面下载成功！');
+                } else if (xhr.readyState === 4) {
+                    showError('下载失败，请尝试右键图片另存为');
+                }
+            };
+
+            xhr.send();
+        }
+
+        // 获取播放链接
+        function getPlayLink() {
+            var keys = Object.keys(allStreamData);
+            if (keys.length === 0) {
+                showError('请先获取直播流信息');
+                return;
+            }
+
+            var currentData = allStreamData[currentQuality];
+            if (!currentData || !currentData.durl || currentData.durl.length === 0) {
+                showError('暂无可用的播放链接');
+                return;
+            }
+
+            var playUrl = currentData.durl[0].url;
+            var qualityDesc = currentData.desc;
+
+            copyToClipboard(playUrl, function() {
+                showToast(qualityDesc + '播放链接已复制！');
+            });
+        }
+
+        // 显示播放链接弹窗
+        function showPlayLinkModal(url, quality) {
+            document.getElementById('playLinkQuality').innerHTML = quality;
+            document.getElementById('playLinkUrl').value = url;
+            document.getElementById('playLinkModal').className = 'modal-overlay playlink-modal show';
+        }
+
+        // 关闭播放链接弹窗
+        function closePlayLinkModal() {
+            document.getElementById('playLinkModal').className = 'modal-overlay playlink-modal';
+        }
+
+        // 从弹窗复制链接
+        function copyPlayLinkFromModal() {
+            var url = document.getElementById('playLinkUrl').value;
+            copyToClipboard(url, function() {
+                showToast('链接已复制到剪贴板！');
+                closePlayLinkModal();
+            });
+        }
+
+        // 显示房间信息
+        function displayRoomInfo(data) {
+            document.getElementById('roomTitle').innerHTML = data.title;
+            document.getElementById('roomAnchor').innerHTML = data.uname;
+            document.getElementById('roomId').innerHTML = data.room_id;
+            document.getElementById('roomOnline').innerHTML = formatNumber(data.online);
+            document.getElementById('areaInfo').innerHTML = data.area_name + ' > ' + data.area_parent_name;
+
+            // 封面图
+            var coverImg = document.getElementById('roomCover');
+            coverImg.src = data.keyframe || data.user_cover || 'https://via.placeholder.com/400x300?text=No+Cover';
+            coverImg.onerror = function() {
+                coverImg.src = 'https://via.placeholder.com/400x300?text=No+Cover';
+            };
+
+            // 开播状态
+            var liveStatus = document.getElementById('liveStatus');
+            var offlineStatus = document.getElementById('offlineStatus');
+
+            if (data.live_status === 1) {
+                liveStatus.style.display = 'block';
+                offlineStatus.style.display = 'none';
+            } else {
+                liveStatus.style.display = 'none';
+                offlineStatus.style.display = 'block';
+                offlineStatus.innerHTML = data.live_status === 2 ? '轮播中' : '未开播';
+            }
+
+            document.getElementById('roomInfo').className = 'card room-info show';
+        }
+
+        // 显示直播流列表
+        function displayStreamList() {
+            // 渲染清晰度标签
+            var tabsContainer = document.getElementById('qualityTabs');
+            tabsContainer.innerHTML = '';
+
+            var keys = Object.keys(allStreamData);
+            keys.forEach(function(qn) {
+                var data = allStreamData[qn];
+                var btn = document.createElement('button');
+                btn.className = 'quality-tab' + (parseInt(qn) === currentQuality ? ' active' : '');
+                btn.innerHTML = data.desc;
+                btn.onclick = (function(q) {
+                    return function() {
+                        currentQuality = q;
+                        displayStreamList();
+                    };
+                })(parseInt(qn));
+                tabsContainer.appendChild(btn);
+            });
+
+            // 渲染地址列表
+            renderStreamUrls();
+
+            document.getElementById('streamList').className = 'card stream-list show';
+        }
+
+        // 渲染直播流地址
+        function renderStreamUrls() {
+            var container = document.getElementById('streamUrls');
+            container.innerHTML = '';
+
+            var currentData = allStreamData[currentQuality];
+            if (!currentData || !currentData.durl) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 16px;">该清晰度暂无可用地址</p>';
+                return;
+            }
+
+            currentData.durl.forEach(function(stream, index) {
+                var item = document.createElement('div');
+                item.className = 'stream-item';
+
+                var streamName = stream.name || ('线路 ' + (index + 1));
+
+                item.innerHTML = 
+                    '<div class="stream-name">' + streamName + 
+                    '<span class="stream-quality">' + currentData.desc + '</span></div>' +
+                    '<div class="stream-url-container">' +
+                    '<input type="text" readonly value="' + stream.url + '" class="stream-url" id="streamUrl' + index + '">' +
+                    '</div>' +
+                    '<div class="stream-actions">' +
+                    '<button class="stream-btn copy" onclick="copyUrl(' + index + ')"><i class="fa fa-copy"></i> 复制</button>' +
+                    '<button class="stream-btn play" onclick="playVideo(\'' + encodeURIComponent(stream.url) + '\', \'' + encodeURIComponent(streamName) + '\')"><i class="fa fa-play"></i> 播放</button>' +
+                    '</div>';
+
+                container.appendChild(item);
+            });
+        }
+
+        // 复制链接
+        function copyUrl(index) {
+            var input = document.getElementById('streamUrl' + index);
+            var url = input.value;
+            copyToClipboard(url, function() {
+                showToast('链接已复制到剪贴板');
+            });
+        }
+
+        // 播放视频
+        function playVideo(url, streamName) {
+            url = decodeURIComponent(url);
+            streamName = decodeURIComponent(streamName);
+
+            var modal = document.getElementById('videoModal');
+            var videoPlayer = document.getElementById('videoPlayer');
+            var currentStreamName = document.getElementById('currentStreamName');
+
+            currentStreamName.innerHTML = streamName;
+            modal.className = 'modal-overlay show';
+
+            // 如果有旧的播放器实例，先销毁
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            videoPlayer.pause();
+            videoPlayer.src = url;
+            
+            videoPlayer.onloadedmetadata = function() {
+                try {
+                    videoPlayer.play();
+                } catch (e) {
+                    console.log('自动播放失败，请手动播放');
+                }
+            };
+
+            videoPlayer.onerror = function() {
+                showToast('视频加载失败，请尝试复制链接到本地播放器', false);
+            };
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            var modal = document.getElementById('videoModal');
+            modal.className = 'modal-overlay';
+
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            var videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.pause();
+            videoPlayer.src = '';
+        }
+
+        // ========================================
+        // 事件绑定 - IE兼容版
+        // ========================================
+
+        function initEvents() {
+            // 监听回车键
+            var roomInput = document.getElementById('roomInput');
+            if (roomInput.addEventListener) {
+                roomInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        fetchStream();
+                    }
+                });
+            } else if (roomInput.attachEvent) {
+                roomInput.attachEvent('onkeypress', function(e) {
+                    if (e.keyCode === 13) {
+                        fetchStream();
+                    }
+                });
+            }
+
+            // 点击弹窗外部关闭视频弹窗
+            var videoModal = document.getElementById('videoModal');
+            if (videoModal.addEventListener) {
+                videoModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal();
+                    }
+                });
+            } else if (videoModal.attachEvent) {
+                videoModal.attachEvent('onclick', function(e) {
+                    if (e.srcElement === videoModal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            // ESC键关闭弹窗
+            if (document.addEventListener) {
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                        closePlayLinkModal();
+                    }
+                });
+            } else if (document.attachEvent) {
+                document.attachEvent('onkeydown', function(e) {
+                    if (e.keyCode === 27) {
+                        closeModal();
+                        closePlayLinkModal();
+                    }
+                });
+            }
+
+            // 点击弹窗外部关闭播放链接弹窗
+            var playLinkModal = document.getElementById('playLinkModal');
+            if (playLinkModal.addEventListener) {
+                playLinkModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePlayLinkModal();
+                    }
+                });
+            } else if (playLinkModal.attachEvent) {
+                playLinkModal.attachEvent('onclick', function(e) {
+                    if (e.srcElement === playLinkModal) {
+                        closePlayLinkModal();
+                    }
+                });
+            }
+        }
+
+        // ========================================
+        // 初始化
+        // ========================================
+
+        function init() {
+            initEvents();
+            
+            try {
+                if (window.console && window.console.log) {
+                    console.log('%cB站直播流提取器', 'font-size:20px;font-weight:bold;color:#FA7298;');
+                }
+            } catch (e) {}
+        }
+
+        // DOM加载完成后执行
+        if (document.addEventListener) {
+            document.addEventListener('DOMContentLoaded', init, false);
+        } else if (document.attachEvent) {
+            document.attachEvent('onreadystatechange', function() {
+                if (document.readyState === 'complete') {
+                    init();
+                }
+            });
+        } else {
+            window.onload = init;
+        }
+
+    })();
+    </script>
+</body>
+</html>

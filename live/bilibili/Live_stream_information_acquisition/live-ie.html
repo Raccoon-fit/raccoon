@@ -150,9 +150,13 @@ body {
     font-size: 14px;
     margin-right: 12px;
     text-decoration: none;
+    /* IE文字阴影增强可读性 */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    filter: alpha(opacity=90);
 }
 .quick-links a:hover {
     text-decoration: underline;
+    filter: alpha(opacity=100);
 }
 
 /* ========================================
@@ -953,6 +957,232 @@ body {
         'use strict';
 
         // ========================================
+        // 全局函数暴露（供IE inline onclick调用）
+        // ========================================
+        window.setRoomNumber = function(roomId) {
+            document.getElementById('roomInput').value = roomId;
+        };
+
+        window.fetchStream = function() {
+            var input = document.getElementById('roomInput').value.trim();
+
+            if (!input) {
+                showError('请输入房间号或直播链接');
+                return;
+            }
+
+            var roomId = parseRoomId(input);
+            if (!roomId) {
+                showError('房间号格式不正确，请输入数字或正确的直播链接');
+                return;
+            }
+
+            // 重置UI
+            document.getElementById('errorMsg').className = 'error-msg';
+            document.getElementById('roomInfo').className = 'card room-info';
+            document.getElementById('streamList').className = 'card stream-list';
+
+            setLoading(true);
+
+            // 获取房间信息
+            getRoomInfo(roomId, function(roomInfo, error) {
+                if (error) {
+                    showError(error.message || '获取房间信息失败');
+                    setLoading(false);
+                    return;
+                }
+
+                // 显示房间信息
+                displayRoomInfo(roomInfo);
+
+                // 检查开播状态
+                if (roomInfo.live_status !== 1) {
+                    var statusText = roomInfo.live_status === 0 ? '空闲' : '轮播';
+                    showError('当前直播间未开播 (状态: ' + statusText + ')');
+                    setLoading(false);
+                    return;
+                }
+
+                // 获取直播流地址
+                getStreamUrl(roomId, function(streamData, error2) {
+                    if (error2) {
+                        showError(error2.message || '获取直播流地址失败');
+                        setLoading(false);
+                        return;
+                    }
+
+                    allStreamData = streamData;
+                    
+                    // 获取第一个可用的清晰度
+                    var keys = Object.keys(streamData);
+                    if (keys.length > 0) {
+                        currentQuality = parseInt(keys[0]);
+                    }
+
+                    // 显示直播流列表
+                    displayStreamList();
+                    setLoading(false);
+                });
+            });
+        };
+
+        window.viewByUrl = function() {
+            var url = prompt('请输入直播流链接（支持FLV/M3U8格式）:');
+            if (!url) return;
+
+            if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+                showError('请输入有效的HTTP/HTTPS链接');
+                return;
+            }
+
+            playVideo(url, '自定义链接');
+        };
+
+        window.downloadCover = function() {
+            var coverImg = document.getElementById('roomCover');
+            var coverSrc = coverImg.src;
+            var title = document.getElementById('roomTitle').innerHTML;
+
+            if (!coverSrc || coverSrc.indexOf('placeholder') !== -1) {
+                showError('暂无封面图可下载');
+                return;
+            }
+
+            showToast('正在下载封面...');
+
+            var xhr = null;
+            if (window.XMLHttpRequest) {
+                xhr = new XMLHttpRequest();
+            } else {
+                try {
+                    xhr = new ActiveXObject('Microsoft.XMLHTTP');
+                } catch (e) {
+                    showError('您的浏览器不支持下载功能');
+                    return;
+                }
+            }
+
+            xhr.open('GET', coverSrc, true);
+            xhr.responseType = 'blob';
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var blob = xhr.response;
+                    var blobUrl = URL.createObjectURL(blob);
+
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    var fileName = title + '_' + document.getElementById('roomId').innerHTML + '.jpg';
+                    link.download = fileName;
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    URL.revokeObjectURL(blobUrl);
+                    showToast('封面下载成功！');
+                } else if (xhr.readyState === 4) {
+                    showError('下载失败，请尝试右键图片另存为');
+                }
+            };
+
+            xhr.send();
+        };
+
+        window.getPlayLink = function() {
+            var keys = Object.keys(allStreamData);
+            if (keys.length === 0) {
+                showError('请先获取直播流信息');
+                return;
+            }
+
+            var currentData = allStreamData[currentQuality];
+            if (!currentData || !currentData.durl || currentData.durl.length === 0) {
+                showError('暂无可用的播放链接');
+                return;
+            }
+
+            var playUrl = currentData.durl[0].url;
+            var qualityDesc = currentData.desc;
+
+            copyToClipboard(playUrl, function() {
+                showToast(qualityDesc + '播放链接已复制！');
+            });
+        };
+
+        window.closeModal = function() {
+            var modal = document.getElementById('videoModal');
+            modal.className = 'modal-overlay';
+
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            var videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.pause();
+            videoPlayer.src = '';
+        };
+
+        window.closePlayLinkModal = function() {
+            document.getElementById('playLinkModal').className = 'modal-overlay playlink-modal';
+        };
+
+        window.copyPlayLinkFromModal = function() {
+            var url = document.getElementById('playLinkUrl').value;
+            copyToClipboard(url, function() {
+                showToast('链接已复制到剪贴板！');
+                closePlayLinkModal();
+            });
+        };
+
+        window.copyUrl = function(index) {
+            var input = document.getElementById('streamUrl' + index);
+            var url = input.value;
+            copyToClipboard(url, function() {
+                showToast('链接已复制到剪贴板');
+            });
+        };
+
+        window.playVideo = function(url, streamName) {
+            url = decodeURIComponent(url);
+            streamName = decodeURIComponent(streamName);
+
+            var modal = document.getElementById('videoModal');
+            var videoPlayer = document.getElementById('videoPlayer');
+            var currentStreamName = document.getElementById('currentStreamName');
+
+            currentStreamName.innerHTML = streamName;
+            modal.className = 'modal-overlay show';
+
+            // 如果有旧的播放器实例，先销毁
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            videoPlayer.pause();
+            videoPlayer.src = url;
+            
+            videoPlayer.onloadedmetadata = function() {
+                try {
+                    videoPlayer.play();
+                } catch (e) {
+                    console.log('自动播放失败，请手动播放');
+                }
+            };
+
+            videoPlayer.onerror = function() {
+                showToast('视频加载失败，请尝试复制链接到本地播放器', false);
+            };
+        };
+
+        // ========================================
         // 全局变量
         // ========================================
         var currentFlvPlayer = null;
@@ -970,8 +1200,8 @@ body {
         // 工具函数
         // ========================================
         
-        // 设置房间号
-        function setRoomNumber(roomId) {
+        // 设置房间号（内部函数）
+        function setRoomNumberInternal(roomId) {
             document.getElementById('roomInput').value = roomId;
         }
 
@@ -1554,13 +1784,13 @@ body {
             if (roomInput.addEventListener) {
                 roomInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        fetchStream();
+                        window.fetchStream();
                     }
                 });
             } else if (roomInput.attachEvent) {
                 roomInput.attachEvent('onkeypress', function(e) {
                     if (e.keyCode === 13) {
-                        fetchStream();
+                        window.fetchStream();
                     }
                 });
             }
@@ -1570,13 +1800,13 @@ body {
             if (videoModal.addEventListener) {
                 videoModal.addEventListener('click', function(e) {
                     if (e.target === this) {
-                        closeModal();
+                        window.closeModal();
                     }
                 });
             } else if (videoModal.attachEvent) {
                 videoModal.attachEvent('onclick', function(e) {
                     if (e.srcElement === videoModal) {
-                        closeModal();
+                        window.closeModal();
                     }
                 });
             }
@@ -1585,15 +1815,15 @@ body {
             if (document.addEventListener) {
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
-                        closeModal();
-                        closePlayLinkModal();
+                        window.closeModal();
+                        window.closePlayLinkModal();
                     }
                 });
             } else if (document.attachEvent) {
                 document.attachEvent('onkeydown', function(e) {
                     if (e.keyCode === 27) {
-                        closeModal();
-                        closePlayLinkModal();
+                        window.closeModal();
+                        window.closePlayLinkModal();
                     }
                 });
             }
@@ -1603,13 +1833,13 @@ body {
             if (playLinkModal.addEventListener) {
                 playLinkModal.addEventListener('click', function(e) {
                     if (e.target === this) {
-                        closePlayLinkModal();
+                        window.closePlayLinkModal();
                     }
                 });
             } else if (playLinkModal.attachEvent) {
                 playLinkModal.attachEvent('onclick', function(e) {
                     if (e.srcElement === playLinkModal) {
-                        closePlayLinkModal();
+                        window.closePlayLinkModal();
                     }
                 });
             }

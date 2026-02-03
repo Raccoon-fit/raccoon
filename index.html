@@ -12,9 +12,12 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#5755f7",
-                        "background-light": "#f5f5f8",
-                        "background-dark": "#101022",
+                        "primary": "#8b5cf6",
+                        "raccoon-dark": "#1a1a2e",
+                        "raccoon-gray": "#4a4e69",
+                        "raccoon-light": "#f2e9e4",
+                        "raccoon-accent": "#c9ada7",
+                        "background-dark": "#0f0f1b",
                     },
                     fontFamily: {
                         "display": ["Plus Jakarta Sans", "sans-serif"]
@@ -24,85 +27,81 @@
             },
         }
     </script>
-<style type="text/tailwindcss">
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+<style type="text/tailwindcss">.glass-card {
+    background: rgba(30, 30, 50, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1)
+    }
+.liquid-glow {
+    filter: blur(80px);
+    z-index: -1
+    }
+.noise-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDI-SuKwtl4lUUeUbmdOtiIl54GCVyj0chIE9PKjwGkCWWBSG8I4HKVdWq4a7Y6KcEMVdqR9DPfXGn7sMNwGlAHykmw7CoH6xcIItPf6dvT3B7e44VB18iGnYbez3p3n58IgmDzRFIezoFAaRYT3KrATTqezNrWhGuy6G-EX9xKfnxtcPShvBvCYRePdevUBMZE3X-rU3x2ynNbrMo-97W4jg6a5jYjdg0K4zkPwwZrk6JCYH9b2BwLmIuvfBJIXGzDbfMONw3yDrI);
+    opacity: 0.03;
+    pointer-events: none
+    }
+.lang-dropdown {
+    display: none
+    }
+.lang-container:hover .lang-dropdown {
+    display: block
+    }
+@keyframes clock-pulse {
+    0%, 100% {
+        opacity: 1;
+        } 50% {
+        opacity: 0.3;
         }
-        .liquid-glow {
-            filter: blur(80px);
-            z-index: -1;
-        }
-        .noise-overlay {
-            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDmF_Xs5FiMdG6kcHSYlwBYjr3IaJA259qo3WKwJdVFPuNEva6YgfqtzULpF7Vf_OkOWvIlJXfOESWoqaj2DYvNT7RTqgsM64_jgFtRTIphltSVouCBotxtV4DPSIwvL5EZrnWVJVCiwFr40YQJKJ6vPjF1MSHEi0W_OP7vzw7d4XAruIiIPzshE6CKNqq5IlOvvlZjOP11-G8Dn3oLsHDM_ZAamEbd8PNDvGpBv2lGrsmZ6_4wP0LGttzI6C-gdv41n8vIF9vXVDo);
-            opacity: 0.05;
-            pointer-events: none;
-        }
-        .lang-dropdown {
-            display: none;
-        }
-        .lang-container:hover .lang-dropdown {
-            display: block;
-        }
-        @keyframes clock-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        .animate-blink {
-            animation: clock-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-    </style>
+    }
+.animate-blink {
+    animation: clock-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite
+    }</style>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-300">
+<body class="bg-raccoon-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-300">
 <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
 <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full liquid-glow"></div>
-<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-500/10 rounded-full liquid-glow"></div>
-<div class="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-cyan-500/10 rounded-full liquid-glow"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-raccoon-gray/20 rounded-full liquid-glow"></div>
+<div class="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-raccoon-accent/10 rounded-full liquid-glow"></div>
 <div class="absolute inset-0 noise-overlay"></div>
 </div>
 <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
 <div class="layout-container flex h-full grow flex-col">
 <div class="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-40">
-<header class="flex items-center justify-between whitespace-nowrap glass-card rounded-full px-6 py-3">
+<header class="flex items-center justify-between whitespace-nowrap glass-card rounded-full px-6 py-2">
 <div class="flex items-center gap-3">
-<div class="size-8 text-primary flex items-center justify-center">
-<span class="material-symbols-outlined text-3xl">pets</span>
+<div class="size-10 text-primary flex items-center justify-center bg-white/10 rounded-full">
+<span class="material-symbols-outlined text-2xl">pets</span>
 </div>
-<h2 class="text-slate-900 dark:text-white text-lg font-extrabold leading-tight tracking-[-0.015em]">软软的小窝</h2>
+<div class="flex flex-col">
+<h2 class="text-slate-900 dark:text-white text-base font-extrabold leading-tight">软软的小窝</h2>
+<span class="text-[10px] text-slate-500 dark:text-raccoon-accent uppercase tracking-tighter">Soft Raccoon's Den</span>
 </div>
-<div class="flex flex-1 justify-end gap-3 md:gap-6 items-center">
-<nav class="hidden md:flex items-center gap-6 mr-4">
-<a class="text-slate-700 dark:text-white text-sm font-semibold hover:text-primary transition-colors" href="#home">Home</a>
-<a class="text-slate-700 dark:text-white text-sm font-semibold hover:text-primary transition-colors" href="#projects">Projects</a>
-<a class="text-slate-700 dark:text-white text-sm font-semibold hover:text-primary transition-colors" href="#lab">Lab</a>
-<a class="text-slate-700 dark:text-white text-sm font-semibold hover:text-primary transition-colors" href="#about">About</a>
-<a class="text-slate-700 dark:text-white text-sm font-semibold hover:text-primary transition-colors" href="https://raccoon.fit/mobile" target="_blank">Official Service Collection</a>
-</nav>
+</div>
+<div class="flex flex-1 justify-end gap-3 items-center">
 <div class="relative lang-container">
-<button class="flex items-center justify-center rounded-full h-10 px-4 bg-primary/10 dark:bg-white/10 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/5">
+<button class="flex items-center justify-center rounded-full h-10 px-4 bg-primary/10 dark:bg-white/5 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/10">
 <span class="material-symbols-outlined text-lg">language</span>
 <span>EN</span>
 <span class="material-symbols-outlined text-xs">expand_more</span>
 </button>
 <div class="lang-dropdown absolute top-full right-0 mt-2 w-40 glass-card rounded-2xl overflow-hidden shadow-2xl z-50">
 <div class="flex flex-col py-2">
-<button class="px-4 py-2 text-left text-sm hover:bg-primary/20 transition-colors">简体中文 (CN)</button>
-<button class="px-4 py-2 text-left text-sm hover:bg-primary/20 transition-colors">English (EN)</button>
-<button class="px-4 py-2 text-left text-sm hover:bg-primary/20 transition-colors">日本語 (JP)</button>
-<button class="px-4 py-2 text-left text-sm hover:bg-primary/20 transition-colors">한국어 (KR)</button>
-<button class="px-4 py-2 text-left text-sm hover:bg-primary/20 transition-colors">Français (FR)</button>
+<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">简体中文 (CN)</button>
+<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">English (EN)</button>
+<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">日本語 (JP)</button>
+<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">한국어 (KR)</button>
+<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">Français (FR)</button>
 </div>
 </div>
 </div>
-<div class="flex items-center justify-center rounded-full h-10 w-24 bg-primary/10 dark:bg-white/10 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/5">
+<div class="hidden md:flex items-center justify-center rounded-full h-10 px-4 bg-white/5 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/5">
 <span class="material-symbols-outlined text-lg">schedule</span>
 <span class="flex items-center">12<span class="animate-blink">:</span>45</span>
 </div>
-<button class="flex items-center justify-center rounded-full h-10 w-10 bg-primary/10 dark:bg-white/10 text-slate-900 dark:text-white border border-white/5">
+<button class="flex items-center justify-center rounded-full h-10 w-10 bg-white/5 text-slate-900 dark:text-white border border-white/5">
 <span class="material-symbols-outlined text-lg">dark_mode</span>
 </button>
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCsxoAlOeIVh-y-7AYApST_a91r1ov5VGu5yGqePu-yUW5QVK0JHNNzCLthuWpYz40IUoBonpd4LTpvwtrgTpkkbAE4pY25NXGsS44u-vVvo_BNANVQLr6N_tlBpMPD90E_cCK4UqrdTn5VZyWBUiNPPZhioGohXzHrN61-836cNYzs3oRseMQGQGiHPVSUEIP1zpRxz_OSlWkDjSuryDN9F1mNuYiV5Rz_ocyexxCPy67Obr3C39aq9QCdRNKpm0JYQRCkdI0KolY");'></div>
 </div>
 </header>
 </div>
@@ -111,20 +110,20 @@
 <div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
 <div class="@container">
 <div class="@[480px]:p-4">
-<div class="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-8 overflow-hidden" style='background-image: linear-gradient(rgba(16, 16, 34, 0.4) 0%, rgba(16, 16, 34, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuAAMfV9MKDlzbeeI5gUPTEu1dZybXCPJoA0kpviaPex5sjS6NrK9vcGXZqAUsO_AhhYo9mB0QflkmvSz2nmaSc0b464yoWeiMNTFh154JPxh5ILGk_UA2Pb89cKHpa9-iASNl3zMved5GsQuq8vTlAkwEHRAwoVgVlDxW2owlSgd0boq4RmzXQNVkL3T2kdFFLOAlrtP0FuARDDqYTKlqkONUXyJIxa0RFg_0NH7iTc6lLohfwYiXMXvGY5LqJLDfft08iFD9_tX1c");'>
+<div class="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-3xl items-center justify-center p-8 overflow-hidden shadow-2xl" style='background-image: linear-gradient(rgba(15, 15, 27, 0.6) 0%, rgba(15, 15, 27, 0.9) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBeeCORxQSaq04Q8E3EPu9qYVTq-Ke9JfjhwC4TsPq2KopGUEzCiaYreTvYJ4VRwx22cHt5Iu3Bq6S-SuIyXCsDIFGEZ0HQ2OHUGP4ut2eRqoqOUT4jJDuVUHYrb_0k4aAi_Lla7UJRV-hOb_IaBpjxk9bEwR6Ot6rGPvpNQmaSroxRePNo5SJ_jFON6djqvGrkcWOT0VQ-QEB5Dvhpe9OdoRGCHCdAaTpm2JMgoyeluXnlTvSx-4m_-js_bp6EJsC7Dr4HV1KKUiQ");'>
 <div class="flex flex-col gap-4 text-center z-10">
 <div class="inline-block self-center px-4 py-1 rounded-full bg-primary/20 border border-primary/40 text-primary text-xs font-bold uppercase tracking-widest">
-                                        Welcome to 2026
+                                        Happy New Year 2026
                                     </div>
 <h1 class="text-white text-5xl font-black leading-tight tracking-[-0.033em] @[480px]:text-7xl">
-                                        Explore the <span class="text-primary italic">Infinite</span> <br/>Possibilities of Code
-                                    </h1>
-<h2 class="text-slate-300 text-base font-medium leading-relaxed max-w-2xl mx-auto @[480px]:text-xl">
-                                        Step into the creative tech playground of Soft Raccoon. Where cozy vibes meet high-performance engineering.
+                                        Soft Raccoon's <br/><span class="text-primary italic">Cozy Den</span>
+</h1>
+<h2 class="text-raccoon-accent text-base font-medium leading-relaxed max-w-2xl mx-auto @[480px]:text-xl">
+                                        Explore a sanctuary of code, design, and raccoon-powered creativity. Welcome to the home of infinite possibilities.
                                     </h2>
 </div>
 <div class="flex gap-4 z-10">
-<a class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-base font-bold shadow-[0_0_20px_rgba(87,85,247,0.4)] hover:scale-105 transition-transform no-underline" href="#projects">
+<a class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-base font-bold shadow-lg hover:bg-violet-600 transition-all no-underline" href="#projects">
                                         Explore Projects
                                     </a>
 <a class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-full h-14 px-8 glass-card text-white text-base font-bold border border-white/20 hover:bg-white/10 transition-colors no-underline" href="#contact">
@@ -135,24 +134,27 @@
 </div>
 </div>
 <div class="flex items-center justify-between px-4 pb-4 pt-10" id="projects">
-<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">Featured Works</h2>
-<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#projects">View all <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em] flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">terminal</span> Featured Works
+                        </h2>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="https://raccoon.fit/mobile">Official Services <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-<div class="glass-card rounded-xl overflow-hidden group hover:border-primary/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAYCAKN5eK-U5vYYuNgdOtzx1S89RADELtQAIt5B7uR_ALypUInsNDIawj6gjO2HD_Wy4O2R4PvRBDlpayyhOYUvJrfx3uXhUzjlXsO2u48E8tu1PGuloAYhTeSGSohLoGuJrvX7L-FtvJHvo9mNNyh8cYkVu9w1Bqiuu12TsVN5Jw8PCTDEG08WhUDGEZxZB_Xs518fTheRX1oLlZnZq4dEQkMyAzcPh56rLZbNRUY1NoyRFCftsisNyw_coF77QqOcmBWEgwRWEI");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-primary/50 transition-all duration-300 shadow-xl flex flex-col">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-primary/20 group-hover:scale-110 transition-transform duration-500">terminal</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-primary text-[10px] font-bold text-white uppercase tracking-wider">Software</span>
+<span class="px-2 py-0.5 rounded-full bg-primary text-[10px] font-bold text-white uppercase tracking-wider">IDE Software</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Ride (IDE)</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">A high-performance integrated development environment designed for low-latency coding.</p>
+<h3 class="text-white text-xl font-bold mb-2">Ride</h3>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A high-performance integrated development environment designed for low-latency coding.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-primary">
-<span class="material-symbols-outlined text-xl">terminal</span>
-<span class="material-symbols-outlined text-xl">bug_report</span>
+<span class="material-symbols-outlined text-xl">code</span>
+<span class="material-symbols-outlined text-xl">rocket_launch</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-primary transition-colors no-underline" href="https://raccoon.fit/Ride" target="_blank">
 <span>Open</span>
@@ -161,20 +163,21 @@
 </div>
 </div>
 </div>
-<div class="glass-card rounded-xl overflow-hidden group hover:border-pink-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCIfBQXJQGAvBIvmmlR02IK7jYRnOAueUaN_sgnD--4fJwIiHtrz8zBLnAPMRjxXeBRo7pUSOoBpYgqWE6tOTlj6Jt5GNr5NX-gWu2xduKaS5diTJa9pUGr7hfef77uaOHdPQGHK_aLH_OsiaxwecOJ0RjjKzWyydYp9huAR8bp7fu1lHzeemv6DiiQ-HbP1vvx1b7GW3AShvNQa5zoTNmEzuWcIG1MkOtYVsUMgtxx8Bd2roy22a6l8oMZZnExRiwYBYdzrGNgcfM");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-pink-500/50 transition-all duration-300 shadow-xl flex flex-col">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-pink-500/20 group-hover:scale-110 transition-transform duration-500">live_tv</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-pink-500 text-[10px] font-bold text-white uppercase tracking-wider">Streaming</span>
+<span class="px-2 py-0.5 rounded-full bg-pink-500 text-[10px] font-bold text-white uppercase tracking-wider">Streaming tool</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
 <h3 class="text-white text-xl font-bold mb-2">Bilibili Streamer</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">Ultimate tool for Bilibili creators with real-time analytics and overlay management.</p>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Ultimate tool for creators with real-time analytics and overlay management for streaming.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-pink-500">
-<span class="material-symbols-outlined text-xl">videocam</span>
 <span class="material-symbols-outlined text-xl">analytics</span>
+<span class="material-symbols-outlined text-xl">sensors</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-pink-500 transition-colors no-underline" href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank">
 <span>Open</span>
@@ -183,20 +186,20 @@
 </div>
 </div>
 </div>
-<div class="glass-card rounded-xl overflow-hidden group hover:border-yellow-500/50 transition-all duration-300 shadow-xl flex flex-col grayscale opacity-80 hover:grayscale-0 hover:opacity-100">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYoaz6DLuC5OW3YkKMAxs2W0yzlbZXFn69rRnew87RDeLYciW-tq9O_sHEsEALYz1LNmwigsotfMRs2oEBiFhvVbwMPhoqggLanWC801nR8YsNsRquaPboJ33OKbhMu1OgA8SFxyxs7MO7jSlVpSR5Gg6kRiPtjxhww_-Ok3z9v8fd4jYKpY2wCKOQoLK42tOj1_QBbAGL0BGHgxq8nwcAOk35PFHlJSM7NEH2VoF9qNNakU-fUPsFvLPasoCWyO8QrrVbqdBjrFg");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-yellow-500/50 transition-all duration-300 shadow-xl flex flex-col grayscale opacity-80 hover:grayscale-0 hover:opacity-100">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-yellow-500/20 group-hover:scale-110 transition-transform duration-500">folder_open</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
 <span class="px-2 py-0.5 rounded-full bg-yellow-600 text-[10px] font-bold text-white uppercase tracking-wider">Archive</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">MULU (Archived)</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">A cross-platform directory manager for organizing large-scale research papers and media assets.</p>
+<h3 class="text-white text-xl font-bold mb-2">MULU</h3>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A cross-platform directory manager for organizing large-scale research papers and media assets.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-yellow-500">
-<span class="material-symbols-outlined text-xl">folder_zip</span>
-<span class="material-symbols-outlined text-xl">history</span>
+<span class="material-symbols-outlined text-xl">inventory_2</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/50 text-sm font-bold border border-white/10 cursor-not-allowed no-underline" href="#">
 <span>Archived</span>
@@ -205,20 +208,21 @@
 </div>
 </div>
 </div>
-<div class="glass-card rounded-xl overflow-hidden group hover:border-emerald-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYoaz6DLuC5OW3YkKMAxs2W0yzlbZXFn69rRnew87RDeLYciW-tq9O_sHEsEALYz1LNmwigsotfMRs2oEBiFhvVbwMPhoqggLanWC801nR8YsNsRquaPboJ33OKbhMu1OgA8SFxyxs7MO7jSlVpSR5Gg6kRiPtjxhww_-Ok3z9v8fd4jYKpY2wCKOQoLK42tOj1_QBbAGL0BGHgxq8nwcAOk35PFHlJSM7NEH2VoF9qNNakU-fUPsFvLPasoCWyO8QrrVbqdBjrFg");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-emerald-500/50 transition-all duration-300 shadow-xl flex flex-col">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-emerald-500/20 group-hover:scale-110 transition-transform duration-500">edit_note</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
 <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider">Productivity</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Lingxiong Notes (灵熊小记)</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">Minimalist, bear-themed markdown notebook designed for quick daily journaling and creative notes.</p>
+<h3 class="text-white text-xl font-bold mb-2">Lingxiong Notes</h3>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Minimalist bear-themed markdown notebook designed for quick daily journaling.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-emerald-500">
-<span class="material-symbols-outlined text-xl">edit_note</span>
-<span class="material-symbols-outlined text-xl">auto_stories</span>
+<span class="material-symbols-outlined text-xl">book_4</span>
+<span class="material-symbols-outlined text-xl">draw</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-emerald-500 transition-colors no-underline" href="https://link3.cc/training_fengfeng_games" target="_blank">
 <span>Open</span>
@@ -227,20 +231,21 @@
 </div>
 </div>
 </div>
-<div class="glass-card rounded-xl overflow-hidden group hover:border-purple-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAYCAKN5eK-U5vYYuNgdOtzx1S89RADELtQAIt5B7uR_ALypUInsNDIawj6gjO2HD_Wy4O2R4PvRBDlpayyhOYUvJrfx3uXhUzjlXsO2u48E8tu1PGuloAYhTeSGSohLoGuJrvX7L-FtvJHvo9mNNyh8cYkVu9w1Bqiuu12TsVN5Jw8PCTDEG08WhUDGEZxZB_Xs518fTheRX1oLlZnZq4dEQkMyAzcPh56rLZbNRUY1NoyRFCftsisNyw_coF77QqOcmBWEgwRWEI");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-purple-500/50 transition-all duration-300 shadow-xl flex flex-col">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-purple-500/20 group-hover:scale-110 transition-transform duration-500">sports_esports</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
 <span class="px-2 py-0.5 rounded-full bg-purple-500 text-[10px] font-bold text-white uppercase tracking-wider">Gamedev</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Mini Game Library (小游戏库)</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">A curated collection of web-based mini-games built with lightweight rendering engines.</p>
+<h3 class="text-white text-xl font-bold mb-2">Mini Game Library</h3>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A curated collection of web mini-games built with lightweight rendering engines.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-purple-500">
-<span class="material-symbols-outlined text-xl">joystick</span>
-<span class="material-symbols-outlined text-xl">sports_esports</span>
+<span class="material-symbols-outlined text-xl">videogame_asset</span>
+<span class="material-symbols-outlined text-xl">stadia_controller</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-purple-500 transition-colors no-underline" href="https://raccoon.fit/game" target="_blank">
 <span>Open</span>
@@ -249,19 +254,20 @@
 </div>
 </div>
 </div>
-<div class="glass-card rounded-xl overflow-hidden group hover:border-cyan-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="bg-cover bg-center h-48 relative" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBEQTZzC8_XrPuXDOZmmroHuO1m2oAegksSx8MmUjkj4PfQkW2OUdQICIp2N4ddU7y7JTK0KayoYUd33ca5oMeTmHgBsdBXgg1_Y6eW0-xFGI3jEYEWQugDXrIKkHM0MURkYfz1g_JB9qQpTqm9hHB1i1G2y_kCu6o0a9G_t-gYvmHBOkYiZUT9SgEuii-k8LsZYY5AZZz6DjBdhWBWSmJJLmwwzXREnIEzroguavvpg8xbOEWKR-l51EwLQeZGPNRVtCnem-ywDcY");'>
-<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="glass-card rounded-2xl overflow-hidden group hover:border-cyan-500/50 transition-all duration-300 shadow-xl flex flex-col">
+<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-8xl text-cyan-500/20 group-hover:scale-110 transition-transform duration-500">psychology</span>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
 <div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-cyan-500 text-[10px] font-bold text-white uppercase tracking-wider">AI/ML</span>
+<span class="px-2 py-0.5 rounded-full bg-cyan-500 text-[10px] font-bold text-white uppercase tracking-wider">AI / ML</span>
 </div>
 </div>
 <div class="p-6 flex flex-col flex-1">
 <h3 class="text-white text-xl font-bold mb-2">RACCOON AI</h3>
-<p class="text-slate-400 text-sm leading-relaxed mb-6 flex-1">Conversational AI trained specifically for creative technologists and open-source contributors.</p>
+<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Conversational AI trained for creative technologists and open-source contributors.</p>
 <div class="flex items-center justify-between">
 <div class="flex gap-3 text-cyan-500">
-<span class="material-symbols-outlined text-xl">psychology</span>
+<span class="material-symbols-outlined text-xl">smart_toy</span>
 <span class="material-symbols-outlined text-xl">hub</span>
 </div>
 <a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-cyan-500 transition-colors no-underline" href="https://raccoon.fit/ai" target="_blank">
@@ -273,42 +279,42 @@
 </div>
 </div>
 <div class="px-4 pb-4 pt-16" id="about">
-<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">About Soft Raccoon</h2>
+<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">The Raccoon's Story</h2>
 </div>
 <div class="flex flex-col lg:flex-row gap-8 p-4">
-<div class="flex-1 glass-card p-8 rounded-xl relative overflow-hidden">
-<div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-9xl">pets</span>
+<div class="flex-1 glass-card p-8 rounded-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5">
+<span class="material-symbols-outlined text-[200px]">pets</span>
 </div>
 <div class="flex items-center gap-6 mb-6">
-<div class="size-20 rounded-full border-4 border-primary/30 overflow-hidden shrink-0">
-<img alt="Illustration of a soft raccoon" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEQTZzC8_XrPuXDOZmmroHuO1m2oAegksSx8MmUjkj4PfQkW2OUdQICIp2N4ddU7y7JTK0KayoYUd33ca5oMeTmHgBsdBXgg1_Y6eW0-xFGI3jEYEWQugDXrIKkHM0MURkYfz1g_JB9qQpTqm9hHB1i1G2y_kCu6o0a9G_t-gYvmHBOkYiZUT9SgEuii-k8LsZYY5AZZz6DjBdhWBWSmJJLmwwzXREnIEzroguavvpg8xbOEWKR-l51EwLQeZGPNRVtCnem-ywDcY"/>
+<div class="size-24 rounded-full border-4 border-primary/30 overflow-hidden shrink-0 shadow-lg">
+<img alt="Ruan Ruan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEQTZzC8_XrPuXDOZmmroHuO1m2oAegksSx8MmUjkj4PfQkW2OUdQICIp2N4ddU7y7JTK0KayoYUd33ca5oMeTmHgBsdBXgg1_Y6eW0-xFGI3jEYEWQugDXrIKkHM0MURkYfz1g_JB9qQpTqm9hHB1i1G2y_kCu6o0a9G_t-gYvmHBOkYiZUT9SgEuii-k8LsZYY5AZZz6DjBdhWBWSmJJLmwwzXREnIEzroguavvpg8xbOEWKR-l51EwLQeZGPNRVtCnem-ywDcY"/>
 </div>
 <div>
 <h3 class="text-white text-2xl font-bold">Ruan Ruan (软软)</h3>
-<p class="text-primary font-semibold">Full-stack Developer &amp; UI Enthusiast</p>
+<p class="text-primary font-semibold">Architect of the Den</p>
 </div>
 </div>
-<p class="text-slate-300 leading-relaxed mb-6 relative z-10">
-                                Hello! I'm Soft Raccoon, a developer who believes technology should be as cozy as a warm den. I specialize in building immersive digital experiences that blend high-performance backend architecture with whimsical, user-centric front-end design.
+<p class="text-raccoon-accent leading-relaxed mb-6 relative z-10">
+                                Hello! I'm Soft Raccoon, a developer who believes technology should be as cozy as a warm den. I specialize in building immersive digital experiences that blend high-performance systems with whimsical, user-centric design.
                             </p>
-<a class="inline-flex items-center gap-2 text-primary font-bold hover:underline mb-6" href="me">
+<a class="inline-flex items-center gap-2 text-primary font-bold hover:underline mb-6 group" href="me">
 <span>Learn more on my personal page</span>
-<span class="material-symbols-outlined text-sm">arrow_forward</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
 </a>
 <div class="grid grid-cols-2 gap-4">
 <div class="p-4 rounded-xl bg-white/5 border border-white/10">
 <p class="text-white font-bold text-2xl">5+</p>
-<p class="text-slate-400 text-xs">Years Experience</p>
+<p class="text-slate-400 text-xs">Years of Magic</p>
 </div>
 <div class="p-4 rounded-xl bg-white/5 border border-white/10">
 <p class="text-white font-bold text-2xl">20+</p>
-<p class="text-slate-400 text-xs">Projects Completed</p>
+<p class="text-slate-400 text-xs">Cozily Built Projects</p>
 </div>
 </div>
 </div>
-<div class="flex-1 glass-card p-8 rounded-xl flex flex-col gap-6">
-<h3 class="text-white text-xl font-bold">Technical Skill Stack</h3>
+<div class="flex-1 glass-card p-8 rounded-2xl flex flex-col gap-6">
+<h3 class="text-white text-xl font-bold">Tech Skillset</h3>
 <div class="space-y-6">
 <div>
 <div class="flex justify-between mb-2">
@@ -316,7 +322,7 @@
 <span class="text-primary text-sm font-bold">95%</span>
 </div>
 <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-primary shadow-[0_0_10px_#5755f7]" style="width: 95%"></div>
+<div class="h-full bg-primary shadow-[0_0_10px_#8b5cf6]" style="width: 95%"></div>
 </div>
 </div>
 <div>
@@ -340,22 +346,30 @@
 </div>
 </div>
 </div>
-<footer class="mt-20 mb-10 px-4 py-10 border-t border-white/10 flex flex-col items-center gap-6" id="contact">
-<div class="flex gap-8">
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-1" href="https://raccoon.fit" target="_blank" title="Official Site">
-<span class="material-symbols-outlined text-2xl">home</span>
-<span class="text-[10px] font-bold uppercase">Site</span>
+<footer class="mt-20 mb-10 px-4 py-10 border-t border-white/10 flex flex-col items-center gap-8" id="contact">
+<div class="flex gap-12">
+<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="https://raccoon.fit" target="_blank" title="Official Site">
+<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Site</span>
 </a>
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-1" href="https://github.com/raccoon-fit" target="_blank" title="GitHub">
-<span class="material-symbols-outlined text-2xl">terminal</span>
-<span class="text-[10px] font-bold uppercase">Git</span>
+<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="https://github.com/raccoon-fit" target="_blank" title="GitHub">
+<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">terminal</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Git</span>
 </a>
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-1" href="mailto:2051775505@qq.com" title="Email Me">
-<span class="material-symbols-outlined text-2xl">mail</span>
-<span class="text-[10px] font-bold uppercase">Mail</span>
+<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="mailto:2051775505@qq.com" title="Email Me">
+<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">mail</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Mail</span>
 </a>
 </div>
-<p class="text-slate-500 text-sm font-medium">© 2026 Soft Raccoon's Cozy Den. Made with <span class="text-pink-500">♥</span> and magic.</p>
+<div class="text-center">
+<p class="text-slate-500 text-sm font-medium">© 2026 Soft Raccoon's Cozy Den. Made with <span class="text-pink-500">♥</span> and raccoon magic.</p>
+<div class="mt-2 flex justify-center gap-4 text-[10px] uppercase font-bold text-slate-600">
+<a class="hover:text-primary" href="#home">Home</a>
+<a class="hover:text-primary" href="#projects">Projects</a>
+<a class="hover:text-primary" href="#about">About</a>
+<a class="hover:text-primary" href="https://raccoon.fit/mobile">Service</a>
+</div>
+</div>
 </footer>
 </div>
 </div>

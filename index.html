@@ -1,380 +1,1592 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Soft Raccoon's Cozy Den</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#8b5cf6",
-                        "raccoon-dark": "#1a1a2e",
-                        "raccoon-gray": "#4a4e69",
-                        "raccoon-light": "#f2e9e4",
-                        "raccoon-accent": "#c9ada7",
-                        "background-dark": "#0f0f1b",
-                    },
-                    fontFamily: {
-                        "display": ["Plus Jakarta Sans", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-<style type="text/tailwindcss">.glass-card {
-    background: rgba(30, 30, 50, 0.4);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1)
-    }
-.liquid-glow {
-    filter: blur(80px);
-    z-index: -1
-    }
-.noise-overlay {
-    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDI-SuKwtl4lUUeUbmdOtiIl54GCVyj0chIE9PKjwGkCWWBSG8I4HKVdWq4a7Y6KcEMVdqR9DPfXGn7sMNwGlAHykmw7CoH6xcIItPf6dvT3B7e44VB18iGnYbez3p3n58IgmDzRFIezoFAaRYT3KrATTqezNrWhGuy6G-EX9xKfnxtcPShvBvCYRePdevUBMZE3X-rU3x2ynNbrMo-97W4jg6a5jYjdg0K4zkPwwZrk6JCYH9b2BwLmIuvfBJIXGzDbfMONw3yDrI);
-    opacity: 0.03;
-    pointer-events: none
-    }
-.lang-dropdown {
-    display: none
-    }
-.lang-container:hover .lang-dropdown {
-    display: block
-    }
-@keyframes clock-pulse {
-    0%, 100% {
-        opacity: 1;
-        } 50% {
-        opacity: 0.3;
-        }
-    }
-.animate-blink {
-    animation: clock-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite
-    }</style>
-</head>
-<body class="bg-raccoon-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-300">
-<div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full liquid-glow"></div>
-<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-raccoon-gray/20 rounded-full liquid-glow"></div>
-<div class="absolute top-[30%] right-[10%] w-[30%] h-[30%] bg-raccoon-accent/10 rounded-full liquid-glow"></div>
-<div class="absolute inset-0 noise-overlay"></div>
-</div>
-<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-<div class="layout-container flex h-full grow flex-col">
-<div class="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-40">
-<header class="flex items-center justify-between whitespace-nowrap glass-card rounded-full px-6 py-2">
-<div class="flex items-center gap-3">
-<div class="size-10 text-primary flex items-center justify-center bg-white/10 rounded-full">
-<span class="material-symbols-outlined text-2xl">pets</span>
-</div>
-<div class="flex flex-col">
-<h2 class="text-slate-900 dark:text-white text-base font-extrabold leading-tight">软软的小窝</h2>
-<span class="text-[10px] text-slate-500 dark:text-raccoon-accent uppercase tracking-tighter">Soft Raccoon's Den</span>
-</div>
-</div>
-<div class="flex flex-1 justify-end gap-3 items-center">
-<div class="relative lang-container">
-<button class="flex items-center justify-center rounded-full h-10 px-4 bg-primary/10 dark:bg-white/5 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/10">
-<span class="material-symbols-outlined text-lg">language</span>
-<span>EN</span>
-<span class="material-symbols-outlined text-xs">expand_more</span>
-</button>
-<div class="lang-dropdown absolute top-full right-0 mt-2 w-40 glass-card rounded-2xl overflow-hidden shadow-2xl z-50">
-<div class="flex flex-col py-2">
-<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">简体中文 (CN)</button>
-<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">English (EN)</button>
-<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">日本語 (JP)</button>
-<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">한국어 (KR)</button>
-<button class="px-4 py-2 text-left text-sm text-white hover:bg-primary/40 transition-colors">Français (FR)</button>
-</div>
-</div>
-</div>
-<div class="hidden md:flex items-center justify-center rounded-full h-10 px-4 bg-white/5 text-slate-900 dark:text-white gap-2 text-sm font-bold border border-white/5">
-<span class="material-symbols-outlined text-lg">schedule</span>
-<span class="flex items-center">12<span class="animate-blink">:</span>45</span>
-</div>
-<button class="flex items-center justify-center rounded-full h-10 w-10 bg-white/5 text-slate-900 dark:text-white border border-white/5">
-<span class="material-symbols-outlined text-lg">dark_mode</span>
-</button>
-</div>
-</header>
-</div>
-<main class="flex flex-col flex-1 mt-24">
-<div class="px-4 md:px-40 flex flex-1 justify-center py-5" id="home">
-<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
-<div class="@container">
-<div class="@[480px]:p-4">
-<div class="relative flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-3xl items-center justify-center p-8 overflow-hidden shadow-2xl" style='background-image: linear-gradient(rgba(15, 15, 27, 0.6) 0%, rgba(15, 15, 27, 0.9) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBeeCORxQSaq04Q8E3EPu9qYVTq-Ke9JfjhwC4TsPq2KopGUEzCiaYreTvYJ4VRwx22cHt5Iu3Bq6S-SuIyXCsDIFGEZ0HQ2OHUGP4ut2eRqoqOUT4jJDuVUHYrb_0k4aAi_Lla7UJRV-hOb_IaBpjxk9bEwR6Ot6rGPvpNQmaSroxRePNo5SJ_jFON6djqvGrkcWOT0VQ-QEB5Dvhpe9OdoRGCHCdAaTpm2JMgoyeluXnlTvSx-4m_-js_bp6EJsC7Dr4HV1KKUiQ");'>
-<div class="flex flex-col gap-4 text-center z-10">
-<div class="inline-block self-center px-4 py-1 rounded-full bg-primary/20 border border-primary/40 text-primary text-xs font-bold uppercase tracking-widest">
-                                        Happy New Year 2026
-                                    </div>
-<h1 class="text-white text-5xl font-black leading-tight tracking-[-0.033em] @[480px]:text-7xl">
-                                        Soft Raccoon's <br/><span class="text-primary italic">Cozy Den</span>
-</h1>
-<h2 class="text-raccoon-accent text-base font-medium leading-relaxed max-w-2xl mx-auto @[480px]:text-xl">
-                                        Explore a sanctuary of code, design, and raccoon-powered creativity. Welcome to the home of infinite possibilities.
-                                    </h2>
-</div>
-<div class="flex gap-4 z-10">
-<a class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-full h-14 px-8 bg-primary text-white text-base font-bold shadow-lg hover:bg-violet-600 transition-all no-underline" href="#projects">
-                                        Explore Projects
-                                    </a>
-<a class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-full h-14 px-8 glass-card text-white text-base font-bold border border-white/20 hover:bg-white/10 transition-colors no-underline" href="#contact">
-                                        Contact Me
-                                    </a>
-</div>
-</div>
-</div>
-</div>
-<div class="flex items-center justify-between px-4 pb-4 pt-10" id="projects">
-<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em] flex items-center gap-2">
-<span class="material-symbols-outlined text-primary">terminal</span> Featured Works
-                        </h2>
-<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="https://raccoon.fit/mobile">Official Services <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-primary/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-primary/20 group-hover:scale-110 transition-transform duration-500">terminal</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-primary text-[10px] font-bold text-white uppercase tracking-wider">IDE Software</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Ride</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A high-performance integrated development environment designed for low-latency coding.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-primary">
-<span class="material-symbols-outlined text-xl">code</span>
-<span class="material-symbols-outlined text-xl">rocket_launch</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-primary transition-colors no-underline" href="https://raccoon.fit/Ride" target="_blank">
-<span>Open</span>
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-</div>
-</div>
-</div>
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-pink-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-pink-500/20 group-hover:scale-110 transition-transform duration-500">live_tv</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-pink-500 text-[10px] font-bold text-white uppercase tracking-wider">Streaming tool</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Bilibili Streamer</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Ultimate tool for creators with real-time analytics and overlay management for streaming.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-pink-500">
-<span class="material-symbols-outlined text-xl">analytics</span>
-<span class="material-symbols-outlined text-xl">sensors</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-pink-500 transition-colors no-underline" href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank">
-<span>Open</span>
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-</div>
-</div>
-</div>
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-yellow-500/50 transition-all duration-300 shadow-xl flex flex-col grayscale opacity-80 hover:grayscale-0 hover:opacity-100">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-yellow-500/20 group-hover:scale-110 transition-transform duration-500">folder_open</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-yellow-600 text-[10px] font-bold text-white uppercase tracking-wider">Archive</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">MULU</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A cross-platform directory manager for organizing large-scale research papers and media assets.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-yellow-500">
-<span class="material-symbols-outlined text-xl">inventory_2</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/50 text-sm font-bold border border-white/10 cursor-not-allowed no-underline" href="#">
-<span>Archived</span>
-<span class="material-symbols-outlined text-sm">lock</span>
-</a>
-</div>
-</div>
-</div>
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-emerald-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-emerald-500/20 group-hover:scale-110 transition-transform duration-500">edit_note</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-emerald-500 text-[10px] font-bold text-white uppercase tracking-wider">Productivity</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Lingxiong Notes</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Minimalist bear-themed markdown notebook designed for quick daily journaling.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-emerald-500">
-<span class="material-symbols-outlined text-xl">book_4</span>
-<span class="material-symbols-outlined text-xl">draw</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-emerald-500 transition-colors no-underline" href="https://link3.cc/training_fengfeng_games" target="_blank">
-<span>Open</span>
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-</div>
-</div>
-</div>
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-purple-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-purple-500/20 group-hover:scale-110 transition-transform duration-500">sports_esports</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-purple-500 text-[10px] font-bold text-white uppercase tracking-wider">Gamedev</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">Mini Game Library</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">A curated collection of web mini-games built with lightweight rendering engines.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-purple-500">
-<span class="material-symbols-outlined text-xl">videogame_asset</span>
-<span class="material-symbols-outlined text-xl">stadia_controller</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-purple-500 transition-colors no-underline" href="https://raccoon.fit/game" target="_blank">
-<span>Open</span>
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-</div>
-</div>
-</div>
-<div class="glass-card rounded-2xl overflow-hidden group hover:border-cyan-500/50 transition-all duration-300 shadow-xl flex flex-col">
-<div class="h-48 relative bg-slate-800 flex items-center justify-center overflow-hidden">
-<span class="material-symbols-outlined text-8xl text-cyan-500/20 group-hover:scale-110 transition-transform duration-500">psychology</span>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 to-transparent"></div>
-<div class="absolute bottom-4 left-4 flex gap-2">
-<span class="px-2 py-0.5 rounded-full bg-cyan-500 text-[10px] font-bold text-white uppercase tracking-wider">AI / ML</span>
-</div>
-</div>
-<div class="p-6 flex flex-col flex-1">
-<h3 class="text-white text-xl font-bold mb-2">RACCOON AI</h3>
-<p class="text-raccoon-accent text-sm leading-relaxed mb-6 flex-1">Conversational AI trained for creative technologists and open-source contributors.</p>
-<div class="flex items-center justify-between">
-<div class="flex gap-3 text-cyan-500">
-<span class="material-symbols-outlined text-xl">smart_toy</span>
-<span class="material-symbols-outlined text-xl">hub</span>
-</div>
-<a class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/10 hover:bg-cyan-500 transition-colors no-underline" href="https://raccoon.fit/ai" target="_blank">
-<span>Open</span>
-<span class="material-symbols-outlined text-sm">open_in_new</span>
-</a>
-</div>
-</div>
-</div>
-</div>
-<div class="px-4 pb-4 pt-16" id="about">
-<h2 class="text-slate-900 dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">The Raccoon's Story</h2>
-</div>
-<div class="flex flex-col lg:flex-row gap-8 p-4">
-<div class="flex-1 glass-card p-8 rounded-2xl relative overflow-hidden">
-<div class="absolute top-0 right-0 p-4 opacity-5">
-<span class="material-symbols-outlined text-[200px]">pets</span>
-</div>
-<div class="flex items-center gap-6 mb-6">
-<div class="size-24 rounded-full border-4 border-primary/30 overflow-hidden shrink-0 shadow-lg">
-<img alt="Ruan Ruan" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEQTZzC8_XrPuXDOZmmroHuO1m2oAegksSx8MmUjkj4PfQkW2OUdQICIp2N4ddU7y7JTK0KayoYUd33ca5oMeTmHgBsdBXgg1_Y6eW0-xFGI3jEYEWQugDXrIKkHM0MURkYfz1g_JB9qQpTqm9hHB1i1G2y_kCu6o0a9G_t-gYvmHBOkYiZUT9SgEuii-k8LsZYY5AZZz6DjBdhWBWSmJJLmwwzXREnIEzroguavvpg8xbOEWKR-l51EwLQeZGPNRVtCnem-ywDcY"/>
-</div>
-<div>
-<h3 class="text-white text-2xl font-bold">Ruan Ruan (软软)</h3>
-<p class="text-primary font-semibold">Architect of the Den</p>
-</div>
-</div>
-<p class="text-raccoon-accent leading-relaxed mb-6 relative z-10">
-                                Hello! I'm Soft Raccoon, a developer who believes technology should be as cozy as a warm den. I specialize in building immersive digital experiences that blend high-performance systems with whimsical, user-centric design.
-                            </p>
-<a class="inline-flex items-center gap-2 text-primary font-bold hover:underline mb-6 group" href="me">
-<span>Learn more on my personal page</span>
-<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</a>
-<div class="grid grid-cols-2 gap-4">
-<div class="p-4 rounded-xl bg-white/5 border border-white/10">
-<p class="text-white font-bold text-2xl">5+</p>
-<p class="text-slate-400 text-xs">Years of Magic</p>
-</div>
-<div class="p-4 rounded-xl bg-white/5 border border-white/10">
-<p class="text-white font-bold text-2xl">20+</p>
-<p class="text-slate-400 text-xs">Cozily Built Projects</p>
-</div>
-</div>
-</div>
-<div class="flex-1 glass-card p-8 rounded-2xl flex flex-col gap-6">
-<h3 class="text-white text-xl font-bold">Tech Skillset</h3>
-<div class="space-y-6">
-<div>
-<div class="flex justify-between mb-2">
-<span class="text-slate-300 text-sm font-semibold uppercase">React / Next.js / Tailwind</span>
-<span class="text-primary text-sm font-bold">95%</span>
-</div>
-<div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-primary shadow-[0_0_10px_#8b5cf6]" style="width: 95%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between mb-2">
-<span class="text-slate-300 text-sm font-semibold uppercase">Rust / Backend Systems</span>
-<span class="text-cyan-500 text-sm font-bold">80%</span>
-</div>
-<div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]" style="width: 80%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between mb-2">
-<span class="text-slate-300 text-sm font-semibold uppercase">UI/UX Design &amp; Branding</span>
-<span class="text-pink-500 text-sm font-bold">88%</span>
-</div>
-<div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-<div class="h-full bg-pink-500 shadow-[0_0_10px_#ec4899]" style="width: 88%"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<footer class="mt-20 mb-10 px-4 py-10 border-t border-white/10 flex flex-col items-center gap-8" id="contact">
-<div class="flex gap-12">
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="https://raccoon.fit" target="_blank" title="Official Site">
-<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">home</span>
-<span class="text-[10px] font-bold uppercase tracking-widest">Site</span>
-</a>
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="https://github.com/raccoon-fit" target="_blank" title="GitHub">
-<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">terminal</span>
-<span class="text-[10px] font-bold uppercase tracking-widest">Git</span>
-</a>
-<a class="text-slate-400 hover:text-primary transition-colors flex flex-col items-center gap-2 group" href="mailto:2051775505@qq.com" title="Email Me">
-<span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform">mail</span>
-<span class="text-[10px] font-bold uppercase tracking-widest">Mail</span>
-</a>
-</div>
-<div class="text-center">
-<p class="text-slate-500 text-sm font-medium">© 2026 Soft Raccoon's Cozy Den. Made with <span class="text-pink-500">♥</span> and raccoon magic.</p>
-<div class="mt-2 flex justify-center gap-4 text-[10px] uppercase font-bold text-slate-600">
-<a class="hover:text-primary" href="#home">Home</a>
-<a class="hover:text-primary" href="#projects">Projects</a>
-<a class="hover:text-primary" href="#about">About</a>
-<a class="hover:text-primary" href="https://raccoon.fit/mobile">Service</a>
-</div>
-</div>
-</footer>
-</div>
-</div>
-</main>
-</div>
-</div>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="软软的小窝 - 数字创意空间">
+    <title>软软的小窝 ✨</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           iOS 26 Ethereal Flow 液态玻璃设计系统
+        ======================================== */
 
-</body></html>
+        :root {
+            /* 梦幻暮光配色方案 */
+            --bg-deep: #0a0a0f;
+            --bg-surface: #12121a;
+
+            /* 液态渐变色彩 */
+            --liquid-violet: #8b5cf6;
+            --liquid-purple: #a855f7;
+            --liquid-pink: #d946ef;
+            --liquid-rose: #f43f5e;
+            --liquid-blue: #6366f1;
+            --liquid-indigo: #4f46e5;
+            --liquid-teal: #14b8a6;
+            --liquid-cyan: #06b6d4;
+
+            /* 语义化颜色 */
+            --primary: #a855f7;
+            --primary-light: #c084fc;
+            --accent: #14b8a6;
+
+            /* 文本颜色 */
+            --text-primary: #ffffff;
+            --text-secondary: rgba(235, 235, 245, 0.7);
+            --text-tertiary: rgba(235, 235, 245, 0.5);
+            --text-muted: rgba(235, 235, 245, 0.35);
+
+            /* 玻璃材质 - 精品级 */
+            --glass-surface: rgba(255, 255, 255, 0.03);
+            --glass-light: rgba(255, 255, 255, 0.06);
+            --glass-medium: rgba(255, 255, 255, 0.1);
+            --glass-strong: rgba(255, 255, 255, 0.15);
+
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-light: rgba(255, 255, 255, 0.04);
+            --glass-border-highlight: rgba(255, 255, 255, 0.25);
+
+            --glass-shadow: rgba(0, 0, 0, 0.25);
+            --glass-shadow-colored: rgba(139, 92, 246, 0.12);
+
+            /* 模糊强度 */
+            --blur-xs: 8px;
+            --blur-sm: 16px;
+            --blur-md: 28px;
+            --blur-lg: 40px;
+            --blur-xl: 60px;
+
+            /* 圆角 */
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --radius-full: 9999px;
+
+            /* 间距 */
+            --space-xs: 0.5rem;
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 5rem;
+
+            /* 动画曲线 */
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+            /* 字体 */
+            --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+        }
+
+        /* ========================================
+           全局重置
+        ======================================== */
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.65;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           液态背景系统
+        ======================================== */
+
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1000;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .liquid-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(var(--blur-xl));
+            opacity: 0.5;
+            will-change: transform;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--liquid-violet) 0%, transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation: float-1 25s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--liquid-blue) 0%, transparent 70%);
+            top: 30%;
+            right: -15%;
+            animation: float-2 30s ease-in-out infinite;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--liquid-pink) 0%, transparent 70%);
+            bottom: -10%;
+            left: 30%;
+            animation: float-3 28s ease-in-out infinite;
+        }
+
+        .orb-4 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--liquid-teal) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            animation: float-4 35s ease-in-out infinite;
+        }
+
+        .orb-5 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, var(--liquid-purple) 0%, transparent 70%);
+            bottom: 20%;
+            right: 10%;
+            animation: float-5 32s ease-in-out infinite;
+        }
+
+        @keyframes float-1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, 30px) scale(1.05); }
+            50% { transform: translate(-20px, 50px) scale(0.95); }
+            75% { transform: translate(40px, 20px) scale(1.02); }
+        }
+
+        @keyframes float-2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-40px, -30px) scale(1.1); }
+            66% { transform: translate(30px, 40px) scale(0.9); }
+        }
+
+        @keyframes float-3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, -50px) scale(1.08); }
+        }
+
+        @keyframes float-4 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            33% { transform: translate(-45%, -55%) scale(1.12); }
+            66% { transform: translate(-55%, -45%) scale(0.88); }
+        }
+
+        @keyframes float-5 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-30px, 30px) rotate(10deg); }
+        }
+
+        /* 背景遮罩 - 增加深度 */
+        .liquid-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--bg-deep) 70%);
+            z: -999;
+            pointer-events: none;
+        }
+
+        /* 噪点纹理 */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.012;
+            z: -998;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* ========================================
+           精品玻璃卡片
+        ======================================== */
+
+        .glass {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.04) 100%
+            );
+            backdrop-filter: blur(var(--blur-md)) saturate(160%);
+            -webkit-backdrop-filter: blur(var(--blur-md)) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            border-radius: var(--radius-lg);
+            transition: all 0.4s var(--ease-smooth);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px) scale(1.005);
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(255, 255, 255, 0.04) 50%,
+                rgba(255, 255, 255, 0.06) 100%
+            );
+            box-shadow:
+                0 16px 48px rgba(0, 0, 0, 0.25),
+                0 0 40px rgba(139, 92, 246, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* 按钮玻璃效果 */
+        .glass-btn {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(255, 255, 255, 0.06) 100%
+            );
+            backdrop-filter: blur(var(--blur-sm)) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* ========================================
+           导航栏
+        ======================================== */
+
+        .nav-wrap {
+            position: fixed;
+            top: var(--space-md);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: calc(100% - var(--space-lg));
+            max-width: 640px;
+        }
+
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            border-radius: var(--radius-xl);
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .nav-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--liquid-violet), var(--liquid-pink));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.35);
+            transition: transform 0.3s var(--ease-bounce);
+        }
+
+        .nav-brand:hover .nav-icon {
+            transform: rotate(12deg) scale(1.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 6px 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 14px;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-full);
+            transition: all 0.25s var(--ease-smooth);
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s var(--ease-smooth);
+            text-decoration: none;
+        }
+
+        .nav-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .nav-time-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--liquid-rose);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+
+        .nav-toggle {
+            display: none;
+            padding: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-toggle span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: var(--text-primary);
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: all 0.25s;
+        }
+
+        /* ========================================
+           主内容区域
+        ======================================== */
+
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            padding: var(--space-3xl) var(--space-md);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Hero 区域 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: calc(80px + var(--space-xl)) var(--space-md) var(--space-xl);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: var(--radius-full);
+            color: var(--liquid-purple);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 6vw, 52px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--space-md);
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.85) 50%, var(--liquid-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--liquid-purple), var(--liquid-pink), var(--liquid-rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: clamp(14px, 2.2vw, 16px);
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin: 0 auto var(--space-xl);
+            line-height: 1.75;
+        }
+
+        .hero-img-wrap {
+            position: relative;
+            max-width: 440px;
+            margin: 0 auto var(--space-xl);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .hero-img-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--liquid-violet), var(--liquid-pink), var(--liquid-blue));
+            border-radius: calc(var(--radius-lg) + 4px);
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(16px);
+            animation: glow-pulse 5s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.65; transform: scale(1.03); }
+        }
+
+        .hero-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--radius-lg);
+            transition: transform 0.5s var(--ease-smooth);
+        }
+
+        .hero-img-wrap:hover .hero-img {
+            transform: scale(1.02);
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--liquid-violet), var(--liquid-purple));
+            color: white;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.45);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(var(--blur-sm));
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* 区块标题 */
+        .section-hd {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .section-hd h2 {
+            font-size: clamp(22px, 4vw, 34px);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.02em;
+        }
+
+        .section-hd p {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+
+        /* 项目卡片 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .project-card {
+            padding: var(--space-lg);
+        }
+
+        .project-ico {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(217, 70, 239, 0.15));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: var(--space-md);
+        }
+
+        .project-card h3 {
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .project-card p {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-md);
+            line-height: 1.7;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: var(--space-md);
+        }
+
+        .tag {
+            padding: 5px 12px;
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .project-card .btn {
+            width: 100%;
+        }
+
+        /* 实验室卡片 */
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .lab-card {
+            padding: var(--space-lg);
+            text-align: center;
+        }
+
+        .lab-ico {
+            font-size: 30px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .lab-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .lab-card p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            line-height: 1.7;
+        }
+
+        /* 关于区域 */
+        .about-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+
+        .about-box {
+            padding: var(--space-lg);
+        }
+
+        .about-box h3 {
+            font-size: clamp(20px, 3vw, 26px);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .about-box p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            line-height: 1.8;
+        }
+
+        .about-box a {
+            color: var(--liquid-purple);
+            text-decoration: none;
+        }
+
+        .about-box a:hover {
+            text-decoration: underline;
+        }
+
+        .skills-box {
+            padding: var(--space-lg);
+        }
+
+        .skills-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .skill-item {
+            margin-bottom: var(--space-md);
+        }
+
+        .skill-hd {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .skill-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .skill-num {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .skill-bar {
+            height: 5px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--liquid-violet), var(--liquid-pink));
+            border-radius: var(--radius-full);
+            width: 0;
+            transition: width 1.2s var(--ease-smooth);
+        }
+
+        /* 页脚 */
+        .footer {
+            padding: var(--space-2xl) var(--space-md) var(--space-xl);
+            text-align: center;
+        }
+
+        .footer-box {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-ico {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--liquid-violet), var(--liquid-pink));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            justify-content: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-links a {
+            padding: 8px 16px;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: var(--radius-full);
+            transition: all 0.25s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-copy {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-top: var(--space-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ========================================
+           动画类
+        ======================================== */
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: all 0.7s var(--ease-smooth);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        .delay-6 { transition-delay: 0.6s; }
+
+        /* ========================================
+           提示信息
+        ======================================== */
+
+        .toast {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(var(--blur-lg));
+            color: white;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            font-size: 13px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s var(--ease-smooth);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ========================================
+           响应式设计
+        ======================================== */
+
+        @media (max-width: 768px) {
+            :root {
+                --space-md: 0.875rem;
+                --space-lg: 1.25rem;
+                --space-xl: 1.75rem;
+                --space-2xl: 2.5rem;
+                --space-3xl: 3rem;
+            }
+
+            .nav-wrap {
+                width: calc(100% - var(--space-md));
+            }
+
+            .nav-bar {
+                padding: 8px 12px;
+            }
+
+            .nav-brand span:last-child {
+                display: none;
+            }
+
+            .nav-menu {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: var(--space-sm) var(--space-md);
+                background: rgba(18, 18, 26, 0.85);
+                backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-item {
+                padding: 0;
+            }
+
+            .nav-link {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 3px;
+                padding: var(--space-xs);
+                font-size: 10px;
+            }
+
+            .nav-actions {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .about-area {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-btns {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--liquid-violet), var(--liquid-pink));
+            border-radius: var(--radius-full);
+        }
+
+        /* 选择 */
+        ::selection {
+            background: rgba(139, 92, 246, 0.4);
+            color: white;
+        }
+
+        /* 跳过链接 */
+        .skip-link {
+            position: absolute;
+            top: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background: var(--text-primary);
+            color: var(--bg-deep);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 9999;
+        }
+
+        .skip-link:focus {
+            top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 液态背景 -->
+    <div class="liquid-bg">
+        <div class="liquid-orb orb-1"></div>
+        <div class="liquid-orb orb-2"></div>
+        <div class="liquid-orb orb-3"></div>
+        <div class="liquid-orb orb-4"></div>
+        <div class="liquid-orb orb-5"></div>
+    </div>
+    <div class="liquid-mask"></div>
+    <div class="noise"></div>
+
+    <!-- 跳过链接 -->
+    <a href="#main" class="skip-link">跳到主要内容</a>
+
+    <!-- 提示 -->
+    <div class="toast" id="wechatToast">
+        <span>💚</span>
+        <span>您正在使用微信浏览</span>
+    </div>
+    <div class="toast" id="qqToast">
+        <span>💙</span>
+        <span>您正在使用QQ浏览</span>
+    </div>
+
+    <!-- 导航 -->
+    <div class="nav-wrap">
+        <nav class="nav-bar">
+            <a href="#home" class="nav-brand">
+                <span class="nav-icon">🦝</span>
+                <span>软软的小窝</span>
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-item"><a href="#home" class="nav-link active">首页</a></li>
+                <li class="nav-item"><a href="#projects" class="nav-link">项目</a></li>
+                <li class="nav-item"><a href="#lab" class="nav-link">实验室</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">关于</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="nav-action-btn" id="themeBtn">
+                    <span id="themeIcon">🌙</span>
+                    <span>深色</span>
+                </button>
+                <div class="nav-time">
+                    <span id="clock">00:00:00</span>
+                    <span class="nav-time-dot"></span>
+                </div>
+                <a href="https://raccoon.fit/mobile" class="nav-action-btn" target="_blank" id="officialBtn">
+                    <span>客服合集</span>
+                </a>
+            </div>
+
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 主内容 -->
+    <main id="main">
+        <!-- 首页 -->
+        <p>本页面不支持IE浏览器，如需使用请<a href="index-ie.html">点击这里</a>查看</p>
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-badge fade-up">
+                    <span>✨</span>
+                    <span>数字创意空间</span>
+                </div>
+                <h1 class="fade-up delay-1">
+                    探索代码的<br><span>无限可能</span>
+                </h1>
+                <p class="hero-desc fade-up delay-2">
+                    这里是软软的数字空间，一个专注于创造、学习和分享的地方。
+                    通过代码探索未知，用技术解决现实问题。
+                </p>
+                <div class="hero-img-wrap fade-up delay-3">
+                    <img src="https://raccoon.fit/image/20260101/2026新年快乐.jpg" alt="2026新年快乐" class="hero-img" width="440" height="293">
+                </div>
+                <div class="hero-btns fade-up delay-4">
+                    <a href="#projects" class="btn btn-primary">
+                        <span>🚀</span>
+                        <span>探索项目</span>
+                    </a>
+                    <a href="#contact" class="btn btn-secondary">
+                        <span>💬</span>
+                        <span>联系我</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 项目 -->
+        <section id="projects">
+            <div class="container">
+                <div class="section-hd fade-up">
+                    <h2>精选作品</h2>
+                    <p>每个项目都是对技术深度的探索和对用户体验的思考</p>
+                </div>
+
+                <div class="projects-grid">
+                    <div class="glass glass-card project-card fade-up delay-1">
+                        <div class="project-ico"><／></div>
+                        <h3>Ride</h3>
+                        <p>站在开发之巅 - 一个强大的在线开发环境，让编码更高效。</p>
+                        <div class="project-tags">
+                            <span class="tag">在线IDE</span>
+                            <span class="tag">开发工具</span>
+                        </div>
+                        <a href="https://raccoon.fit/Ride" class="btn btn-primary" target="_blank">立即体验 ↗</a>
+                    </div>
+
+                    <div class="glass glass-card project-card fade-up delay-2">
+                        <div class="project-ico"><／></div>
+                        <h3>哔哩哔哩直播流获取</h3>
+                        <p>一键获取哔哩哔哩直播流地址和直播信息</p>
+                        <div class="project-tags">
+                            <span class="tag">直播辅助</span>
+                            <span class="tag">哔哩哔哩</span>
+                        </div>
+                        <a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" class="btn btn-primary" target="_blank">立即体验 ↗</a>
+                    </div>
+
+                    <div class="glass glass-card project-card fade-up delay-3">
+                        <div class="project-ico">📱</div>
+                        <h3>MULU</h3>
+                        <p>一个已归档的移动应用项目，探索了完整的开发流程。</p>
+                        <div class="project-tags">
+                            <span class="tag">React Native</span>
+                            <span class="tag">UI/UX</span>
+                        </div>
+                        <a href="#" class="btn btn-secondary">查看归档</a>
+                    </div>
+
+                    <div class="glass glass-card project-card fade-up delay-4">
+                        <div class="project-ico">📝</div>
+                        <h3>灵熊小记</h3>
+                        <p>你的神奇小伙伴「灵熊」已就位！帮你悄无声息地搞定很多事。</p>
+                        <div class="project-tags">
+                            <span class="tag">Vue.js</span>
+                            <span class="tag">Markdown</span>
+                        </div>
+                        <a href="https://link3.cc/training_fengfeng_games" class="btn btn-primary" target="_blank">访问项目 ↗</a>
+                    </div>
+
+                    <div class="glass glass-card project-card fade-up delay-5">
+                        <div class="project-ico">🎮</div>
+                        <h3>小游戏库</h3>
+                        <p>探索人工智能与前端开发的结合，关注想法的诞生与实现。</p>
+                        <div class="project-tags">
+                            <span class="tag">CSS</span>
+                            <span class="tag">HTML5</span>
+                        </div>
+                        <a href="https://raccoon.fit/game" class="btn btn-secondary" target="_blank">查看详情 ↗</a>
+                    </div>
+
+                    <div class="glass glass-card project-card fade-up delay-6">
+                        <div class="project-ico">🤖</div>
+                        <h3>RACCOON AI</h3>
+                        <p>欢迎体验 RACCOON AI，与智能对话的未来对话。</p>
+                        <div class="project-tags">
+                            <span class="tag">AI</span>
+                            <span class="tag">聊天</span>
+                        </div>
+                        <a href="https://raccoon.fit/ai" class="btn btn-secondary" target="_blank">立即体验 ↗</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实验室 -->
+        <section id="lab">
+            <div class="container">
+                <div class="section-hd fade-up">
+                    <h2>创意实验室</h2>
+                    <p>这里存放着正在进行中的实验、原型和创意构思</p>
+                </div>
+
+                <div class="lab-grid">
+                    <div class="glass glass-card lab-card fade-up delay-1">
+                        <div class="lab-ico">🔮</div>
+                        <h3>AI 辅助设计</h3>
+                        <p>探索人工智能在设计流程中的应用，尝试自动生成 UI 组件和设计系统。</p>
+                    </div>
+                    <div class="glass glass-card lab-card fade-up delay-2">
+                        <div class="lab-ico">🎨</div>
+                        <h3>交互原型</h3>
+                        <p>创建高级交互动画和微交互，提升数字产品的体验质感。</p>
+                    </div>
+                    <div class="glass glass-card lab-card fade-up delay-3">
+                        <div class="lab-ico">📊</div>
+                        <h3>数据可视化</h3>
+                        <p>将复杂数据转化为直观的视觉故事，探索信息设计的边界。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于 -->
+        <section id="about">
+            <div class="about-area">
+                <div class="glass glass-card about-box fade-up delay-1">
+                    <h3>关于软软</h3>
+                    <p>
+                        一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，
+                        更是创造美和价值的艺术形式。
+                    </p>
+                    <p>
+                        选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——
+                        这些特质正是技术探索者所需要的核心品质。
+                    </p>
+                    <p>
+                        Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、
+                        追求卓越的技术哲学。
+                    </p>
+                    <a href="me">>> 点这里进入软软的个人主页</a>
+                </div>
+
+                <div class="glass glass-card skills-box fade-up delay-2">
+                    <h4 class="skills-title">技术专长</h4>
+
+                    <div class="skill-item" data-width="85">
+                        <div class="skill-hd">
+                            <span class="skill-name">前端开发</span>
+                            <span class="skill-num">85%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item" data-width="75">
+                        <div class="skill-hd">
+                            <span class="skill-name">UI/UX 设计</span>
+                            <span class="skill-num">75%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item" data-width="80">
+                        <div class="skill-hd">
+                            <span class="skill-name">产品思维</span>
+                            <span class="skill-num">80%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item" data-width="70">
+                        <div class="skill-hd">
+                            <span class="skill-name">创意编程</span>
+                            <span class="skill-num">70%</span>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer id="contact" class="footer">
+        <div class="glass footer-box">
+            <div class="footer-logo">
+                <span class="footer-ico">🦝</span>
+                <span>软软的小窝</span>
+            </div>
+            <p>探索、创造、成长。欢迎与我联系，交流想法，合作创新。</p>
+            <div class="footer-links">
+                <a href="mailto:2051775505@qq.com">邮箱</a>
+                <a href="https://github.com/raccoon-fit" target="_blank">GitHub</a>
+                <a href="https://raccoon.fit" target="_blank">官网</a>
+                <a href="#home">返回顶部</a>
+            </div>
+            <div class="footer-copy">
+                © 2025-2026 软软. 本网站由浣熊设计与开发
+            </div>
+        </div>
+    </footer>
+
+    <!-- 引入 GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- 引入 Lenis -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ========================================
+            // 主题管理
+            // ========================================
+            const Theme = {
+                dark: true,
+
+                init() {
+                    const saved = localStorage.getItem('theme');
+                    if (saved) {
+                        this.dark = saved === 'dark';
+                    } else {
+                        this.dark = true;
+                        localStorage.setItem('theme', 'dark');
+                    }
+                    this.apply();
+                },
+
+                toggle() {
+                    this.dark = !this.dark;
+                    localStorage.setItem('theme', this.dark ? 'dark' : 'light');
+                    this.apply();
+                },
+
+                apply() {
+                    const icon = document.getElementById('themeIcon');
+                    const btnText = document.getElementById('themeBtn').querySelector('span:last-child');
+                    if (icon) icon.textContent = this.dark ? '☀️' : '🌙';
+                    if (btnText) btnText.textContent = this.dark ? '浅色' : '深色';
+                }
+            };
+
+            // ========================================
+            // Lenis 平滑滚动
+            // ========================================
+            function initSmoothScroll() {
+                const lenis = new Lenis({
+                    duration: 1,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    smooth: true,
+                    mouseMultiplier: 1,
+                    smoothTouch: false,
+                });
+
+                function raf(time) {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                }
+
+                requestAnimationFrame(raf);
+                return lenis;
+            }
+
+            // ========================================
+            // 浏览器检测
+            // ========================================
+            function detectBrowser() {
+                if (/MicroMessenger/i.test(navigator.userAgent)) {
+                    const t = document.getElementById('wechatToast');
+                    if (t) {
+                        t.classList.add('show');
+                        gsap.fromTo(t, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 });
+                        setTimeout(() => {
+                            gsap.to(t, { y: -20, opacity: 0, duration: 0.3 });
+                        }, 2500);
+                    }
+                } else if (/QQ\//i.test(navigator.userAgent) || /MQQBrowser/i.test(navigator.userAgent)) {
+                    const t = document.getElementById('qqToast');
+                    if (t) {
+                        t.classList.add('show');
+                        gsap.fromTo(t, { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 });
+                        setTimeout(() => {
+                            gsap.to(t, { y: -20, opacity: 0, duration: 0.3 });
+                        }, 2500);
+                    }
+                }
+            }
+
+            // ========================================
+            // 时钟
+            // ========================================
+            function updateClock() {
+                const clockEl = document.getElementById('clock');
+                if (clockEl) {
+                    const now = new Date();
+                    clockEl.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                }
+            }
+
+            // ========================================
+            // 导航交互
+            // ========================================
+            function initNavigation() {
+                const navToggle = document.getElementById('navToggle');
+                const navMenu = document.getElementById('navMenu');
+
+                if (navToggle && navMenu) {
+                    navToggle.addEventListener('click', () => {
+                        navMenu.classList.toggle('show');
+                    });
+                }
+
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (navMenu) navMenu.classList.remove('show');
+                    });
+                });
+
+                const sections = document.querySelectorAll('section[id]');
+                const navLinks = document.querySelectorAll('.nav-link');
+
+                function updateActiveLink() {
+                    const scrollPos = window.scrollY + 180;
+                    sections.forEach(section => {
+                        const sectionTop = section.offsetTop;
+                        const sectionHeight = section.offsetHeight;
+                        const sectionId = section.getAttribute('id');
+                        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                            navLinks.forEach(link => {
+                                link.classList.remove('active');
+                                if (link.getAttribute('href') === `#${sectionId}`) {
+                                    link.classList.add('active');
+                                }
+                            });
+                        }
+                    });
+                }
+
+                window.addEventListener('scroll', updateActiveLink);
+                updateActiveLink();
+            }
+
+            // ========================================
+            // 滚动动画
+            // ========================================
+            function initScrollAnimations() {
+                const fadeElements = document.querySelectorAll('.fade-up');
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+
+                            const skillItem = entry.target.closest('.skill-item');
+                            if (skillItem) {
+                                const width = skillItem.getAttribute('data-width');
+                                const fill = skillItem.querySelector('.skill-fill');
+                                if (fill && width) {
+                                    gsap.to(fill, {
+                                        width: width + '%',
+                                        duration: 1,
+                                        ease: 'power2.out',
+                                        delay: 0.2
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+                fadeElements.forEach(el => observer.observe(el));
+
+                // Hero 动画
+                if (document.querySelector('.hero')) {
+                    gsap.fromTo('.hero-badge',
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.1 }
+                    );
+
+                    gsap.fromTo('.hero h1',
+                        { opacity: 0, y: 30 },
+                        { opacity: 1, y: 0, duration: 1, ease: 'power2.out', delay: 0.3 }
+                    );
+
+                    gsap.fromTo('.hero-desc',
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
+                    );
+
+                    gsap.fromTo('.hero-img-wrap',
+                        { opacity: 0, scale: 0.95 },
+                        { opacity: 1, scale: 1, duration: 1, ease: 'power2.out', delay: 0.7 }
+                    );
+
+                    gsap.fromTo('.hero-btns',
+                        { opacity: 0, y: 15 },
+                        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.9 }
+                    );
+                }
+            }
+
+            // ========================================
+            // 液态背景动画
+            // ========================================
+            function initLiquidAnim() {
+                const orbs = document.querySelectorAll('.liquid-orb');
+
+                orbs.forEach((orb, index) => {
+                    gsap.to(orb, {
+                        scale: 1 + Math.random() * 0.15,
+                        duration: 8 + Math.random() * 4,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: 'sine.inOut',
+                        delay: index * 0.5
+                    });
+                });
+            }
+
+            // ========================================
+            // 平滑锚点
+            // ========================================
+            function initSmoothAnchor() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            const offsetTop = targetElement.offsetTop - 80;
+                            window.scrollTo({
+                                top: offsetTop,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+            }
+
+            // ========================================
+            // 官网按钮
+            // ========================================
+            function initOfficialBtn() {
+                const btn = document.getElementById('officialBtn');
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        gsap.to(this, { scale: 0.95, duration: 0.1, onComplete: () => {
+                            gsap.to(this, { scale: 1, duration: 0.2, ease: 'elastic.out(1, 0.5)' });
+                        }});
+                    });
+                }
+            }
+
+            // ========================================
+            // 初始化
+            // ========================================
+            document.addEventListener('DOMContentLoaded', () => {
+                Theme.init();
+                initSmoothScroll();
+                detectBrowser();
+                updateClock();
+                setInterval(updateClock, 1000);
+                initNavigation();
+                initScrollAnimations();
+                initLiquidAnim();
+                initSmoothAnchor();
+                initOfficialBtn();
+
+                const themeBtn = document.getElementById('themeBtn');
+                if (themeBtn) {
+                    themeBtn.addEventListener('click', () => Theme.toggle());
+                }
+
+                console.log('%c🦝 软软的小窝', 'font-size:20px;font-weight:bold;background:linear-gradient(135deg,#8b5cf6,#d946ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent;');
+            });
+
+        })();
+    </script>
+</body>
+</html>

@@ -1,4 +1,6 @@
-<html lang="zh-CN"><head>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
@@ -11,6 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HLS.js (用于播放m3u8格式) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
         :root {
@@ -43,6 +47,22 @@
         }
 
         .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-green:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-green:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -110,6 +130,25 @@
             backdrop-filter: blur(5px);
         }
 
+        /* 滚动条样式 */
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
         /* 移动端适配 */
         @media (max-width: 640px) {
             .container {
@@ -124,9 +163,17 @@
                 width: 100%;
                 height: 200px;
             }
+
+            .search-buttons {
+                flex-direction: column;
+            }
+
+            .search-buttons button {
+                width: 100%;
+            }
         }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.right-2{right:0.5rem}.right-4{right:1rem}.top-2{top:0.5rem}.top-4{top:1rem}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.flex{display:flex}.inline-flex{display:inline-flex}.hidden{display:none}.aspect-video{aspect-ratio:16 / 9}.h-20{height:5rem}.h-32{height:8rem}.h-full{height:100%}.w-20{width:5rem}.w-48{width:12rem}.w-full{width:100%}.min-w-0{min-width:0px}.min-w-\[160px\]{min-width:160px}.max-w-4xl{max-width:56rem}.max-w-2xl{max-width:42rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border-2{border-width:2px}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-gray-50{--tw-bg-opacity:1;background-color:rgb(249 250 251 / var(--tw-bg-opacity, 1))}.bg-gray-500{--tw-bg-opacity:1;background-color:rgb(107 114 128 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-blue-500{--tw-gradient-from:#3b82f6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-500{--tw-gradient-from:#a855f7 var(--tw-gradient-from-position);--tw-gradient-to:rgb(168 85 247 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-500{--tw-gradient-from:#ec4899 var(--tw-gradient-from-position);--tw-gradient-to:rgb(236 72 153 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-blue-600{--tw-gradient-to:#2563eb var(--tw-gradient-to-position)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}.object-cover{object-fit:cover}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-4{padding-left:1rem;padding-right:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-8{padding-left:2rem;padding-right:2rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-500{--tw-text-opacity:1;color:rgb(59 130 246 / var(--tw-text-opacity, 1))}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-400{--tw-text-opacity:1;color:rgb(74 222 128 / var(--tw-text-opacity, 1))}.text-red-500{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-800{--tw-text-opacity:1;color:rgb(30 64 175 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.opacity-75{opacity:0.75}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.outline-none{outline:2px solid transparent;outline-offset:2px}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:from-blue-600:hover{--tw-gradient-from:#2563eb var(--tw-gradient-from-position);--tw-gradient-to:rgb(37 99 235 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-purple-600:hover{--tw-gradient-from:#9333ea var(--tw-gradient-from-position);--tw-gradient-to:rgb(147 51 234 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-pink-600:hover{--tw-gradient-from:#db2777 var(--tw-gradient-from-position);--tw-gradient-to:rgb(219 39 119 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-blue-700:hover{--tw-gradient-to:#1d4ed8 var(--tw-gradient-to-position)}.hover\:to-purple-700:hover{--tw-gradient-to:#7e22ce var(--tw-gradient-to-position)}.hover\:to-pink-700:hover{--tw-gradient-to:#be185d var(--tw-gradient-to-position)}.hover\:text-blue-700:hover{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.hover\:text-gray-200:hover{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:flex-row{flex-direction:row}}</style></head>
+</head>
 <body class="py-8 px-4">
     <div class="container mx-auto max-w-4xl">
         <!-- Header -->
@@ -136,7 +183,7 @@
             </div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">B站直播流提取器</h1>
             <p class="text-gray-600">输入房间号或直播链接，获取可直接播放的直播流地址</p>
-<p>本页面不支持IE浏览器，如需使用请<a href="live-ie.html">点击这里</a>查看</p>
+            <p class="text-sm text-gray-500 mt-1">本页面不支持IE浏览器，如需使用请<a href="live-ie.html" class="text-blue-500 hover:text-blue-700">点击这里</a>查看</p>
         </div>
 
         <!-- Search Card -->
@@ -145,12 +192,28 @@
                 <div class="flex-1 relative">
                     <input type="text" id="roomInput" class="input-field w-full px-5 py-4 rounded-xl border-2 border-gray-200 outline-none text-lg" placeholder="请输入房间号 (如: 6) 或完整链接" autocomplete="off">
                 </div>
-                <button id="fetchBtn" class="btn-primary px-8 py-4 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2 min-w-[160px]" onclick="fetchStream()">
-                    <span id="btnText"><i class="fas fa-search"></i> 获取直播流</span>
-                    <span id="btnLoading" class="hidden">
-                        <div class="loading-spinner"></div>
-                    </span>
-                </button>
+                <div class="flex flex-col sm:flex-row gap-2 search-buttons">
+                    <button id="fetchBtn" class="btn-primary px-6 py-4 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2 min-w-[140px]" onclick="fetchStream()">
+                        <span id="btnText"><i class="fas fa-search"></i> 获取直播流</span>
+                        <span id="btnLoading" class="hidden">
+                            <div class="loading-spinner"></div>
+                        </span>
+                    </button>
+                    <button id="searchByNameBtn" class="btn-green px-6 py-4 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-2 min-w-[140px]" onclick="searchByName()">
+                        <span id="searchBtnText"><i class="fas fa-user"></i> 昵称搜索</span>
+                        <span id="searchBtnLoading" class="hidden">
+                            <div class="loading-spinner"></div>
+                        </span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 昵称搜索结果区域 -->
+            <div id="nameSearchResults" class="mt-6 hidden">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">搜索结果</h3>
+                <div id="searchResultsList" class="space-y-3 max-h-60 overflow-y-auto pr-2 scrollbar-custom">
+                    <!-- 搜索结果将在这里动态插入 -->
+                </div>
             </div>
 
             <!-- 新增：通过链接查看按钮 -->
@@ -245,11 +308,49 @@
                 </button>
             </div>
             <div class="aspect-video bg-black">
-                <video id="videoPlayer" controls="" class="w-full h-full"></video>
+                <video id="videoPlayer" controls class="w-full h-full"></video>
             </div>
             <div class="p-4 bg-gray-50">
                 <p class="text-sm text-gray-600 mb-2">当前线路：<span id="currentStreamName" class="font-medium"></span></p>
                 <p class="text-xs text-gray-500">提示：如播放失败，请复制链接到本地播放器（如PotPlayer、VLC）观看</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 昵称搜索Modal -->
+    <div id="nameSearchModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center justify-between p-4 border-b bg-gradient-to-r from-green-500 to-green-600">
+                <h3 class="font-bold text-lg text-white"><i class="fas fa-user mr-2"></i>昵称搜索</h3>
+                <button onclick="closeNameSearchModal()" class="text-white hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <div class="flex gap-2">
+                        <input type="text" id="nicknameInput" class="flex-1 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700" placeholder="输入主播昵称 (如: 老E、小缘)" onkeypress="if(event.key=='Enter')searchNickname()">
+                        <button onclick="searchNickname()" class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all flex items-center gap-2">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">提示：搜索结果来自B站用户搜索，可能包含多个同名主播</p>
+                </div>
+                
+                <div id="searchModalResults" class="space-y-3 max-h-80 overflow-y-auto pr-2 scrollbar-custom">
+                    <!-- 搜索结果将在这里动态插入 -->
+                </div>
+                
+                <div id="searchLoading" class="hidden text-center py-4">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    <p class="text-sm text-gray-600">正在搜索中...</p>
+                </div>
+                
+                <div id="noResults" class="hidden text-center py-4">
+                    <i class="fas fa-search text-4xl text-gray-300 mb-2"></i>
+                    <p class="text-gray-600">未找到相关主播</p>
+                    <p class="text-sm text-gray-500 mt-1">请尝试更具体的关键词或检查主播昵称</p>
+                </div>
             </div>
         </div>
     </div>
@@ -262,11 +363,42 @@
         </div>
     </div>
 
+    <!-- 播放链接Modal (已存在于原代码中) -->
+    <div id="playLinkModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            <div class="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-500 to-blue-600">
+                <h3 class="font-bold text-lg text-white"><i class="fas fa-link mr-2"></i>播放链接</h3>
+                <button onclick="closePlayLinkModal()" class="text-white hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-2">清晰度：<span id="playLinkQuality" class="font-medium text-blue-500"></span></p>
+                <div class="flex gap-2">
+                    <input type="text" readonly id="playLinkUrl" class="flex-1 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700" onclick="this.select()">
+                    <button onclick="copyPlayLinkFromModal()" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all flex items-center gap-2">
+                        <i class="fas fa-copy"></i> 复制
+                    </button>
+                </div>
+                <div class="mt-4 p-4 bg-blue-50 rounded-xl">
+                    <h4 class="font-medium text-blue-800 mb-2"><i class="fas fa-info-circle mr-1"></i>使用说明</h4>
+                    <ul class="text-sm text-blue-700 space-y-1">
+                        <li>• 复制链接后，可在PotPlayer、VLC等播放器中打开</li>
+                        <li>• 或使用下载工具（如IDM、FDM）下载直播录制</li>
+                        <li>• 链接具有时效性，建议需要时重新获取</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 全局变量
         let currentFlvPlayer = null;
+        let currentHlsPlayer = null;
         let allStreamData = {};
         let currentQuality = 0;
+        let currentSearchResults = [];
 
         // CORS 代理列表（按优先级排序）
         const CORS_PROXIES = [
@@ -313,6 +445,23 @@
             const btn = document.getElementById('fetchBtn');
             const btnText = document.getElementById('btnText');
             const btnLoading = document.getElementById('btnLoading');
+
+            btn.disabled = loading;
+
+            if (loading) {
+                btnText.classList.add('hidden');
+                btnLoading.classList.remove('hidden');
+            } else {
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+            }
+        }
+
+        // 设置搜索按钮加载状态
+        function setSearchLoading(loading) {
+            const btn = document.getElementById('searchByNameBtn');
+            const btnText = document.getElementById('searchBtnText');
+            const btnLoading = document.getElementById('searchBtnLoading');
 
             btn.disabled = loading;
 
@@ -414,22 +563,22 @@
         function viewByUrl() {
             const url = prompt('请输入直播流链接（支持FLV/M3U8格式）:');
             if (!url) return;
-            
+
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 showError('请输入有效的HTTP/HTTPS链接');
                 return;
             }
-            
+
             // 验证链接格式
             const validFormats = ['.flv', '.m3u8', 'flv', 'hls'];
             const isValid = validFormats.some(format => url.includes(format));
-            
+
             if (!isValid) {
                 if (!confirm('链接格式可能不受支持（非FLV/M3U8），是否继续尝试播放？')) {
                     return;
                 }
             }
-            
+
             playVideo(url, '自定义链接');
         }
 
@@ -452,6 +601,7 @@
             document.getElementById('errorMsg').classList.add('hidden');
             document.getElementById('roomInfo').classList.add('hidden');
             document.getElementById('streamList').classList.add('hidden');
+            document.getElementById('nameSearchResults').classList.add('hidden');
 
             setLoading(true);
 
@@ -510,7 +660,7 @@
                 const link = document.createElement('a');
                 link.href = blobUrl;
                 // 生成文件名：标题_房间号.jpg
-                const fileName = `${title}_${document.getElementById('roomId').textContent}.jpg`;
+                const fileName = `${title}_${document.getElementById('roomId').textContent}.jpg`.replace(/[<>:"/\\|?*]/g, '_');
                 link.download = fileName;
                 link.style.display = 'none';
 
@@ -557,57 +707,9 @@
         // 显示播放链接弹窗
         function showPlayLinkModal(url, quality) {
             const modal = document.getElementById('playLinkModal');
-            if (!modal) {
-                // 创建弹窗（如果不存在）
-                createPlayLinkModal();
-            }
-
             document.getElementById('playLinkQuality').textContent = quality;
             document.getElementById('playLinkUrl').value = url;
-            document.getElementById('playLinkModal').classList.remove('hidden');
-        }
-
-        // 创建播放链接弹窗（如果需要）
-        function createPlayLinkModal() {
-            const modalHTML = `
-                <div id="playLinkModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
-                    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
-                        <div class="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-500 to-blue-600">
-                            <h3 class="font-bold text-lg text-white"><i class="fas fa-link mr-2"></i>播放链接</h3>
-                            <button onclick="closePlayLinkModal()" class="text-white hover:text-gray-200 text-2xl">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="p-6">
-                            <p class="text-sm text-gray-600 mb-2">清晰度：<span id="playLinkQuality" class="font-medium text-blue-500"></span></p>
-                            <div class="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    readonly 
-                                    id="playLinkUrl"
-                                    class="flex-1 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700"
-                                    onclick="this.select()"
-                                >
-                                <button 
-                                    onclick="copyPlayLinkFromModal()"
-                                    class="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all flex items-center gap-2"
-                                >
-                                    <i class="fas fa-copy"></i> 复制
-                                </button>
-                            </div>
-                            <div class="mt-4 p-4 bg-blue-50 rounded-xl">
-                                <h4 class="font-medium text-blue-800 mb-2"><i class="fas fa-info-circle mr-1"></i>使用说明</h4>
-                                <ul class="text-sm text-blue-700 space-y-1">
-                                    <li>• 复制链接后，可在PotPlayer、VLC等播放器中打开</li>
-                                    <li>• 或使用下载工具（如IDM、FDM）下载直播录制</li>
-                                    <li>• 链接具有时效性，建议需要时重新获取</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            modal.classList.remove('hidden');
         }
 
         // 关闭播放链接弹窗
@@ -788,36 +890,64 @@
                 currentFlvPlayer.destroy();
                 currentFlvPlayer = null;
             }
+            
+            if (currentHlsPlayer) {
+                currentHlsPlayer.destroy();
+                currentHlsPlayer = null;
+            }
+
+            // 重置视频源
+            videoPlayer.src = '';
+            videoPlayer.load();
 
             // 检查是否是FLV格式
             if (flvjs.isSupported() && (url.includes('.flv') || url.includes('flv'))) {
-                currentFlvPlayer = flvjs.createPlayer({
-                    type: 'flv',
-                    url: url,
-                    cors: true,
-                    withCredentials: false
-                });
+                try {
+                    currentFlvPlayer = flvjs.createPlayer({
+                        type: 'flv',
+                        url: url,
+                        cors: true,
+                        withCredentials: false
+                    });
 
-                currentFlvPlayer.attachMediaElement(videoPlayer);
-                currentFlvPlayer.load();
-                currentFlvPlayer.play().catch(e => {
-                    console.warn('自动播放失败:', e);
-                    showToast('请点击视频区域手动播放', false);
-                });
+                    currentFlvPlayer.attachMediaElement(videoPlayer);
+                    currentFlvPlayer.load();
+                    currentFlvPlayer.play().catch(e => {
+                        console.warn('自动播放失败:', e);
+                        showToast('请点击视频区域手动播放', false);
+                    });
+                } catch (error) {
+                    console.error('FLV播放失败:', error);
+                    videoPlayer.src = url;
+                    videoPlayer.play().catch(e => {
+                        showToast('请手动点击播放按钮', false);
+                    });
+                }
             } else if (url.includes('.m3u8') || url.includes('hls')) {
                 // 尝试使用HLS.js
                 if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(videoPlayer);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        videoPlayer.play().catch(e => console.warn('自动播放失败:', e));
-                    });
+                    try {
+                        currentHlsPlayer = new Hls();
+                        currentHlsPlayer.loadSource(url);
+                        currentHlsPlayer.attachMedia(videoPlayer);
+                        currentHlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                            videoPlayer.play().catch(e => console.warn('自动播放失败:', e));
+                        });
+                    } catch (error) {
+                        console.error('HLS播放失败:', error);
+                        videoPlayer.src = url;
+                        videoPlayer.play().catch(e => {
+                            showToast('请手动点击播放按钮', false);
+                        });
+                    }
                 } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
                     videoPlayer.src = url;
                     videoPlayer.addEventListener('loadedmetadata', () => {
                         videoPlayer.play().catch(e => console.warn('自动播放失败:', e));
                     });
+                } else {
+                    showToast('当前浏览器不支持HLS播放，请尝试FLV格式或使用其他浏览器', false);
+                    videoPlayer.src = url;
                 }
             } else {
                 // 尝试直接播放
@@ -840,6 +970,11 @@
                 currentFlvPlayer.destroy();
                 currentFlvPlayer = null;
             }
+            
+            if (currentHlsPlayer) {
+                currentHlsPlayer.destroy();
+                currentHlsPlayer = null;
+            }
 
             const videoPlayer = document.getElementById('videoPlayer');
             videoPlayer.pause();
@@ -853,6 +988,166 @@
             }
             return num.toString();
         }
+
+        // ==================== 昵称搜索功能 ====================
+
+        // 显示昵称搜索模态框
+        function showNameSearchModal() {
+            document.getElementById('nameSearchModal').classList.remove('hidden');
+            document.getElementById('nicknameInput').focus();
+        }
+
+        // 关闭昵称搜索模态框
+        function closeNameSearchModal() {
+            document.getElementById('nameSearchModal').classList.add('hidden');
+        }
+
+        // 通过昵称搜索
+        async function searchByName() {
+            showNameSearchModal();
+        }
+
+        // 执行昵称搜索
+        async function searchNickname() {
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            
+            if (!nickname) {
+                showError('请输入主播昵称');
+                return;
+            }
+            
+            // 显示加载状态
+            document.getElementById('searchLoading').classList.remove('hidden');
+            document.getElementById('noResults').classList.add('hidden');
+            document.getElementById('searchModalResults').innerHTML = '';
+            
+            try {
+                // 使用B站搜索API
+                const searchUrl = `https://api.bilibili.com/x/web-interface/search/type?search_type=bili_user&keyword=${encodeURIComponent(nickname)}&page_size=20`;
+                
+                const data = await proxyRequest(searchUrl);
+                
+                if (data.code !== 0 || !data.data || !data.data.result) {
+                    throw new Error('搜索失败');
+                }
+                
+                const results = data.data.result;
+                
+                if (results.length === 0) {
+                    document.getElementById('searchLoading').classList.add('hidden');
+                    document.getElementById('noResults').classList.remove('hidden');
+                    return;
+                }
+                
+                // 存储搜索结果
+                currentSearchResults = results;
+                
+                // 显示结果
+                renderSearchResults(results);
+                
+                document.getElementById('searchLoading').classList.add('hidden');
+                
+            } catch (error) {
+                console.error('搜索失败:', error);
+                document.getElementById('searchLoading').classList.add('hidden');
+                showError('搜索失败，请稍后重试');
+            }
+        }
+
+        // 渲染搜索结果
+        function renderSearchResults(users) {
+            const container = document.getElementById('searchModalResults');
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+                return;
+            }
+            
+            users.forEach((user, index) => {
+                const userItem = document.createElement('div');
+                userItem.className = 'bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors cursor-pointer';
+                userItem.onclick = () => selectUser(user);
+                
+                // 处理用户数据
+                const uname = user.uname || '未知用户';
+                const upic = user.upic || 'https://via.placeholder.com/100?text=头像';
+                const usign = user.usign || '暂无简介';
+                const fans = user.fans || 0;
+                const videos = user.videos || 0;
+                const isLive = user.is_live === 1;
+                
+                userItem.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
+                                <img src="${upic}" alt="${uname}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/100?text=头像'">
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-gray-800 truncate">${uname}</h4>
+                                ${isLive ? 
+                                    '<span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">直播中</span>' : 
+                                    '<span class="bg-gray-500 text-white text-xs px-2 py-0.5 rounded-full">未开播</span>'
+                                }
+                            </div>
+                            <p class="text-sm text-gray-600 truncate">${usign}</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                <span><i class="fas fa-users mr-1"></i>粉丝: ${formatNumber(fans)}</span>
+                                <span><i class="fas fa-video mr-1"></i>视频: ${formatNumber(videos)}</span>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <button class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-sm flex items-center gap-1">
+                                查看
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(userItem);
+            });
+        }
+
+        // 选择用户
+        async function selectUser(user) {
+            // 关闭搜索框
+            closeNameSearchModal();
+            
+            // 显示加载状态
+            setSearchLoading(true);
+            
+            try {
+                // 获取用户直播间信息
+                const liveApiUrl = `https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=${user.mid}`;
+                const data = await proxyRequest(liveApiUrl);
+                
+                if (data.code === 0 && data.data && data.data.roomid) {
+                    // 自动填入房间号并获取直播流
+                    document.getElementById('roomInput').value = data.data.roomid;
+                    await fetchStream();
+                } else {
+                    // 如果没找到直播间，尝试使用用户uid直接搜索
+                    const roomSearchUrl = `https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?uid=${user.mid}`;
+                    const roomData = await proxyRequest(roomSearchUrl);
+                    
+                    if (roomData.code === 0 && roomData.data && roomData.data.room_id) {
+                        document.getElementById('roomInput').value = roomData.data.room_id;
+                        await fetchStream();
+                    } else {
+                        showError('该用户暂无直播间');
+                    }
+                }
+            } catch (error) {
+                console.error('获取直播间失败:', error);
+                showError('获取直播间失败，请手动输入房间号');
+            } finally {
+                setSearchLoading(false);
+            }
+        }
+
+        // ==================== 事件监听 ====================
 
         // 监听回车键
         document.getElementById('roomInput').addEventListener('keypress', function(e) {
@@ -873,6 +1168,7 @@
             if (e.key === 'Escape') {
                 closeModal();
                 closePlayLinkModal();
+                closeNameSearchModal();
             }
         });
 
@@ -882,39 +1178,26 @@
             if (modal && e.target === modal) {
                 closePlayLinkModal();
             }
+            
+            const nameModal = document.getElementById('nameSearchModal');
+            if (nameModal && e.target === nameModal) {
+                closeNameSearchModal();
+            }
         });
 
-        // 初始化时创建播放链接弹窗
-        createPlayLinkModal();
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果已经创建了播放链接弹窗，就不需要再创建了
+            if (!document.getElementById('playLinkModal')) {
+                // 创建播放链接弹窗
+                createPlayLinkModal();
+            }
+        });
+
+        // 创建播放链接弹窗（如果需要）
+        function createPlayLinkModal() {
+            // 这个函数现在不需要了，因为弹窗已经直接写在HTML中
+        }
     </script>
-                <div id="playLinkModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
-                    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
-                        <div class="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-500 to-blue-600">
-                            <h3 class="font-bold text-lg text-white"><i class="fas fa-link mr-2"></i>播放链接</h3>
-                            <button onclick="closePlayLinkModal()" class="text-white hover:text-gray-200 text-2xl">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="p-6">
-                            <p class="text-sm text-gray-600 mb-2">清晰度：<span id="playLinkQuality" class="font-medium text-blue-500"></span></p>
-                            <div class="flex gap-2">
-                                <input type="text" readonly="" id="playLinkUrl" class="flex-1 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm text-gray-700" onclick="this.select()">
-                                <button onclick="copyPlayLinkFromModal()" class="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all flex items-center gap-2">
-                                    <i class="fas fa-copy"></i> 复制
-                                </button>
-                            </div>
-                            <div class="mt-4 p-4 bg-blue-50 rounded-xl">
-                                <h4 class="font-medium text-blue-800 mb-2"><i class="fas fa-info-circle mr-1"></i>使用说明</h4>
-                                <ul class="text-sm text-blue-700 space-y-1">
-                                    <li>• 复制链接后，可在PotPlayer、VLC等播放器中打开</li>
-                                    <li>• 或使用下载工具（如IDM、FDM）下载直播录制</li>
-                                    <li>• 链接具有时效性，建议需要时重新获取</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-</body></html>
+</body>
+</html>

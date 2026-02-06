@@ -1447,6 +1447,192 @@
             perspective: 1000px;
         }
     </style>
+<style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #0F0F0F;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .nav-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #FF7F50, #8B4513);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 20px rgba(255, 140, 66, 0.4);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        .nav-icon:hover {
+            transform: rotate(15deg) scale(1.15);
+        }
+        .nav-brand {
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .main-content {
+            margin-top: 120px;
+            text-align: center;
+        }
+        h1 {
+            font-size: clamp(32px, 7vw, 58px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff, #FF7F50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #FF7F50, #8B4513);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 25px rgba(255, 140, 66, 0.4);
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 140, 66, 0.6);
+        }
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .password-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .password-modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8) translateY(50px);
+            transition: transform 0.3s ease;
+        }
+        .password-modal.show .password-modal-content {
+            transform: scale(1) translateY(0);
+        }
+        .password-modal h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .password-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .password-input:focus {
+            outline: none;
+            border-color: #FF7F50;
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .password-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .password-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .password-btn-primary {
+            background: linear-gradient(135deg, #FF7F50, #8B4513);
+            color: white;
+        }
+        .password-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 140, 66, 0.6);
+        }
+        .password-btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .password-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        .error-message {
+            color: #FF6B6B;
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .error-message.show {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <!-- 加载遮罩 -->
@@ -1517,26 +1703,30 @@
         <!-- 首页 -->
         <section id="home" class="hero">
             <div class="container">
-                <div class="hero-badge fade-up">
-                    <span>数字创意空间</span>
-                </div>
-                <h1 class="fade-up delay-1">
-                    探索代码的<br>
-                    <span>无限可能</span>
-                </h1>
-                <p class="hero-desc fade-up delay-2">
-                    这里是软软的数字空间，一个专注于创造、学习和分享的地方。
-                    通过代码探索未知，用技术解决现实问题。
-                </p>
-                <div class="hero-btns fade-up delay-4">
-                    <a href="#projects" class="btn btn-primary pulse-glow">
-                        <span>探索项目</span>
-                    </a>
-                    <a href="#contact" class="btn btn-secondary">
-                        <span>联系我</span>
-                    </a>
-                </div>
+        <div class="nav-bar">
+            <div class="nav-icon" id="navIcon">🦝</div>
+            <div class="nav-brand" id="navBrand">软软的小窝</div>
+        </div>
+        
+        <div class="main-content">
+            <h1>探索代码的无限可能</h1>
+            <p>这里是软软的数字空间，一个专注于创造、学习和分享的地方。通过代码探索未知，用技术解决现实问题。</p>
+            <a href="#projects" class="btn">探索项目</a>
+        </div>
+    </div>
+
+    <div class="password-modal" id="passwordModal">
+        <div class="password-modal-content">
+            <h3>请输入调试密码</h3>
+            <input type="password" id="passwordInput" class="password-input" placeholder="输入密码..." maxlength="20">
+            <div class="error-message" id="errorMessage">密码错误，请重新输入</div>
+            <div class="password-buttons">
+                <button class="password-btn password-btn-primary" id="confirmBtn">确定</button>
+                <button class="password-btn password-btn-secondary" id="cancelBtn">取消</button>
             </div>
+        </div>
+    </div>
+
         </section>
 
         <!-- 项目 -->
@@ -2191,6 +2381,104 @@
             });
 
         })();
+    </script>
+<script>
+        // 密码验证功能
+        const PasswordModal = {
+            correctPassword: 'RuanRuan',
+            isOpen: false,
+            init() {
+                this.bindEvents();
+            },
+            bindEvents() {
+                const navBrand = document.getElementById('navBrand');
+                const navIcon = document.getElementById('navIcon');
+                const confirmBtn = document.getElementById('confirmBtn');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const passwordInput = document.getElementById('passwordInput');
+                const passwordModal = document.getElementById('passwordModal');
+
+                if (navBrand) {
+                    navBrand.addEventListener('click', () => this.show());
+                }
+                if (navIcon) {
+                    navIcon.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.show();
+                    });
+                }
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', () => this.checkPassword());
+                }
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => this.hide());
+                }
+                if (passwordInput) {
+                    passwordInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            this.checkPassword();
+                        }
+                    });
+                }
+                if (passwordModal) {
+                    passwordModal.addEventListener('click', (e) => {
+                        if (e.target === passwordModal) {
+                            this.hide();
+                        }
+                    });
+                }
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isOpen) {
+                        this.hide();
+                    }
+                });
+            },
+            show() {
+                const modal = document.getElementById('passwordModal');
+                const input = document.getElementById('passwordInput');
+                const errorMsg = document.getElementById('errorMessage');
+                if (modal && input && errorMsg) {
+                    modal.classList.add('show');
+                    input.value = '';
+                    errorMsg.classList.remove('show');
+                    setTimeout(() => {
+                        input.focus();
+                    }, 300);
+                    this.isOpen = true;
+                }
+            },
+            hide() {
+                const modal = document.getElementById('passwordModal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    this.isOpen = false;
+                }
+            },
+            checkPassword() {
+                const input = document.getElementById('passwordInput');
+                const errorMsg = document.getElementById('errorMessage');
+                if (input && errorMsg) {
+                    const password = input.value;
+                    if (password === this.correctPassword) {
+                        this.hide();
+                        window.location.href = 'debug_raccoon_sztskj.html';
+                    } else {
+                        errorMsg.classList.add('show');
+                        input.value = '';
+                        input.focus();
+                        setTimeout(() => {
+                            errorMsg.classList.remove('show');
+                        }, 3000);
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            PasswordModal.init();
+            console.log('🦝 软软的小窝 - 欢迎来到浣熊的数字空间！');
+        });
     </script>
 </body>
 </html>

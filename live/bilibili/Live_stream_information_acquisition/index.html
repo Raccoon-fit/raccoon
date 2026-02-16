@@ -1,285 +1,1313 @@
 <!DOCTYPE html>
-
-<html lang="zh-CN"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Bilibili 直播流提取工具</title>
-<!-- BEGIN: External Resources -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            winBlue: '#0078d7',
-            winBg: '#f2f2f2',
-            biliBlue: '#3366ff',
-            biliPurple: '#9a66ff',
-          },
-          fontFamily: {
-            sans: ['"Segoe UI"', '"Microsoft YaHei"', 'sans-serif'],
-          }
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="referrer" content="no-referrer">
+    <title>Bilibili 直播流提取工具</title>
+    
+    <!-- External Resources -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        winBlue: '#0078d7',
+                        winBg: '#f2f2f2',
+                        biliBlue: '#3366ff',
+                        biliPurple: '#9a66ff',
+                    },
+                    fontFamily: {
+                        sans: ['"Segoe UI"', '"Microsoft YaHei"', 'sans-serif'],
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
-<!-- END: External Resources -->
-<!-- BEGIN: Custom Styles -->
-<style data-purpose="desktop-and-window">
-    body {
-      background: linear-gradient(135deg, #1e4d8c 0%, #0078d7 100%);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      margin: 0;
-    }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e4d8c 0%, #0078d7 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+        }
 
-    .window-frame {
-      width: 95%;
-      max-width: 1100px;
-      height: 85vh;
-      background: #ffffff;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-      border: 1px solid #707070;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
+        .window-frame {
+            width: 95%;
+            max-width: 1100px;
+            height: 85vh;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid #707070;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-    .title-bar {
-      height: 32px;
-      background: #ffffff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-left: 10px;
-      user-select: none;
-    }
+        .title-bar {
+            height: 32px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-left: 10px;
+            user-select: none;
+        }
 
-    .window-controls {
-      display: flex;
-      height: 100%;
-    }
+        .window-controls {
+            display: flex;
+            height: 100%;
+        }
 
-    .win-btn {
-      width: 46px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      font-size: 10px;
-    }
+        .win-btn {
+            width: 46px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            font-size: 10px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
 
-    .win-btn:hover { background: #e5e5e5; }
-    .win-btn.close:hover { background: #e81123; color: white; }
+        .win-btn:hover { background: #e5e5e5; }
+        .win-btn.close:hover { background: #e81123; color: white; }
 
-    .sidebar {
-      background: rgba(243, 243, 243, 0.8);
-      backdrop-filter: blur(10px);
-      border-right: 1px solid #e0e0e0;
-    }
+        .sidebar {
+            background: rgba(243, 243, 243, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid #e0e0e0;
+        }
 
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cdcdcd;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #a6a6a6;
-    }
-  </style>
-<!-- END: Custom Styles -->
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cdcdcd;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a6a6a6;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3366ff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .video-container {
+            background: #000;
+            position: relative;
+            padding-top: 56.25%;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .modal-footer {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Stream List Styles */
+        .stream-item {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stream-item:hover {
+            border-color: #0078d7;
+        }
+
+        .stream-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .stream-quality {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .stream-url-container {
+            margin-bottom: 8px;
+        }
+
+        .stream-url {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+            background: #fff;
+            color: #666;
+        }
+
+        .stream-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stream-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .stream-btn.copy {
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .stream-btn.copy:hover {
+            background: #f0f0f0;
+        }
+
+        .stream-btn.play {
+            background: #3366ff;
+            color: white;
+        }
+
+        .stream-btn.play:hover {
+            background: #2952cc;
+        }
+
+        /* Quality Tabs */
+        .quality-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quality-tab {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quality-tab:hover {
+            border-color: #0078d7;
+        }
+
+        .quality-tab.active {
+            background: #0078d7;
+            border-color: #0078d7;
+            color: white;
+        }
+
+        /* Error Message */
+        .error-msg {
+            background: #fee;
+            border: 1px solid #fcc;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            display: none;
+            color: #c0392b;
+            font-size: 13px;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        /* Live Status Badge */
+        .live-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .offline-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #95a5a6;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Room Cover */
+        .room-cover {
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .room-cover img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn.download {
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .action-btn.download:hover {
+            background: #f0f0f0;
+        }
+
+        .action-btn.playlink {
+            background: #3366ff;
+            color: white;
+        }
+
+        .action-btn.playlink:hover {
+            background: #2952cc;
+        }
+
+        /* History Item */
+        .history-item {
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .history-item p {
+            padding: 8px;
+            margin: 0;
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .quick-links span {
+            float: left;
+            margin-right: 8px;
+            line-height: 24px;
+        }
+
+        .quick-links a {
+            float: left;
+            color: #0078d7;
+            text-decoration: none;
+            margin-right: 12px;
+            line-height: 24px;
+        }
+
+        .quick-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body class="font-sans">
-<!-- BEGIN: Windows 10 Application Window -->
-<div class="window-frame rounded-sm" data-purpose="app-container">
-<!-- BEGIN: Title Bar -->
-<header class="title-bar">
-<div class="flex items-center gap-2">
-<i class="fa-solid fa-satellite-dish text-winBlue text-sm"></i>
-<span class="text-xs text-gray-700">Bilibili 直播流提取工具</span>
-</div>
-<div class="window-controls">
-<div class="win-btn"><i class="fa-solid fa-minus"></i></div>
-<div class="win-btn"><i class="fa-regular fa-square"></i></div>
-<div class="win-btn close"><i class="fa-solid fa-xmark text-sm"></i></div>
-</div>
-</header>
-<!-- END: Title Bar -->
-<div class="flex flex-1 overflow-hidden">
-<!-- BEGIN: Navigation Sidebar -->
-<nav class="sidebar w-64 p-4 hidden md:flex flex-col gap-6">
-<div data-purpose="quick-access">
-<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">常用房间</h3>
-<div class="flex flex-col gap-1">
-<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
-<span class="w-2 h-2 rounded-full bg-green-500"></span> 峰峰大王
-            </button>
-<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
-<span class="w-2 h-2 rounded-full bg-gray-400"></span> 黑色小乌鸦
-            </button>
-<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
-<span class="w-2 h-2 rounded-full bg-green-500"></span> 小树
-            </button>
-</div>
-</div>
-<div data-purpose="nav-links">
-<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">其他功能</h3>
-<div class="flex flex-col gap-1">
-<a class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700" href="live-ie.html">
-<i class="fa-solid fa-link w-4 text-winBlue"></i> 直链播放器
-            </a>
-<a class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700" href="../Commemorate/memorial.html">
-<i class="fa-solid fa-heart w-4 text-red-500"></i> 纪念空间
-            </a>
-</div>
-</div>
-</nav>
-<!-- END: Navigation Sidebar -->
-<!-- BEGIN: Main Content Area -->
-<main class="flex-1 flex flex-col bg-white overflow-y-auto custom-scrollbar">
-<!-- Header / Search Section -->
-<section class="p-6 border-b border-gray-100" data-purpose="search-header">
-<div class="max-w-3xl mx-auto">
-<h1 class="text-2xl font-light text-gray-800 mb-6">解析直播间地址</h1>
-<div class="flex gap-2">
-<div class="relative flex-1">
-<input class="w-full px-4 py-2 border border-gray-300 focus:border-winBlue focus:ring-1 focus:ring-winBlue outline-none transition-all" placeholder="输入房间号或完整直播间链接..." type="text"/>
-</div>
-<button class="bg-biliBlue hover:bg-blue-700 text-white px-6 py-2 flex items-center gap-2 transition-all shadow-sm">
-<i class="fa-solid fa-bolt"></i> 提取
-              </button>
-</div>
-</div>
-</section>
-<div class="p-6 max-w-5xl mx-auto w-full space-y-8">
-<!-- BEGIN: Instructions Panel -->
-<div class="bg-blue-50 border-l-4 border-biliBlue p-4 rounded-r" data-purpose="usage-guide">
-<div class="flex items-center justify-between cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden')">
-<span class="text-sm font-bold text-biliBlue uppercase tracking-wide"><i class="fa-solid fa-circle-info mr-2"></i>使用说明</span>
-<i class="fa-solid fa-chevron-down text-xs text-biliBlue"></i>
-</div>
-<div class="mt-3 text-sm text-gray-600 space-y-1">
-<p>1. 在上方输入框粘帖 Bilibili 直播间 URL 或房间号。</p>
-<p>2. 点击“提取”按钮获取该房间的所有可用直播流地址。</p>
-<p>3. 支持播放 m3u8 与 flv 格式（取决于浏览器支持或本地播放器）。</p>
-</div>
-</div>
-<!-- END: Instructions Panel -->
-<!-- BEGIN: Room Info Card -->
-<section class="grid md:grid-cols-3 gap-6" data-purpose="room-result">
-<div class="md:col-span-1">
-<div class="border border-gray-200 p-2 bg-white shadow-sm">
-<img alt="Room Cover" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlZDqSalctOeGh_vjc79z1N3BK0PZjG4iL7rUmqaMhiSZU4TH199DvAklcbQJxCKxzTxZeM4rQxHm_TYlNJhN_oxPFSbsTbkQeJwLLu1pxVld9XPHRJ9GpewWyJfT-RgaZz-aN_z9ZDz3vwEYPIr9EpEKboMoFgJYyVS8KoBKIt4M-26PUz-3HJvmHYbup_-V8qtgWfblj_h3RCXbZlj9IjPTevAqGFSQg1n-dN6l2Sr4ANA34IQ4CeMIzHMJtRXJgJFbw_MwNunM"/>
-</div>
-</div>
-<div class="md:col-span-2 flex flex-col justify-center">
-<div class="flex items-center gap-2 mb-2">
-<span class="px-2 py-0.5 bg-biliPurple text-white text-xs rounded">网游</span>
-<span class="text-gray-400 text-xs">ID: 123456</span>
-</div>
-<h2 class="text-xl font-bold text-gray-900 mb-1">【S13】全球总决赛淘汰赛 观赛大厅</h2>
-<p class="text-gray-600 mb-4">主播：哔哩哔哩赛事 <span class="ml-4"><i class="fa-solid fa-user-group mr-1"></i> 2.5万</span></p>
-<div class="flex gap-3">
-<button class="px-4 py-1.5 border border-biliBlue text-biliBlue hover:bg-blue-50 text-sm transition-colors">
-<i class="fa-solid fa-share-nodes mr-2"></i>分享房间
-                </button>
-</div>
-</div>
-</section>
-<!-- END: Room Info Card -->
-<!-- BEGIN: Stream List -->
-<section data-purpose="stream-urls">
-<h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">可用线路</h3>
-<div class="space-y-2">
-<!-- Stream Item 1 -->
-<div class="flex flex-col md:flex-row md:items-center justify-between p-3 bg-gray-50 border border-gray-200 hover:border-winBlue transition-colors group">
-<div class="mb-2 md:mb-0">
-<span class="text-xs font-bold text-white bg-gray-500 px-1.5 py-0.5 rounded mr-2">FLV</span>
-<code class="text-xs text-gray-600 break-all">https://d1--cn-gotcha01.bilivideo.com/live-bili/846...</code>
-</div>
-<div class="flex gap-2">
-<button class="bg-white border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 flex items-center gap-1">
-<i class="fa-regular fa-copy"></i> 复制
-                  </button>
-<button class="bg-biliBlue text-white px-3 py-1 text-xs hover:bg-blue-700 flex items-center gap-1">
-<i class="fa-solid fa-play"></i> 播放
-                  </button>
-</div>
-</div>
-<!-- Stream Item 2 -->
-<div class="flex flex-col md:flex-row md:items-center justify-between p-3 bg-gray-50 border border-gray-200 hover:border-winBlue transition-colors group">
-<div class="mb-2 md:mb-0">
-<span class="text-xs font-bold text-white bg-orange-500 px-1.5 py-0.5 rounded mr-2">M3U8</span>
-<code class="text-xs text-gray-600 break-all">https://d1--cn-gotcha01.bilivideo.com/live-bili/846...</code>
-</div>
-<div class="flex gap-2">
-<button class="bg-white border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 flex items-center gap-1">
-<i class="fa-regular fa-copy"></i> 复制
-                  </button>
-<button class="bg-biliBlue text-white px-3 py-1 text-xs hover:bg-blue-700 flex items-center gap-1">
-<i class="fa-solid fa-play"></i> 播放
-                  </button>
-</div>
-</div>
-</div>
-</section>
-<!-- END: Stream List -->
-<!-- BEGIN: History -->
-<section data-purpose="history">
-<h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">最近提取记录</h3>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-<div class="p-2 border border-gray-100 hover:shadow-md cursor-pointer transition-shadow">
-<img class="w-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSyofAbdf9yJZqCrVr-KUE9Pmp-oYM2XFfGeX2EOWS7e8lWVMD86XH3VeT0nURSnEqjujirOcsGCBF5l-o2FzwrGxaYUfmbEoDNstkDJPOKv4cqw0s7PbeDE9NH6g6DBlV5H1rf13b-eRHgNno5jB1uGYVVSi2_PEc-zpbhdeBeXmfKUCfA69D82m_fBcDEYKsWY17JG2GBB-ymZQxXvKneL5kYx3_H0O4Rjt0E9U_Lp2lorrOLg8CsUtMKAgSQmqIdKbY8JZmZFs"/>
-<p class="text-xs text-gray-700 truncate">这里是历史房间标题</p>
-</div>
-<div class="p-2 border border-gray-100 hover:shadow-md cursor-pointer transition-shadow">
-<img class="w-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYmGVpvQgkjjN9s9W6aWEoC_jblmwIlG4_J4zbUgQndWz2__dQO_far4y2biLEFhPNhzMR4Ock3BsE4ufIwV54ZRKlNHWE-axSevT8NKSACpRlT5kUc9RPsdsSuIvXvvc46TDjBLwMOGFHMYwlimVci7huDjP-2HaibpY0v-WLvQcMVjB3xveo2wKvgjuCm0lVqffLJoNGNI-56EzVvFc41YMRs4mMl9QdlbELbIQt7V4cN_ofzci9o-iVLtp86TcFaCdZS5DdVVw"/>
-<p class="text-xs text-gray-700 truncate">峰峰大王直播间</p>
-</div>
-</div>
-</section>
-<!-- END: History -->
-</div>
-<!-- BEGIN: Footer -->
-<footer class="mt-auto p-4 border-t border-gray-100 text-center text-xs text-gray-400" data-purpose="app-footer">
-<p>© 2023 Bilibili Stream Tool | 基于 Web 技术构建的桌面级应用界面</p>
-</footer>
-<!-- END: Footer -->
-</main>
-<!-- END: Main Content Area -->
-</div>
-<!-- BEGIN: Video Modal (Simulated) -->
-<div class="absolute inset-0 bg-black/60 hidden flex items-center justify-center z-50 p-8" id="videoModal">
-<div class="bg-black w-full max-w-4xl aspect-video relative border border-gray-700">
-<button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl" onclick="document.getElementById('videoModal').classList.add('hidden')">
-<i class="fa-solid fa-xmark"></i>
-</button>
-<div class="w-full h-full flex items-center justify-center text-gray-500 flex-col gap-4">
-<i class="fa-solid fa-circle-play text-6xl"></i>
-<p>视频播放器加载中...</p>
-</div>
-</div>
-</div>
-<!-- END: Video Modal -->
-</div>
-<!-- END: Windows 10 Application Window -->
-<script data-purpose="ui-logic">
-    // Minimal logic for the UI demonstration
-    document.querySelectorAll('.win-btn.close').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if(confirm('确定要关闭 Bilibili 直播流提取工具吗？')) {
-          alert('在实际应用中，这里将调用 window.close()');
+    <!-- Windows 10 Application Window -->
+    <div class="window-frame rounded-sm">
+        <!-- Title Bar -->
+        <header class="title-bar">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-satellite-dish text-winBlue text-sm"></i>
+                <span class="text-xs text-gray-700">Bilibili 直播流提取工具</span>
+            </div>
+            <div class="window-controls">
+                <button class="win-btn" id="minimizeBtn" title="最小化"><i class="fa-solid fa-minus"></i></button>
+                <button class="win-btn" id="maximizeBtn" title="最大化"><i class="fa-regular fa-square"></i></button>
+                <button class="win-btn close" id="closeBtn" title="关闭"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Navigation Sidebar -->
+            <nav class="sidebar w-64 p-4 hidden md:flex flex-col gap-6">
+                <!-- Quick Access -->
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">常用房间</h3>
+                    <div class="flex flex-col gap-1" id="quickRooms">
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" data-room-id="1909467159">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span> 峰峰大王
+                        </button>
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" data-room-id="30754733">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span> 黑色小乌鸦
+                        </button>
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" data-room-id="7689273">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span> 小树
+                        </button>
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" data-room-id="1710489335">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span> 黎六六
+                        </button>
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" data-room-id="1777408088">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span> 鱼非鱼
+                        </button>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">提取历史</h3>
+                    <div class="grid grid-cols-2 gap-2" id="historyGrid">
+                        <!-- History items will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Other Functions -->
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">其他功能</h3>
+                    <div class="flex flex-col gap-1">
+                        <button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors" onclick="viewByUrl()">
+                            <i class="fa-solid fa-link w-4 text-winBlue"></i> 通过链接查看
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 flex flex-col bg-white overflow-y-auto custom-scrollbar">
+                <!-- Header / Search Section -->
+                <section class="p-6 border-b border-gray-100" data-purpose="search-header">
+                    <div class="max-w-3xl mx-auto">
+                        <h1 class="text-2xl font-light text-gray-800 mb-6">解析直播间地址</h1>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <input class="w-full px-4 py-2 border border-gray-300 focus:border-winBlue focus:ring-1 focus:ring-winBlue outline-none transition-all" id="roomInput" placeholder="输入房间号或完整直播间链接..." type="text">
+                            </div>
+                            <button class="bg-biliBlue hover:bg-blue-700 text-white px-6 py-2 flex items-center gap-2 transition-all shadow-sm" id="extractBtn" onclick="fetchStream()">
+                                <span id="btnText"><i class="fa-solid fa-bolt"></i> 提取</span>
+                                <span id="btnLoading" style="display: none;">
+                                    <span class="loading-spinner" style="width: 16px; height: 16px;"></span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="p-6 max-w-5xl mx-auto w-full space-y-8">
+                    <!-- Error Message -->
+                    <div class="error-msg" id="errorMsg">
+                        <i class="fa-solid fa-exclamation-circle"></i>
+                        <span id="errorText" style="margin-left: 8px;"></span>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="hidden" id="loadingState">
+                        <div class="flex flex-col items-center justify-center py-12">
+                            <div class="loading-spinner mb-4"></div>
+                            <p class="text-gray-500">正在获取直播流信息...</p>
+                        </div>
+                    </div>
+
+                    <!-- Instructions Panel -->
+                    <div class="bg-blue-50 border-l-4 border-biliBlue p-4 rounded-r" id="usageGuide">
+                        <div class="flex items-center justify-between cursor-pointer" onclick="document.getElementById('usageContent').classList.toggle('hidden')">
+                            <span class="text-sm font-bold text-biliBlue uppercase tracking-wide"><i class="fa-solid fa-circle-info mr-2"></i>使用说明</span>
+                            <i class="fa-solid fa-chevron-down text-xs text-biliBlue transition-transform" id="usageIcon"></i>
+                        </div>
+                        <div class="mt-3 text-sm text-gray-600 space-y-1" id="usageContent">
+                            <p>1. 在上方输入框粘帖 Bilibili 直播间 URL 或房间号。</p>
+                            <p>2. 点击"提取"按钮获取该房间的所有可用直播流地址。</p>
+                            <p>3. 支持播放 m3u8 与 flv 格式（取决于浏览器支持或本地播放器）。</p>
+                            <p>4. 点击常用房间可快速查看该房间的直播流。</p>
+                        </div>
+                    </div>
+
+                    <!-- Room Info Card -->
+                    <section class="hidden" id="roomResult">
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1">
+                                <div class="room-cover border border-gray-200 bg-white shadow-sm">
+                                    <img alt="Room Cover" id="roomCover" src="">
+                                    <div class="live-badge" id="liveStatus" style="display: none;">
+                                        <i class="fa-solid fa-broadcast-tower"></i> 直播中
+                                    </div>
+                                    <div class="offline-badge" id="offlineStatus" style="display: none;">
+                                        未开播
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2 flex flex-col justify-center">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 bg-biliPurple text-white text-xs rounded" id="roomArea">网游</span>
+                                    <span class="text-gray-400 text-xs" id="roomId">ID: 123456</span>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-900 mb-1" id="roomTitle">房间标题</h2>
+                                <p class="text-gray-600 mb-2">主播：<span id="roomAnchor">主播名</span></p>
+                                <p class="text-gray-500 text-sm mb-4">
+                                    <i class="fa-solid fa-eye mr-1"></i><span id="roomOnline">0</span>
+                                    <span class="ml-4" id="areaInfo"></span>
+                                </p>
+                                <div class="action-btns">
+                                    <button class="action-btn download" onclick="downloadCover()">
+                                        <i class="fa-solid fa-image"></i> 下载封面
+                                    </button>
+                                    <button class="action-btn playlink" onclick="getPlayLink()">
+                                        <i class="fa-solid fa-link"></i> 获取播放链接
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Stream List -->
+                    <section class="hidden" id="streamSection">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">
+                            <i class="fa-solid fa-link mr-2"></i>可用直播流地址
+                        </h3>
+                        <p class="text-sm text-gray-500 mb-4">提示：点击"复制"复制链接，点击"播放"在线观看，或使用PotPlayer/VLC播放</p>
+                        
+                        <div class="quality-tabs" id="qualityTabs"></div>
+                        
+                        <div class="stream-items" id="streamUrls"></div>
+                    </section>
+                </div>
+
+                <!-- Footer -->
+                <footer class="mt-auto p-4 border-t border-gray-100 text-center text-xs text-gray-400">
+                    <p>© 2023 Bilibili Stream Tool | 基于 Web 技术构建的桌面级应用界面</p>
+                </footer>
+            </main>
+        </div>
+
+        <!-- Video Player Modal -->
+        <div class="modal-overlay" id="videoModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-play-circle mr-2"></i>在线播放</h3>
+                    <span class="modal-close" onclick="closeModal()">&times;</span>
+                </div>
+                <div class="video-container">
+                    <video id="videoPlayer" controls>
+                        您的浏览器不支持 video 标签。
+                    </video>
+                </div>
+                <div class="modal-footer">
+                    <p>当前线路：<span id="currentStreamName"></span></p>
+                    <p class="small">提示：如播放失败，请复制链接到本地播放器（如PotPlayer、VLC）观看</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastText">操作成功</span>
+    </div>
+
+    <script>
+        // ========================================
+        // Global Variables
+        // ========================================
+        var currentFlvPlayer = null;
+        var allStreamData = {};
+        var currentQuality = 0;
+        var currentRoomInfo = null;
+
+        // CORS Proxies
+        var CORS_PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+
+        // ========================================
+        // Utility Functions
+        // ========================================
+
+        // Parse room ID from input
+        function parseRoomId(input) {
+            input = input.trim();
+            
+            // Pure number
+            if (/^\d+$/.test(input)) {
+                return input;
+            }
+            
+            // URL patterns
+            var urlMatch = input.match(/live\.bilibili\.com\/(\d+)/);
+            if (urlMatch) {
+                return urlMatch[1];
+            }
+            
+            return null;
         }
-      });
-    });
-  </script>
-</body></html>
+
+        // Format number
+        function formatNumber(num) {
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + '万';
+            }
+            return num.toString();
+        }
+
+        // Show error message
+        function showError(message) {
+            var errorDiv = document.getElementById('errorMsg');
+            document.getElementById('errorText').textContent = message;
+            errorDiv.className = 'error-msg show';
+
+            setTimeout(function() {
+                errorDiv.className = 'error-msg';
+            }, 5000);
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            var toast = document.getElementById('toast');
+            var toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.className = 'toast show';
+
+            setTimeout(function() {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Set loading state
+        function setLoading(loading) {
+            var btn = document.getElementById('extractBtn');
+            var btnText = document.getElementById('btnText');
+            var btnLoading = document.getElementById('btnLoading');
+
+            btn.disabled = loading;
+
+            if (loading) {
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline-block';
+            } else {
+                btnText.style.display = 'inline-block';
+                btnLoading.style.display = 'none';
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text, callback) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    if (callback) callback();
+                })['catch'](function() {
+                    fallbackCopyToClipboard(text, callback);
+                });
+            } else {
+                fallbackCopyToClipboard(text, callback);
+            }
+        }
+
+        // Fallback copy method
+        function fallbackCopyToClipboard(text, callback) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                document.execCommand('copy');
+                if (callback) callback();
+            } catch (err) {
+                alert('请手动复制以下链接：\n' + text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ========================================
+        // API Functions
+        // ========================================
+
+        // Proxy request
+        function proxyRequest(url, callback) {
+            function tryRequest(proxyIndex) {
+                if (proxyIndex >= CORS_PROXIES.length) {
+                    callback(null, new Error('所有代理服务都不可用'));
+                    return;
+                }
+
+                var proxy = CORS_PROXIES[proxyIndex];
+                var proxyUrl = proxy + encodeURIComponent(url);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', proxyUrl, true);
+                xhr.timeout = 15000;
+                xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                if (data && typeof data === 'object') {
+                                    callback(data);
+                                } else {
+                                    tryRequest(proxyIndex + 1);
+                                }
+                            } catch (e) {
+                                tryRequest(proxyIndex + 1);
+                            }
+                        } else {
+                            tryRequest(proxyIndex + 1);
+                        }
+                    }
+                };
+
+                xhr.onerror = function() {
+                    tryRequest(proxyIndex + 1);
+                };
+
+                xhr.ontimeout = function() {
+                    tryRequest(proxyIndex + 1);
+                };
+
+                xhr.send();
+            }
+
+            tryRequest(0);
+        }
+
+        // Get room info
+        function getRoomInfo(roomId, callback) {
+            var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + roomId;
+
+            proxyRequest(apiUrl, function(data, error) {
+                if (error) {
+                    callback(null, error);
+                    return;
+                }
+
+                if (data && data.code === 0) {
+                    callback(data.data);
+                } else {
+                    callback(null, new Error(data ? data.message : '获取房间信息失败'));
+                }
+            });
+        }
+
+        // Get stream URL
+        function getStreamUrl(roomId, callback) {
+            var qualities = [0, 1, 2, 3, 4];
+            var streamData = {};
+            var completed = 0;
+
+            function checkComplete() {
+                completed++;
+                if (completed === qualities.length) {
+                    var keys = Object.keys(streamData);
+                    if (keys.length > 0) {
+                        callback(streamData);
+                    } else {
+                        callback(null, new Error('获取直播流地址失败'));
+                    }
+                }
+            }
+
+            qualities.forEach(function(qn) {
+                var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=' + roomId + '&quality=' + qn + '&platform=web';
+
+                proxyRequest(apiUrl, function(data, error) {
+                    if (error) {
+                        checkComplete();
+                        return;
+                    }
+
+                    if (data && data.code === 0 && data.data && data.data.durl) {
+                        var desc = '清晰度 ' + qn;
+                        if (data.data.quality_description) {
+                            for (var i = 0; i < data.data.quality_description.length; i++) {
+                                if (data.data.quality_description[i].qn === qn) {
+                                    desc = data.data.quality_description[i].desc;
+                                    break;
+                                }
+                            }
+                        }
+
+                        streamData[qn] = {
+                            quality: qn,
+                            desc: desc,
+                            durl: data.data.durl
+                        };
+                    }
+                    checkComplete();
+                });
+            });
+        }
+
+        // ========================================
+        // Core Functions
+        // ========================================
+
+        // Fetch stream
+        function fetchStream() {
+            var input = document.getElementById('roomInput').value.trim();
+
+            if (!input) {
+                showError('请输入房间号或直播链接');
+                return;
+            }
+
+            var roomId = parseRoomId(input);
+            if (!roomId) {
+                showError('房间号格式不正确，请输入数字或正确的直播链接');
+                return;
+            }
+
+            // Reset UI
+            document.getElementById('errorMsg').className = 'error-msg';
+            document.getElementById('roomResult').classList.add('hidden');
+            document.getElementById('streamSection').classList.add('hidden');
+
+            setLoading(true);
+
+            // Get room info
+            getRoomInfo(roomId, function(roomInfo, error) {
+                if (error) {
+                    showError(error.message || '获取房间信息失败');
+                    setLoading(false);
+                    return;
+                }
+
+                currentRoomInfo = roomInfo;
+
+                // Display room info
+                displayRoomInfo(roomInfo);
+
+                // Check live status
+                if (roomInfo.live_status !== 1) {
+                    var statusText = roomInfo.live_status === 0 ? '空闲' : '轮播';
+                    showError('当前直播间未开播 (状态: ' + statusText + ')');
+                    setLoading(false);
+                    return;
+                }
+
+                // Get stream URL
+                getStreamUrl(roomId, function(streamData, error2) {
+                    if (error2) {
+                        showError(error2.message || '获取直播流地址失败');
+                        setLoading(false);
+                        return;
+                    }
+
+                    allStreamData = streamData;
+
+                    // Get first available quality
+                    var keys = Object.keys(streamData);
+                    if (keys.length > 0) {
+                        currentQuality = parseInt(keys[0]);
+                    }
+
+                    // Display stream list
+                    displayStreamList();
+                    
+                    // Save to history
+                    saveToHistory(roomId, roomInfo);
+                    
+                    setLoading(false);
+                });
+            });
+        }
+
+        // Display room info
+        function displayRoomInfo(data) {
+            document.getElementById('roomTitle').textContent = data.title || '未知标题';
+            document.getElementById('roomAnchor').textContent = data.uname || '未知主播';
+            document.getElementById('roomId').textContent = 'ID: ' + data.room_id;
+            document.getElementById('roomOnline').textContent = formatNumber(data.online || 0);
+            document.getElementById('areaInfo').textContent = (data.area_name || '') + ' > ' + (data.area_parent_name || '');
+            document.getElementById('roomArea').textContent = data.area_name || '未知';
+
+            // Cover image
+            var coverImg = document.getElementById('roomCover');
+            coverImg.src = data.keyframe || data.user_cover || 'https://via.placeholder.com/400x300?text=No+Cover';
+            coverImg.onerror = function() {
+                coverImg.src = 'https://via.placeholder.com/400x300?text=No+Cover';
+            };
+
+            // Live status
+            var liveStatus = document.getElementById('liveStatus');
+            var offlineStatus = document.getElementById('offlineStatus');
+
+            if (data.live_status === 1) {
+                liveStatus.style.display = 'block';
+                offlineStatus.style.display = 'none';
+            } else {
+                liveStatus.style.display = 'none';
+                offlineStatus.style.display = 'block';
+                offlineStatus.textContent = data.live_status === 2 ? '轮播中' : '未开播';
+            }
+
+            document.getElementById('roomResult').classList.remove('hidden');
+        }
+
+        // Display stream list
+        function displayStreamList() {
+            // Render quality tabs
+            var tabsContainer = document.getElementById('qualityTabs');
+            tabsContainer.innerHTML = '';
+
+            var keys = Object.keys(allStreamData);
+            keys.forEach(function(qn) {
+                var data = allStreamData[qn];
+                var btn = document.createElement('button');
+                btn.className = 'quality-tab' + (parseInt(qn) === currentQuality ? ' active' : '');
+                btn.textContent = data.desc;
+                btn.onclick = (function(q) {
+                    return function() {
+                        currentQuality = q;
+                        displayStreamList();
+                    };
+                })(parseInt(qn));
+                tabsContainer.appendChild(btn);
+            });
+
+            // Render stream URLs
+            renderStreamUrls();
+
+            document.getElementById('streamSection').classList.remove('hidden');
+        }
+
+        // Render stream URLs
+        function renderStreamUrls() {
+            var container = document.getElementById('streamUrls');
+            container.innerHTML = '';
+
+            var currentData = allStreamData[currentQuality];
+            if (!currentData || !currentData.durl) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 16px;">该清晰度暂无可用地址</p>';
+                return;
+            }
+
+            currentData.durl.forEach(function(stream, index) {
+                var streamName = stream.name || ('线路 ' + (index + 1));
+
+                var item = document.createElement('div');
+                item.className = 'stream-item';
+                item.innerHTML = 
+                    '<div class="stream-name">' + streamName + 
+                    '<span class="stream-quality">' + currentData.desc + '</span></div>' +
+                    '<div class="stream-url-container">' +
+                    '<input type="text" readonly value="' + stream.url + '" class="stream-url" id="streamUrl' + index + '">' +
+                    '</div>' +
+                    '<div class="stream-actions">' +
+                    '<button class="stream-btn copy" onclick="copyUrl(' + index + ')"><i class="fa fa-copy"></i> 复制</button>' +
+                    '<button class="stream-btn play" onclick="playVideo(\'' + encodeURIComponent(stream.url) + '\', \'' + encodeURIComponent(streamName) + '\')"><i class="fa fa-play"></i> 播放</button>' +
+                    '</div>';
+
+                container.appendChild(item);
+            });
+        }
+
+        // Copy URL
+        function copyUrl(index) {
+            var input = document.getElementById('streamUrl' + index);
+            var url = input.value;
+            copyToClipboard(url, function() {
+                showToast('链接已复制到剪贴板');
+            });
+        }
+
+        // Play video
+        function playVideo(url, streamName) {
+            url = decodeURIComponent(url);
+            streamName = decodeURIComponent(streamName);
+
+            var modal = document.getElementById('videoModal');
+            var videoPlayer = document.getElementById('videoPlayer');
+            var currentStreamName = document.getElementById('currentStreamName');
+
+            currentStreamName.textContent = streamName;
+            modal.className = 'modal-overlay show';
+
+            // Destroy old player
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            videoPlayer.pause();
+            videoPlayer.src = url;
+
+            videoPlayer.onloadedmetadata = function() {
+                try {
+                    videoPlayer.play();
+                } catch (e) {
+                    console.log('自动播放失败，请手动播放');
+                }
+            };
+
+            videoPlayer.onerror = function() {
+                showToast('视频加载失败，请尝试复制链接到本地播放器');
+            };
+        }
+
+        // Close modal
+        function closeModal() {
+            var modal = document.getElementById('videoModal');
+            modal.className = 'modal-overlay';
+
+            if (currentFlvPlayer) {
+                if (typeof currentFlvPlayer.destroy === 'function') {
+                    currentFlvPlayer.destroy();
+                }
+                currentFlvPlayer = null;
+            }
+
+            var videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.pause();
+            videoPlayer.src = '';
+        }
+
+        // View by URL
+        function viewByUrl() {
+            var url = prompt('请输入直播流链接（支持FLV/M3U8格式）:');
+            if (!url) return;
+
+            if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0) {
+                showError('请输入有效的HTTP/HTTPS链接');
+                return;
+            }
+
+            playVideo(url, '自定义链接');
+        }
+
+        // Download cover
+        function downloadCover() {
+            var coverImg = document.getElementById('roomCover');
+            var coverSrc = coverImg.src;
+            var title = document.getElementById('roomTitle').textContent;
+
+            if (!coverSrc || coverSrc.indexOf('placeholder') !== -1) {
+                showError('暂无封面图可下载');
+                return;
+            }
+
+            showToast('正在下载封面...');
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', coverSrc, true);
+            xhr.responseType = 'blob';
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var blob = xhr.response;
+                    var blobUrl = URL.createObjectURL(blob);
+
+                    var link = document.createElement('a');
+                    link.href = blobUrl;
+                    var fileName = title + '_' + document.getElementById('roomId').textContent.replace('ID: ', '') + '.jpg';
+                    link.download = fileName;
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    URL.revokeObjectURL(blobUrl);
+                    showToast('封面下载成功！');
+                } else if (xhr.readyState === 4) {
+                    showError('下载失败，请尝试右键图片另存为');
+                }
+            };
+
+            xhr.send();
+        }
+
+        // Get play link
+        function getPlayLink() {
+            var keys = Object.keys(allStreamData);
+            if (keys.length === 0) {
+                showError('请先获取直播流信息');
+                return;
+            }
+
+            var currentData = allStreamData[currentQuality];
+            if (!currentData || !currentData.durl || currentData.durl.length === 0) {
+                showError('暂无可用的播放链接');
+                return;
+            }
+
+            var playUrl = currentData.durl[0].url;
+            var qualityDesc = currentData.desc;
+
+            copyToClipboard(playUrl, function() {
+                showToast(qualityDesc + '播放链接已复制！');
+            });
+        }
+
+        // ========================================
+        // History Management
+        // ========================================
+
+        function saveToHistory(roomId, roomInfo) {
+            var history = JSON.parse(localStorage.getItem('bilibiliStreamHistory') || '[]');
+            
+            // Remove existing
+            history = history.filter(function(item) {
+                return item.roomId !== roomId;
+            });
+            
+            // Add to beginning
+            history.unshift({
+                roomId: roomId,
+                title: roomInfo.title,
+                cover: roomInfo.keyframe || roomInfo.user_cover,
+                anchor: roomInfo.uname
+            });
+            
+            // Max 20 items
+            if (history.length > 20) {
+                history = history.slice(0, 20);
+            }
+            
+            localStorage.setItem('bilibiliStreamHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            var history = JSON.parse(localStorage.getItem('bilibiliStreamHistory') || '[]');
+            var container = document.getElementById('historyGrid');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-xs col-span-2 text-center py-4">暂无提取记录</p>';
+                return;
+            }
+            
+            container.innerHTML = history.slice(0, 6).map(function(item) {
+                return '<div class="history-item" onclick="loadRoom(\'' + item.roomId + '\')">' +
+                    '<img src="' + (item.cover || 'https://via.placeholder.com/200x120?text=No+Cover') + '" alt="' + item.title + '">' +
+                    '<p>' + (item.title || '未知标题') + '</p>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function loadRoom(roomId) {
+            if (!roomId) {
+                showError('请输入有效的房间号');
+                return;
+            }
+            
+            document.getElementById('roomInput').value = roomId;
+            fetchStream();
+        }
+
+        // ========================================
+        // Event Listeners
+        // ========================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enter key to search
+            document.getElementById('roomInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    fetchStream();
+                }
+            });
+
+            // Quick room buttons
+            document.getElementById('quickRooms').addEventListener('click', function(e) {
+                var btn = e.target.closest('button');
+                if (btn) {
+                    var roomId = btn.dataset.roomId;
+                    loadRoom(roomId);
+                }
+            });
+
+            // Click outside modal to close
+            document.getElementById('videoModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // ESC key to close modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // Window control buttons
+            document.getElementById('closeBtn').addEventListener('click', function() {
+                if (confirm('确定要关闭 Bilibili 直播流提取工具吗？')) {
+                    showToast('在实际应用中，这里将关闭窗口');
+                }
+            });
+
+            document.getElementById('minimizeBtn').addEventListener('click', function() {
+                showToast('最小化窗口');
+            });
+
+            document.getElementById('maximizeBtn').addEventListener('click', function() {
+                showToast('最大化/还原窗口');
+            });
+
+            // Initialize history
+            renderHistory();
+        });
+    </script>
+</body>
+</html>

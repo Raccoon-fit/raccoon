@@ -1,962 +1,285 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>B站直播流提取工具</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flv.js@1.6.2/dist/flv.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-blue: #3366ff;
-            --primary-purple: #9a66ff;
-            --bg-dark: #0f172a;
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bilibili 直播流提取工具</title>
+<!-- BEGIN: External Resources -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            winBlue: '#0078d7',
+            winBg: '#f2f2f2',
+            biliBlue: '#3366ff',
+            biliPurple: '#9a66ff',
+          },
+          fontFamily: {
+            sans: ['"Segoe UI"', '"Microsoft YaHei"', 'sans-serif'],
+          }
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1e293b 100%);
-            min-height: 100vh;
-            color: #334155;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.93);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(51, 102, 255, 0.25);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(51, 102, 255, 0.35);
-        }
-        .input-field {
-            transition: all 0.3s ease;
-            background: rgba(248, 250, 252, 0.9);
-            border: 2px solid #e2e8f0;
-        }
-        .input-field:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.15);
-            background: white;
-        }
-        .live-badge {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .quality-tag {
-            transition: all 0.2s ease;
-        }
-        .quality-tag.active {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(51, 102, 255, 0.3);
-        }
-        .history-item {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        .history-item:hover {
-            background-color: #f8fafc;
-            border-left-color: var(--primary-blue);
-            transform: translateX(4px);
-        }
-        .loading-spinner {
-            border: 3px solid rgba(51, 102, 255, 0.1);
-            border-top: 3px solid var(--primary-blue);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .toast {
-            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        .modal-overlay {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-        }
-        .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-    </style>
+      }
+    }
+  </script>
+<!-- END: External Resources -->
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="desktop-and-window">
+    body {
+      background: linear-gradient(135deg, #1e4d8c 0%, #0078d7 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .window-frame {
+      width: 95%;
+      max-width: 1100px;
+      height: 85vh;
+      background: #ffffff;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      border: 1px solid #707070;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .title-bar {
+      height: 32px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 10px;
+      user-select: none;
+    }
+
+    .window-controls {
+      display: flex;
+      height: 100%;
+    }
+
+    .win-btn {
+      width: 46px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      font-size: 10px;
+    }
+
+    .win-btn:hover { background: #e5e5e5; }
+    .win-btn.close:hover { background: #e81123; color: white; }
+
+    .sidebar {
+      background: rgba(243, 243, 243, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid #e0e0e0;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cdcdcd;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #a6a6a6;
+    }
+  </style>
+<!-- END: Custom Styles -->
 </head>
-<body class="py-6 px-4 md:py-8 md:px-6">
-    <div class="container mx-auto max-w-5xl">
-        <!-- 页眉 -->
-        <div class="text-center mb-8 md:mb-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white shadow-xl mb-4 md:mb-6">
-                <i class="fas fa-satellite-dish text-3xl md:text-4xl" style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-            </div>
-            <h1 class="text-2xl md:text-4xl font-bold text-white mb-3">B站直播流提取工具</h1>
-            <p class="text-slate-300 text-sm md:text-base">输入房间号或直播链接，获取可直接播放的直播流地址</p>
-<a href="../Commemorate/memorial.html">点这里查看已注销的哔哩哔哩主播</a><br>
-
-<a href="live-ie.html">如需使用IE浏览器查看本站请点这里</a>
-        </div>
-
-        <!-- 折叠的使用说明 -->
-        <details class="glass-card mb-6 overflow-hidden group">
-            <summary class="list-none cursor-pointer p-4 md:p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                        <i class="fas fa-info-circle text-blue-500"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800">使用说明</h3>
-                        <p class="text-slate-500 text-sm">新用户请点击展开查看</p>
-                    </div>
-                </div>
-                <i class="fas fa-chevron-down text-slate-400 transition-transform group-open:rotate-180"></i>
-            </summary>
-            <div class="p-4 md:p-6 pt-0 border-t border-slate-100">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="space-y-2">
-                        <h4 class="font-semibold text-slate-800 flex items-center gap-2"><i class="fas fa-keyboard text-blue-500"></i> 核心功能</h4>
-                        <ul class="text-slate-600 space-y-1.5">
-                            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span>在输入框中直接输入B站房间号（纯数字）或完整直播链接</li>
-                            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span>点击"提取直播流"获取可用播放地址</li>
-                            <li class="flex items-start gap-2"><span class="text-blue-500 mt-0.5">•</span>支持在线播放、复制链接到播放器</li>
-                        </ul>
-                    </div>
-                    <div class="space-y-2">
-                        <h4 class="font-semibold text-slate-800 flex items-center gap-2"><i class="fas fa-lightbulb text-amber-500"></i> 使用技巧</h4>
-                        <ul class="text-slate-600 space-y-1.5">
-                            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span>可点击"通过链接查看"直接输入已有的FLV/M3U8链接</li>
-                            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span>直播间封面可以右键保存或使用"下载封面"按钮</li>
-                            <li class="flex items-start gap-2"><span class="text-amber-500 mt-0.5">•</span>页面会自动保存您的查询记录</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </details>
-
-        <!-- 主搜索卡片 -->
-        <div class="glass-card p-6 mb-6">
-            <div class="flex flex-col md:flex-row gap-4 mb-6">
-                <div class="flex-1 relative">
-                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400">
-                        <i class="fas fa-hashtag"></i>
-                    </div>
-                    <input type="text" id="roomInput" class="input-field w-full pl-12 pr-5 py-4 rounded-xl outline-none text-base" placeholder="例如：6 或 https://live.bilibili.com/6" autocomplete="off">
-                </div>
-                <button id="fetchBtn" onclick="fetchStream()" class="btn-primary px-8 py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-3">
-                    <span id="btnText"><i class="fas fa-bolt"></i> 提取直播流</span>
-                    <span id="btnLoading" class="hidden">
-                        <div class="loading-spinner"></div>
-                    </span>
+<body class="font-sans">
+<!-- BEGIN: Windows 10 Application Window -->
+<div class="window-frame rounded-sm" data-purpose="app-container">
+<!-- BEGIN: Title Bar -->
+<header class="title-bar">
+<div class="flex items-center gap-2">
+<i class="fa-solid fa-satellite-dish text-winBlue text-sm"></i>
+<span class="text-xs text-gray-700">Bilibili 直播流提取工具</span>
+</div>
+<div class="window-controls">
+<div class="win-btn"><i class="fa-solid fa-minus"></i></div>
+<div class="win-btn"><i class="fa-regular fa-square"></i></div>
+<div class="win-btn close"><i class="fa-solid fa-xmark text-sm"></i></div>
+</div>
+</header>
+<!-- END: Title Bar -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Navigation Sidebar -->
+<nav class="sidebar w-64 p-4 hidden md:flex flex-col gap-6">
+<div data-purpose="quick-access">
+<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">常用房间</h3>
+<div class="flex flex-col gap-1">
+<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
+<span class="w-2 h-2 rounded-full bg-green-500"></span> 峰峰大王
+            </button>
+<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
+<span class="w-2 h-2 rounded-full bg-gray-400"></span> 黑色小乌鸦
+            </button>
+<button class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700 transition-colors">
+<span class="w-2 h-2 rounded-full bg-green-500"></span> 小树
+            </button>
+</div>
+</div>
+<div data-purpose="nav-links">
+<h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">其他功能</h3>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700" href="live-ie.html">
+<i class="fa-solid fa-link w-4 text-winBlue"></i> 直链播放器
+            </a>
+<a class="flex items-center gap-3 p-2 hover:bg-gray-200 rounded text-sm text-gray-700" href="../Commemorate/memorial.html">
+<i class="fa-solid fa-heart w-4 text-red-500"></i> 纪念空间
+            </a>
+</div>
+</div>
+</nav>
+<!-- END: Navigation Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col bg-white overflow-y-auto custom-scrollbar">
+<!-- Header / Search Section -->
+<section class="p-6 border-b border-gray-100" data-purpose="search-header">
+<div class="max-w-3xl mx-auto">
+<h1 class="text-2xl font-light text-gray-800 mb-6">解析直播间地址</h1>
+<div class="flex gap-2">
+<div class="relative flex-1">
+<input class="w-full px-4 py-2 border border-gray-300 focus:border-winBlue focus:ring-1 focus:ring-winBlue outline-none transition-all" placeholder="输入房间号或完整直播间链接..." type="text"/>
+</div>
+<button class="bg-biliBlue hover:bg-blue-700 text-white px-6 py-2 flex items-center gap-2 transition-all shadow-sm">
+<i class="fa-solid fa-bolt"></i> 提取
+              </button>
+</div>
+</div>
+</section>
+<div class="p-6 max-w-5xl mx-auto w-full space-y-8">
+<!-- BEGIN: Instructions Panel -->
+<div class="bg-blue-50 border-l-4 border-biliBlue p-4 rounded-r" data-purpose="usage-guide">
+<div class="flex items-center justify-between cursor-pointer" onclick="this.nextElementSibling.classList.toggle('hidden')">
+<span class="text-sm font-bold text-biliBlue uppercase tracking-wide"><i class="fa-solid fa-circle-info mr-2"></i>使用说明</span>
+<i class="fa-solid fa-chevron-down text-xs text-biliBlue"></i>
+</div>
+<div class="mt-3 text-sm text-gray-600 space-y-1">
+<p>1. 在上方输入框粘帖 Bilibili 直播间 URL 或房间号。</p>
+<p>2. 点击“提取”按钮获取该房间的所有可用直播流地址。</p>
+<p>3. 支持播放 m3u8 与 flv 格式（取决于浏览器支持或本地播放器）。</p>
+</div>
+</div>
+<!-- END: Instructions Panel -->
+<!-- BEGIN: Room Info Card -->
+<section class="grid md:grid-cols-3 gap-6" data-purpose="room-result">
+<div class="md:col-span-1">
+<div class="border border-gray-200 p-2 bg-white shadow-sm">
+<img alt="Room Cover" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlZDqSalctOeGh_vjc79z1N3BK0PZjG4iL7rUmqaMhiSZU4TH199DvAklcbQJxCKxzTxZeM4rQxHm_TYlNJhN_oxPFSbsTbkQeJwLLu1pxVld9XPHRJ9GpewWyJfT-RgaZz-aN_z9ZDz3vwEYPIr9EpEKboMoFgJYyVS8KoBKIt4M-26PUz-3HJvmHYbup_-V8qtgWfblj_h3RCXbZlj9IjPTevAqGFSQg1n-dN6l2Sr4ANA34IQ4CeMIzHMJtRXJgJFbw_MwNunM"/>
+</div>
+</div>
+<div class="md:col-span-2 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 bg-biliPurple text-white text-xs rounded">网游</span>
+<span class="text-gray-400 text-xs">ID: 123456</span>
+</div>
+<h2 class="text-xl font-bold text-gray-900 mb-1">【S13】全球总决赛淘汰赛 观赛大厅</h2>
+<p class="text-gray-600 mb-4">主播：哔哩哔哩赛事 <span class="ml-4"><i class="fa-solid fa-user-group mr-1"></i> 2.5万</span></p>
+<div class="flex gap-3">
+<button class="px-4 py-1.5 border border-biliBlue text-biliBlue hover:bg-blue-50 text-sm transition-colors">
+<i class="fa-solid fa-share-nodes mr-2"></i>分享房间
                 </button>
-            </div>
-
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6 border-t border-slate-100">
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-slate-500 text-sm">快捷房间号：</span>
-                    <button onclick="setRoomNumber(1909467159)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm transition-colors">峰峰大王</button>
-                    <button onclick="setRoomNumber(30754733)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm transition-colors">黑色小乌鸦</button>
-                    <button onclick="setRoomNumber(7689273)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm transition-colors">小树</button>
-                </div>
-                <button onclick="viewByUrl()" class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl transition-all text-sm font-medium flex items-center gap-2 shadow-md">
-                    <i class="fas fa-external-link-alt"></i> 通过已有链接直接播放
-                </button>
-            </div>
-        </div>
-
-        <!-- 错误提示 -->
-        <div id="errorMsg" class="glass-card p-4 mb-6 hidden border-l-4 border-red-500">
-            <div class="flex items-center gap-3 text-red-600">
-                <i class="fas fa-exclamation-triangle text-xl"></i>
-                <span id="errorText"></span>
-            </div>
-        </div>
-
-        <!-- 房间信息卡片 -->
-        <div id="roomInfo" class="glass-card p-6 mb-6 hidden">
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-shrink-0">
-                    <div class="relative rounded-xl overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 w-full md:w-64 h-48 shadow-lg">
-                        <img id="roomCover" src="" alt="直播间封面" class="w-full h-full object-cover">
-                        <div id="liveStatus" class="live-badge absolute top-3 right-3 px-3 py-1 rounded-full text-white text-xs font-bold hidden">
-                            <i class="fas fa-circle mr-1 text-xs"></i>直播中
-                        </div>
-                        <div id="offlineStatus" class="bg-slate-600 absolute top-3 right-3 px-3 py-1 rounded-full text-white text-xs font-bold hidden">
-                            未开播
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mt-4">
-                        <button onclick="downloadCover()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                            <i class="fas fa-image"></i> 下载封面
-                        </button>
-                        <button onclick="getPlayLink()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                            <i class="fas fa-link"></i> 获取链接
-                        </button>
-                    </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h2 id="roomTitle" class="text-xl md:text-2xl font-bold text-slate-800 mb-3 line-clamp-2"></h2>
-                    <div class="space-y-3 mb-6">
-                        <div class="flex items-center gap-4 text-slate-600">
-                            <span class="flex items-center gap-2"><i class="fas fa-user-circle text-blue-500"></i> <span id="roomAnchor" class="font-medium"></span></span>
-                            <span class="flex items-center gap-2"><i class="fas fa-door-closed text-purple-500"></i> 房间号: <span id="roomId" class="font-mono font-medium"></span></span>
-                        </div>
-                        <div class="flex items-center gap-4 text-slate-500 text-sm">
-                            <span class="flex items-center gap-2"><i class="fas fa-eye text-green-500"></i> <span id="roomOnline"></span> 在线</span>
-                            <span id="areaInfo" class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-red-500"></i> </span>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                        <p class="text-sm text-slate-700">提示：成功获取到直播流信息后，下方将显示可用的播放地址。您可以在线播放，或复制链接到 PotPlayer、VLC 等播放器使用。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 直播流地址列表 -->
-        <div id="streamList" class="glass-card p-6 mb-6 hidden">
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1"><i class="fas fa-stream text-blue-500 mr-2"></i>可用直播流地址</h3>
-                    <p class="text-slate-500 text-sm">点击"复制"获取链接，点击"播放"在线观看</p>
-                </div>
-                <div id="qualityTabs" class="flex flex-wrap gap-2 mt-3 md:mt-0"></div>
-            </div>
-
-            <div id="streamUrls" class="space-y-4">
-                <!-- 流地址项将动态插入这里 -->
-            </div>
-        </div>
-
-        <!-- 历史记录 -->
-        <div id="historySection" class="glass-card p-6 hidden">
-            <h3 class="text-lg font-bold text-slate-800 mb-4"><i class="fas fa-history text-slate-500 mr-2"></i>最近查询</h3>
-            <div id="historyList" class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin pr-2">
-                <!-- 历史记录项将动态插入这里 -->
-            </div>
-        </div>
-
-        <!-- 页脚 -->
-        <div class="text-center pt-6 mt-8 border-t border-slate-800">
-            <p class="text-slate-400 text-sm">本工具仅供学习研究使用，请尊重版权并遵守平台相关规定</p>
-            <p class="text-slate-500 text-xs mt-2">Powered by Bilibili Live API</p>
-        </div>
-    </div>
-
-    <!-- 视频播放器模态框 -->
-    <div id="videoModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-5xl overflow-hidden shadow-2xl">
-            <div class="flex items-center justify-between p-4 border-b border-slate-100">
-                <h3 class="font-bold text-lg text-slate-800"><i class="fas fa-play-circle text-blue-500 mr-2"></i>在线播放</h3>
-                <button onclick="closeModal()" class="text-slate-500 hover:text-slate-700 text-2xl transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="aspect-video bg-black">
-                <video id="videoPlayer" controls class="w-full h-full"></video>
-            </div>
-            <div class="p-4 bg-slate-50">
-                <p class="text-sm text-slate-600 mb-1">当前线路：<span id="currentStreamName" class="font-medium text-slate-800"></span></p>
-                <p class="text-xs text-slate-500">如播放卡顿，可尝试更换线路或使用本地播放器打开链接</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 播放链接模态框 -->
-    <div id="playLinkModal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div class="p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 class="font-bold text-xl text-slate-800"><i class="fas fa-link text-blue-500 mr-2"></i>播放链接</h3>
-                        <p class="text-slate-500 text-sm mt-1">清晰度：<span id="playLinkQuality" class="font-medium text-blue-600"></span></p>
-                    </div>
-                    <button onclick="closePlayLinkModal()" class="text-slate-500 hover:text-slate-700 text-2xl transition-colors">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="flex gap-2 mb-6">
-                    <input type="text" readonly id="playLinkUrl" class="flex-1 px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-700 font-mono" onclick="this.select()">
-                    <button onclick="copyPlayLinkFromModal()" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all flex items-center gap-2 shadow-md">
-                        <i class="fas fa-copy"></i> 复制
-                    </button>
-                </div>
-                <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <h4 class="font-medium text-blue-800 mb-3 flex items-center gap-2"><i class="fas fa-info-circle"></i> 使用说明</h4>
-                    <ul class="text-sm text-blue-700 space-y-2">
-                        <li class="flex items-start gap-2"><span class="bg-blue-100 text-blue-800 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">1</span> 复制上方链接，在 PotPlayer、VLC、MPV 等播放器中打开即可观看</li>
-                        <li class="flex items-start gap-2"><span class="bg-blue-100 text-blue-800 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">2</span> 也可使用 IDM、FDM 等下载工具进行直播录制</li>
-                        <li class="flex items-start gap-2"><span class="bg-blue-100 text-blue-800 rounded-full w-5 h-5 flex items-center justify-center text-xs mt-0.5">3</span> 链接具有时效性，若失效请重新获取</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 提示Toast -->
-    <div id="toast" class="fixed top-4 right-4 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-xl hidden z-50 toast">
-        <div class="flex items-center gap-3">
-            <i id="toastIcon" class="fas fa-check-circle text-green-300"></i>
-            <span id="toastText" class="font-medium">操作成功</span>
-        </div>
-    </div>
-
-    <script>
-        // ==================== 全局变量与配置 ====================
-        let currentFlvPlayer = null;
-        let currentHlsPlayer = null;
-        let allStreamData = {};
-        let currentQuality = 0;
-        let searchHistory = JSON.parse(localStorage.getItem('biliLiveHistory')) || [];
-
-        // 代理配置
-        const CORS_PROXIES = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest='
-        ];
-
-        // ==================== 页面初始化 ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            // 加载历史记录
-            renderHistory();
-            
-            // 监听输入框回车键
-            document.getElementById('roomInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') fetchStream();
-            });
-            
-            // 监听ESC键关闭模态框
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeModal();
-                    closePlayLinkModal();
-                }
-            });
-            
-            // 点击外部关闭模态框
-            document.getElementById('videoModal').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
-            document.getElementById('playLinkModal').addEventListener('click', function(e) {
-                if (e.target === this) closePlayLinkModal();
-            });
-        });
-
-        // ==================== 核心功能函数 ====================
-
-        // 设置房间号
-        function setRoomNumber(roomId) {
-            const input = document.getElementById('roomInput');
-            input.value = roomId;
-            input.focus();
+</div>
+</div>
+</section>
+<!-- END: Room Info Card -->
+<!-- BEGIN: Stream List -->
+<section data-purpose="stream-urls">
+<h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">可用线路</h3>
+<div class="space-y-2">
+<!-- Stream Item 1 -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-3 bg-gray-50 border border-gray-200 hover:border-winBlue transition-colors group">
+<div class="mb-2 md:mb-0">
+<span class="text-xs font-bold text-white bg-gray-500 px-1.5 py-0.5 rounded mr-2">FLV</span>
+<code class="text-xs text-gray-600 break-all">https://d1--cn-gotcha01.bilivideo.com/live-bili/846...</code>
+</div>
+<div class="flex gap-2">
+<button class="bg-white border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 flex items-center gap-1">
+<i class="fa-regular fa-copy"></i> 复制
+                  </button>
+<button class="bg-biliBlue text-white px-3 py-1 text-xs hover:bg-blue-700 flex items-center gap-1">
+<i class="fa-solid fa-play"></i> 播放
+                  </button>
+</div>
+</div>
+<!-- Stream Item 2 -->
+<div class="flex flex-col md:flex-row md:items-center justify-between p-3 bg-gray-50 border border-gray-200 hover:border-winBlue transition-colors group">
+<div class="mb-2 md:mb-0">
+<span class="text-xs font-bold text-white bg-orange-500 px-1.5 py-0.5 rounded mr-2">M3U8</span>
+<code class="text-xs text-gray-600 break-all">https://d1--cn-gotcha01.bilivideo.com/live-bili/846...</code>
+</div>
+<div class="flex gap-2">
+<button class="bg-white border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 flex items-center gap-1">
+<i class="fa-regular fa-copy"></i> 复制
+                  </button>
+<button class="bg-biliBlue text-white px-3 py-1 text-xs hover:bg-blue-700 flex items-center gap-1">
+<i class="fa-solid fa-play"></i> 播放
+                  </button>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Stream List -->
+<!-- BEGIN: History -->
+<section data-purpose="history">
+<h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">最近提取记录</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="p-2 border border-gray-100 hover:shadow-md cursor-pointer transition-shadow">
+<img class="w-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSyofAbdf9yJZqCrVr-KUE9Pmp-oYM2XFfGeX2EOWS7e8lWVMD86XH3VeT0nURSnEqjujirOcsGCBF5l-o2FzwrGxaYUfmbEoDNstkDJPOKv4cqw0s7PbeDE9NH6g6DBlV5H1rf13b-eRHgNno5jB1uGYVVSi2_PEc-zpbhdeBeXmfKUCfA69D82m_fBcDEYKsWY17JG2GBB-ymZQxXvKneL5kYx3_H0O4Rjt0E9U_Lp2lorrOLg8CsUtMKAgSQmqIdKbY8JZmZFs"/>
+<p class="text-xs text-gray-700 truncate">这里是历史房间标题</p>
+</div>
+<div class="p-2 border border-gray-100 hover:shadow-md cursor-pointer transition-shadow">
+<img class="w-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYmGVpvQgkjjN9s9W6aWEoC_jblmwIlG4_J4zbUgQndWz2__dQO_far4y2biLEFhPNhzMR4Ock3BsE4ufIwV54ZRKlNHWE-axSevT8NKSACpRlT5kUc9RPsdsSuIvXvvc46TDjBLwMOGFHMYwlimVci7huDjP-2HaibpY0v-WLvQcMVjB3xveo2wKvgjuCm0lVqffLJoNGNI-56EzVvFc41YMRs4mMl9QdlbELbIQt7V4cN_ofzci9o-iVLtp86TcFaCdZS5DdVVw"/>
+<p class="text-xs text-gray-700 truncate">峰峰大王直播间</p>
+</div>
+</div>
+</section>
+<!-- END: History -->
+</div>
+<!-- BEGIN: Footer -->
+<footer class="mt-auto p-4 border-t border-gray-100 text-center text-xs text-gray-400" data-purpose="app-footer">
+<p>© 2023 Bilibili Stream Tool | 基于 Web 技术构建的桌面级应用界面</p>
+</footer>
+<!-- END: Footer -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+<!-- BEGIN: Video Modal (Simulated) -->
+<div class="absolute inset-0 bg-black/60 hidden flex items-center justify-center z-50 p-8" id="videoModal">
+<div class="bg-black w-full max-w-4xl aspect-video relative border border-gray-700">
+<button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl" onclick="document.getElementById('videoModal').classList.add('hidden')">
+<i class="fa-solid fa-xmark"></i>
+</button>
+<div class="w-full h-full flex items-center justify-center text-gray-500 flex-col gap-4">
+<i class="fa-solid fa-circle-play text-6xl"></i>
+<p>视频播放器加载中...</p>
+</div>
+</div>
+</div>
+<!-- END: Video Modal -->
+</div>
+<!-- END: Windows 10 Application Window -->
+<script data-purpose="ui-logic">
+    // Minimal logic for the UI demonstration
+    document.querySelectorAll('.win-btn.close').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if(confirm('确定要关闭 Bilibili 直播流提取工具吗？')) {
+          alert('在实际应用中，这里将调用 window.close()');
         }
-
-        // 显示错误信息
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMsg');
-            document.getElementById('errorText').textContent = message;
-            errorDiv.classList.remove('hidden');
-            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-        }
-
-        // 显示Toast通知
-        function showToast(message, isSuccess = true) {
-            const toast = document.getElementById('toast');
-            const toastText = document.getElementById('toastText');
-            const toastIcon = document.getElementById('toastIcon');
-            
-            toastText.textContent = message;
-            toastIcon.className = isSuccess ? 
-                'fas fa-check-circle text-green-300' : 
-                'fas fa-exclamation-circle text-amber-300';
-            
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
-
-        // 设置加载状态
-        function setLoading(loading) {
-            const btn = document.getElementById('fetchBtn');
-            const btnText = document.getElementById('btnText');
-            const btnLoading = document.getElementById('btnLoading');
-            
-            btn.disabled = loading;
-            if (loading) {
-                btnText.classList.add('hidden');
-                btnLoading.classList.remove('hidden');
-            } else {
-                btnText.classList.remove('hidden');
-                btnLoading.classList.add('hidden');
-            }
-        }
-
-        // 解析房间号
-        function parseRoomId(input) {
-            if (/^\d+$/.test(input)) return input;
-            const urlMatch = input.match(/live\.bilibili\.com\/(\d+)/);
-            return urlMatch ? urlMatch[1] : null;
-        }
-
-        // 通过代理发送请求
-        async function proxyRequest(url) {
-            for (const proxy of CORS_PROXIES) {
-                try {
-                    const proxyUrl = proxy + encodeURIComponent(url);
-                    const response = await axios.get(proxyUrl, {
-                        timeout: 10000,
-                        headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            'Accept': 'application/json, text/plain, */*'
-                        }
-                    });
-                    if (response.data && typeof response.data === 'object') {
-                        return response.data;
-                    }
-                } catch (error) {
-                    console.warn(`代理 ${proxy} 失败:`, error.message);
-                    continue;
-                }
-            }
-            throw new Error('网络请求失败，请稍后重试');
-        }
-
-        // 获取房间信息
-        async function getRoomInfo(roomId) {
-            const apiUrl = `https://api.live.bilibili.com/room/v1/Room/get_info?room_id=${roomId}`;
-            const data = await proxyRequest(apiUrl);
-            if (data.code !== 0) throw new Error(data.message || '获取房间信息失败');
-            return data.data;
-        }
-
-        // 获取直播流地址
-        async function getStreamUrl(roomId) {
-            const qualities = [0, 1, 2, 3, 4];
-            const streamData = {};
-            
-            for (const qn of qualities) {
-                try {
-                    const apiUrl = `https://api.live.bilibili.com/room/v1/Room/playUrl?cid=${roomId}&quality=${qn}&platform=web`;
-                    const data = await proxyRequest(apiUrl);
-                    
-                    if (data.code === 0 && data.data && data.data.durl) {
-                        streamData[qn] = {
-                            quality: qn,
-                            desc: data.data.quality_description?.find(q => q.qn === qn)?.desc || `清晰度 ${qn}`,
-                            durl: data.data.durl
-                        };
-                    }
-                } catch (e) {
-                    console.warn(`清晰度 ${qn} 获取失败:`, e.message);
-                }
-            }
-            
-            if (Object.keys(streamData).length === 0) {
-                throw new Error('无法获取直播流地址，可能直播间未开播或设置了访问限制');
-            }
-            return streamData;
-        }
-
-        // 通过链接直接播放
-        function viewByUrl() {
-            const url = prompt('请输入FLV或M3U8格式的直播流链接:');
-            if (!url) return;
-            
-            if (!url.startsWith('http')) {
-                showError('请输入有效的HTTP/HTTPS链接');
-                return;
-            }
-            
-            const validFormats = ['.flv', '.m3u8', 'flv', 'hls'];
-            const isValid = validFormats.some(format => url.includes(format));
-            
-            if (!isValid && !confirm('链接格式可能不受支持，是否继续尝试播放？')) {
-                return;
-            }
-            
-            playVideo(url, '自定义链接');
-        }
-
-        // 主提取函数
-        async function fetchStream() {
-            const input = document.getElementById('roomInput').value.trim();
-            if (!input) {
-                showError('请输入房间号或直播链接');
-                return;
-            }
-            
-            const roomId = parseRoomId(input);
-            if (!roomId) {
-                showError('格式错误：请输入纯数字房间号或完整的B站直播链接');
-                return;
-            }
-            
-            // 重置界面
-            document.getElementById('errorMsg').classList.add('hidden');
-            document.getElementById('roomInfo').classList.add('hidden');
-            document.getElementById('streamList').classList.add('hidden');
-            setLoading(true);
-            
-            try {
-                // 获取房间信息
-                const roomInfo = await getRoomInfo(roomId);
-                
-                // 显示房间信息
-                displayRoomInfo(roomInfo);
-                
-                // 检查开播状态
-                if (roomInfo.live_status !== 1) {
-                    showError(`当前直播间未开播 (状态: ${roomInfo.live_status === 0 ? '空闲' : '轮播'})`);
-                    setLoading(false);
-                    return;
-                }
-                
-                // 获取直播流地址
-                allStreamData = await getStreamUrl(roomId);
-                currentQuality = Object.keys(allStreamData)[0];
-                
-                // 显示直播流列表
-                displayStreamList();
-                
-                // 添加到历史记录
-                addToHistory(roomInfo);
-                
-            } catch (error) {
-                showError(error.message || '获取失败，请检查房间号或网络连接');
-                console.error('获取失败:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        // 显示房间信息
-        function displayRoomInfo(data) {
-            document.getElementById('roomTitle').textContent = data.title;
-            document.getElementById('roomAnchor').textContent = data.uname;
-            document.getElementById('roomId').textContent = data.room_id;
-            document.getElementById('roomOnline').textContent = formatNumber(data.online);
-            document.getElementById('areaInfo').textContent = `${data.area_name} > ${data.area_parent_name}`;
-            
-            // 封面图
-            const coverImg = document.getElementById('roomCover');
-            coverImg.src = data.keyframe || data.user_cover || 'https://via.placeholder.com/400x300?text=No+Cover';
-            coverImg.onerror = () => coverImg.src = 'https://via.placeholder.com/400x300?text=No+Cover';
-            
-            // 直播状态
-            const liveStatus = document.getElementById('liveStatus');
-            const offlineStatus = document.getElementById('offlineStatus');
-            if (data.live_status === 1) {
-                liveStatus.classList.remove('hidden');
-                offlineStatus.classList.add('hidden');
-            } else {
-                liveStatus.classList.add('hidden');
-                offlineStatus.classList.remove('hidden');
-                offlineStatus.textContent = data.live_status === 2 ? '轮播中' : '未开播';
-            }
-            
-            document.getElementById('roomInfo').classList.remove('hidden');
-        }
-
-        // 显示直播流列表
-        function displayStreamList() {
-            // 渲染清晰度标签
-            const tabsContainer = document.getElementById('qualityTabs');
-            tabsContainer.innerHTML = '';
-            
-            Object.keys(allStreamData).forEach(qn => {
-                const data = allStreamData[qn];
-                const btn = document.createElement('button');
-                btn.className = `quality-tag px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    parseInt(qn) === currentQuality ? 
-                    'active text-white' : 
-                    'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`;
-                btn.textContent = data.desc;
-                btn.onclick = () => changeQuality(parseInt(qn));
-                tabsContainer.appendChild(btn);
-            });
-            
-            // 渲染地址列表
-            renderStreamUrls();
-            document.getElementById('streamList').classList.remove('hidden');
-        }
-
-        // 切换清晰度
-        function changeQuality(qn) {
-            currentQuality = qn;
-            displayStreamList();
-        }
-
-        // 渲染直播流地址
-        function renderStreamUrls() {
-            const container = document.getElementById('streamUrls');
-            container.innerHTML = '';
-            
-            const currentData = allStreamData[currentQuality];
-            if (!currentData?.durl) {
-                container.innerHTML = '<p class="text-slate-500 text-center py-6">该清晰度暂无可用地址</p>';
-                return;
-            }
-            
-            currentData.durl.forEach((stream, index) => {
-                const streamName = stream.name || `线路 ${index + 1}`;
-                const item = document.createElement('div');
-                item.className = 'bg-gradient-to-r from-slate-50 to-white rounded-xl p-5 border border-slate-200';
-                item.innerHTML = `
-                    <div class="flex flex-col lg:flex-row lg:items-center gap-4">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-3 mb-2">
-                                <span class="font-semibold text-slate-800">${streamName}</span>
-                                <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">${currentData.desc}</span>
-                            </div>
-                            <div class="flex items-center">
-                                <input type="text" readonly value="${stream.url}" 
-                                    class="stream-url-input flex-1 px-4 py-3 bg-white border border-slate-300 rounded-lg text-sm text-slate-600 font-mono truncate"
-                                    id="streamUrl${index}">
-                            </div>
-                        </div>
-                        <div class="flex gap-2 flex-shrink-0">
-                            <button onclick="copyUrl('${stream.url}', ${index})"
-                                class="px-5 py-2.5 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-lg transition-all text-sm flex items-center gap-2 shadow-sm">
-                                <i class="fas fa-copy"></i> 复制
-                            </button>
-                            <button onclick="playVideo('${stream.url}', '${streamName}')"
-                                class="px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg transition-all text-sm flex items-center gap-2 shadow-sm">
-                                <i class="fas fa-play"></i> 播放
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        // ==================== 实用功能函数 ====================
-
-        // 复制链接
-        async function copyUrl(url, index) {
-            try {
-                await navigator.clipboard.writeText(url);
-                showToast('链接已复制到剪贴板');
-            } catch (error) {
-                const input = document.getElementById(`streamUrl${index}`);
-                input.select();
-                document.execCommand('copy');
-                showToast('链接已复制');
-            }
-        }
-
-        // 播放视频
-        function playVideo(url, streamName) {
-            const modal = document.getElementById('videoModal');
-            const videoPlayer = document.getElementById('videoPlayer');
-            const currentStreamName = document.getElementById('currentStreamName');
-            
-            currentStreamName.textContent = streamName;
-            modal.classList.remove('hidden');
-            
-            // 清理之前的播放器
-            if (currentFlvPlayer) {
-                currentFlvPlayer.destroy();
-                currentFlvPlayer = null;
-            }
-            if (currentHlsPlayer) {
-                currentHlsPlayer.destroy();
-                currentHlsPlayer = null;
-            }
-            
-            videoPlayer.src = '';
-            videoPlayer.load();
-            
-            // 根据格式选择播放方式
-            if (flvjs.isSupported() && url.includes('.flv')) {
-                try {
-                    currentFlvPlayer = flvjs.createPlayer({
-                        type: 'flv',
-                        url: url,
-                        cors: true,
-                        withCredentials: false
-                    });
-                    currentFlvPlayer.attachMediaElement(videoPlayer);
-                    currentFlvPlayer.load();
-                    currentFlvPlayer.play().catch(e => {
-                        console.warn('自动播放失败:', e);
-                        showToast('点击视频区域手动播放', false);
-                    });
-                } catch (error) {
-                    console.error('FLV播放失败:', error);
-                    videoPlayer.src = url;
-                }
-            } else if (url.includes('.m3u8')) {
-                if (Hls.isSupported()) {
-                    try {
-                        currentHlsPlayer = new Hls();
-                        currentHlsPlayer.loadSource(url);
-                        currentHlsPlayer.attachMedia(videoPlayer);
-                        currentHlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
-                            videoPlayer.play().catch(e => console.warn('自动播放失败:', e));
-                        });
-                    } catch (error) {
-                        console.error('HLS播放失败:', error);
-                        videoPlayer.src = url;
-                    }
-                } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoPlayer.src = url;
-                    videoPlayer.addEventListener('loadedmetadata', () => {
-                        videoPlayer.play().catch(e => console.warn('自动播放失败:', e));
-                    });
-                } else {
-                    showToast('当前浏览器不支持HLS格式', false);
-                    videoPlayer.src = url;
-                }
-            } else {
-                videoPlayer.src = url;
-                videoPlayer.addEventListener('loadedmetadata', () => {
-                    videoPlayer.play().catch(e => {
-                        console.warn('自动播放失败:', e);
-                        showToast('点击视频区域手动播放', false);
-                    });
-                });
-            }
-        }
-
-        // 关闭视频模态框
-        function closeModal() {
-            const modal = document.getElementById('videoModal');
-            modal.classList.add('hidden');
-            
-            if (currentFlvPlayer) {
-                currentFlvPlayer.destroy();
-                currentFlvPlayer = null;
-            }
-            if (currentHlsPlayer) {
-                currentHlsPlayer.destroy();
-                currentHlsPlayer = null;
-            }
-            
-            const videoPlayer = document.getElementById('videoPlayer');
-            videoPlayer.pause();
-            videoPlayer.src = '';
-        }
-
-        // 下载封面
-        async function downloadCover() {
-            const coverImg = document.getElementById('roomCover');
-            const coverSrc = coverImg.src;
-            const title = document.getElementById('roomTitle').textContent;
-            const roomId = document.getElementById('roomId').textContent;
-            
-            if (!coverSrc || coverSrc.includes('placeholder')) {
-                showError('暂无封面图可下载');
-                return;
-            }
-            
-            try {
-                showToast('正在下载封面...');
-                const response = await fetch(coverSrc);
-                if (!response.ok) throw new Error('获取图片失败');
-                
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = `B站直播封面_${title}_${roomId}.jpg`.replace(/[<>:"/\\|?*]/g, '_');
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-                
-                showToast('封面下载成功！');
-            } catch (error) {
-                console.error('下载失败:', error);
-                showError('下载失败，请尝试右键图片另存为');
-            }
-        }
-
-        // 获取播放链接
-        function getPlayLink() {
-            if (!allStreamData || Object.keys(allStreamData).length === 0) {
-                showError('请先获取直播流信息');
-                return;
-            }
-            
-            const currentData = allStreamData[currentQuality];
-            if (!currentData?.durl || currentData.durl.length === 0) {
-                showError('暂无可用的播放链接');
-                return;
-            }
-            
-            const playUrl = currentData.durl[0].url;
-            const qualityDesc = currentData.desc;
-            
-            copyToClipboard(playUrl).then(() => {
-                showToast(`${qualityDesc}播放链接已复制！`);
-            }).catch(() => {
-                showPlayLinkModal(playUrl, qualityDesc);
-            });
-        }
-
-        // 显示播放链接模态框
-        function showPlayLinkModal(url, quality) {
-            document.getElementById('playLinkQuality').textContent = quality;
-            document.getElementById('playLinkUrl').value = url;
-            document.getElementById('playLinkModal').classList.remove('hidden');
-        }
-
-        // 关闭播放链接模态框
-        function closePlayLinkModal() {
-            document.getElementById('playLinkModal').classList.add('hidden');
-        }
-
-        // 复制播放链接
-        function copyPlayLinkFromModal() {
-            const url = document.getElementById('playLinkUrl').value;
-            copyToClipboard(url).then(() => {
-                showToast('链接已复制到剪贴板！');
-                closePlayLinkModal();
-            }).catch(() => {
-                showError('复制失败，请手动选择复制');
-            });
-        }
-
-        // 通用复制函数
-        async function copyToClipboard(text) {
-            if (navigator.clipboard?.writeText) {
-                return navigator.clipboard.writeText(text);
-            } else {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                return Promise.resolve();
-            }
-        }
-
-        // ==================== 历史记录功能 ====================
-
-        // 添加到历史记录
-        function addToHistory(roomInfo) {
-            const historyItem = {
-                room_id: roomInfo.room_id,
-                title: roomInfo.title,
-                uname: roomInfo.uname,
-                cover: roomInfo.keyframe || roomInfo.user_cover,
-                time: new Date().toISOString()
-            };
-            
-            // 移除重复项
-            searchHistory = searchHistory.filter(item => item.room_id !== roomInfo.room_id);
-            // 添加到开头
-            searchHistory.unshift(historyItem);
-            // 保留最近10条
-            searchHistory = searchHistory.slice(0, 10);
-            
-            // 保存到本地存储
-            localStorage.setItem('biliLiveHistory', JSON.stringify(searchHistory));
-            
-            // 更新显示
-            renderHistory();
-        }
-
-        // 渲染历史记录
-        function renderHistory() {
-            const container = document.getElementById('historyList');
-            const section = document.getElementById('historySection');
-            
-            if (searchHistory.length === 0) {
-                section.classList.add('hidden');
-                return;
-            }
-            
-            section.classList.remove('hidden');
-            container.innerHTML = '';
-            
-            searchHistory.forEach(item => {
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-item bg-white p-4 rounded-lg border border-slate-200 cursor-pointer';
-                historyItem.onclick = () => {
-                    document.getElementById('roomInput').value = item.room_id;
-                    fetchStream();
-                };
-                
-                const time = new Date(item.time).toLocaleString('zh-CN', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                
-                historyItem.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-slate-200">
-                            <img src="${item.cover || 'https://via.placeholder.com/100?text=Cover'}" 
-                                 alt="${item.title}" 
-                                 class="w-full h-full object-cover"
-                                 onerror="this.src='https://via.placeholder.com/100?text=Cover'">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-slate-800 truncate">${item.title}</h4>
-                            <div class="flex items-center justify-between mt-1">
-                                <span class="text-sm text-slate-600">${item.uname}</span>
-                                <span class="text-xs text-slate-500">${time}</span>
-                            </div>
-                        </div>
-                        <div class="flex-shrink-0 text-slate-400">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(historyItem);
-            });
-        }
-
-        // ==================== 工具函数 ====================
-
-        // 数字格式化
-        function formatNumber(num) {
-            if (num >= 10000) return (num / 10000).toFixed(1) + '万';
-            if (num >= 1000) return (num / 1000).toFixed(1) + '千';
-            return num.toString();
-        }
-    </script>
-</body>
-</html>
+      });
+    });
+  </script>
+</body></html>

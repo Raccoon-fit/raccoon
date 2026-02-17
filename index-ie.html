@@ -29,6 +29,115 @@ body {
     min-height: 100vh;
 }
 
+/* 新年横幅样式 */
+.newyear-banner-ie {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background: linear-gradient(90deg, #B71C1C, #E53935, #FFD700, #E53935, #B71C1C);
+    background-size: 200% 100%;
+    animation: banner-shimmer 3s linear infinite;
+    box-shadow: 0 2px 10px rgba(229, 57, 53, 0.3);
+}
+
+@keyframes banner-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+.newyear-banner-content-ie {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px 16px;
+    display: block;
+    *zoom: 1;
+}
+
+.newyear-banner-content-ie:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.newyear-link-ie {
+    float: left;
+    display: inline;
+    color: #FFD700;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.newyear-link-ie:hover {
+    color: #FFF;
+    text-decoration: underline;
+}
+
+.newyear-text-ie {
+    float: right;
+    display: inline;
+    color: #FFD700;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* 灯笼装饰 */
+.lantern-ie {
+    position: fixed;
+    font-size: 28px;
+    z-index: 100;
+    animation: lantern-swing 3s ease-in-out infinite;
+    cursor: pointer;
+    text-decoration: none;
+    top: 70px;
+}
+
+.lantern-ie:hover {
+    transform: scale(1.2);
+}
+
+.lantern-left-ie { left: 3%; }
+.lantern-right-ie { right: 3%; }
+
+@keyframes lantern-swing {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* 新年祝福标签 */
+.newyear-badge-ie {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #B71C1C, #E53935);
+    border: 1px solid #FFD700;
+    border-radius: 9999px;
+    color: #FFD700;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+}
+
+/* 新年装饰角标 */
+.newyear-corner-ie {
+    position: absolute;
+    font-size: 36px;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.corner-tl-ie { top: 16px; left: 16px; }
+.corner-tr-ie { top: 16px; right: 16px; }
+.corner-bl-ie { bottom: 16px; left: 16px; }
+.corner-br-ie { bottom: 16px; right: 16px; }
+
 /* ========================================
    液态背景系统 - IE滤镜版
 ======================================== */
@@ -150,7 +259,7 @@ body {
 ======================================== */
 .nav-wrap-ie {
     position: fixed;
-    top: 16px;
+    top: 52px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -303,7 +412,7 @@ section-ie {
     min-height: 100vh;
     display: block;
     text-align: center;
-    padding-top: 120px;
+    padding-top: 140px;
     padding-bottom: 32px;
 }
 
@@ -340,6 +449,19 @@ section-ie {
     max-width: 540px;
     margin: 0 auto 32px;
     line-height: 1.75;
+}
+
+/* 新年祝福卡片 */
+.newyear-wish-ie {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(90deg, rgba(183, 28, 28, 0.3), rgba(229, 57, 53, 0.3));
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    color: #FFD700;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .hero-img-wrap-ie {
@@ -647,6 +769,7 @@ section-ie {
     margin: 0 auto;
     padding: 32px;
     border-top: 1px solid rgba(255,255,255,0.06);
+    position: relative;
 }
 
 .footer-logo-ie {
@@ -704,6 +827,16 @@ section-ie {
     border-top: 1px solid rgba(255,255,255,0.04);
 }
 
+/* 页脚新年祝福 */
+.footer-newyear-ie {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    color: #FFD700;
+    font-size: 13px;
+    font-weight: 500;
+}
+
 /* 跳过链接 */
 .skip-link-ie {
     position: absolute;
@@ -727,36 +860,51 @@ section-ie {
         width: calc(100% - 24px);
         float: none;
     }
-    
+
     .lab-card-ie {
         width: calc(100% - 24px);
         float: none;
     }
-    
+
     .about-box-ie,
     .skills-box-ie {
         width: calc(100% - 16px);
         float: none;
         margin-bottom: 16px;
     }
-    
+
     .nav-menu-ie {
         display: none;
     }
-    
+
     .nav-bar-ie {
         text-align: center;
     }
-    
+
     .nav-brand-ie {
         float: none;
         display: inline-block;
     }
-    
+
     .nav-actions-ie {
         float: none;
         display: inline-block;
         margin-top: 10px;
+    }
+    
+    .newyear-banner-content-ie {
+        text-align: center;
+    }
+    
+    .newyear-link-ie,
+    .newyear-text-ie {
+        float: none;
+        display: block;
+        margin: 4px 0;
+    }
+    
+    .lantern-ie {
+        display: none;
     }
 }
 
@@ -792,6 +940,18 @@ html {
 <![endif]-->
 </head>
 <body>
+    <!-- 新年横幅 -->
+    <div class="newyear-banner-ie">
+        <div class="newyear-banner-content-ie">
+            <a href="index-ie.html" class="newyear-link-ie">🎯 IE兼容版</a>
+            <span class="newyear-text-ie">🎊 恭贺新禧 · 丙午马年大吉 · 万事如意 🎊</span>
+        </div>
+    </div>
+
+    <!-- 灯笼装饰 -->
+    <a href="#" class="lantern-ie lantern-left-ie" title="新年快乐">🏮</a>
+    <a href="#" class="lantern-ie lantern-right-ie" title="马年大吉">🧧</a>
+
     <!-- IE兼容液态背景 -->
     <div class="liquid-bg-ie">
         <div class="liquid-orb-ie orb-ie-1"></div>
@@ -841,9 +1001,11 @@ html {
         <!-- 首页 - IE版 -->
         <section-ie id="home-ie" class="hero-ie">
             <div class="container-ie">
-                <div class="hero-badge-ie">
-                    <span>✨</span>
-                    <span>数字创意空间</span>
+                <!-- 新年徽章 -->
+                <div class="newyear-badge-ie">
+                    <span>🎊</span>
+                    <span>丙午马年 · 新春快乐</span>
+                    <span>🎊</span>
                 </div>
                 <h1 class="hero-h1-ie">
                     探索代码的<br><span>无限可能</span>
@@ -852,6 +1014,10 @@ html {
                     这里是软软的数字空间，一个专注于创造、学习和分享的地方。
                     通过代码探索未知，用技术解决现实问题。
                 </p>
+                <!-- 新年祝福 -->
+                <div class="newyear-wish-ie">
+                    ✨ 愿新的一年代码无bug，创意无极限 ✨
+                </div>
                 <div class="hero-img-wrap-ie">
                     <img src="https://raccoon.fit/image/20260101/2026新年快乐.jpg" alt="2026新年快乐" width="440" height="293">
                 </div>
@@ -1044,6 +1210,12 @@ html {
     <!-- 页脚 - IE版 -->
     <footer-ie id="contact-ie" class="footer-ie">
         <div class="footer-box-ie">
+            <!-- 新年装饰角标 -->
+            <span class="newyear-corner-ie corner-tl-ie">🧧</span>
+            <span class="newyear-corner-ie corner-tr-ie">🏮</span>
+            <span class="newyear-corner-ie corner-bl-ie">🎊</span>
+            <span class="newyear-corner-ie corner-br-ie">✨</span>
+            
             <div class="footer-logo-ie">
                 <span class="footer-ico-ie">🦝</span>
                 <span>软软的小窝</span>
@@ -1057,6 +1229,10 @@ html {
             </div>
             <div class="footer-copy-ie">
                 © 2025-2026 软软. 本网站由浣熊设计与开发
+            </div>
+            <!-- 新年祝福 -->
+            <div class="footer-newyear-ie">
+                🎊 恭贺新禧 · 丙午马年大吉 · 万事如意 · 新春快乐 🎊
             </div>
         </div>
     </footer-ie>
@@ -1280,6 +1456,7 @@ html {
             try {
                 if (window.console && window.console.log) {
                     console.log('%c🦝 软软的小窝', 'font-size:20px;font-weight:bold;background:linear-gradient(135deg,#8b5cf6,#d946ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent;');
+                    console.log('%c🎊 新年快乐！丙午马年大吉！🎊', 'font-size:16px;color:#FFD700;');
                 }
             } catch (e) {}
         }

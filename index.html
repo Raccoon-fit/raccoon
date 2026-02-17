@@ -23,6 +23,11 @@
               dark: '#0A0A0A',
               surface: '#121212',
               accent: '#CD853F',
+            },
+            newyear: {
+              red: '#E53935',
+              gold: '#FFD700',
+              'red-dark': '#B71C1C',
             }
           },
           fontFamily: {
@@ -32,6 +37,8 @@
             'float': 'float 6s ease-in-out infinite',
             'shimmer': 'shimmer 2s linear infinite',
             'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'firework': 'firework 1.5s ease-out infinite',
+            'lantern-swing': 'lantern-swing 3s ease-in-out infinite',
           },
           keyframes: {
             float: {
@@ -40,6 +47,15 @@
             },
             shimmer: {
               '100%': { transform: 'translateX(100%)' },
+            },
+            firework: {
+              '0%': { transform: 'translateY(0) scale(0)', opacity: '1' },
+              '50%': { transform: 'translateY(-100px) scale(1)', opacity: '0.8' },
+              '100%': { transform: 'translateY(-150px) scale(0.5)', opacity: '0' },
+            },
+            'lantern-swing': {
+              '0%, 100%': { transform: 'rotate(-5deg)' },
+              '50%': { transform: 'rotate(5deg)' },
             }
           }
         }
@@ -103,16 +119,92 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(8px);
     }
+
+    /* 新年氛围样式 */
+    .newyear-lantern {
+      position: fixed;
+      font-size: 2.5rem;
+      z-index: 40;
+      animation: lantern-swing 3s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .newyear-lantern:hover {
+      transform: scale(1.2);
+    }
+
+    .firework-particle {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    .newyear-glow {
+      text-shadow: 0 0 10px rgba(229, 57, 53, 0.5), 0 0 20px rgba(229, 57, 53, 0.3);
+    }
+
+    .gold-glow {
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    /* 新年横幅 */
+    .newyear-banner {
+      background: linear-gradient(90deg, #E53935, #FFD700, #E53935);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    /* 福字装饰 */
+    .fu-character {
+      font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      font-weight: bold;
+      font-size: 3rem;
+      background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+    }
   </style>
 </head>
 <body class="font-sans custom-scrollbar">
+<!-- BEGIN: IE兼容版链接 -->
+<div class="fixed top-0 left-0 z-[9998] w-full bg-gradient-to-r from-red-900/90 to-red-800/90 backdrop-blur-sm border-b border-red-700/50">
+  <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+    <a href="index-ie.html" class="inline-flex items-center gap-2 text-yellow-200 hover:text-yellow-100 transition-colors text-sm font-medium">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+      </svg>
+      IE兼容版请点击这里进入
+    </a>
+    <div class="flex items-center gap-4 text-yellow-200/80 text-xs">
+      <span>🎊 恭贺新禧 · 马年大吉 🎊</span>
+    </div>
+  </div>
+</div>
+<!-- END: IE兼容版链接 -->
+
 <!-- BEGIN: GlobalBackground -->
 <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
 <div class="absolute inset-0 bg-pattern opacity-30"></div>
 <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-raccoon-orange/10 blur-[120px] rounded-full animate-pulse-slow"></div>
 <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-raccoon-brown/10 blur-[100px] rounded-full"></div>
+<!-- 新年装饰：漂浮的红包元素 -->
+<div class="absolute top-[20%] left-[10%] w-16 h-20 bg-red-600/20 blur-xl rounded-full animate-pulse"></div>
+<div class="absolute top-[60%] right-[15%] w-20 h-24 bg-red-500/20 blur-xl rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+<div class="absolute bottom-[20%] left-[20%] w-12 h-16 bg-yellow-500/20 blur-xl rounded-full animate-pulse" style="animation-delay: 2s;"></div>
 </div>
 <!-- END: GlobalBackground -->
+
+<!-- BEGIN: 灯笼装饰 -->
+<div class="newyear-lantern" style="top: 80px; left: 5%;">🏮</div>
+<div class="newyear-lantern" style="top: 100px; right: 5%; animation-delay: 0.5s;">🏮</div>
+<div class="newyear-lantern" style="top: 150px; left: 8%; animation-delay: 1s;">🧧</div>
+<div class="newyear-lantern" style="top: 180px; right: 8%; animation-delay: 1.5s;">🧧</div>
+<!-- END: 灯笼装饰 -->
+
 <!-- BEGIN: LoadingOverlay -->
 <div class="fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-700" id="loadingOverlay">
 <div class="text-center">
@@ -120,11 +212,13 @@
 <div class="w-48 h-1 bg-zinc-900 rounded-full overflow-hidden relative">
 <div class="absolute inset-0 bg-raccoon-orange w-1/2 animate-[shimmer_1.5s_infinite] origin-left"></div>
 </div>
+<!-- 新年祝福加载动画 -->
+<div class="mt-4 text-red-400 text-sm font-medium">正在进入软软的小窝...</div>
 </div>
 </div>
 <!-- END: LoadingOverlay -->
 <!-- BEGIN: Navigation -->
-<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl">
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl" style="top: calc(6px + 36px);">
 <div class="glass-effect rounded-full px-6 py-3 flex items-center justify-between shadow-2xl">
 <div class="flex items-center gap-3 cursor-pointer group" data-purpose="brand-logo" id="navBrandTrigger">
 <div class="w-10 h-10 bg-gradient-to-br from-raccoon-orange to-raccoon-brown rounded-xl flex items-center justify-center text-xl shadow-lg shadow-raccoon-orange/20 transition-transform group-hover:rotate-12" id="navIcon">🦝</div>
@@ -152,13 +246,20 @@
 <!-- BEGIN: HeroSection -->
 <section class="min-h-screen flex flex-col items-center justify-center pt-24 px-6 relative overflow-hidden">
 <div class="hero-gradient absolute inset-0 pointer-events-none"></div>
+<!-- 新年装饰元素 -->
+<div class="absolute top-20 left-10 text-6xl opacity-20 animate-pulse">🎉</div>
+<div class="absolute top-32 right-16 text-5xl opacity-20 animate-pulse" style="animation-delay: 0.5s;">🎊</div>
+<div class="absolute bottom-32 left-16 text-5xl opacity-20 animate-pulse" style="animation-delay: 1s;">✨</div>
+<div class="absolute bottom-20 right-10 text-6xl opacity-20 animate-pulse" style="animation-delay: 1.5s;">🧧</div>
+
 <div class="relative z-10 text-center max-w-4xl mx-auto">
-<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-effect text-xs font-medium text-raccoon-orange mb-8 border-raccoon-orange/20 animate-fade-in">
+<!-- 新年横幅 -->
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-effect text-xs font-medium text-newyear-gold mb-8 border-newyear-red/20 animate-fade-in">
 <span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-raccoon-orange opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-raccoon-orange"></span>
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span>
 </span>
-          DIGITAL CREATIVE STUDIO v2.0
+          🎊 丙午马年 · 新春快乐 🎊
         </div>
 <h1 class="text-5xl md:text-8xl font-black mb-8 tracking-tighter text-gradient leading-tight">
           探索代码的<br/><span class="italic text-raccoon-orange">无限可能</span>
@@ -166,6 +267,10 @@
 <p class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-light">
           这里是软软的数字空间，一个专注于创造、学习和分享的地方。通过代码探索未知，用技术解决现实问题。
         </p>
+<!-- 新年祝福语 -->
+<div class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-red-900/30 to-yellow-900/30 border border-red-500/20 inline-block">
+  <p class="text-yellow-200 text-sm font-medium">✨ 愿新的一年代码无bug，创意无极限 ✨</p>
+</div>
 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
 <a class="w-full sm:w-auto px-10 py-4 bg-raccoon-orange text-white font-bold rounded-2xl shadow-xl shadow-raccoon-orange/20 hover:scale-105 transition-transform active:scale-95" href="#projects">
             探索项目
@@ -388,6 +493,12 @@
 <div class="container mx-auto max-w-7xl">
 <div class="glass-effect rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden">
 <div class="absolute inset-0 bg-raccoon-orange/5 pointer-events-none"></div>
+<!-- 新年装饰角标 -->
+<div class="absolute top-4 left-4 text-4xl opacity-30">🧧</div>
+<div class="absolute top-4 right-4 text-4xl opacity-30">🏮</div>
+<div class="absolute bottom-4 left-4 text-4xl opacity-30">🎊</div>
+<div class="absolute bottom-4 right-4 text-4xl opacity-30">✨</div>
+
 <div class="inline-flex w-20 h-20 bg-gradient-to-br from-raccoon-orange to-raccoon-brown rounded-3xl items-center justify-center text-4xl shadow-2xl shadow-raccoon-orange/30 mb-8 mx-auto">🦝</div>
 <h2 class="text-4xl md:text-5xl font-black mb-6">软软的小窝</h2>
 <p class="text-zinc-500 max-w-md mx-auto mb-12">探索、创造、成长。欢迎与我联系，交流想法，合作创新。</p>
@@ -403,6 +514,10 @@
 <span class="w-10 h-px bg-zinc-600"></span>
 <span class="text-[10px] font-mono text-zinc-500">STAY HUNGRY STAY FOOLISH</span>
 </div>
+</div>
+<!-- 新年祝福横幅 -->
+<div class="mt-8 pt-8 border-t border-white/5">
+  <p class="text-yellow-500/60 text-sm">🎊 恭贺新禧 · 马年大吉 · 万事如意 · 新春快乐 🎊</p>
 </div>
 </div>
 </div>
@@ -502,7 +617,28 @@
       observer.observe(el);
     });
 
+    // 新年烟花效果
+    function createFirework() {
+      const colors = ['#E53935', '#FFD700', '#FF5722', '#FF9800', '#FFEB3B'];
+      const firework = document.createElement('div');
+      firework.className = 'firework-particle';
+      firework.style.left = Math.random() * 100 + 'vw';
+      firework.style.top = Math.random() * 50 + 20 + 'vh';
+      firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      firework.style.boxShadow = `0 0 10px ${firework.style.backgroundColor}, 0 0 20px ${firework.style.backgroundColor}`;
+      firework.style.animation = `firework ${1 + Math.random()}s ease-out forwards`;
+      document.body.appendChild(firework);
+      
+      setTimeout(() => {
+        firework.remove();
+      }, 2000);
+    }
+
+    // 每隔一段时间发射烟花
+    setInterval(createFirework, 3000);
+
     console.log('%c🦝 软软的小窝 | Raccoon Space', 'color: #FF7F50; font-size: 20px; font-weight: bold;');
     console.log('欢迎来到创意实验室！如果你看到了这条消息，或许你可以试试点击顶部的浣熊头像。');
+    console.log('🎊 新年快乐！马年大吉！🎊');
   </script>
 </body></html>

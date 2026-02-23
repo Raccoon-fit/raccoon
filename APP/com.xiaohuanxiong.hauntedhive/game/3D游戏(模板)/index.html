@@ -6,88 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>3D 双角色切换控制器</title>
-    
-    <!-- UA验证失败提示页面样式 -->
-    <style>
-        #ua-fallback-page {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #ffffff;
-            color: #000000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999999;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        #ua-fallback-page.visible {
-            display: flex;
-        }
-
-        .fallback-content {
-            text-align: center;
-            padding: 40px;
-            max-width: 500px;
-        }
-
-        .fallback-icon {
-            font-size: 64px;
-            margin-bottom: 24px;
-        }
-
-        .fallback-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #1a1a1a;
-        }
-
-        .fallback-message {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #333333;
-            margin-bottom: 24px;
-        }
-
-        .fallback-download {
-            display: inline-block;
-            padding: 12px 32px;
-            background: #000000;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 8px;
-        }
-
-        .fallback-package {
-            font-size: 12px;
-            color: #666666;
-            margin-top: 16px;
-            font-family: monospace;
-        }
-    </style>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- UA验证失败提示页面 -->
-    <div id="ua-fallback-page">
-        <div class="fallback-content">
-            <div class="fallback-icon">🦝</div>
-            <h1 class="fallback-title">请在灵熊小记APP查看</h1>
-            <p class="fallback-message">
-                为了获得最佳体验，请下载并安装灵熊小记官方应用。
-            </p>
-            <div class="fallback-package">com.xiaohuanxiong.hauntedhive</div>
-        </div>
-    </div>
-
     <!-- 3D 场景容器 -->
     <div id="scene-container"></div>
 
@@ -189,55 +110,6 @@
         <div class="loading-spinner"></div>
         <div>加载中...</div>
     </div>
-
-    <!-- UA验证脚本 -->
-    <script>
-        // UA验证常量
-        const TARGET_UA = 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 LingXiongRaccoon/1.0 (package:com.xiaohuanxiong.hauntedhive; official:raccoon.fit)';
-        
-        // UA验证函数
-        function validateUA() {
-            const currentUA = navigator.userAgent;
-            console.log('🔍 Current UA:', currentUA);
-            console.log('🎯 Target UA:', TARGET_UA);
-            
-            if (currentUA === TARGET_UA) {
-                console.log('✅ UA验证通过 - 显示游戏内容');
-                return true;
-            } else {
-                console.log('❌ UA验证失败 - 显示提示页面');
-                return false;
-            }
-        }
-
-        // 初始化UA验证
-        function initUAValidation() {
-            if (!validateUA()) {
-                // 显示UA验证失败页面
-                document.getElementById('ua-fallback-page').classList.add('visible');
-                // 隐藏游戏容器
-                document.getElementById('scene-container').style.display = 'none';
-                // 隐藏其他UI元素
-                const hideElements = ['libraries-info', 'info-panel', 'first-person-hint', 'keyboard-hint', 'remote-hint', 'loading', 'joystick-container'];
-                hideElements.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
-                return false;
-            }
-            return true;
-        }
-
-        // 在页面加载时立即执行UA验证
-        (function() {
-            console.log('🚀 页面初始化 - 开始UA验证...');
-            if (!initUAValidation()) {
-                console.log('🛑 UA验证未通过，页面已阻止');
-            } else {
-                console.log('✅ UA验证通过，继续加载');
-            }
-        })();
-    </script>
 
     <!-- 引入 Three.js 库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>3D 双角色切换控制器</title>
+    
+    <!-- UA验证失败提示页面样式 -->
+    <style>
+        #ua-fallback-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            color: #000000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #ua-fallback-page.visible {
+            display: flex;
+        }
+
+        .fallback-content {
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+
+        .fallback-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+
+        .fallback-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .fallback-message {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333333;
+            margin-bottom: 24px;
+        }
+
+        .fallback-download {
+            display: inline-block;
+            padding: 12px 32px;
+            background: #000000;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 8px;
+        }
+
+        .fallback-package {
+            font-size: 12px;
+            color: #666666;
+            margin-top: 16px;
+            font-family: monospace;
+        }
+    </style>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- UA验证失败提示页面 -->
+    <div id="ua-fallback-page">
+        <div class="fallback-content">
+            <div class="fallback-icon">🦝</div>
+            <h1 class="fallback-title">请在灵熊小记APP查看</h1>
+            <p class="fallback-message">
+                为了获得最佳体验，请下载并安装灵熊小记官方应用。
+            </p>
+            <div class="fallback-package">com.xiaohuanxiong.hauntedhive</div>
+        </div>
+    </div>
+
+    <!-- 3D 场景容器 -->
+    <div id="scene-container"></div>
+
+    <!-- 摇杆控制器（移动端显示） -->
+    <div id="joystick-container" class="hide-on-desktop">
+        <div id="joystick-base">
+            <div id="joystick-knob"></div>
+        </div>
+    </div>
+
+    <!-- 库信息标注 -->
+    <div id="libraries-info" style="position: fixed; top: 10px; right: 15px; color: rgba(255,255,255,0.5); font-size: 10px; z-index: 1000; text-align: right; line-height: 1.4;">
+        <div style="font-size: 9px; margin-bottom: 3px; opacity: 0.7;">(3D 双角色切换控制器)</div>
+        <div style="font-weight: bold; color: rgba(255,255,255,0.6);">使用的库:</div>
+        <div>Three.js r128</div>
+        <div>minimax(MiniMax)</div>
+    </div>
+
+    <!-- 信息面板 -->
+    <div id="info-panel">
+        <div id="info-panel-header" onclick="toggleInfoPanel()" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <h3 style="margin: 0; font-size: 14px;">
+                游戏控制
+                <span id="input-mode-indicator" class="touch">触摸</span>
+            </h3>
+            <span id="info-panel-arrow" style="font-size: 10px;">▼</span>
+        </div>
+        
+        <div id="info-panel-content">
+            <p>画质: <select id="quality-select" style="background: transparent; color: #00f2fe; border: 1px solid rgba(79, 172, 254, 0.3); border-radius: 4px; padding: 2px 5px; font-size: 11px;">
+                <option value="0">超低</option>
+                <option value="1">低</option>
+                <option value="2">普通</option>
+                <option value="3">高</option>
+                <option value="4">超清</option>
+                <option value="5">极致</option>
+                <option value="6">超极致</option>
+            </select></p>
+            <p>角色: <span id="character-indicator">🔴</span> <span id="character-label">红色小球</span></p>
+            <p>视角: <button id="view-mode-btn" style="background: rgba(79, 172, 254, 0.3); color: #00f2fe; border: 1px solid rgba(79, 172, 254, 0.5); border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 11px;">切换第一人称</button></p>
+            <p>金币: <span id="coin-display">0/15</span></p>
+            <p>得分: <span id="score-display">0</span></p>
+            <p>位置: <span id="position-display">0.0, 0.0</span></p>
+            <p>输入: <span id="joystick-display">0.00, 0.00</span></p>
+            <p>状态: <span id="status-display">等待输入...</span></p>
+            <p style="margin-top: 10px; font-size: 11px; color: #888;">
+                靠近<span style="color: #ffd700;">金币</span>收集，靠近<span style="color: #ff6b6b;">红色</span>/<span style="color: #6b7b8c;">灰色</span>光柱可切换角色
+            </p>
+        </div>
+    </div>
+
+    <script>
+    let infoPanelExpanded = true;
+    function toggleInfoPanel() {
+        infoPanelExpanded = !infoPanelExpanded;
+        const content = document.getElementById('info-panel-content');
+        const arrow = document.getElementById('info-panel-arrow');
+        if (infoPanelExpanded) {
+            content.style.display = 'block';
+            arrow.textContent = '▼';
+        } else {
+            content.style.display = 'none';
+            arrow.textContent = '▶';
+        }
+    }
+    </script>
+
+    <!-- 第一人称模式提示 -->
+    <div id="first-person-hint" class="hide-on-desktop hidden" style="position: fixed; bottom: 180px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 8px; font-size: 12px; color: #fff; text-align: center;">
+        <div style="margin-bottom: 4px;">👆 左下摇杆移动 | 右下摇杆旋转视角</div>
+        <div>电脑端: WASD移动 + Q/E旋转 + 点击屏幕锁定鼠标</div>
+    </div>
+
+    <!-- 键盘提示面板（电脑端显示） -->
+    <div id="keyboard-hint" class="hide-on-mobile">
+        <h4>键盘控制</h4>
+        <div class="key-row">
+            <div class="key" id="key-w">W</div>
+        </div>
+        <div class="key-row">
+            <div class="key" id="key-a">A</div>
+            <div class="key" id="key-s">S</div>
+            <div class="key" id="key-d">D</div>
+        </div>
+    </div>
+
+    <!-- 电视遥控器提示面板 -->
+    <div id="remote-hint" class="hide-on-mobile" tabindex="0">
+        <button class="remote-btn" id="remote-up" tabindex="-1">↑</button>
+        <button class="remote-btn" id="remote-ok" tabindex="-1">OK</button>
+        <button class="remote-btn" id="remote-down" tabindex="-1">↓</button>
+        <button class="remote-btn" id="remote-left" tabindex="-1">←</button>
+        <button class="remote-btn" id="remote-right" tabindex="-1">→</button>
+        <button class="remote-btn" id="remote-back" tabindex="-1">返</button>
+    </div>
+
+    <!-- 加载提示 -->
+    <div id="loading" class="hidden">
+        <div class="loading-spinner"></div>
+        <div>加载中...</div>
+    </div>
+
+    <!-- UA验证脚本 -->
+    <script>
+        // UA验证常量
+        const TARGET_UA = 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 LingXiongRaccoon/1.0 (package:com.xiaohuanxiong.hauntedhive; official:raccoon.fit)';
+        
+        // UA验证函数
+        function validateUA() {
+            const currentUA = navigator.userAgent;
+            console.log('🔍 Current UA:', currentUA);
+            console.log('🎯 Target UA:', TARGET_UA);
+            
+            if (currentUA === TARGET_UA) {
+                console.log('✅ UA验证通过 - 显示游戏内容');
+                return true;
+            } else {
+                console.log('❌ UA验证失败 - 显示提示页面');
+                return false;
+            }
+        }
+
+        // 初始化UA验证
+        function initUAValidation() {
+            if (!validateUA()) {
+                // 显示UA验证失败页面
+                document.getElementById('ua-fallback-page').classList.add('visible');
+                // 隐藏游戏容器
+                document.getElementById('scene-container').style.display = 'none';
+                // 隐藏其他UI元素
+                const hideElements = ['libraries-info', 'info-panel', 'first-person-hint', 'keyboard-hint', 'remote-hint', 'loading', 'joystick-container'];
+                hideElements.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                return false;
+            }
+            return true;
+        }
+
+        // 在页面加载时立即执行UA验证
+        (function() {
+            console.log('🚀 页面初始化 - 开始UA验证...');
+            if (!initUAValidation()) {
+                console.log('🛑 UA验证未通过，页面已阻止');
+            } else {
+                console.log('✅ UA验证通过，继续加载');
+            }
+        })();
+    </script>
+
+    <!-- 引入 Three.js 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 引入 TTQ 引擎 -->
+    <script src="minimax.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

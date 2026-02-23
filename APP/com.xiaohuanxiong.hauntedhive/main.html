@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵熊小记</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #ffffff !important; /* 纯白色背景 */
+            color: #000000 !important; /* 黑色文字 */
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        #ua-check-message {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffffff !important; /* 纯白色背景 */
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #ua-check-message .message-content {
+            background: #ffffff; /* 白色背景 */
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #e0e0e0; /* 浅灰色边框 */
+        }
+
+        #ua-check-message h1 {
+            font-size: 28px;
+            color: #000000 !important; /* 黑色文字 */
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        #ua-check-message p {
+            font-size: 16px;
+            color: #333333 !important; /* 深灰色文字 */
+            margin-bottom: 25px;
+        }
+
+        #ua-check-message .app-badge {
+            display: inline-block;
+            background: #f5f5f5; /* 浅灰色背景 */
+            color: #000000 !important; /* 黑色文字 */
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        #app-content {
+            display: none; 
+        }
+
+        :root {
+            --primary-color: #333333; /* 深灰色 */
+            --primary-light: #666666; /* 中灰色 */
+            --primary-dark: #000000; /* 黑色 */
+            --accent-color: #333333; /* 深灰色 */
+            --success-color: #333333; /* 深灰色 */
+            --warning-color: #333333; /* 深灰色 */
+            --danger-color: #333333; /* 深灰色 */
+            --info-color: #333333; /* 深灰色 */
+            
+            --bg-gradient: #ffffff; /* 纯白色 */
+            --card-bg: #ffffff; /* 纯白色 */
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --text-color: #000000; /* 黑色 */
+            --text-secondary: #666666; /* 深灰色 */
+            --border-color: #e0e0e0; /* 浅灰色 */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(0, 0, 0, 0.1); /* 浅黑色边框 */
+        }
+        
+        .dark-mode {
+            --bg-gradient: #ffffff; /* 保持白色 */
+            --card-bg: #ffffff; /* 保持白色 */
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --text-color: #000000; /* 黑色 */
+            --text-secondary: #666666; /* 深灰色 */
+            --border-color: #e0e0e0; /* 浅灰色 */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 全局样式 */
+        .container {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            transition: background 0.3s ease;
+        }
+        
+        .top-bar {
+            background: #ffffff; /* 白色背景 */
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000000; /* 黑色图标 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000000 !important; /* 黑色文字 */
+            letter-spacing: -0.5px;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .top-action-btn {
+            width: 40px;
+            height: 40px;
+            background: #ffffff; /* 白色背景 */
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .top-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: #f9f9f9; /* 稍浅的灰色 */
+        }
+        
+        .top-action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #000000 !important; /* 黑色文字 */
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .app-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0; /* 浅灰色 */
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .app-card:active {
+            transform: translateY(-4px) scale(0.98);
+        }
+        
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: #000000; /* 黑色图标 */
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+        
+        .app-card:hover .app-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .app-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        
+        .app-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .app-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            color: #000000 !important; /* 黑色文字 */
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* 更新日志 */
+        .update-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .update-item {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .update-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .version-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .version-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: #f5f5f5; /* 浅灰色背景 */
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        
+        .version-changes {
+            padding-left: 20px;
+        }
+        
+        .change-item {
+            margin-bottom: 10px;
+            color: var(--text-color);
+            position: relative;
+            padding-left: 5px;
+        }
+        
+        .change-item::before {
+            content: '▶';
+            position: absolute;
+            left: -15px;
+            color: #000000; /* 黑色 */
+            font-size: 12px;
+        }
+        
+        .change-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .badge-fixed { background: #f5f5f5; color: #333333; border: 1px solid #ddd; }
+        .badge-added { background: #f5f5f5; color: #333333; border: 1px solid #ddd; }
+        .badge-changed { background: #f5f5f5; color: #333333; border: 1px solid #ddd; }
+        .badge-improved { background: #f5f5f5; color: #333333; border: 1px solid #ddd; }
+        
+        /* 客服中心 */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .service-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            transition: all 0.4s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000; /* 黑色图标 */
+            font-size: 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 4px solid var(--card-bg);
+        }
+        
+        .service-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .service-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        .service-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .service-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            color: #000000; /* 黑色文字 */
+            border: 1px solid #e0e0e0;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: #e8e8e8; /* 稍深的灰色 */
+        }
+        
+        .service-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .service-btn.disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+            opacity: 0.6;
+            color: #999999;
+        }
+        
+        .service-btn.disabled:hover {
+            transform: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            background: #ffffff; /* 白色背景 */
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: 12px 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: #000000; /* 黑色 */
+            border-radius: 0 0 3px 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #000000 !important; /* 黑色 */
+        }
+        
+        .nav-item.active::before {
+            width: 40px;
+        }
+        
+        .nav-item:hover {
+            color: #000000; /* 黑色 */
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item.active i {
+            transform: translateY(-5px);
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* 浮动按钮 */
+        .floating-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #f5f5f5; /* 浅灰色背景 */
+            color: #000000; /* 黑色图标 */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .floating-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .floating-btn i {
+            font-size: 24px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 15px;
+            }
+            
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+            
+            .page-subtitle {
+                font-size: 15px;
+            }
+            
+            .app-card, .update-item, .service-card {
+                padding: 20px;
+            }
+            
+            .floating-btn {
+                bottom: 70px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .floating-btn i {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .page-subtitle {
+                font-size: 14px;
+            }
+            
+            .top-bar {
+                padding: 15px;
+            }
+            
+            .logo-text h1 {
+                font-size: 18px;
+            }
+            
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            .nav-item i {
+                font-size: 20px;
+            }
+            
+            .nav-item span {
+                font-size: 11px;
+            }
+            /* UA提示信息的响应式调整 */
+            #ua-check-message h1 {
+                font-size: 24px;
+            }
+            #ua-check-message p {
+                font-size: 14px;
+            }
+        }
+        
+        /* 工具类 */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .app-card:hover, .service-card:hover, .floating-btn:hover {
+                transform: none;
+            }
+            
+            .app-card:active, .service-card:active, .floating-btn:active {
+                transform: scale(0.98);
+            }
+            
+            .top-action-btn:hover {
+                transform: none;
+            }
+            
+            .top-action-btn:active {
+                transform: scale(0.95);
+            }
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0; /* 浅灰色轨道 */
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cccccc; /* 灰色滑块 */
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #999999; /* 深灰色滑块 */
+        }
+    </style>
+</head>
+<body>
+    <!-- User-Agent检测提示 -->
+    <div id="ua-check-message">
+        <div class="message-content">
+            <h1>请在灵熊小记APP查看</h1>
+            <p>为了获得最佳体验，请下载并安装灵熊小记官方应用。</p>
+            <div class="app-badge">com.xiaohuanxiong.hauntedhive</div>
+        </div>
+    </div>
+
+    <!-- 原始应用内容（仅当UA正确时显示） -->
+    <div id="app-content">
+        <div class="container">
+            <!-- 顶部栏 -->
+            <div class="top-bar">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-bear"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>灵熊小记</h1>
+                        <p>一站式工具集合</p>
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <div class="top-action-btn" id="searchBtn" title="搜索">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="top-action-btn" id="themeBtn" title="切换主题">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 主要内容区 -->
+            <div class="main-content">
+                <!-- 首页 -->
+                <div class="page active" id="homePage">
+                    <div class="page-header">
+                        <h1 class="page-title">探索无限可能</h1>
+                        <p class="page-subtitle">从3D游戏到实用工具，一站式满足您的所有需求</p>
+                    </div>
+                    
+                    <div class="card-grid">
+                        <div class="app-card" onclick="navigateTo('new_UI/index_v1.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="app-title">3D交互界面</div>
+                            <div class="app-desc">体验全新的3D交互界面，带来沉浸式的视觉体验和流畅的操作感受</div>
+                            <span class="app-tag">测试中</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('game/3D游戏(模板)/index.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="app-title">3D游戏模板</div>
+                            <div class="app-desc">快速创建3D游戏的开发模板，助力游戏开发之旅</div>
+                            <span class="app-tag">游戏</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('new_UI/应用管理专家Pro.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="app-title">系统管理专家</div>
+                            <div class="app-desc">高级系统管理工具，提供全面的设备管理和优化功能</div>
+                            <span class="app-tag">工具</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('bilibili_Shortcut_function.html')">
+                            <div class="app-icon">
+                                <i class="fab fa-bilibili"></i>
+                            </div>
+                            <div class="app-title">哔哩哔哩工具</div>
+                            <div class="app-desc">B站快捷功能和实用工具集合，提升使用体验</div>
+                            <span class="app-tag">工具</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('Domesticated_peak/start.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <div class="app-title">养峰峰游戏</div>
+                            <div class="app-desc">休闲有趣的养成小游戏，放松心情的最佳选择</div>
+                            <span class="app-tag">游戏</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('Cultivate_into_immortals/start.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-dragon"></i>
+                            </div>
+                            <div class="app-title">3D修仙游戏</div>
+                            <div class="app-desc">沉浸式修仙题材游戏，体验不一样的仙侠世界</div>
+                            <span class="app-tag">游戏</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('推箱子/index.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div class="app-title">推箱子游戏</div>
+                            <div class="app-desc">经典益智解谜游戏，挑战您的逻辑思维能力</div>
+                            <span class="app-tag">游戏</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('Local_Media_Center.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-photo-video"></i>
+                            </div>
+                            <div class="app-title">本地媒体中心</div>
+                            <div class="app-desc">多媒体文件管理和播放，打造个人娱乐中心</div>
+                            <span class="app-tag">工具</span>
+                        </div>
+                        
+                        <div class="app-card" onclick="navigateTo('跨平台功能/热榜.html')">
+                            <div class="app-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="app-title">全网热榜</div>
+                            <div class="app-desc">实时查看各大平台热门内容，掌握最新趋势和热点</div>
+                            <span class="app-tag">资讯</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 游戏中心 -->
+                <div class="page" id="gamePage">
+                    <div class="page-header">
+                        <h1 class="page-title">游戏中心</h1>
+                        <p class="page-subtitle">更多游戏和娱乐内容，探索无限乐趣</p>
+                    </div>
+                    
+                    <div class="service-grid">
+                        <div class="service-card" onclick="navigateTo('new_UI/game.html')">
+                            <div class="service-avatar">
+                                <i class="fas fa-gamepad"></i>
+                            </div>
+                            <h3 class="service-name">全部游戏</h3>
+                            <p class="service-desc">点击进入游戏中心，探索更多精彩游戏和娱乐内容</p>
+                            <button class="service-btn">
+                                <i class="fas fa-play"></i> 进入游戏中心
+                            </button>
+                        </div>
+                        
+                        <div class="service-card" onclick="navigateTo('game/3D游戏(模板)/index.html')">
+                            <div class="service-avatar">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <h3 class="service-name">3D游戏模板</h3>
+                            <p class="service-desc">快速创建3D游戏的开发模板，助力游戏开发之旅</p>
+                            <button class="service-btn">
+                                <i class="fas fa-code"></i> 查看模板
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 推广中心 -->
+                <div class="page" id="promoPage">
+                    <div class="page-header">
+                        <h1 class="page-title">推广中心</h1>
+                        <p class="page-subtitle">优质应用和内容推荐，发现更多精彩</p>
+                    </div>
+                    
+                    <div class="service-grid">
+                        <div class="service-card" onclick="navigateTo('Ad/Ad.html')">
+                            <div class="service-avatar">
+                                <i class="fas fa-ad"></i>
+                            </div>
+                            <h3 class="service-name">推广内容</h3>
+                            <p class="service-desc">点击查看精选推广内容，发现优质应用和工具</p>
+                            <button class="service-btn">
+                                <i class="fas fa-external-link-alt"></i> 查看推广
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 更新日志 -->
+                <div class="page" id="updatePage">
+                    <div class="page-header">
+                        <h1 class="page-title">更新日志</h1>
+                        <p class="page-subtitle">记录每一次版本改动，见证灵熊小记的成长</p>
+                    </div>
+                    
+                    <div class="update-list">
+                        <!-- 版本 1.26.1.1 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.26.1.1</h3>
+                                <span class="version-date">2026年1月22日</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-changed">优化</span>
+                                    更新版本号逻辑【1.年份.月份.当月更新的第x个版本】
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">改进</span>
+                                    优化首页样式和用户体验
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 版本 1.7.2 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.7.2</h3>
+                                <span class="version-date">2025年12月11日</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    优化「登陆」页显示问题
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">改进</span>
+                                    优化「游戏库」UI显示问题
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复「游戏库」里OneShot游戏无法加载的问题
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复部分页面无法加载客服中心的问题
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 版本 1.7.1 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.7.1</h3>
+                                <span class="version-date">2025年12月9日</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复了已知问题和BUG
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 版本 1.7.0 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.7.0</h3>
+                                <span class="version-date">2025年12月1日</span>
+                            </div>
+                            <div style="background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                                <strong style="color: #000000;">重要通知：</strong> 
+                                <span style="color: #000000;">由于服务器文件系统问题，1.7.0版本更新延期发布。我们正在努力恢复数据并尽快发布新版本。v1.7.0版本已发布</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-changed">变更</span>
+                                    软件更名为「灵熊小记」
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    更新应用图标，采用全新设计
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    首页更新为3D界面
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    新增「错误检测控制台」功能，实时监控页面运行状态
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">优化</span>
+                                    优化页面加载性能，减少资源占用
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复了夜间模式切换时的闪烁问题
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">改进</span>
+                                    增强移动端适配，提升触控体验
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">改进</span>
+                                    改进导航栏交互反馈，增加视觉提示
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-improved">优化</span>
+                                    优化「游戏库」分类和搜索功能
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复已知的安全性问题
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 版本 1.6.0 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.6.0</h3>
+                                <span class="version-date">2025年9月10日</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-fixed">修复</span>
+                                    修复了已知问题
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「游戏库」功能
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「隐私政策」
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- 版本 1.0.0 -->
+                        <div class="update-item">
+                            <div class="version-header">
+                                <h3 class="version-title">版本 1.0.0</h3>
+                                <span class="version-date">2025年7月15日</span>
+                            </div>
+                            <ul class="version-changes">
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    创建了此APP
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    添加包名
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    设置APP名称为「回魂日志」
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「开屏页」
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「纪念·哔哩哔哩注销主播」功能
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「养峰峰小游戏」功能
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「3D修仙游戏」功能
+                                </li>
+                                <li class="change-item">
+                                    <span class="change-badge badge-added">新增</span>
+                                    增加「首页」导航栏
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 客服中心 -->
+                <div class="page" id="servicePage">
+                    <div class="page-header">
+                        <h1 class="page-title">客服中心</h1>
+                        <p class="page-subtitle">选择您需要联系的游戏客服，获取专业帮助</p>
+                    </div>
+                    
+                    <div class="service-grid">
+                        <!-- 米姆米姆哈 -->
+                        <div class="service-card">
+                            <div class="service-avatar">
+                                <img src="https://gzbtxxkjyxgsli.qiyukf.net/f11c107c027e6e3c3a4af0d1a441c84f.jpg" alt="米姆米姆哈图标">
+                            </div>
+                            <h3 class="service-name">米姆米姆哈</h3>
+                            <p class="service-desc">提供游戏问题解答、账号申诉、充值问题等全方位服务</p>
+                            <button class="service-btn" onclick="navigateTo('其他功能/米姆米姆哈客服.html')">
+                                <i class="fas fa-headset"></i> 联系客服
+                            </button>
+                        </div>
+                        
+                        <!-- 超能世界 -->
+                        <div class="service-card">
+                            <div class="service-avatar">
+                                <img src="https://opsoss.q1.com/CLUB/2022/08/08/16599422694841561a73b-611e-46fb-87e6-af0d85e38a45.png" alt="超能世界客服图标">
+                            </div>
+                            <h3 class="service-name">超能世界</h3>
+                            <p class="service-desc">角色扮演游戏，提供游戏咨询、BUG反馈、活动咨询等服务</p>
+                            <button class="service-btn" onclick="navigateTo('其他功能/超能世界客服.html')">
+                                <i class="fas fa-headset"></i> 联系客服
+                            </button>
+                        </div>
+                        
+                        <!-- 虎牙直播 -->
+                        <div class="service-card">
+                            <div class="service-avatar">
+                                <i class="fas fa-tv"></i>
+                            </div>
+                            <h3 class="service-name">虎牙直播</h3>
+                            <p class="service-desc">直播平台客服，处理账号、充值、直播相关问题</p>
+                            <button class="service-btn" onclick="navigateTo('其他功能/虎牙直播客服.html')">
+                                <i class="fas fa-headset"></i> 联系客服
+                            </button>
+                        </div>
+                        
+                        <!-- 哔哩哔哩 -->
+                        <div class="service-card">
+                            <div class="service-avatar">
+                                <i class="fab fa-bilibili"></i>
+                            </div>
+                            <h3 class="service-name">哔哩哔哩</h3>
+                            <p class="service-desc">视频平台客服，处理账号、会员、投稿相关问题</p>
+                            <button class="service-btn" onclick="navigateTo('其他功能/哔哩哔哩客服.html')">
+                                <i class="fas fa-headset"></i> 联系客服
+                            </button>
+                        </div>
+                        
+                        <!-- 预留客服 -->
+                        <div class="service-card">
+                            <div class="service-avatar">
+                                <i class="fas fa-crystal-ball"></i>
+                            </div>
+                            <h3 class="service-name">更多客服</h3>
+                            <p class="service-desc">更多游戏和平台客服即将上线，敬请期待</p>
+                            <button class="service-btn disabled">
+                                <i class="fas fa-clock"></i> 敬请期待
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+                <a class="nav-item active" data-page="home">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </a>
+                <a class="nav-item" data-page="game">
+                    <i class="fas fa-gamepad"></i>
+                    <span>游戏</span>
+                </a>
+                <a class="nav-item" data-page="promo">
+                    <i class="fas fa-ad"></i>
+                    <span>推广</span>
+                </a>
+                <a class="nav-item" data-page="update">
+                    <i class="fas fa-history"></i>
+                    <span>更新</span>
+                </a>
+                <a class="nav-item" data-page="service">
+                    <i class="fas fa-headset"></i>
+                    <span>客服</span>
+                </a>
+                <a class="nav-item" data-page="debug">
+                    <i class="fas fa-debug"></i>
+                    <a href="debug.html">测试</a>
+                </a>
+            </div>
+            
+            <!-- 浮动返回按钮 -->
+            <button class="floating-btn hidden" id="backBtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function checkUserAgent() {
+            const targetUA = 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 LingXiongRaccoon/1.0 (package:com.xiaohuanxiong.hauntedhive; official:raccoon.fit)';
+            
+            const currentUA = navigator.userAgent;
+            
+            const uaCheckPassed = currentUA.includes('LingXiongRaccoon/1.0');
+            
+            const uaMessage = document.getElementById('ua-check-message');
+            const appContent = document.getElementById('app-content');
+            
+            if (uaCheckPassed) {
+                appContent.style.display = 'block';
+                uaMessage.style.display = 'none';
+            } else {
+                uaMessage.style.display = 'flex';
+                appContent.style.display = 'none';
+                
+              
+                console.log('当前User-Agent:', currentUA);
+                console.log('目标User-Agent:', targetUA);
+            }
+        })();
+
+        class SimplePageManager {
+            constructor() {
+                this.currentPage = 'home';
+                this.pageHistory = ['home'];
+                this.init();
+            }
+            
+            init() {
+                this.showPage('home');
+                
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = item.getAttribute('data-page');
+                        if (page && page !== this.currentPage) {
+                            this.navigateTo(page);
+                        }
+                    });
+                });
+                
+                document.getElementById('backBtn').addEventListener('click', () => {
+                    this.goBack();
+                });
+            }
+            
+            navigateTo(page) {
+                if (page === this.currentPage) return;
+                
+                this.pageHistory.push(page);
+                this.currentPage = page;
+                
+                this.showPage(page);
+                this.updateBackButton();
+                
+                this.updateNav();
+            }
+            
+            goBack() {
+                if (this.pageHistory.length > 1) {
+                    this.pageHistory.pop(); 
+                    const prevPage = this.pageHistory[this.pageHistory.length - 1];
+                    this.currentPage = prevPage;
+                    
+                    this.showPage(prevPage);
+                    this.updateBackButton();
+                    this.updateNav();
+                }
+            }
+            
+            showPage(page) {
+                document.querySelectorAll('.page').forEach(p => {
+                    p.classList.remove('active');
+                });
+                
+                const pageId = page + 'Page';
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+            }
+            
+            updateNav() {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const activeNav = document.querySelector(`.nav-item[data-page="${this.currentPage}"]`);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+            }
+            
+            updateBackButton() {
+                const backBtn = document.getElementById('backBtn');
+                if (this.pageHistory.length > 1) {
+                    backBtn.classList.remove('hidden');
+                } else {
+                    backBtn.classList.add('hidden');
+                }
+            }
+        }
+        
+        function navigateTo(url) {
+            if (!url) return;
+            try {
+                window.location.href = url;
+            } catch (error) {
+                console.error('跳转失败:', error);
+            }
+        }
+        
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeBtn');
+            
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                themeBtn.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.add('dark-mode');
+                themeBtn.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('app-content').style.display === 'block') {
+                window.pageManager = new SimplePageManager();
+                
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('themeBtn').classList.replace('fa-moon', 'fa-sun');
+                }
+                
+                document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+                
+                document.getElementById('searchBtn').addEventListener('click', function() {
+                    alert('搜索功能即将上线！');
+                });
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.app-card, .service-card, .update-item').forEach((card, index) => {
+                        card.style.animationDelay = `${index * 0.1}s`;
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        card.style.animation = 'fadeIn 0.5s ease forwards';
+                    });
+                }, 100);
+                
+                if ('ontouchstart' in window) {
+                    document.querySelectorAll('.app-card, .service-card, .nav-item, .top-action-btn, .service-btn').forEach(el => {
+                        el.addEventListener('touchstart', function() {
+                            this.style.opacity = '0.8';
+                        });
+                        
+                        el.addEventListener('touchend', function() {
+                            this.style.opacity = '1';
+                        });
+                        
+                        el.addEventListener('touchcancel', function() {
+                            this.style.opacity = '1';
+                        });
+                    });
+                }
+            }
+        });
+        
+        document.addEventListener('click', function(e) {
+        }, { passive: true });
+    </script>
+</body>
+</html>

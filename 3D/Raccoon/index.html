@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北美浣熊 3D模型 | North American Raccoon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.85);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f5f5f5;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 12px;
+            background: rgba(10, 10, 15, 0.85);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #3a3a4a 0%, #2a2a3a 100%);
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(135deg, #4a4a5a 0%, #3a3a4a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, #6a5acd 0%, #483d8b 100%);
+            border-color: rgba(106, 90, 205, 0.5);
+        }
+
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 280px;
+        }
+
+        .info-panel h3 {
+            font-size: 1rem;
+            color: #f5f5f5;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(106, 90, 205, 0.2);
+            border-top-color: #6a5acd;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+        <p>正在加载浣熊模型...</p>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div class="header">
+        <h1>北美浣熊 | Procyon lotor</h1>
+        <p>Interactive 3D Model</p>
+    </div>
+
+    <div class="info-panel">
+        <h3>模型信息</h3>
+        <div class="info-item">
+            <span class="info-label">科属</span>
+            <span class="info-value">Procyon lotor</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">科</span>
+            <span class="info-value">浣熊科</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">分布</span>
+            <span class="info-value">北美洲</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">特征</span>
+            <span class="info-value">黑色眼罩 + 环形尾巴</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="btn-idle">待机动画</button>
+        <button class="control-btn" id="btn-rotate">自动旋转</button>
+        <button class="control-btn" id="btn-wireframe">线框模式</button>
+        <button class="control-btn" id="btn-reset">重置视角</button>
+    </div>
+
+    <div class="hint">鼠标拖拽旋转 | 滚轮缩放 | 右键平移</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Scene setup
+        let scene, camera, renderer, controls;
+        let raccoon, tailGroup, headGroup;
+        let isIdleAnimating = false;
+        let isAutoRotating = false;
+        let isWireframe = false;
+        let clock = new THREE.Clock();
+
+        // Materials
+        let bodyMaterial, darkFurMaterial, lightFurMaterial, maskMaterial, whiteFurMaterial, noseMaterial, eyeMaterial, innerEarMaterial, tailDarkMaterial, tailLightMaterial;
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0f);
+            scene.fog = new THREE.Fog(0x0a0a0f, 8, 35);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(4, 2.5, 6);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.3;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.minDistance = 2;
+            controls.maxDistance = 15;
+            controls.maxPolarAngle = Math.PI / 2 + 0.2;
+            controls.target.set(0, 0.3, 0);
+
+            // Lighting
+            setupLighting();
+
+            // Create materials
+            createMaterials();
+
+            // Create raccoon
+            createRaccoon();
+
+            // Create environment
+            createEnvironment();
+
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            setupControls();
+
+            // Hide loading
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 800);
+
+            // Start animation
+            animate();
+        }
+
+        function createMaterials() {
+            // Body fur - realistic gray-brown with slight variation
+            bodyMaterial = new THREE.MeshStandardMaterial({
+                color: 0x5a4f45,
+                roughness: 0.92,
+                metalness: 0.02,
+            });
+
+            // Dark fur for limbs
+            darkFurMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1f1a16,
+                roughness: 0.95,
+                metalness: 0.01,
+            });
+
+            // Light/cream fur for underside
+            lightFurMaterial = new THREE.MeshStandardMaterial({
+                color: 0xa89880,
+                roughness: 0.9,
+                metalness: 0.02,
+            });
+
+            // Black mask - slightly glossy
+            maskMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0c0a08,
+                roughness: 0.6,
+                metalness: 0.15,
+            });
+
+            // White fur for muzzle
+            whiteFurMaterial = new THREE.MeshStandardMaterial({
+                color: 0xe8e0d5,
+                roughness: 0.85,
+                metalness: 0.02,
+            });
+
+            // Nose - shiny black
+            noseMaterial = new THREE.MeshStandardMaterial({
+                color: 0x151515,
+                roughness: 0.25,
+                metalness: 0.3,
+            });
+
+            // Eyes - dark with slight reflection
+            eyeMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.15,
+                metalness: 0.6,
+                emissive: 0x111111,
+            });
+
+            // Inner ear - pinkish brown
+            innerEarMaterial = new THREE.MeshStandardMaterial({
+                color: 0x7a6050,
+                roughness: 0.85,
+                metalness: 0.02,
+            });
+
+            // Tail dark rings
+            tailDarkMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1510,
+                roughness: 0.9,
+                metalness: 0.02,
+            });
+
+            // Tail light rings
+            tailLightMaterial = new THREE.MeshStandardMaterial({
+                color: 0x6b5d50,
+                roughness: 0.88,
+                metalness: 0.02,
+            });
+        }
+
+        function setupLighting() {
+            // Ambient light - subtle fill
+            const ambientLight = new THREE.AmbientLight(0x303045, 0.5);
+            scene.add(ambientLight);
+
+            // Key light (warm) - main light source
+            const keyLight = new THREE.DirectionalLight(0xfff5e0, 1.4);
+            keyLight.position.set(6, 10, 6);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 2048;
+            keyLight.shadow.mapSize.height = 2048;
+            keyLight.shadow.camera.near = 0.5;
+            keyLight.shadow.camera.far = 50;
+            keyLight.shadow.camera.left = -10;
+            keyLight.shadow.camera.right = 10;
+            keyLight.shadow.camera.top = 10;
+            keyLight.shadow.camera.bottom = -10;
+            keyLight.shadow.bias = -0.0001;
+            keyLight.shadow.radius = 4;
+            scene.add(keyLight);
+
+            // Fill light (cool blue) - from left
+            const fillLight = new THREE.DirectionalLight(0xa0c0ff, 0.6);
+            fillLight.position.set(-6, 5, 4);
+            scene.add(fillLight);
+
+            // Rim light - back light for edge definition
+            const rimLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            rimLight.position.set(-2, 4, -6);
+            scene.add(rimLight);
+
+            // Bottom fill - subtle uplight
+            const bottomLight = new THREE.DirectionalLight(0x252530, 0.25);
+            bottomLight.position.set(0, -2, 2);
+            scene.add(bottomLight);
+
+            // Point light for face detail
+            const faceLight = new THREE.PointLight(0xfff0e0, 0.4, 8);
+            faceLight.position.set(3, 2, 3);
+            scene.add(faceLight);
+        }
+
+        function createRaccoon() {
+            raccoon = new THREE.Group();
+
+            // === BODY ===
+            // Main body - pear shaped
+            const bodyGeom = new THREE.SphereGeometry(1.1, 48, 36);
+            bodyGeom.scale(1, 0.85, 0.7);
+            const body = new THREE.Mesh(bodyGeom, bodyMaterial);
+            body.position.set(-0.1, 0.35, 0);
+            body.castShadow = true;
+            body.receiveShadow = true;
+            raccoon.add(body);
+
+            // Chest area - forward bulk
+            const chestGeom = new THREE.SphereGeometry(0.75, 32, 28);
+            chestGeom.scale(1, 0.9, 0.75);
+            const chest = new THREE.Mesh(chestGeom, bodyMaterial);
+            chest.position.set(0.7, 0.25, 0.05);
+            chest.castShadow = true;
+            raccoon.add(chest);
+
+            // Lower chest/belly
+            const bellyGeom = new THREE.SphereGeometry(0.65, 28, 24);
+            bellyGeom.scale(1.2, 0.55, 0.65);
+            const belly = new THREE.Mesh(bellyGeom, lightFurMaterial);
+            belly.position.set(0.4, 0.05, 0);
+            belly.castShadow = true;
+            raccoon.add(belly);
+
+            // Back hump/shoulders
+            const backGeom = new THREE.SphereGeometry(0.7, 32, 28);
+            backGeom.scale(1.3, 0.85, 0.65);
+            const back = new THREE.Mesh(backGeom, bodyMaterial);
+            back.position.set(-0.6, 0.55, 0);
+            back.castShadow = true;
+            raccoon.add(back);
+
+            // Rump/buttocks area
+            const rumpGeom = new THREE.SphereGeometry(0.6, 28, 24);
+            rumpGeom.scale(1.2, 0.7, 0.6);
+            const rump = new THREE.Mesh(rumpGeom, bodyMaterial);
+            rump.position.set(-1.0, 0.4, 0);
+            rump.castShadow = true;
+            raccoon.add(rump);
+
+            // === HEAD ===
+            headGroup = new THREE.Group();
+            headGroup.position.set(1.0, 0.65, 0);
+
+            // Main head - broad and somewhat flattened
+            const headGeom = new THREE.SphereGeometry(0.6, 40, 32);
+            headGeom.scale(1.15, 0.9, 0.95);
+            const head = new THREE.Mesh(headGeom, bodyMaterial);
+            head.castShadow = true;
+            headGroup.add(head);
+
+            // Top of head - slightly raised
+            const topHeadGeom = new THREE.SphereGeometry(0.35, 24, 20);
+            topHeadGeom.scale(1.3, 0.5, 1);
+            const topHead = new THREE.Mesh(topHeadGeom, bodyMaterial);
+            topHead.position.set(-0.1, 0.35, 0);
+            topHead.castShadow = true;
+            headGroup.add(topHead);
+
+            // Cheekbones - broad face
+            const cheekGeom = new THREE.SphereGeometry(0.25, 20, 16);
+
+            const leftCheek = new THREE.Mesh(cheekGeom, bodyMaterial);
+            leftCheek.position.set(0.15, -0.1, 0.4);
+            leftCheek.scale.set(1.2, 0.8, 1);
+            leftCheek.castShadow = true;
+            headGroup.add(leftCheek);
+
+            const rightCheek = new THREE.Mesh(cheekGeom, bodyMaterial);
+            rightCheek.position.set(0.15, -0.1, -0.4);
+            rightCheek.scale.set(1.2, 0.8, 1);
+            rightCheek.castShadow = true;
+            headGroup.add(rightCheek);
+
+            // Snout - elongated cone
+            const snoutGeom = new THREE.ConeGeometry(0.22, 0.6, 20);
+            snoutGeom.rotateZ(-Math.PI / 2);
+            const snout = new THREE.Mesh(snoutGeom, whiteFurMaterial);
+            snout.position.set(0.65, -0.12, 0);
+            snout.castShadow = true;
+            headGroup.add(snout);
+
+            // Snout bridge
+            const snoutBridgeGeom = new THREE.SphereGeometry(0.18, 16, 12);
+            snoutBridgeGeom.scale(1.5, 0.6, 0.8);
+            const snoutBridge = new THREE.Mesh(snoutBridgeGeom, whiteFurMaterial);
+            snoutBridge.position.set(0.45, -0.05, 0);
+            snoutBridge.castShadow = true;
+            headGroup.add(snoutBridge);
+
+            // Nose tip
+            const noseGeom = new THREE.SphereGeometry(0.07, 14, 14);
+            const nose = new THREE.Mesh(noseGeom, noseMaterial);
+            nose.position.set(0.95, -0.12, 0);
+            nose.castShadow = true;
+            headGroup.add(nose);
+
+            // Nose pad
+            const nosePadGeom = new THREE.SphereGeometry(0.05, 12, 12);
+            nosePadGeom.scale(1.3, 0.8, 1.2);
+            const nosePad = new THREE.Mesh(nosePadGeom, noseMaterial);
+            nosePad.position.set(0.92, -0.15, 0);
+            headGroup.add(nosePad);
+
+            // === BLACK MASK (The distinctive bandit mask) ===
+            // Left mask patch
+            const maskLeftGeom = new THREE.SphereGeometry(0.32, 24, 20);
+            maskLeftGeom.scale(1.4, 0.45, 0.6);
+            const maskLeft = new THREE.Mesh(maskLeftGeom, maskMaterial);
+            maskLeft.position.set(0.2, 0.02, 0.28);
+            maskLeft.castShadow = true;
+            headGroup.add(maskLeft);
+
+            // Right mask patch
+            const maskRight = new THREE.Mesh(maskLeftGeom, maskMaterial);
+            maskRight.position.set(0.2, 0.02, -0.28);
+            maskRight.castShadow = true;
+            headGroup.add(maskRight);
+
+            // Bridge of mask
+            const maskBridgeGeom = new THREE.SphereGeometry(0.25, 20, 16);
+            maskBridgeGeom.scale(1.2, 0.35, 0.8);
+            const maskBridge = new THREE.Mesh(maskBridgeGeom, maskMaterial);
+            maskBridge.position.set(0.25, -0.02, 0);
+            headGroup.add(maskBridge);
+
+            // Mask extension to cheeks
+            const maskCheekGeom = new THREE.SphereGeometry(0.2, 16, 12);
+            maskCheekGeom.scale(1, 0.4, 1.2);
+
+            const leftMaskCheek = new THREE.Mesh(maskCheekGeom, maskMaterial);
+            leftMaskCheek.position.set(0.3, -0.15, 0.35);
+            headGroup.add(leftMaskCheek);
+
+            const rightMaskCheek = new THREE.Mesh(maskCheekGeom, maskMaterial);
+            rightMaskCheek.position.set(0.3, -0.15, -0.35);
+            headGroup.add(rightMaskCheek);
+
+            // === EYES ===
+            const eyeGeom = new THREE.SphereGeometry(0.085, 18, 18);
+
+            const leftEye = new THREE.Mesh(eyeGeom, eyeMaterial);
+            leftEye.position.set(0.35, 0.06, 0.18);
+            leftEye.castShadow = true;
+            headGroup.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeom, eyeMaterial);
+            rightEye.position.set(0.35, 0.06, -0.18);
+            rightEye.castShadow = true;
+            headGroup.add(rightEye);
+
+            // Eye highlights for life
+            const highlightGeom = new THREE.SphereGeometry(0.022, 8, 8);
+            const highlightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+            const leftHighlight = new THREE.Mesh(highlightGeom, highlightMat);
+            leftHighlight.position.set(0.4, 0.08, 0.2);
+            headGroup.add(leftHighlight);
+
+            const rightHighlight = new THREE.Mesh(highlightGeom, highlightMat);
+            rightHighlight.position.set(0.44, 0.1, -0.2);
+            headGroup.add(rightHighlight);
+
+            // Secondary smaller highlight
+            const highlight2Geom = new THREE.SphereGeometry(0.012, 6, 6);
+            const leftHighlight2 = new THREE.Mesh(highlight2Geom, highlightMat);
+            leftHighlight2.position.set(0.42, 0.05, 0.2);
+            headGroup.add(leftHighlight2);
+
+            const rightHighlight2 = new THREE.Mesh(highlight2Geom, highlightMat);
+            rightHighlight2.position.set(0.42, 0.05, -0.18);
+            headGroup.add(rightHighlight2);
+
+            // === EARS ===
+            const earGeom = new THREE.SphereGeometry(0.2, 20, 16);
+            earGeom.scale(0.9, 1.4, 0.55);
+
+            // Left ear
+            const leftEar = new THREE.Mesh(earGeom, bodyMaterial);
+            leftEar.position.set(-0.15, 0.5, 0.32);
+            leftEar.rotation.z = 0.15;
+            leftEar.rotation.x = -0.1;
+            leftEar.castShadow = true;
+            headGroup.add(leftEar);
+
+            // Left inner ear
+            const innerEarGeom = new THREE.SphereGeometry(0.13, 16, 12);
+            innerEarGeom.scale(0.85, 1.2, 0.5);
+            const leftInnerEar = new THREE.Mesh(innerEarGeom, innerEarMaterial);
+            leftInnerEar.position.set(-0.12, 0.5, 0.34);
+            leftInnerEar.rotation.z = 0.15;
+            headGroup.add(leftInnerEar);
+
+            // Right ear
+            const rightEar = new THREE.Mesh(earGeom, bodyMaterial);
+            rightEar.position.set(-0.15, 0.5, -0.32);
+            rightEar.rotation.z = 0.15;
+            rightEar.rotation.x = 0.1;
+            rightEar.castShadow = true;
+            headGroup.add(rightEar);
+
+            // Right inner ear
+            const rightInnerEar = new THREE.Mesh(innerEarGeom, innerEarMaterial);
+            rightInnerEar.position.set(-0.12, 0.5, -0.34);
+            rightInnerEar.rotation.z = 0.15;
+            headGroup.add(rightInnerEar);
+
+
+// 删除现有的胡须代码，替换为以下代码
+
+// 创建胡须材质（白色，稍微有点光泽）
+const whiskerMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.3,
+    metalness: 0.1
+});
+
+// 左侧胡须（从浣熊左脸颊伸出）
+for (let i = 0; i < 5; i++) {
+    // 每根胡须有不同的长度和曲率
+    const length = 0.4 + Math.random() * 0.2;
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(
+            -0.1 + Math.random() * 0.05, // 轻微随机弯曲
+            (i - 2) * 0.03, // 垂直分布
+            length * 0.3
+        ),
+        new THREE.Vector3(
+            -0.15 + Math.random() * 0.1,
+            (i - 2) * 0.05,
+            length * 0.7
+        ),
+        new THREE.Vector3(
+            -0.1 + Math.random() * 0.05,
+            (i - 2) * 0.03,
+            length
+        )
+    ]);
+    
+    // 创建沿着曲线延伸的管状几何体
+    const whiskerGeom = new THREE.TubeGeometry(
+        curve,
+        20, // 分段数
+        [0.005, 0.004, 0.003, 0.001], // 半径逐渐变小
+        8, // 径向分段
+        false
+    );
+    
+    const whisker = new THREE.Mesh(whiskerGeom, whiskerMat);
+    
+    // 将胡须定位到脸颊位置
+    whisker.position.set(0.55, -0.05 + i * 0.04, 0.15);
+    whisker.rotation.y = Math.PI / 6; // 稍微向前旋转
+    
+    headGroup.add(whisker);
+}
+
+// 右侧胡须（对称）
+for (let i = 0; i < 5; i++) {
+    const length = 0.4 + Math.random() * 0.2;
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(
+            0.1 - Math.random() * 0.05,
+            (i - 2) * 0.03,
+            length * 0.3
+        ),
+        new THREE.Vector3(
+            0.15 - Math.random() * 0.1,
+            (i - 2) * 0.05,
+            length * 0.7
+        ),
+        new THREE.Vector3(
+            0.1 - Math.random() * 0.05,
+            (i - 2) * 0.03,
+            length
+        )
+    ]);
+    
+    const whiskerGeom = new THREE.TubeGeometry(
+        curve,
+        20,
+        [0.005, 0.004, 0.003, 0.001],
+        8,
+        false
+    );
+    
+    const whisker = new THREE.Mesh(whiskerGeom, whiskerMat);
+    
+    whisker.position.set(-0.55, -0.05 + i * 0.04, 0.15);
+    whisker.rotation.y = -Math.PI / 6;
+    
+    headGroup.add(whisker);
+}
+
+
+            // === MOUTH ===
+            // Mouth opening
+            const mouthGeom = new THREE.SphereGeometry(0.08, 12, 8);
+            mouthGeom.scale(1.4, 0.25, 0.8);
+            const mouth = new THREE.Mesh(mouthGeom, maskMaterial);
+            mouth.position.set(0.6, -0.22, 0);
+            headGroup.add(mouth);
+
+            // Mouth corners
+            const mouthCornerGeom = new THREE.SphereGeometry(0.04, 8, 6);
+            const leftMouthCorner = new THREE.Mesh(mouthCornerGeom, maskMaterial);
+            leftMouthCorner.position.set(0.52, -0.2, 0.06);
+            headGroup.add(leftMouthCorner);
+
+            const rightMouthCorner = new THREE.Mesh(mouthCornerGeom, maskMaterial);
+            rightMouthCorner.position.set(0.52, -0.2, -0.06);
+            headGroup.add(rightMouthCorner);
+
+            raccoon.add(headGroup);
+
+// === TAIL ===
+tailGroup = new THREE.Group();
+tailGroup.position.set(-1.5, 0.45, 0);
+
+// 创建内部组，用于容纳尾部部件
+const innerTailGroup = new THREE.Group();
+
+// 尾部参数
+const tailSegments = 24; // 保持分段数不变，确保平滑弯曲
+const segmentLength = 0.18; // 每个圆柱体很短
+const baseRadius = 0.28; // 基座半径
+
+// 定义弧形参数 - 一个向下的弧形
+const arcRadius = 3.5; // 弧形的半径，越大越平缓
+const arcAngle = 0.5; // 弧形覆盖的角度（弧度）
+const startAngle = 0; // 起始角度（水平方向）
+
+// 创建一系列小圆柱体，每个都有微小角度
+for (let i = 0; i < tailSegments; i++) {
+    // 计算当前位置在弧形上的参数
+    const t = i / tailSegments; // 0到1之间的比例
+    const angle = startAngle + t * arcAngle; // 当前角度
+    
+    // 计算弧形上的位置
+    const x = arcRadius * Math.sin(angle);
+    const y = -arcRadius * (1 - Math.cos(angle)); // 负号使弧形向下
+    
+    // 计算下一个点的角度（用于确定当前段的方向）
+    const nextT = (i + 1) / tailSegments;
+    const nextAngle = startAngle + nextT * arcAngle;
+    const nextX = arcRadius * Math.sin(nextAngle);
+    const nextY = -arcRadius * (1 - Math.cos(nextAngle));
+    
+    // 计算当前段的方向向量
+    const dirX = nextX - x;
+    const dirY = nextY - y;
+    
+    // 计算当前段应该旋转的角度
+    const segmentAngle = Math.atan2(dirY, dirX);
+    
+    // 计算半径渐变
+    const radius = baseRadius * (1 - t * 0.6);
+    
+    // 创建很短的圆柱体
+    const segmentGeom = new THREE.CylinderGeometry(
+        radius * 0.95,
+        radius * 0.90,
+        segmentLength,
+        20,
+        1 // 高度方向只有1个分段，因为我们每个都很短
+    );
+    
+    // 两白两黑交替模式
+    // 计算当前分段在4个一组的循环中的位置
+    const cycleIndex = i % 4; // 0,1,2,3
+    // 前两个为浅色(白色)，后两个为深色(黑色)
+    const segmentMat = (cycleIndex < 2) ? tailLightMaterial : tailDarkMaterial;
+    
+    const segment = new THREE.Mesh(segmentGeom, segmentMat);
+    
+    // 设置位置 - 每段的中点
+    const midX = x + dirX * 0.5;
+    const midY = y + dirY * 0.5;
+    segment.position.set(midX, midY, 0);
+    
+    // 设置旋转：圆柱体默认沿Y轴，我们需要将其旋转到方向向量上
+    // 首先将圆柱体旋转90度使其沿X轴，然后旋转到实际方向
+    segment.rotation.z = Math.PI / 2; // 先旋转90度使圆柱体沿X轴
+    segment.rotation.z += segmentAngle; // 再旋转到实际方向
+    
+    segment.castShadow = true;
+    segment.receiveShadow = true;
+    innerTailGroup.add(segment);
+}
+
+// 添加尾尖
+const tailTipGeom = new THREE.SphereGeometry(0.1, 16, 12);
+const tailTip = new THREE.Mesh(tailTipGeom, tailDarkMaterial); // 尾尖使用深色材质
+// 计算尾尖位置（最后一个段之后）
+const finalT = 1;
+const finalAngle = startAngle + finalT * arcAngle;
+const tipX = arcRadius * Math.sin(finalAngle);
+const tipY = -arcRadius * (1 - Math.cos(finalAngle));
+tailTip.position.set(tipX, tipY, 0);
+tailTip.castShadow = true;
+innerTailGroup.add(tailTip);
+
+// 将内部组旋转180度，实现翻转
+innerTailGroup.rotation.y = Math.PI;
+
+// 将尾巴放大两倍
+innerTailGroup.scale.set(0.8, 0.8, 0.8); // 原来是0.4, 现在放大到0.8
+
+// 将翻转后的内部组添加到主tailGroup
+tailGroup.add(innerTailGroup);
+
+// 原有的整体旋转设置保持不变
+tailGroup.rotation.y = 0;
+tailGroup.rotation.z = 0.35;
+tailGroup.rotation.x = 0;
+
+// 直接添加到浣熊主体，不添加任何基座
+raccoon.add(tailGroup);
+
+         
+// === LEGS ===
+// Front legs
+const frontLegGeom = new THREE.CylinderGeometry(0.13, 0.11, 0.65, 16);
+frontLegGeom.translate(0, -0.32, 0);
+
+// Left front leg
+const leftFrontLeg = new THREE.Mesh(frontLegGeom, darkFurMaterial);
+leftFrontLeg.position.set(0.55, 0.0, 0.38);
+leftFrontLeg.rotation.x = 0.15;
+leftFrontLeg.castShadow = true;
+raccoon.add(leftFrontLeg);
+
+// Left front paw
+const pawGeom = new THREE.SphereGeometry(0.13, 14, 12);
+pawGeom.scale(1.3, 0.55, 1.1);
+const leftFrontPaw = new THREE.Mesh(pawGeom, darkFurMaterial);
+leftFrontPaw.position.set(0.55, -0.28, 0.42);
+leftFrontPaw.castShadow = true;
+raccoon.add(leftFrontPaw);
+
+// Right front leg
+const rightFrontLeg = new THREE.Mesh(frontLegGeom, darkFurMaterial);
+rightFrontLeg.position.set(0.55, 0.0, -0.38);
+rightFrontLeg.rotation.x = -0.15;
+rightFrontLeg.castShadow = true;
+raccoon.add(rightFrontLeg);
+
+// Right front paw
+const rightFrontPaw = new THREE.Mesh(pawGeom, darkFurMaterial);
+rightFrontPaw.position.set(0.55, -0.28, -0.42);
+rightFrontPaw.castShadow = true;
+raccoon.add(rightFrontPaw);
+
+// Back legs - thicker
+const backLegGeom = new THREE.CylinderGeometry(0.16, 0.12, 0.55, 16);
+backLegGeom.translate(0, -0.28, 0);
+
+// Left back leg
+const leftBackLeg = new THREE.Mesh(backLegGeom, darkFurMaterial);
+leftBackLeg.position.set(-0.85, 0.08, 0.32);
+leftBackLeg.rotation.x = 0.2;
+leftBackLeg.castShadow = true;
+raccoon.add(leftBackLeg);
+
+// Left back paw
+const backPawGeom = new THREE.SphereGeometry(0.15, 14, 12);
+backPawGeom.scale(1.4, 0.55, 1.15);
+const leftBackPaw = new THREE.Mesh(backPawGeom, darkFurMaterial);
+leftBackPaw.position.set(-0.85, -0.18, 0.38);
+leftBackPaw.castShadow = true;
+raccoon.add(leftBackPaw);
+
+// Right back leg
+const rightBackLeg = new THREE.Mesh(backLegGeom, darkFurMaterial);
+rightBackLeg.position.set(-0.85, 0.08, -0.32);
+rightBackLeg.rotation.x = -0.2;
+rightBackLeg.castShadow = true;
+raccoon.add(rightBackLeg);
+
+// Right back paw
+const rightBackPaw = new THREE.Mesh(backPawGeom, darkFurMaterial);
+rightBackPaw.position.set(-0.85, -0.18, -0.38);
+rightBackPaw.castShadow = true;
+raccoon.add(rightBackPaw);
+
+// === CLAWS ===
+const clawMat = new THREE.MeshStandardMaterial({
+    color: 0x181510,
+    roughness: 0.4,
+    metalness: 0.2
+});
+
+// Front claws - 已修改为5个爪子并下移
+for (let paw = 0; paw < 2; paw++) {
+    for (let claw = 0; claw < 5; claw++) {
+        const clawGeom = new THREE.ConeGeometry(0.018, 0.09, 6);
+        const clawMesh = new THREE.Mesh(clawGeom, clawMat);
+        const zOffset = (claw - 2) * 0.04;
+        const xPos = paw === 0 ? 0.55 : 0.55;
+        const zPos = paw === 0 ? 0.46 + claw * 0.018 : -0.46 - claw * 0.018;
+        clawMesh.position.set(xPos, -0.35, zPos + zOffset);
+        clawMesh.rotation.x = Math.PI;
+        clawMesh.castShadow = true;
+        raccoon.add(clawMesh);
+    }
+}
+
+// Back claws - 已修改为5个爪子并下移
+for (let paw = 0; paw < 2; paw++) {
+    for (let claw = 0; claw < 5; claw++) {
+        const clawGeom = new THREE.ConeGeometry(0.02, 0.1, 6);
+        const clawMesh = new THREE.Mesh(clawGeom, clawMat);
+        const zOffset = (claw - 2) * 0.04;
+        const xPos = -0.85;
+        const zPos = paw === 0 ? 0.42 + claw * 0.018 : -0.42 - claw * 0.018;
+        clawMesh.position.set(xPos, -0.25, zPos + zOffset);
+        clawMesh.rotation.x = Math.PI;
+        clawMesh.castShadow = true;
+        raccoon.add(clawMesh);
+    }
+}
+
+// Position the complete raccoon
+raccoon.position.y = 0.15;
+raccoon.rotation.y = 0.3; // Slight turn for better initial view
+scene.add(raccoon);
+}
+
+function createEnvironment() {
+    // Ground plane with subtle reflection
+    const groundGeom = new THREE.PlaneGeometry(40, 40);
+    const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x101018,
+        roughness: 0.85,
+        metalness: 0.15
+    });
+    const ground = new THREE.Mesh(groundGeom, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.52;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Grid for depth perception
+    const gridHelper = new THREE.GridHelper(25, 40, 0x252530, 0x181820);
+    gridHelper.position.y = -0.51;
+    scene.add(gridHelper);
+
+    // Subtle ambient particles
+    const particleGeom = new THREE.BufferGeometry();
+    const particleCount = 150;
+    const positions = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 30;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 15 + 3;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
+    }
+
+    particleGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const particleMat = new THREE.PointsMaterial({
+        color: 0x4a4a5a,
+        size: 0.04,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    const particles = new THREE.Points(particleGeom, particleMat);
+    scene.add(particles);
+}
+
+function setupControls() {
+    document.getElementById('btn-idle').addEventListener('click', function() {
+        isIdleAnimating = !isIdleAnimating;
+        this.classList.toggle('active', isIdleAnimating);
+    });
+
+    document.getElementById('btn-rotate').addEventListener('click', function() {
+        isAutoRotating = !isAutoRotating;
+        this.classList.toggle('active', isAutoRotating);
+    });
+
+    document.getElementById('btn-wireframe').addEventListener('click', function() {
+        isWireframe = !isWireframe;
+        this.classList.toggle('active', isWireframe);
+
+        const materials = [bodyMaterial, darkFurMaterial, lightFurMaterial, maskMaterial,
+                        whiteFurMaterial, innerEarMaterial, tailDarkMaterial, tailLightMaterial];
+        materials.forEach(mat => {
+            if (mat) mat.wireframe = isWireframe;
+        });
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        camera.position.set(4, 2.5, 6);
+        controls.target.set(0, 0.3, 0);
+        controls.update();
+    });
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const time = clock.getElapsedTime();
+
+    // Idle breathing animation
+    if (isIdleAnimating && raccoon) {
+        // Subtle breathing
+        const breathe = Math.sin(time * 2.2) * 0.015;
+        raccoon.scale.y = 1 + breathe;
+        raccoon.scale.x = 1 - breathe * 0.3;
+
+        // Tail gentle sway
+        if (tailGroup) {
+            tailGroup.rotation.x = Math.sin(time * 2.5) * 0.08;
+            tailGroup.rotation.y = Math.sin(time * 1.8) * 0.12;
+        }
+
+        // Subtle head movement
+        if (headGroup) {
+            headGroup.rotation.y = Math.sin(time * 1.2) * 0.03;
+            headGroup.rotation.x = Math.sin(time * 1.5) * 0.02;
+        }
+    }
+
+
+            // Auto rotation
+            if (isAutoRotating && raccoon) {
+                raccoon.rotation.y += 0.006;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Initialize
+        init();
+    </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+<script>
+(function() {
+    // 创建样式
+    const style = document.createElement('style');
+    style.textContent = `
+        .floating-credit-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 150, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: #e0e0ff;
+            font-size: 14px;
+            line-height: 1.6;
+            z-index: 9999;
+            max-width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            pointer-events: auto;
+            user-select: none;
+        }
+        
+        .floating-credit-panel:hover {
+            background: rgba(25, 25, 40, 0.85);
+            border-color: rgba(120, 120, 180, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .credit-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ffffff;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(100, 100, 150, 0.2);
+            letter-spacing: 0.5px;
+        }
+        
+        .credit-content {
+            text-align: center;
+        }
+        
+        .credit-line {
+            margin: 8px 0;
+            opacity: 0.9;
+        }
+        
+        .owner-name {
+            color: #ff6b9d;
+            font-weight: 600;
+        }
+        
+        .creator-name {
+            color: #7cb9ff;
+            font-weight: 600;
+        }
+        
+        .platform-name {
+            color: #4da6ff;
+            font-weight: 600;
+        }
+    `;
+    
+    // 创建面板元素
+    const panel = document.createElement('div');
+    panel.className = 'floating-credit-panel';
+    panel.innerHTML = `
+        <div class="credit-title">本页面的创作名单</div>
+        <div class="credit-content">
+            <div class="credit-line">网站所有者：<span class="owner-name">软软</span></div>
+            <div class="credit-line">页面制作：<span class="creator-name">MiniMax</span></div>
+            <div class="credit-line">技术支持：<span class="platform-name">腾讯元宝</span></div>
+        </div>
+    `;
+    
+    // 添加到页面
+    document.head.appendChild(style);
+    document.body.appendChild(panel);
+    
+    // 添加交互效果
+    let clickTimer;
+    panel.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        // 快速点击两次切换显示/隐藏
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+            // 单次点击无效果
+        }, 300);
+        
+        if (e.detail === 2) {
+            this.style.opacity = this.style.opacity === '0' ? '1' : '0';
+            this.style.pointerEvents = this.style.opacity === '0' ? 'none' : 'auto';
+        }
+    });
+    
+    // 鼠标悬停效果
+    panel.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px) scale(1.02)';
+    });
+    
+    panel.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+    
+    // 窗口调整大小时重新定位（确保在右下角）
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            panel.style.right = '20px';
+            panel.style.bottom = '20px';
+        }, 100);
+    });
+    
+    // 添加键盘快捷键（Alt+C显示/隐藏面板）
+    window.addEventListener('keydown', function(e) {
+        if (e.altKey && e.key === 'c') {
+            e.preventDefault();
+            panel.style.opacity = panel.style.opacity === '0' ? '1' : '0';
+            panel.style.pointerEvents = panel.style.opacity === '0' ? 'none' : 'auto';
+        }
+    });
+    
+    // 初始化完成后稍微延迟显示，避免与页面加载冲突
+    setTimeout(() => {
+        panel.style.opacity = '0';
+        panel.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            panel.style.opacity = '1';
+        }, 100);
+    }, 1000);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>哔哩哔哩客服中心</title>
+    <style>
+        :root {
+            --primary-color: #6d4c41;
+            --secondary-color: #8d6e63;
+            --bg-gradient: linear-gradient(135deg, #f5e6d3 0%, #e8d5b5 100%);
+            --night-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            transition: background 1s;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+        }
+        
+        .chat-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-iframe {
+            flex: 1;
+            border: none;
+            background: #f9f5f0;
+            width: 100%;
+            min-height: calc(100vh - 60px);
+        }
+        
+        /* 夜间模式 */
+        .night-mode {
+            background: var(--night-gradient);
+        }
+        
+        .night-mode .chat-header {
+            background: #4a3428;
+        }
+        
+        .night-mode .chat-iframe {
+            background: #2c3e50;
+        }
+        
+        @media (orientation: portrait) {
+            .chat-header {
+                padding: 10px;
+            }
+            .chat-header h2 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>哔哩哔哩客服中心</h2>
+                <div class="time-indicator" id="timeIndicator"></div>
+            </div>
+            <iframe src="https://www.bilibili.com/h5/customer-service?night=1&native.theme=2" class="chat-iframe" id="chatIframe"></iframe>
+        </div>
+    </div>
+    <script>
+        // 昼夜模式切换
+        function updateTimeIndicator() {
+            const now = new Date();
+            const hours = now.getHours();
+            const isNight = hours >= 18 || hours <= 6;
+            document.body.classList.toggle('night-mode', isNight);
+            document.getElementById('timeIndicator').textContent =
+                `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} ${isNight ? '🌙' : '☀️'}`;
+        }
+        
+        // 初始化
+        updateTimeIndicator();
+        setInterval(updateTimeIndicator, 60000);
+        
+        // 动态调整布局
+        function resizeHandler() {
+            const iframe = document.getElementById('chatIframe');
+            iframe.style.height = (window.innerHeight - document.querySelector('.chat-header').offsetHeight) + 'px';
+        }
+        
+        window.addEventListener('resize', resizeHandler);
+        window.addEventListener('load', resizeHandler);
+        
+        // 处理iframe消息
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'iframeHeight') {
+                const iframe = document.getElementById('chatIframe');
+                const maxHeight = window.innerHeight - document.querySelector('.chat-header').offsetHeight;
+                iframe.style.height = Math.min(e.data.height, maxHeight) + 'px';
+            }
+        });
+    </script>
+</body>
+
+<script src="http://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/lxxjjianrong.js"></script>
+</html>

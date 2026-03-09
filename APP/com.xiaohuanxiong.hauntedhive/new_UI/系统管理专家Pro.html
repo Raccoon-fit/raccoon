@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统控制面板</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .control-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+        
+        .card-header i {
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--success);
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            color: var(--light);
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            margin: 5px;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #3651d4;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .status-box {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+            text-align: center;
+        }
+        
+        .success {
+            background: rgba(76, 201, 240, 0.2);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .error {
+            background: rgba(247, 37, 133, 0.2);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-sliders-h"></i> 系统控制面板</h1>
+            <p>直接控制系统功能 - 无需跳转</p>
+        </header>
+        
+        <div id="status" class="status-box"></div>
+        
+        <div class="dashboard">
+            <!-- 显示控制 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-desktop"></i>
+                    <h2>显示控制</h2>
+                </div>
+                
+                <div class="control-group">
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>亮度</span>
+                            <span id="brightness-value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="brightness-slider">
+                    </div>
+                    
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dark-mode-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>深色模式</span>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="setFullscreen()">全屏模式</button>
+                <button class="btn" onclick="lockOrientation()">锁定竖屏</button>
+            </div>
+            
+            <!-- 声音控制 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-volume-up"></i>
+                    <h2>声音控制</h2>
+                </div>
+                
+                <div class="control-group">
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>音量</span>
+                            <span id="volume-value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="volume-slider">
+                    </div>
+                    
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="mute-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>静音</span>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="testSound()">测试声音</button>
+                <button class="btn" onclick="vibrate()">振动测试</button>
+            </div>
+            
+            <!-- 通知控制 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-bell"></i>
+                    <h2>通知控制</h2>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="requestNotificationPermission()">请求通知权限</button>
+                    <button class="btn" onclick="sendNotification()">发送测试通知</button>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">通知权限</div>
+                        <div class="info-value" id="notification-permission">未知</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 网络控制 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-wifi"></i>
+                    <h2>网络控制</h2>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="checkConnection()">检查网络状态</button>
+                    <button class="btn" onclick="reloadPage()">刷新页面</button>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">在线状态</div>
+                        <div class="info-value" id="online-status">未知</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">连接类型</div>
+                        <div class="info-value" id="connection-type">未知</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 存储控制 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-hdd"></i>
+                    <h2>存储控制</h2>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="clearCache()">清除缓存</button>
+                    <button class="btn" onclick="checkStorage()">检查存储</button>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">已用存储</div>
+                        <div class="info-value" id="used-storage">未知</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">剩余存储</div>
+                        <div class="info-value" id="free-storage">未知</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 设备信息 -->
+            <div class="control-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h2>设备信息</h2>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">用户代理</div>
+                        <div class="info-value" id="user-agent">检测中...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">平台</div>
+                        <div class="info-value" id="platform">检测中...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">语言</div>
+                        <div class="info-value" id="language">检测中...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">屏幕分辨率</div>
+                        <div class="info-value" id="screen-resolution">检测中...</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="copySystemInfo()">复制系统信息</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 显示状态消息
+        function showStatus(message, type = 'success') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status-box ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 初始化控制面板
+        function initControlPanel() {
+            // 设置滑块事件监听
+            document.getElementById('brightness-slider').addEventListener('input', function() {
+                const value = this.value;
+                document.getElementById('brightness-value').textContent = `${value}%`;
+                setBrightness(value);
+            });
+            
+            document.getElementById('volume-slider').addEventListener('input', function() {
+                const value = this.value;
+                document.getElementById('volume-value').textContent = `${value}%`;
+                setVolume(value);
+            });
+            
+            // 初始化系统信息
+            updateSystemInfo();
+            
+            showStatus('控制面板已初始化');
+        }
+        
+        // 设置亮度
+        function setBrightness(value) {
+            // 尝试使用WebIDE接口
+            if (typeof webapp !== 'undefined' && webapp.设置亮度参数) {
+                webapp.设置亮度参数(Math.round(value * 2.55));
+                showStatus(`亮度已设置为 ${value}%`);
+            } else {
+                // 使用标准Web API（仅影响当前页面）
+                document.body.style.filter = `brightness(${value}%)`;
+                showStatus(`页面亮度已设置为 ${value}%`);
+            }
+        }
+        
+        // 设置音量
+        function setVolume(value) {
+            // 尝试使用WebIDE接口
+            if (typeof webapp !== 'undefined' && webapp.设置声音参数) {
+                webapp.设置声音参数(Math.round(value * 0.15));
+                showStatus(`音量已设置为 ${value}%`);
+            } else {
+                // 使用标准Web API（仅影响当前页面）
+                const audioElements = document.getElementsByTagName('audio');
+                const volumeLevel = value / 100;
+                
+                for (let i = 0; i < audioElements.length; i++) {
+                    audioElements[i].volume = volumeLevel;
+                }
+                
+                showStatus(`页面音量已设置为 ${value}%`);
+            }
+        }
+        
+        // 设置全屏
+        function setFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+                showStatus('已进入全屏模式');
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+                showStatus('已进入全屏模式');
+            } else {
+                showStatus('您的浏览器不支持全屏模式', 'error');
+            }
+        }
+        
+        // 锁定屏幕方向
+        function lockOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait')
+                    .then(() => showStatus('屏幕方向已锁定为竖屏'))
+                    .catch(() => showStatus('无法锁定屏幕方向', 'error'));
+            } else {
+                showStatus('您的浏览器不支持屏幕方向锁定', 'error');
+            }
+        }
+        
+        // 测试声音
+        function testSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 440;
+            gainNode.gain.value = 0.1;
+            
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 1);
+            
+            setTimeout(() => {
+                oscillator.stop();
+            }, 1000);
+            
+            showStatus('测试声音已播放');
+        }
+        
+        // 振动
+        function vibrate() {
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+                showStatus('设备已振动');
+            } else {
+                showStatus('您的设备不支持振动', 'error');
+            }
+        }
+        
+        // 请求通知权限
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    document.getElementById('notification-permission').textContent = permission;
+                    showStatus(`通知权限: ${permission}`);
+                });
+            } else {
+                showStatus('您的浏览器不支持通知', 'error');
+            }
+        }
+        
+        // 发送通知
+        function sendNotification() {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("测试通知", {
+                    body: "这是一条来自系统控制面板的测试通知",
+                    icon: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMyIDhDMjUuMzcgOCAyMCAxMy4zNyAyMCAyMFY0NEgyOFY1NkgyNlY2MEgzOFY1NkgzNlY0NEg0NFYyMEM0NCAxMy4zNyAzOC42MyA4IDMyIDhaTTMyIDEyQzM1LjMxIDEyIDM4IDE0LjY5IDM4IDE4VjQwSDI2VjE4QzI2IDE0LjY5IDI4LjY5IDEyIDMyIDEyWiIgZmlsbD0iIzY2N2VlYSIvPgo8L3N2Zz4K"
+                });
+                showStatus('测试通知已发送');
+            } else {
+                showStatus('无法发送通知，请先请求权限', 'error');
+            }
+        }
+        
+        // 检查网络连接
+        function checkConnection() {
+            const online = navigator.onLine;
+            document.getElementById('online-status').textContent = online ? '在线' : '离线';
+            
+            if (navigator.connection) {
+                const connection = navigator.connection;
+                document.getElementById('connection-type').textContent = connection.effectiveType;
+            }
+            
+            showStatus(`网络状态: ${online ? '在线' : '离线'}`);
+        }
+        
+        // 刷新页面
+        function reloadPage() {
+            location.reload();
+        }
+        
+        // 清除缓存
+        function clearCache() {
+            if (caches) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            // 清除localStorage和sessionStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            showStatus('缓存已清除');
+        }
+        
+        // 检查存储
+        function checkStorage() {
+            if (navigator.storage && navigator.storage.estimate) {
+                navigator.storage.estimate().then(estimate => {
+                    const used = (estimate.usage / (1024 * 1024)).toFixed(2);
+                    const total = (estimate.quota / (1024 * 1024)).toFixed(2);
+                    const free = (total - used).toFixed(2);
+                    
+                    document.getElementById('used-storage').textContent = `${used} MB`;
+                    document.getElementById('free-storage').textContent = `${free} MB`;
+                    
+                    showStatus(`存储使用情况: ${used}MB / ${total}MB`);
+                });
+            } else {
+                showStatus('无法获取存储信息', 'error');
+            }
+        }
+        
+        // 更新系统信息
+        function updateSystemInfo() {
+            document.getElementById('user-agent').textContent = 
+                navigator.userAgent.substring(0, 30) + '...';
+            document.getElementById('platform').textContent = navigator.platform;
+            document.getElementById('language').textContent = navigator.language;
+            document.getElementById('screen-resolution').textContent = 
+                `${screen.width} × ${screen.height}`;
+            
+            // 检查通知权限
+            if ("Notification" in window) {
+                document.getElementById('notification-permission').textContent = Notification.permission;
+            }
+            
+            // 检查网络状态
+            checkConnection();
+            
+            // 检查存储
+            checkStorage();
+        }
+        
+        // 复制系统信息
+        function copySystemInfo() {
+            const systemInfo = `
+用户代理: ${navigator.userAgent}
+平台: ${navigator.platform}
+语言: ${navigator.language}
+屏幕分辨率: ${screen.width} × ${screen.height}
+在线状态: ${navigator.onLine ? '在线' : '离线'}
+            `.trim();
+            
+            navigator.clipboard.writeText(systemInfo).then(() => {
+                showStatus('系统信息已复制到剪贴板');
+            }).catch(() => {
+                showStatus('复制失败', 'error');
+            });
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initControlPanel);
+        
+        // 网络状态变化监听
+        window.addEventListener('online', () => {
+            document.getElementById('online-status').textContent = '在线';
+            showStatus('网络已连接');
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('online-status').textContent = '离线';
+            showStatus('网络已断开', 'error');
+        });
+    </script>
+</body>
+
+</html>

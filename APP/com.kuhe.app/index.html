@@ -129,10 +129,11 @@
         .modal-actions {
             display: flex;
             justify-content: flex-end;
+            gap: 0.5rem;
             margin-top: 1.5rem;
         }
         .modal-actions button {
-            padding: 0.4rem 1.5rem;
+            padding: 0.4rem 1rem;
             background: #ffffff;
             border: 1px solid #cccccc;
             cursor: pointer;
@@ -223,6 +224,29 @@
         }
         .float-btn.sign-btn {
             font-size: 20px;
+        }
+        /* 左下角搜索按钮 */
+        .search-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333333;
+            z-index: 900;
+            transition: background 0.1s;
+        }
+        .search-btn:hover {
+            background: #f5f5f5;
         }
         /* 右下角个人中心按钮 */
         .profile-btn {
@@ -478,19 +502,17 @@
     </div>
 </div>
 
-<!-- 登录模态框 (含密码登录和token登录) -->
+<!-- 登录模态框 -->
 <div id="loginModal" class="modal-overlay" style="display: none;">
     <div class="modal">
         <div class="modal-tabs">
             <div class="modal-tab active" id="loginPasswordTab">密码登录</div>
             <div class="modal-tab" id="loginTokenTab">Token登录</div>
         </div>
-        <!-- 密码登录表单 -->
         <div id="passwordLoginForm">
             <input type="text" id="modalLoginName" placeholder="邮箱/用户名">
             <input type="password" id="modalLoginPassword" placeholder="密码">
         </div>
-        <!-- Token登录表单 -->
         <div id="tokenLoginForm" style="display: none;">
             <input type="text" id="modalToken" placeholder="输入Token">
         </div>
@@ -502,7 +524,7 @@
     </div>
 </div>
 
-<!-- 注册模态框 (无昵称输入，昵称自动使用QQ号) -->
+<!-- 注册模态框 -->
 <div id="registerModal" class="modal-overlay" style="display: none;">
     <div class="modal">
         <h3>注册酷盒社区</h3>
@@ -525,7 +547,6 @@
     <div class="modal">
         <h3>个人中心</h3>
         <div id="profileContent">
-            <!-- 动态填充用户信息 -->
             <div style="text-align: center; padding: 1rem;">加载中...</div>
         </div>
         <div class="modal-actions">
@@ -534,11 +555,30 @@
     </div>
 </div>
 
-<!-- 底部悬浮按钮组（中央） -->
+<!-- 搜索模态框 -->
+<div id="searchModal" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <h3>搜索帖子</h3>
+        <input type="text" id="searchKeyword" placeholder="输入关键词...">
+        <div class="modal-actions" style="justify-content: space-between;">
+            <button id="searchAllBtn">全部帖子</button>
+            <div>
+                <button id="searchCancel">取消</button>
+                <button id="searchSubmit">搜索</button>
+            </div>
+        </div>
+        <div id="searchMessage" class="modal-message"></div>
+    </div>
+</div>
+
+<!-- 底部悬浮按钮组 -->
 <div class="float-buttons-center">
     <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
     <div class="float-btn" id="postFloatBtn">+</div>
 </div>
+
+<!-- 左下角搜索按钮 -->
+<div class="search-btn" id="searchBtn" title="搜索">🔍</div>
 
 <!-- 右下角个人中心按钮 -->
 <div class="profile-btn" id="profileBtn" title="个人中心">
@@ -588,7 +628,7 @@
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
 
-        // 固定的 localtoken
+        // 固定的 localtoken（每个接口不同，保持不变）
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
         const LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
         const LOCALTOKEN_POSTADD = 'TA1DBPQ19f7sT9HWZYPVeCiVsfMqcrfHaQzk2TbN3UgI9h9ZXjlLSm0gIVTK7s/VXgOSjLcRNJf6VZur0hMVUzo+uzE5TvZRCPnTT5gdFWmhedtyWXF3TXrrP6GMUnylIa6O3V+ZojnQj91I/lHqhw==';
@@ -596,20 +636,27 @@
         const LOCALTOKEN_REGISTER = '7fKDj/4vaSdU45Sq0XbBKjdYgE/umXRxAH9KagMqh9J3jmfV5cXEb9ZAQSbM+lhvB83uSc0WQoG/2d15lKZxwA==';
         const LOCALTOKEN_SIGN = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8ssiVgBwGkWhiYPkp842AGOFOIbsMXtiimiKe0BugMFEa8SKkA9vhM160lA4/hAo4/8=';
         const LOCALTOKEN_USERDATA = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8svaK82YHk4EgVJ5IHJ2WNuRbp6sLwKwU32ifb280M9KeA==';
+        const LOCALTOKEN_SEARCH = 'S6oKa74Ez/wO+LJzPTFOdZy2iORMGkFh+ni5n1EP7gyk7phnnFd0ywBBPr+YqLHX8OZpI0c9Fk0JKLHk2jwv/peH1+owIwhupHE5nB3p7WgTyTamLC7QvSo0Luir4cXU9NTLdOYOpCky57HPkzKmqQ=='; // 搜索专用
 
         // 状态
-        let currentAuthorization = localStorage.getItem('token') || 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ'; // 默认值
-        let currentUser = null; // 存储用户信息 { avatar, nickname, uid }
+        let currentAuthorization = localStorage.getItem('token') || ''; // 初始为空，无默认token
+        let currentUser = null;
 
+        // 分页状态
         let currentPage = 1;
-        let limit = 10;
+        let limit = 8; // 默认每页8条（与搜索一致）
         let totalPosts = 0;
         let posts = [];
         let expandedCid = null;
         let expandedElement = null;
 
+        // 搜索状态
+        let searchMode = false; // 是否处于搜索模式
+        let searchKeyword = '';
+        let searchTotal = 0;
+
         // 登录模态框tab状态
-        let loginMode = 'password'; // 'password' 或 'token'
+        let loginMode = 'password';
 
         // DOM 元素
         const postListEl = document.getElementById('postList');
@@ -663,6 +710,15 @@
         const profileBtnText = document.getElementById('profileBtnText');
         const profileAvatar = document.getElementById('profileAvatar');
 
+        // 搜索相关
+        const searchBtn = document.getElementById('searchBtn');
+        const searchModal = document.getElementById('searchModal');
+        const searchKeywordInput = document.getElementById('searchKeyword');
+        const searchAllBtn = document.getElementById('searchAllBtn');
+        const searchCancel = document.getElementById('searchCancel');
+        const searchSubmit = document.getElementById('searchSubmit');
+        const searchMessage = document.getElementById('searchMessage');
+
         // 工具函数：日期格式化
         function formatDate(timestamp) {
             if (!timestamp) return '未知';
@@ -670,7 +726,7 @@
             return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
         }
 
-        // 处理内容：第一个insert公开，第二个insert替换为隐藏提示，其余忽略
+        // 处理内容
         function processContent(rawText) {
             if (!rawText) return '';
             try {
@@ -757,6 +813,10 @@
 
         // 获取并展开详情
         async function expandPost(cid, postItem) {
+            if (!currentAuthorization) {
+                showToast('请先登录');
+                return;
+            }
             if (expandedCid === cid) {
                 removeExpanded();
                 return;
@@ -794,21 +854,34 @@
             }
         }
 
-        // 获取帖子列表
-        async function fetchPosts(page = 1) {
+        // 获取帖子列表（支持搜索）
+        async function fetchPosts(page = 1, keyword = '') {
+            if (!currentAuthorization) {
+                showToast('请先登录');
+                return;
+            }
             showLoading(true);
             hideError();
             removeExpanded();
 
-            const searchParams = JSON.stringify({ type: 'post' });
-            const body = `page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
+            let url = LIST_URL;
+            let body;
+            if (keyword) {
+                // 搜索模式
+                const searchParams = JSON.stringify({ status: 'publish' });
+                body = `searchKey=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
+            } else {
+                // 普通列表
+                const searchParams = JSON.stringify({ type: 'post' });
+                body = `page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
+            }
 
             try {
                 const response = await fetch(LIST_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_LIST,
+                        'localtoken': keyword ? LOCALTOKEN_SEARCH : LOCALTOKEN_LIST,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: body
@@ -820,7 +893,7 @@
                     posts = json.data || [];
                     totalPosts = json.total || posts.length;
                     renderList(posts);
-                    renderPagination(page, totalPosts);
+                    renderPagination(page, totalPosts, keyword);
                 } else {
                     throw new Error(json.msg || '获取列表失败');
                 }
@@ -865,7 +938,7 @@
         }
 
         // 分页
-        function renderPagination(page, total) {
+        function renderPagination(page, total, keyword = '') {
             const totalPages = Math.ceil(total / limit);
             paginationEl.innerHTML = `
                 <button id="prevPage" ${page <= 1 ? 'disabled' : ''}>上一页</button>
@@ -876,14 +949,22 @@
             document.getElementById('prevPage')?.addEventListener('click', () => {
                 if (currentPage > 1) {
                     currentPage--;
-                    fetchPosts(currentPage);
+                    if (searchMode) {
+                        fetchPosts(currentPage, searchKeyword);
+                    } else {
+                        fetchPosts(currentPage);
+                    }
                 }
             });
 
             document.getElementById('nextPage')?.addEventListener('click', () => {
                 if (currentPage < totalPages) {
                     currentPage++;
-                    fetchPosts(currentPage);
+                    if (searchMode) {
+                        fetchPosts(currentPage, searchKeyword);
+                    } else {
+                        fetchPosts(currentPage);
+                    }
                 }
             });
         }
@@ -912,13 +993,15 @@
 
                 if (response.ok && json.code === 1 && json.data && json.data.token) {
                     currentAuthorization = json.data.token;
-                    // 保存 token 到 localStorage
                     localStorage.setItem('token', currentAuthorization);
                     modalMessage.textContent = '登录成功！';
-                    // 获取用户信息并更新头像
                     await fetchAndStoreUserData();
                     setTimeout(() => {
                         closeLoginModal();
+                        // 重置到首页
+                        searchMode = false;
+                        searchKeyword = '';
+                        currentPage = 1;
                         fetchPosts(currentPage);
                     }, 500);
                 } else {
@@ -937,22 +1020,26 @@
             }
             currentAuthorization = token.trim();
             localStorage.setItem('token', currentAuthorization);
-            // 验证 token 并获取用户信息
             try {
                 await fetchAndStoreUserData();
                 modalMessage.textContent = 'Token登录成功！';
                 setTimeout(() => {
                     closeLoginModal();
+                    searchMode = false;
+                    searchKeyword = '';
+                    currentPage = 1;
                     fetchPosts(currentPage);
                 }, 500);
             } catch (err) {
                 modalMessage.textContent = `Token无效: ${err.message}`;
                 localStorage.removeItem('token');
+                currentAuthorization = '';
             }
         }
 
-        // 获取并存储用户信息，更新头像
+        // 获取并存储用户信息
         async function fetchAndStoreUserData() {
+            if (!currentAuthorization) throw new Error('未登录');
             try {
                 const response = await fetch(USER_DATA_URL, {
                     method: 'POST',
@@ -972,7 +1059,6 @@
                         nickname: json.data.nickname || json.data.name || '未知',
                         avatar: json.data.avatar || ''
                     };
-                    // 保存到 localStorage
                     localStorage.setItem('user', JSON.stringify(currentUser));
                     updateProfileButton();
                 } else {
@@ -980,16 +1066,16 @@
                 }
             } catch (err) {
                 console.error('获取用户信息失败', err);
-                // 清除无效的 token
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                currentAuthorization = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ';
+                currentAuthorization = '';
                 currentUser = null;
                 updateProfileButton();
+                throw err;
             }
         }
 
-        // 更新右下角个人中心按钮显示
+        // 更新个人中心按钮
         function updateProfileButton() {
             if (currentUser && currentUser.avatar) {
                 profileAvatar.src = currentUser.avatar;
@@ -1001,7 +1087,7 @@
             }
         }
 
-        // 从 localStorage 恢复用户信息
+        // 从 localStorage 恢复
         function restoreFromStorage() {
             const storedToken = localStorage.getItem('token');
             if (storedToken) {
@@ -1011,17 +1097,15 @@
                     try {
                         currentUser = JSON.parse(storedUser);
                         updateProfileButton();
+                        fetchPosts(currentPage); // 自动加载
                     } catch (e) {
-                        // 如果解析失败，重新获取
-                        fetchAndStoreUserData();
+                        fetchAndStoreUserData().then(() => fetchPosts(currentPage));
                     }
                 } else {
-                    fetchAndStoreUserData(); // 有 token 但无用户信息，重新获取
+                    fetchAndStoreUserData().then(() => fetchPosts(currentPage));
                 }
             } else {
-                currentAuthorization = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ';
-                currentUser = null;
-                updateProfileButton();
+                showToast('请先登录');
             }
         }
 
@@ -1068,7 +1152,6 @@
         // 注册
         async function register(mail, code, password) {
             registerMessage.textContent = '';
-            // 从邮箱提取QQ号作为昵称
             const name = mail.split('@')[0];
             const body = new URLSearchParams();
             body.append('name', name);
@@ -1111,8 +1194,12 @@
             }
         }
 
-        // 发帖功能
+        // 发帖
         async function addPost(title, content) {
+            if (!currentAuthorization) {
+                showToast('请先登录');
+                return;
+            }
             if (!title.trim() || !content.trim()) {
                 postMessage.textContent = '标题和内容不能为空';
                 return;
@@ -1149,7 +1236,12 @@
                 if (response.ok && json.code === 1) {
                     showToast('发布成功');
                     closePostModal();
-                    fetchPosts(currentPage);
+                    // 刷新当前列表
+                    if (searchMode) {
+                        fetchPosts(currentPage, searchKeyword);
+                    } else {
+                        fetchPosts(currentPage);
+                    }
                 } else {
                     postMessage.textContent = `发布失败: ${json.msg || '未知错误'}`;
                 }
@@ -1158,7 +1250,7 @@
             }
         }
 
-        // 签到功能
+        // 签到
         async function signIn() {
             if (!currentAuthorization) {
                 showToast('请先登录');
@@ -1172,7 +1264,7 @@
                         'localtoken': LOCALTOKEN_SIGN,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: '' // 空body
+                    body: ''
                 });
 
                 const responseText = await response.text();
@@ -1193,7 +1285,7 @@
             }
         }
 
-        // 获取个人中心数据并显示
+        // 个人中心数据获取
         async function fetchUserDataForProfile() {
             if (!currentAuthorization) {
                 showToast('请先登录');
@@ -1230,7 +1322,7 @@
             }
         }
 
-        // 渲染个人中心数据
+        // 渲染个人中心
         function renderUserData(data) {
             const created = formatDate(data.created);
             const permsName = data.perms?.name || '未知';
@@ -1265,7 +1357,7 @@
             }, duration);
         }
 
-        // 登录模态框控制
+        // 模态框控制
         function openLoginModal() {
             loginModal.style.display = 'flex';
             modalLoginName.value = '';
@@ -1292,7 +1384,6 @@
             }
         }
 
-        // 注册模态框控制
         function openRegisterModal() {
             registerModal.style.display = 'flex';
             regMail.value = '';
@@ -1304,7 +1395,6 @@
             registerModal.style.display = 'none';
         }
 
-        // 个人中心模态框控制
         function openProfileModal() {
             profileModal.style.display = 'flex';
             fetchUserDataForProfile();
@@ -1313,7 +1403,6 @@
             profileModal.style.display = 'none';
         }
 
-        // 发帖弹窗控制
         function openPostModal() {
             postModal.classList.add('show');
             postTitle.value = '';
@@ -1322,6 +1411,15 @@
         }
         function closePostModal() {
             postModal.classList.remove('show');
+        }
+
+        function openSearchModal() {
+            searchModal.style.display = 'flex';
+            searchKeywordInput.value = searchKeyword; // 保留上次关键词
+            searchMessage.textContent = '';
+        }
+        function closeSearchModal() {
+            searchModal.style.display = 'none';
         }
 
         // 事件绑定
@@ -1383,6 +1481,32 @@
             if (e.target === profileModal) closeProfileModal();
         });
 
+        // 搜索
+        searchBtn.addEventListener('click', openSearchModal);
+        searchCancel.addEventListener('click', closeSearchModal);
+        searchSubmit.addEventListener('click', () => {
+            const keyword = searchKeywordInput.value.trim();
+            if (!keyword) {
+                searchMessage.textContent = '请输入关键词';
+                return;
+            }
+            searchMode = true;
+            searchKeyword = keyword;
+            currentPage = 1;
+            closeSearchModal();
+            fetchPosts(currentPage, keyword);
+        });
+        searchAllBtn.addEventListener('click', () => {
+            searchMode = false;
+            searchKeyword = '';
+            currentPage = 1;
+            closeSearchModal();
+            fetchPosts(currentPage);
+        });
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) closeSearchModal();
+        });
+
         // 辅助函数
         function showLoading(show) {
             listLoading.style.display = show ? 'block' : 'none';
@@ -1406,9 +1530,8 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // 初始化
+        // 初始化：先恢复登录状态，如果未登录则提示
         restoreFromStorage();
-        fetchPosts(currentPage);
     })();
 </script>
 </body>

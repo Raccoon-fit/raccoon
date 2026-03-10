@@ -32,7 +32,6 @@
             font-weight: 400;
             margin: 0;
         }
-        /* 账户下拉菜单 */
         .account-dropdown {
             position: relative;
             display: inline-block;
@@ -298,7 +297,7 @@
             font-size: 0.9rem;
             color: #555555;
         }
-        /* 底部悬浮按钮组（居中） */
+        /* 底部悬浮按钮组 */
         .float-buttons-center {
             position: fixed;
             bottom: 20px;
@@ -770,10 +769,8 @@
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
         const INBOX_URL = 'http://159.75.183.170:3000/Users/UserInbox';
-        // 滑块验证接口（需要根据实际后端调整）
-        const SLIDE_VERIFY_URL = 'http://159.75.183.170:3000/Users/VerifySlide'; // 假设的验证接口
 
-        // 固定的 localtoken
+        // 固定的 localtoken（保持不变）
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
         const LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
         const LOCALTOKEN_POSTADD = 'TA1DBPQ19f7sT9HWZYPVeCiVsfMqcrfHaQzk2TbN3UgI9h9ZXjlLSm0gIVTK7s/VXgOSjLcRNJf6VZur0hMVUzo+uzE5TvZRCPnTT5gdFWmhedtyWXF3TXrrP6GMUnylIa6O3V+ZojnQj91I/lHqhw==';
@@ -814,7 +811,7 @@
         let slideSecretKey = '';
         let slideOriginalBase64 = '';
         let slideJigsawBase64 = '';
-        let pendingLoginParams = {}; // 保存登录参数，用于滑块验证后重新登录
+        let pendingLoginParams = {}; // 保存登录参数
 
         // DOM 元素
         const postListEl = document.getElementById('postList');
@@ -905,7 +902,7 @@
             return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
         }
 
-        // 处理内容
+        // 处理内容（用于详情）
         function processContent(rawText) {
             if (!rawText) return '';
             try {
@@ -1145,7 +1142,7 @@
             });
         }
 
-        // 登录功能（密码登录）
+        // 登录功能（密码登录，首次尝试）
         async function loginWithPassword(name, password) {
             modalMessage.textContent = '';
             const body = `name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`;
@@ -1200,7 +1197,6 @@
                 modalMessage.textContent = '请输入Token';
                 return;
             }
-            // Token登录不需要滑块验证，直接设置token
             currentAuthorization = token.trim();
             localStorage.setItem('token', currentAuthorization);
             try {
@@ -1222,7 +1218,6 @@
 
         // 处理滑块验证
         function handleSlideVerification(data, loginParams) {
-            // 保存登录参数，用于验证后重新登录
             pendingLoginParams = loginParams;
             slideToken = data.token;
             slideSecretKey = data.secretKey;
@@ -1250,51 +1245,57 @@
             slideMessage.textContent = '';
         }
 
+        // 生成 pointJson（示例，根据实际情况修改）
+        function generatePointJson(distance, secretKey) {
+            // 这里简单地拼接 distance 和 secretKey 并进行 Base64 编码
+            // 实际应根据后端算法实现
+            const raw = `${distance}:${secretKey}`;
+            return btoa(raw);
+        }
+
         // 滑块确认验证
         async function confirmSlide() {
-            const distance = parseInt(slideRange.value); // 假设滑块值表示偏移百分比或像素
-            // 这里需要根据实际接口构造请求，可能需要将distance、token、secretKey发送到服务器
-            // 由于没有实际接口，我们模拟验证成功
+            const distance = parseInt(slideRange.value);
             slideMessage.textContent = '验证中...';
 
-            // 模拟验证请求（实际应替换为真实接口）
-            // 假设验证接口返回新的凭证，然后我们用这个凭证重新登录
             try {
-                // 构造验证请求
-                const verifyBody = new URLSearchParams();
-                verifyBody.append('token', slideToken);
-                verifyBody.append('secretKey', slideSecretKey);
-                verifyBody.append('distance', distance);
-                // 可能需要轨迹数据，这里简化
+                const pointJson = generatePointJson(distance, slideSecretKey);
 
-                // 模拟验证成功
-                // 实际应调用 SLIDE_VERIFY_URL
-                // const response = await fetch(SLIDE_VERIFY_URL, { method: 'POST', body: verifyBody });
-                // const result = await response.json();
-                // if (result.code === 1) {
-                //     // 验证成功，获取验证凭证
-                //     const slidePassToken = result.data.token;
-                //     // 重新登录，带上滑块凭证
-                //     await loginWithPasswordAfterSlide(pendingLoginParams.name, pendingLoginParams.password, slidePassToken);
-                // } else {
-                //     slideMessage.textContent = result.msg || '验证失败';
-                // }
+                const loginBody = new URLSearchParams();
+                loginBody.append('name', pendingLoginParams.name);
+                loginBody.append('password', pendingLoginParams.password);
+                loginBody.append('pointJson', pointJson);
+                loginBody.append('token', slideToken);
 
-                // 模拟直接成功
-                slideMessage.textContent = '验证成功，正在登录...';
-                setTimeout(() => {
-                    // 模拟登录成功
-                    // 实际应该重新调用登录接口，带上滑块凭证
-                    // 这里为了演示，直接设置一个token
-                    currentAuthorization = 'app_763_demo_token_after_slide';
+                const response = await fetch(LOGIN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: loginBody.toString()
+                });
+
+                const responseText = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(responseText);
+                } catch {
+                    throw new Error('服务器返回非JSON格式');
+                }
+
+                if (json.code === 1 && json.data && json.data.token) {
+                    currentAuthorization = json.data.token;
                     localStorage.setItem('token', currentAuthorization);
-                    fetchAndStoreUserData();
+                    await fetchAndStoreUserData();
                     closeLoginModal();
                     searchMode = false;
                     searchKeyword = '';
                     currentPage = 1;
                     fetchPosts(currentPage);
-                }, 1000);
+                    showToast('登录成功');
+                } else {
+                    slideMessage.textContent = json.msg || '登录失败';
+                }
             } catch (err) {
                 slideMessage.textContent = `验证错误: ${err.message}`;
             }
@@ -1702,7 +1703,6 @@
             modalToken.value = '';
             modalMessage.textContent = '';
             setLoginMode('password');
-            // 重置滑块区域隐藏
             slideVerifyArea.style.display = 'none';
             passwordLoginForm.style.display = 'block';
             tokenLoginForm.style.display = 'none';
@@ -1799,15 +1799,13 @@
             if (e.target === loginModal) closeLoginModal();
         });
 
-        // 滑块验证事件
         slideCancel.addEventListener('click', () => {
-            // 取消验证，返回登录表单
             slideVerifyArea.style.display = 'none';
             passwordLoginForm.style.display = 'block';
             tokenLoginForm.style.display = 'none';
             loginActions.style.display = 'flex';
             modalMessage.style.display = 'block';
-            setLoginMode(loginMode); // 恢复正确表单
+            setLoginMode(loginMode);
         });
         slideConfirm.addEventListener('click', confirmSlide);
         slideRange.addEventListener('input', (e) => {
@@ -1849,7 +1847,6 @@
             if (e.target === profileModal) closeProfileModal();
         });
 
-        // 搜索
         searchBtn.addEventListener('click', openSearchModal);
         searchCancel.addEventListener('click', closeSearchModal);
         searchSubmit.addEventListener('click', () => {
@@ -1875,7 +1872,6 @@
             if (e.target === searchModal) closeSearchModal();
         });
 
-        // 系统消息分页
         inboxPrevPage.addEventListener('click', () => {
             if (inboxPage > 1) {
                 inboxPage--;
@@ -1891,7 +1887,6 @@
             if (e.target === inboxModal) closeInboxModal();
         });
 
-        // 辅助函数
         function showLoading(show) {
             listLoading.style.display = show ? 'block' : 'none';
             if (show) postListEl.innerHTML = '';

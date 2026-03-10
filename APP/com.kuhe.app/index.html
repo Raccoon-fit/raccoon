@@ -15,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #111111;
             line-height: 1.5;
-            padding: 2rem 1rem 5rem; /* 底部留出空间给悬浮按钮 */
+            padding: 2rem 1rem 5rem;
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -32,7 +32,11 @@
             font-weight: 400;
             margin: 0;
         }
-        #loginBtn {
+        .header-right {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .header-right button {
             padding: 0.4rem 1.2rem;
             background: #ffffff;
             border: 1px solid #cccccc;
@@ -40,10 +44,10 @@
             color: #333333;
             font-size: 0.9rem;
         }
-        #loginBtn:hover {
+        .header-right button:hover {
             background: #f5f5f5;
         }
-        /* 登录模态框 */
+        /* 模态框通用样式 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -60,7 +64,7 @@
             background: #ffffff;
             border: 1px solid #cccccc;
             padding: 2rem;
-            width: 300px;
+            width: 320px;
             max-width: 90%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
@@ -76,6 +80,25 @@
             border: 1px solid #cccccc;
             background: #ffffff;
             font-size: 0.9rem;
+        }
+        .modal .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .modal .input-group input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .modal .input-group button {
+            padding: 0.6rem 1rem;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .modal .input-group button:hover {
+            background: #f5f5f5;
         }
         .modal-actions {
             display: flex;
@@ -122,7 +145,7 @@
         .post-float-btn:hover {
             background: #f5f5f5;
         }
-        /* 发帖弹窗 (从底部滑出) */
+        /* 发帖弹窗 */
         .post-modal {
             position: fixed;
             bottom: 0;
@@ -313,7 +336,10 @@
 <body>
 <div class="header">
     <h1>酷盒社区官方网站</h1>
-    <button id="loginBtn">登录</button>
+    <div class="header-right">
+        <button id="loginBtn">登录</button>
+        <button id="registerBtn">注册</button>
+    </div>
 </div>
 
 <!-- 登录模态框 -->
@@ -330,10 +356,29 @@
     </div>
 </div>
 
+<!-- 注册模态框 -->
+<div id="registerModal" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <h3>注册酷盒社区</h3>
+        <div class="input-group">
+            <input type="email" id="regMail" placeholder="邮箱">
+            <button id="sendCodeBtn">获取验证码</button>
+        </div>
+        <input type="text" id="regCode" placeholder="验证码">
+        <input type="text" id="regName" placeholder="昵称">
+        <input type="password" id="regPassword" placeholder="密码">
+        <div id="registerMessage" class="modal-message"></div>
+        <div class="modal-actions">
+            <button id="registerCancel">取消</button>
+            <button id="registerSubmit">注册</button>
+        </div>
+    </div>
+</div>
+
 <!-- 发帖悬浮按钮 -->
 <div class="post-float-btn" id="postFloatBtn">+</div>
 
-<!-- 发帖弹窗（从底部滑出） -->
+<!-- 发帖弹窗 -->
 <div class="post-modal" id="postModal">
     <div class="modal-content">
         <h3>发布新帖子</h3>
@@ -365,13 +410,17 @@
         const DETAIL_URL = 'http://159.75.183.170:3000/Posts/PostsInfo';
         const LOGIN_URL = 'http://159.75.183.170:3000/Users/Login';
         const POST_ADD_URL = 'http://159.75.183.170:3000/Posts/PostsAdd';
+        const SEND_CODE_URL = 'http://159.75.183.170:3000/Users/SendRegisterCode';
+        const REGISTER_URL = 'http://159.75.183.170:3000/Users/Register';
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
         const LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
         const LOCALTOKEN_POSTADD = 'TA1DBPQ19f7sT9HWZYPVeCiVsfMqcrfHaQzk2TbN3UgI9h9ZXjlLSm0gIVTK7s/VXgOSjLcRNJf6VZur0hMVUzo+uzE5TvZRCPnTT5gdFWmhedtyWXF3TXrrP6GMUnylIa6O3V+ZojnQj91I/lHqhw==';
+        const LOCALTOKEN_SENDCODE = '7fKDj/4vaSdU45Sq0XbBKjdYgE/umXRxAH9KagMqh9KECTKG280E7NG4NVD3JzywK7geG2Cqm42wnW3uwzxeSA==';
+        const LOCALTOKEN_REGISTER = '7fKDj/4vaSdU45Sq0XbBKjdYgE/umXRxAH9KagMqh9J3jmfV5cXEb9ZAQSbM+lhvB83uSc0WQoG/2d15lKZxwA==';
 
-        // Authorization 头：未登录时使用默认值，登录后使用返回的 token
+        // Authorization 头
         let currentAuthorization = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ'; // 默认值
 
         // 状态
@@ -382,11 +431,14 @@
         let expandedCid = null;
         let expandedElement = null;
 
-        // DOM
+        // DOM 元素
         const postListEl = document.getElementById('postList');
         const listLoading = document.getElementById('listLoading');
         const listError = document.getElementById('listError');
         const paginationEl = document.getElementById('pagination');
+        const globalToast = document.getElementById('globalToast');
+
+        // 登录相关
         const loginBtn = document.getElementById('loginBtn');
         const loginModal = document.getElementById('loginModal');
         const modalLoginName = document.getElementById('modalLoginName');
@@ -394,6 +446,19 @@
         const modalMessage = document.getElementById('modalMessage');
         const modalCancel = document.getElementById('modalCancel');
         const modalSubmit = document.getElementById('modalSubmit');
+
+        // 注册相关
+        const registerBtn = document.getElementById('registerBtn');
+        const registerModal = document.getElementById('registerModal');
+        const regMail = document.getElementById('regMail');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const regCode = document.getElementById('regCode');
+        const regName = document.getElementById('regName');
+        const regPassword = document.getElementById('regPassword');
+        const registerMessage = document.getElementById('registerMessage');
+        const registerCancel = document.getElementById('registerCancel');
+        const registerSubmit = document.getElementById('registerSubmit');
+
         // 发帖相关
         const postFloatBtn = document.getElementById('postFloatBtn');
         const postModal = document.getElementById('postModal');
@@ -402,7 +467,6 @@
         const postMessage = document.getElementById('postMessage');
         const postCancel = document.getElementById('postCancel');
         const postSubmit = document.getElementById('postSubmit');
-        const globalToast = document.getElementById('globalToast');
 
         // 工具函数：日期格式化
         function formatDate(timestamp) {
@@ -655,7 +719,7 @@
                     currentAuthorization = json.data.token;
                     modalMessage.textContent = '登录成功！';
                     setTimeout(() => {
-                        closeModal();
+                        closeLoginModal();
                         fetchPosts(currentPage);
                     }, 500);
                 } else {
@@ -663,6 +727,90 @@
                 }
             } catch (err) {
                 modalMessage.textContent = `错误: ${err.message}`;
+            }
+        }
+
+        // 发送验证码
+        async function sendCode(mail) {
+            if (!mail) {
+                registerMessage.textContent = '请输入邮箱';
+                return false;
+            }
+            registerMessage.textContent = '发送中...';
+            const body = `mail=${encodeURIComponent(mail)}`;
+
+            try {
+                const response = await fetch(SEND_CODE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'localtoken': LOCALTOKEN_SENDCODE,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: body
+                });
+
+                const responseText = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(responseText);
+                } catch {
+                    throw new Error('服务器返回非JSON格式');
+                }
+
+                if (response.ok && json.code === 1) {
+                    registerMessage.textContent = '验证码发送成功';
+                    return true;
+                } else {
+                    registerMessage.textContent = json.msg || '发送失败';
+                    return false;
+                }
+            } catch (err) {
+                registerMessage.textContent = `错误: ${err.message}`;
+                return false;
+            }
+        }
+
+        // 注册
+        async function register(mail, code, name, password) {
+            registerMessage.textContent = '';
+            const body = new URLSearchParams();
+            body.append('name', name);
+            body.append('code', code);
+            body.append('password', password);
+            body.append('mail', mail);
+
+            try {
+                const response = await fetch(REGISTER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'localtoken': LOCALTOKEN_REGISTER,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: body.toString()
+                });
+
+                const responseText = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(responseText);
+                } catch {
+                    throw new Error('服务器返回非JSON格式');
+                }
+
+                if (response.ok && json.code === 1) {
+                    registerMessage.textContent = '注册成功！';
+                    setTimeout(() => {
+                        closeRegisterModal();
+                        showToast('注册成功，请登录');
+                    }, 500);
+                    return true;
+                } else {
+                    registerMessage.textContent = json.msg || '注册失败';
+                    return false;
+                }
+            } catch (err) {
+                registerMessage.textContent = `错误: ${err.message}`;
+                return false;
             }
         }
 
@@ -674,7 +822,6 @@
             }
 
             postMessage.textContent = '';
-            // 构建 text 字段为 Delta 格式的 JSON 数组
             const textDelta = JSON.stringify([{ insert: content }]);
             const body = new URLSearchParams();
             body.append('title', title);
@@ -705,7 +852,7 @@
                 if (response.ok && json.code === 1) {
                     showToast('发布成功');
                     closePostModal();
-                    fetchPosts(currentPage); // 刷新列表
+                    fetchPosts(currentPage);
                 } else {
                     postMessage.textContent = `发布失败: ${json.msg || '未知错误'}`;
                 }
@@ -723,15 +870,28 @@
             }, duration);
         }
 
-        // 模态框控制
-        function openModal() {
+        // 登录模态框控制
+        function openLoginModal() {
             loginModal.style.display = 'flex';
             modalLoginName.value = '';
             modalLoginPassword.value = '';
             modalMessage.textContent = '';
         }
-        function closeModal() {
+        function closeLoginModal() {
             loginModal.style.display = 'none';
+        }
+
+        // 注册模态框控制
+        function openRegisterModal() {
+            registerModal.style.display = 'flex';
+            regMail.value = '';
+            regCode.value = '';
+            regName.value = '';
+            regPassword.value = '';
+            registerMessage.textContent = '';
+        }
+        function closeRegisterModal() {
+            registerModal.style.display = 'none';
         }
 
         // 发帖弹窗控制
@@ -746,8 +906,8 @@
         }
 
         // 事件绑定
-        loginBtn.addEventListener('click', openModal);
-        modalCancel.addEventListener('click', closeModal);
+        loginBtn.addEventListener('click', openLoginModal);
+        modalCancel.addEventListener('click', closeLoginModal);
         modalSubmit.addEventListener('click', () => {
             const name = modalLoginName.value.trim();
             const password = modalLoginPassword.value.trim();
@@ -758,7 +918,28 @@
             login(name, password);
         });
         loginModal.addEventListener('click', (e) => {
-            if (e.target === loginModal) closeModal();
+            if (e.target === loginModal) closeLoginModal();
+        });
+
+        registerBtn.addEventListener('click', openRegisterModal);
+        registerCancel.addEventListener('click', closeRegisterModal);
+        sendCodeBtn.addEventListener('click', async () => {
+            const mail = regMail.value.trim();
+            await sendCode(mail);
+        });
+        registerSubmit.addEventListener('click', async () => {
+            const mail = regMail.value.trim();
+            const code = regCode.value.trim();
+            const name = regName.value.trim();
+            const password = regPassword.value.trim();
+            if (!mail || !code || !name || !password) {
+                registerMessage.textContent = '请填写所有字段';
+                return;
+            }
+            await register(mail, code, name, password);
+        });
+        registerModal.addEventListener('click', (e) => {
+            if (e.target === registerModal) closeRegisterModal();
         });
 
         postFloatBtn.addEventListener('click', openPostModal);
@@ -768,7 +949,6 @@
             const content = postContent.value.trim();
             addPost(title, content);
         });
-        // 点击背景关闭发帖弹窗？为了简单，不添加背景点击关闭，防止误触
 
         // 辅助函数
         function showLoading(show) {

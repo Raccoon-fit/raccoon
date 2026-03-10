@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>酷盒社区 · 帖子浏览</title>
+    <title>酷盒社区官方网站</title>
     <style>
         * {
             margin: 0;
@@ -15,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #111111;
             line-height: 1.5;
-            padding: 2rem 1rem 6rem;
+            padding: 2rem 1rem 8rem; /* 增加底部空间给下载横幅 */
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -405,11 +405,34 @@
         .error {
             color: #aa0000;
         }
+        /* 下载横幅按钮 */
+        .download-banner {
+            text-align: center;
+            margin: 2rem auto 1rem;
+            max-width: 600px;
+        }
+        .download-link {
+            display: inline-block;
+            width: 90%;
+            max-width: 400px;
+            background-color: #2c5e2e; /* 深绿色 */
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.1s;
+        }
+        .download-link:hover {
+            background-color: #1f4a21;
+        }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1>📋 酷盒社区 · 帖子浏览</h1>
+    <h1>酷盒社区官网</h1>
     <div class="header-right">
         <button id="loginBtn">登录</button>
         <button id="registerBtn">注册</button>
@@ -506,6 +529,11 @@
     <div id="pagination" class="pagination"></div>
 </div>
 
+<!-- 下载APP横幅 -->
+<div class="download-banner">
+    <a href="https://share.feijipan.com/s/sFFk9QMZ" target="_blank" rel="noopener noreferrer" class="download-link">前往酷盒app体验更佳</a>
+</div>
+
 <script>
     (function() {
         // 接口配置
@@ -516,7 +544,7 @@
         const SEND_CODE_URL = 'http://159.75.183.170:3000/Users/SendRegisterCode';
         const REGISTER_URL = 'http://159.75.183.170:3000/Users/Register';
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
-        const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData'; // 个人中心数据接口
+        const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
@@ -1074,7 +1102,6 @@
 
         // 渲染个人中心数据
         function renderUserData(data) {
-            // 提取需要的字段
             const created = formatDate(data.created);
             const permsName = data.perms?.name || '未知';
             const html = `

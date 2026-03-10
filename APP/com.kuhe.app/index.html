@@ -19,17 +19,48 @@
             max-width: 1000px;
             margin: 0 auto;
         }
-        .container {
+        .header {
             display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 400;
+            justify-content: space-between;
+            align-items: flex-end;
             border-bottom: 1px solid #dddddd;
             padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin: 0;
+        }
+        .login-area {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+        .login-area input {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #cccccc;
+            background: #ffffff;
+            font-size: 0.9rem;
+            width: 140px;
+        }
+        .login-area button {
+            padding: 0.4rem 1rem;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            color: #333333;
+        }
+        .login-area button:hover {
+            background: #f5f5f5;
+        }
+        .login-message {
+            font-size: 0.85rem;
+            color: #666666;
+            max-width: 200px;
+            word-break: break-word;
         }
         /* 帖子列表 */
         .post-list {
@@ -61,20 +92,20 @@
             color: #666666;
             font-size: 0.9rem;
         }
-        /* 详情卡片 - 插入在帖子项下方 */
+        /* 详情卡片 */
         .detail-card {
             border: 1px solid #dddddd;
             border-top: none;
             background: #fafafa;
             padding: 1.5rem;
-            margin-bottom: 1rem; /* 与下一个帖子保持间距 */
+            margin-bottom: 1rem;
         }
         .detail-grid {
             display: grid;
             grid-template-columns: auto 1fr;
             gap: 0.8rem 1.5rem;
             align-items: start;
-            max-height: 500px;        /* 限制高度，可滚动 */
+            max-height: 500px;
             overflow-y: auto;
             padding-right: 0.5rem;
         }
@@ -145,16 +176,22 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>酷盒社区官方网站</h1>
-
-    <!-- 帖子列表区 -->
-    <div id="listContainer">
-        <ul class="post-list" id="postList"></ul>
-        <div id="listLoading" class="loading" style="display: none;">加载中...</div>
-        <div id="listError" class="error" style="display: none;"></div>
-        <div id="pagination" class="pagination"></div>
+<div class="header">
+    <h1>📋 酷盒社区 · 帖子浏览</h1>
+    <div class="login-area">
+        <input type="text" id="loginName" placeholder="邮箱/用户名" value="2051775505@qq.com">
+        <input type="password" id="loginPassword" placeholder="密码" value="ABC123456CBA">
+        <button id="loginBtn">登录</button>
+        <span id="loginMessage" class="login-message"></span>
     </div>
+</div>
+
+<!-- 帖子列表区 -->
+<div id="listContainer">
+    <ul class="post-list" id="postList"></ul>
+    <div id="listLoading" class="loading" style="display: none;">加载中...</div>
+    <div id="listError" class="error" style="display: none;"></div>
+    <div id="pagination" class="pagination"></div>
 </div>
 
 <script>
@@ -162,23 +199,31 @@
         // 接口配置
         const LIST_URL = 'http://159.75.183.170:3000/Posts/PostsList';
         const DETAIL_URL = 'http://159.75.183.170:3000/Posts/PostsInfo';
-        const AUTHORIZATION = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ';
-        const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
-        const LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
+        const LOGIN_URL = 'http://159.75.183.170:3000/Users/Login';
+        const AUTHORIZATION = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ'; // 固定应用令牌
+
+        // 备用的 localtoken（未登录时使用）
+        const FALLBACK_LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
+        const FALLBACK_LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
 
         // 状态
         let currentPage = 1;
         let limit = 10;
         let totalPosts = 0;
         let posts = [];
-        let expandedCid = null;          // 当前展开的帖子ID
-        let expandedElement = null;       // 当前展开的详情DOM元素
+        let expandedCid = null;
+        let expandedElement = null;
+        let userToken = ''; // 登录后保存的 token，将作为 localtoken 使用
 
         // DOM
         const postListEl = document.getElementById('postList');
         const listLoading = document.getElementById('listLoading');
         const listError = document.getElementById('listError');
         const paginationEl = document.getElementById('pagination');
+        const loginName = document.getElementById('loginName');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginMessage = document.getElementById('loginMessage');
 
         // 工具函数：日期格式化
         function formatDate(timestamp) {
@@ -187,7 +232,7 @@
             return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
         }
 
-        // 处理内容：第一个insert公开，第二个insert替换为隐藏提示，其余忽略（针对Delta数组）
+        // 处理内容：第一个insert公开，第二个insert替换为隐藏提示，其余忽略
         function processContent(rawText) {
             if (!rawText) return '';
             try {
@@ -201,25 +246,22 @@
                             } else if (index === 1) {
                                 result += '【该隐藏内容请在APP内查看】';
                             }
-                            // 后续忽略
                         }
                     });
                     return result;
                 }
-            } catch (e) {
-                // 不是JSON，普通字符串
-            }
+            } catch (e) {}
             return rawText.replace(/【隐藏内容】/g, '【该隐藏内容请在APP内查看】');
         }
 
-        // 生成详情卡片HTML（包含所有可用字段）
+        // 生成详情卡片HTML（只显示非敏感字段）
         function generateDetailHTML(data) {
             const author = data.authorInfo || {};
             const sections = data.sections || {};
+            const images = data.images || [];
 
-            // 基础字段
+            // 基础字段（公开）
             const fields = [
-                { label: '响应码', value: data.code ?? '-' },
                 { label: '帖子ID', value: data.cid ?? '-' },
                 { label: '标题', value: data.title || '-' },
                 { label: '发布时间', value: formatDate(data.created) },
@@ -227,40 +269,30 @@
                 { label: '浏览数', value: data.views ?? '-' },
                 { label: '点赞数', value: data.likes ?? '-' },
                 { label: '评论数', value: data.commentsNum ?? '-' },
-                { label: '是否置顶', value: data.istop === 1 ? '是' : '否' },
+                { label: '置顶', value: data.istop === 1 ? '是' : '否' },
                 { label: '状态', value: data.status || '-' },
                 { label: '类型', value: data.type || '-' },
             ];
 
-            // 发布者信息
+            // 发布者信息（公开部分）
             const authorFields = [
                 { label: 'UID', value: author.uid ?? '-' },
                 { label: '昵称', value: author.screenName || author.name || '-' },
-                { label: '邮箱', value: author.mail || '-' },
-                { label: 'VIP到期', value: author.vip ? formatDate(author.vip) : '无' },
-                { label: '注册时间', value: author.created ? formatDate(author.created) : '-' },
-                { label: '最后登录', value: author.logged ? formatDate(author.logged) : '-' },
                 { label: '简介', value: author.introduce || '-' },
-                { label: '头像', value: author.avatar || '-' },
-                { label: '经验值', value: author.experience ?? '-' },
-                { label: '性别', value: author.gender === 1 ? '男' : (author.gender === 2 ? '女' : '未知') },
-                { label: '是否VIP', value: author.isvip === 1 ? '是' : '否' },
+                // 隐藏邮箱、VIP、经验、性别、登录时间等敏感字段
             ];
 
-            // 分区信息
+            // 分区信息（公开部分）
             const sectionFields = [
                 { label: '分区ID', value: sections.sid ?? '-' },
                 { label: '分区名称', value: sections.name || '-' },
                 { label: '分区类型', value: sections.type || '-' },
-                { label: '图标', value: sections.imgurl || '-' },
-                { label: '背景图', value: sections.bGurl || '-' },
             ];
 
-            // 图片列表
-            const images = data.images || [];
-            const imagesHtml = images.length ? images.map(url => `<div>${escapeHtml(url)}</div>`).join('') : '无';
+            // 图片列表简化为数量
+            const imagesHtml = images.length ? `共 ${images.length} 张图片` : '无';
 
-            // 帖子内容（经过处理）
+            // 帖子内容
             const content = processContent(data.text || '');
 
             // 构建HTML
@@ -273,24 +305,24 @@
             });
 
             // 发布者信息
-            html += '<div class="detail-section">👤 发布者信息</div>';
+            html += '<div class="detail-section">👤 发布者</div>';
             authorFields.forEach(f => {
                 html += `<div class="detail-label">${f.label}：</div><div class="detail-value">${escapeHtml(String(f.value))}</div>`;
             });
 
             // 分区信息
-            html += '<div class="detail-section">📂 分区信息</div>';
+            html += '<div class="detail-section">📂 分区</div>';
             sectionFields.forEach(f => {
                 html += `<div class="detail-label">${f.label}：</div><div class="detail-value">${escapeHtml(String(f.value))}</div>`;
             });
 
             // 图片
-            html += `<div class="detail-label">图片列表：</div><div class="detail-value">${imagesHtml}</div>`;
+            html += `<div class="detail-label">图片：</div><div class="detail-value">${imagesHtml}</div>`;
 
             // 帖子内容（大框）
-            html += `<div class="detail-label">帖子内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
+            html += `<div class="detail-label">内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
 
-            html += '</div>'; // 关闭detail-grid
+            html += '</div>';
             return `<div class="detail-card" data-cid="${data.cid}">${html}</div>`;
         }
 
@@ -301,29 +333,27 @@
                 expandedElement = null;
             }
             expandedCid = null;
-            // 移除所有帖子项的高亮
             document.querySelectorAll('.post-item').forEach(li => li.classList.remove('selected'));
         }
 
-        // 获取并插入详情
+        // 获取并展开详情
         async function expandPost(cid, postItem) {
-            // 如果已经展开同一个，则收起
             if (expandedCid === cid) {
                 removeExpanded();
                 return;
             }
-
-            // 移除之前的展开
             removeExpanded();
 
-            // 显示加载占位（可选，此处直接调用接口）
+            // 确定使用的 localtoken
+            const localToken = userToken || FALLBACK_LOCALTOKEN_DETAIL;
+
             try {
                 const body = `key=${cid}`;
                 const response = await fetch(DETAIL_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': AUTHORIZATION,
-                        'localtoken': LOCALTOKEN_DETAIL,
+                        'localtoken': localToken,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: body
@@ -332,19 +362,14 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const json = await response.json();
                 if (json.code === 1 && json.data) {
-                    // 生成详情卡片
                     const detailHtml = generateDetailHTML(json.data);
-                    // 创建临时容器
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = detailHtml;
                     const detailElement = tempDiv.firstElementChild;
 
-                    // 在postItem后面插入
                     postItem.insertAdjacentElement('afterend', detailElement);
                     expandedElement = detailElement;
                     expandedCid = cid;
-
-                    // 高亮当前帖子项
                     postItem.classList.add('selected');
                 } else {
                     throw new Error(json.msg || '获取详情失败');
@@ -358,17 +383,20 @@
         async function fetchPosts(page = 1) {
             showLoading(true);
             hideError();
-            removeExpanded(); // 切换页码时收起所有详情
+            removeExpanded();
 
             const searchParams = JSON.stringify({ type: 'post' });
             const body = `page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
+
+            // 确定使用的 localtoken
+            const localToken = userToken || FALLBACK_LOCALTOKEN_LIST;
 
             try {
                 const response = await fetch(LIST_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': AUTHORIZATION,
-                        'localtoken': LOCALTOKEN_LIST,
+                        'localtoken': localToken,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: body
@@ -404,7 +432,6 @@
                 const title = post.title || '无标题';
                 const author = post.authorInfo?.name || '匿名';
                 const created = formatDate(post.created);
-                // 注意：这里不加selected类，因为高亮由expandPost管理
                 html += `
                     <li class="post-item" data-cid="${cid}">
                         <div class="post-title">${escapeHtml(title)}</div>
@@ -417,13 +444,10 @@
             });
             postListEl.innerHTML = html;
 
-            // 绑定点击事件
             document.querySelectorAll('.post-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     const cid = item.dataset.cid;
-                    if (cid) {
-                        expandPost(cid, item);
-                    }
+                    if (cid) expandPost(cid, item);
                 });
             });
         }
@@ -452,21 +476,61 @@
             });
         }
 
+        // 登录功能
+        async function login() {
+            const name = loginName.value.trim();
+            const password = loginPassword.value.trim();
+            if (!name || !password) {
+                loginMessage.textContent = '请输入用户名和密码';
+                return;
+            }
+
+            loginMessage.textContent = '登录中...';
+            const body = `name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`;
+
+            try {
+                const response = await fetch(LOGIN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: body
+                });
+
+                const responseText = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(responseText);
+                } catch {
+                    throw new Error('服务器返回非JSON格式');
+                }
+
+                if (response.ok && json.code === 1 && json.data && json.data.token) {
+                    userToken = json.data.token; // 保存 token
+                    loginMessage.textContent = '登录成功！';
+                    // 可以重新加载列表（使用新 token）
+                    fetchPosts(currentPage);
+                } else {
+                    loginMessage.textContent = json.msg || '登录失败';
+                }
+            } catch (err) {
+                loginMessage.textContent = `错误: ${err.message}`;
+            }
+        }
+
+        // 辅助函数
         function showLoading(show) {
             listLoading.style.display = show ? 'block' : 'none';
             if (show) postListEl.innerHTML = '';
         }
-
         function showError(msg) {
             listError.style.display = 'block';
             listError.textContent = `错误: ${msg}`;
             postListEl.innerHTML = '';
         }
-
         function hideError() {
             listError.style.display = 'none';
         }
-
         function escapeHtml(unsafe) {
             if (!unsafe) return '';
             return unsafe
@@ -476,6 +540,9 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
+        // 事件绑定
+        loginBtn.addEventListener('click', login);
 
         // 初始化
         fetchPosts(currentPage);

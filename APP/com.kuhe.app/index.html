@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>酷盒社区官方网站</title>
+    <title>酷盒社区 · 帖子浏览</title>
     <style>
         * {
             margin: 0;
@@ -15,7 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: #111111;
             line-height: 1.5;
-            padding: 2rem 1rem 6rem; /* 增加底部空间 */
+            padding: 2rem 1rem 6rem;
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -64,14 +64,86 @@
             background: #ffffff;
             border: 1px solid #cccccc;
             padding: 2rem;
-            width: 340px;
+            width: 400px;
             max-width: 90%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .modal h3 {
             font-weight: 400;
             margin-bottom: 1.5rem;
             color: #333333;
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 0.5rem;
+        }
+        .modal .info-item {
+            display: flex;
+            margin-bottom: 0.8rem;
+        }
+        .modal .info-label {
+            width: 100px;
+            flex-shrink: 0;
+            color: #555555;
+        }
+        .modal .info-value {
+            flex: 1;
+            word-break: break-word;
+            color: #111111;
+        }
+        .modal .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            object-fit: cover;
+            border: 1px solid #dddddd;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        .modal-actions button {
+            padding: 0.4rem 1.5rem;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            color: #333333;
+        }
+        .modal-actions button:hover {
+            background: #f5f5f5;
+        }
+        .modal input, .modal .input-group {
+            margin-bottom: 1rem;
+        }
+        .modal .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .modal .input-group input {
+            flex: 1;
+        }
+        .modal input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #cccccc;
+            background: #ffffff;
+            font-size: 0.9rem;
+        }
+        .modal .input-group button {
+            padding: 0.6rem 1rem;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .modal .input-group button:hover {
+            background: #f5f5f5;
+        }
+        .modal-message {
+            font-size: 0.85rem;
+            color: #aa0000;
+            margin-top: 0.5rem;
         }
         .modal-tabs {
             display: flex;
@@ -93,56 +165,8 @@
             color: #111111;
             margin-bottom: -1px;
         }
-        .modal input {
-            width: 100%;
-            padding: 0.6rem;
-            margin-bottom: 1rem;
-            border: 1px solid #cccccc;
-            background: #ffffff;
-            font-size: 0.9rem;
-        }
-        .modal .input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .modal .input-group input {
-            flex: 1;
-            margin-bottom: 0;
-        }
-        .modal .input-group button {
-            padding: 0.6rem 1rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .modal .input-group button:hover {
-            background: #f5f5f5;
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        .modal-actions button {
-            padding: 0.4rem 1rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
-            cursor: pointer;
-            color: #333333;
-        }
-        .modal-actions button:hover {
-            background: #f5f5f5;
-        }
-        .modal-message {
-            font-size: 0.85rem;
-            color: #aa0000;
-            margin-top: 0.5rem;
-        }
-        /* 底部悬浮按钮组 */
-        .float-buttons {
+        /* 底部悬浮按钮组（居中） */
+        .float-buttons-center {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -171,6 +195,29 @@
         }
         .float-btn.sign-btn {
             font-size: 20px;
+        }
+        /* 右下角个人中心按钮 */
+        .profile-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            color: #333333;
+            z-index: 900;
+            transition: background 0.1s;
+        }
+        .profile-btn:hover {
+            background: #f5f5f5;
         }
         /* 发帖弹窗 */
         .post-modal {
@@ -362,7 +409,7 @@
 </head>
 <body>
 <div class="header">
-    <h1>酷盒社区官方网站</h1>
+    <h1>📋 酷盒社区 · 帖子浏览</h1>
     <div class="header-right">
         <button id="loginBtn">登录</button>
         <button id="registerBtn">注册</button>
@@ -411,11 +458,28 @@
     </div>
 </div>
 
-<!-- 底部悬浮按钮组 -->
-<div class="float-buttons">
+<!-- 个人中心模态框 -->
+<div id="profileModal" class="modal-overlay" style="display: none;">
+    <div class="modal">
+        <h3>个人中心</h3>
+        <div id="profileContent">
+            <!-- 动态填充用户信息 -->
+            <div style="text-align: center; padding: 1rem;">加载中...</div>
+        </div>
+        <div class="modal-actions">
+            <button id="profileClose">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 底部悬浮按钮组（中央） -->
+<div class="float-buttons-center">
     <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
     <div class="float-btn" id="postFloatBtn">+</div>
 </div>
+
+<!-- 右下角个人中心按钮 -->
+<div class="profile-btn" id="profileBtn" title="个人中心">👤</div>
 
 <!-- 发帖弹窗 -->
 <div class="post-modal" id="postModal">
@@ -451,7 +515,8 @@
         const POST_ADD_URL = 'http://159.75.183.170:3000/Posts/PostsAdd';
         const SEND_CODE_URL = 'http://159.75.183.170:3000/Users/SendRegisterCode';
         const REGISTER_URL = 'http://159.75.183.170:3000/Users/Register';
-        const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd'; // 签到接口
+        const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
+        const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData'; // 个人中心数据接口
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
@@ -460,6 +525,7 @@
         const LOCALTOKEN_SENDCODE = '7fKDj/4vaSdU45Sq0XbBKjdYgE/umXRxAH9KagMqh9KECTKG280E7NG4NVD3JzywK7geG2Cqm42wnW3uwzxeSA==';
         const LOCALTOKEN_REGISTER = '7fKDj/4vaSdU45Sq0XbBKjdYgE/umXRxAH9KagMqh9J3jmfV5cXEb9ZAQSbM+lhvB83uSc0WQoG/2d15lKZxwA==';
         const LOCALTOKEN_SIGN = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8ssiVgBwGkWhiYPkp842AGOFOIbsMXtiimiKe0BugMFEa8SKkA9vhM160lA4/hAo4/8=';
+        const LOCALTOKEN_USERDATA = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8svaK82YHk4EgVJ5IHJ2WNuRbp6sLwKwU32ifb280M9KeA==';
 
         // Authorization 头
         let currentAuthorization = 'app_763_2w7kUKhmn3jHSbrofYMCQjiRMkr12nOQ'; // 默认值
@@ -518,6 +584,12 @@
 
         // 签到按钮
         const signBtn = document.getElementById('signBtn');
+
+        // 个人中心相关
+        const profileBtn = document.getElementById('profileBtn');
+        const profileModal = document.getElementById('profileModal');
+        const profileContent = document.getElementById('profileContent');
+        const profileClose = document.getElementById('profileClose');
 
         // 工具函数：日期格式化
         function formatDate(timestamp) {
@@ -839,7 +911,7 @@
         async function register(mail, code, password) {
             registerMessage.textContent = '';
             // 从邮箱提取QQ号作为昵称
-            const name = mail.split('@')[0]; // 假设邮箱前缀就是QQ号
+            const name = mail.split('@')[0];
             const body = new URLSearchParams();
             body.append('name', name);
             body.append('code', code);
@@ -963,6 +1035,64 @@
             }
         }
 
+        // 获取个人中心数据并显示
+        async function fetchUserData() {
+            if (!currentAuthorization) {
+                showToast('请先登录');
+                closeProfileModal();
+                return;
+            }
+            profileContent.innerHTML = '<div style="text-align: center; padding: 1rem;">加载中...</div>';
+            try {
+                const response = await fetch(USER_DATA_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': currentAuthorization,
+                        'localtoken': LOCALTOKEN_USERDATA,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: ''
+                });
+
+                const responseText = await response.text();
+                let json;
+                try {
+                    json = JSON.parse(responseText);
+                } catch {
+                    throw new Error('服务器返回非JSON格式');
+                }
+
+                if (response.ok && json.code === 1 && json.data) {
+                    renderUserData(json.data);
+                } else {
+                    throw new Error(json.msg || '获取用户信息失败');
+                }
+            } catch (err) {
+                profileContent.innerHTML = `<div style="color: #aa0000; padding: 1rem;">错误: ${err.message}</div>`;
+            }
+        }
+
+        // 渲染个人中心数据
+        function renderUserData(data) {
+            // 提取需要的字段
+            const created = formatDate(data.created);
+            const permsName = data.perms?.name || '未知';
+            const html = `
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <div><span class="info-label">UID：</span>${data.uid || '-'}</div>
+                    <div><span class="info-label">经验：</span>${data.experience || 0}</div>
+                    <div><span class="info-label">粉丝：</span>${data.fanNum || 0}</div>
+                    <div><span class="info-label">关注：</span>${data.followNum || 0}</div>
+                    <div><span class="info-label">点赞数：</span>${data.totalLikes || 0}</div>
+                    <div><span class="info-label">注册时间：</span>${created}</div>
+                    <div><span class="info-label">连续签到：</span>${data.consSignIn || 0}</div>
+                    <div><span class="info-label">今日签到：</span>${data.isClock ? '已签' : '未签'}</div>
+                    <div><span class="info-label">用户组：</span>${permsName}</div>
+                </div>
+            `;
+            profileContent.innerHTML = html;
+        }
+
         // 显示全局提示
         function showToast(msg, duration = 2000) {
             globalToast.textContent = msg;
@@ -979,7 +1109,6 @@
             modalLoginPassword.value = '';
             modalToken.value = '';
             modalMessage.textContent = '';
-            // 默认显示密码登录tab
             setLoginMode('password');
         }
         function closeLoginModal() {
@@ -1010,6 +1139,15 @@
         }
         function closeRegisterModal() {
             registerModal.style.display = 'none';
+        }
+
+        // 个人中心模态框控制
+        function openProfileModal() {
+            profileModal.style.display = 'flex';
+            fetchUserData();
+        }
+        function closeProfileModal() {
+            profileModal.style.display = 'none';
         }
 
         // 发帖弹窗控制
@@ -1075,6 +1213,12 @@
         });
 
         signBtn.addEventListener('click', signIn);
+
+        profileBtn.addEventListener('click', openProfileModal);
+        profileClose.addEventListener('click', closeProfileModal);
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) closeProfileModal();
+        });
 
         // 辅助函数
         function showLoading(show) {

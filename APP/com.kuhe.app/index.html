@@ -5,25 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>酷盒社区官方网站</title>
     <style>
+        /* 基础变量 - 日间模式 */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #111111;
+            --border-color: #dddddd;
+            --secondary-bg: #fafafa;
+            --hover-bg: #f5f5f5;
+            --modal-bg: #ffffff;
+            --modal-border: #cccccc;
+            --toast-bg: #333333;
+            --toast-text: #ffffff;
+            --link-color: #2c5e2e;
+        }
+
+        /* 夜间模式变量 */
+        body.night-mode {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #444444;
+            --secondary-bg: #2d2d2d;
+            --hover-bg: #3a3a3a;
+            --modal-bg: #2d2d2d;
+            --modal-border: #555555;
+            --toast-bg: #555555;
+            --toast-text: #ffffff;
+            --link-color: #4caf50;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            background: #ffffff;
+            background: var(--bg-color);
+            color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #111111;
             line-height: 1.5;
             padding: 2rem 1rem 8rem;
             max-width: 1000px;
             margin: 0 auto;
+            transition: background 0.3s, color 0.3s;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            border-bottom: 1px solid #dddddd;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
             margin-bottom: 1.5rem;
         }
@@ -31,6 +60,7 @@
             font-size: 1.8rem;
             font-weight: 400;
             margin: 0;
+            color: var(--text-color);
         }
         .account-dropdown {
             position: relative;
@@ -38,22 +68,22 @@
         }
         .account-btn {
             padding: 0.4rem 1.2rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
             font-size: 0.9rem;
             min-width: 80px;
         }
         .account-btn:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .dropdown-content {
             display: none;
             position: absolute;
             right: 0;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--modal-bg);
+            border: 1px solid var(--modal-border);
             min-width: 120px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 1;
@@ -65,11 +95,11 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
             font-size: 0.9rem;
         }
         .dropdown-content button:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .account-dropdown:hover .dropdown-content {
             display: block;
@@ -88,20 +118,21 @@
             z-index: 1000;
         }
         .modal {
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--modal-bg);
+            border: 1px solid var(--modal-border);
             padding: 2rem;
             width: 500px;
             max-width: 90%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             max-height: 80vh;
             overflow-y: auto;
+            color: var(--text-color);
         }
         .modal h3 {
             font-weight: 400;
             margin-bottom: 1.5rem;
-            color: #333333;
-            border-bottom: 1px solid #eeeeee;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 0.5rem;
         }
         .modal .info-item {
@@ -111,19 +142,22 @@
         .modal .info-label {
             width: 100px;
             flex-shrink: 0;
-            color: #555555;
+            color: #555555; /* 保持中性，夜间模式可调 */
+        }
+        body.night-mode .modal .info-label {
+            color: #aaaaaa;
         }
         .modal .info-value {
             flex: 1;
             word-break: break-word;
-            color: #111111;
+            color: var(--text-color);
         }
         .modal .avatar {
             width: 40px;
             height: 40px;
             border-radius: 20px;
             object-fit: cover;
-            border: 1px solid #dddddd;
+            border: 1px solid var(--border-color);
         }
         .modal-actions {
             display: flex;
@@ -133,13 +167,13 @@
         }
         .modal-actions button {
             padding: 0.4rem 1rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
         }
         .modal-actions button:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .modal input, .modal .input-group {
             margin-bottom: 1rem;
@@ -154,19 +188,21 @@
         .modal input {
             width: 100%;
             padding: 0.6rem;
-            border: 1px solid #cccccc;
-            background: #ffffff;
+            border: 1px solid var(--modal-border);
+            background: var(--bg-color);
+            color: var(--text-color);
             font-size: 0.9rem;
         }
         .modal .input-group button {
             padding: 0.6rem 1rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             cursor: pointer;
+            color: var(--text-color);
             white-space: nowrap;
         }
         .modal .input-group button:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .modal-message {
             font-size: 0.85rem;
@@ -177,7 +213,7 @@
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
-            border-bottom: 1px solid #dddddd;
+            border-bottom: 1px solid var(--border-color);
         }
         .modal-tab {
             padding: 0.4rem 1rem;
@@ -186,11 +222,14 @@
             border: 1px solid transparent;
             border-bottom: none;
         }
+        body.night-mode .modal-tab {
+            color: #aaaaaa;
+        }
         .modal-tab.active {
-            border-color: #cccccc;
-            border-bottom-color: #ffffff;
-            background: #ffffff;
-            color: #111111;
+            border-color: var(--modal-border);
+            border-bottom-color: var(--modal-bg);
+            background: var(--modal-bg);
+            color: var(--text-color);
             margin-bottom: -1px;
         }
         /* 滑块验证样式 */
@@ -205,8 +244,8 @@
         }
         .slide-images img {
             max-width: 200px;
-            border: 1px solid #dddddd;
-            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+            background: var(--secondary-bg);
         }
         .slide-control {
             display: flex;
@@ -218,22 +257,22 @@
             flex: 1;
             height: 6px;
             -webkit-appearance: none;
-            background: #dddddd;
+            background: var(--border-color);
             border-radius: 3px;
         }
         .slide-control input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 30px;
             height: 30px;
-            background: #ffffff;
-            border: 1px solid #aaaaaa;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .slide-value {
             font-size: 0.9rem;
-            color: #555555;
+            color: var(--text-color);
             min-width: 60px;
         }
         /* 消息列表样式 */
@@ -247,8 +286,8 @@
             display: flex;
             gap: 1rem;
             padding: 0.8rem;
-            border: 1px solid #eeeeee;
-            background: #fafafa;
+            border: 1px solid var(--border-color);
+            background: var(--secondary-bg);
         }
         .message-avatar {
             flex-shrink: 0;
@@ -263,15 +302,21 @@
             font-size: 0.9rem;
             color: #666666;
         }
+        body.night-mode .message-header {
+            color: #aaaaaa;
+        }
         .message-name {
             font-weight: 500;
-            color: #333333;
+            color: var(--text-color);
         }
         .message-time {
             color: #999999;
         }
+        body.night-mode .message-time {
+            color: #777777;
+        }
         .message-text {
-            color: #111111;
+            color: var(--text-color);
             word-break: break-word;
         }
         .message-pagination {
@@ -283,21 +328,21 @@
         }
         .message-pagination button {
             padding: 0.3rem 1rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
         }
         .message-pagination button:disabled {
             color: #aaaaaa;
-            border-color: #dddddd;
+            border-color: var(--border-color);
             cursor: not-allowed;
         }
         .message-pagination span {
             font-size: 0.9rem;
-            color: #555555;
+            color: var(--text-color);
         }
-        /* 底部悬浮按钮组 */
+        /* 底部悬浮按钮组（居中） */
         .float-buttons-center {
             position: fixed;
             bottom: 20px;
@@ -311,19 +356,19 @@
             width: 60px;
             height: 60px;
             border-radius: 30px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
             transition: background 0.1s;
         }
         .float-btn:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .float-btn.sign-btn {
             font-size: 20px;
@@ -336,42 +381,49 @@
             width: 60px;
             height: 60px;
             border-radius: 30px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
             z-index: 900;
             transition: background 0.1s;
         }
         .search-btn:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
-        /* 右下角个人中心按钮 */
-        .profile-btn {
+        /* 右下角个人中心按钮和夜间模式按钮 */
+        .right-bottom-buttons {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 900;
+        }
+        .profile-btn, .night-mode-btn {
             width: 60px;
             height: 60px;
             border-radius: 30px;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
-            color: #333333;
-            z-index: 900;
+            color: var(--text-color);
             transition: background 0.1s;
             overflow: hidden;
             padding: 0;
+        }
+        .profile-btn:hover, .night-mode-btn:hover {
+            background: var(--hover-bg);
         }
         .profile-btn img {
             width: 100%;
@@ -379,8 +431,8 @@
             object-fit: cover;
             border-radius: 30px;
         }
-        .profile-btn:hover {
-            background: #f5f5f5;
+        .night-mode-btn {
+            font-size: 24px;
         }
         /* 发帖弹窗 */
         .post-modal {
@@ -388,8 +440,8 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: #ffffff;
-            border-top: 1px solid #cccccc;
+            background: var(--modal-bg);
+            border-top: 1px solid var(--modal-border);
             box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
             transform: translateY(100%);
             transition: transform 0.3s ease;
@@ -408,14 +460,15 @@
         .post-modal h3 {
             font-weight: 400;
             margin-bottom: 1.5rem;
-            color: #333333;
+            color: var(--text-color);
         }
         .post-modal input, .post-modal textarea {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
-            border: 1px solid #cccccc;
-            background: #ffffff;
+            border: 1px solid var(--modal-border);
+            background: var(--bg-color);
+            color: var(--text-color);
             font-size: 0.95rem;
             font-family: inherit;
         }
@@ -430,13 +483,13 @@
         }
         .post-modal-actions button {
             padding: 0.6rem 1.5rem;
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
         }
         .post-modal-actions button:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .post-message {
             margin-bottom: 1rem;
@@ -448,8 +501,8 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #333333;
-            color: #ffffff;
+            background: var(--toast-bg);
+            color: var(--toast-text);
             padding: 0.6rem 1.2rem;
             border-radius: 30px;
             font-size: 0.9rem;
@@ -460,19 +513,19 @@
         /* 帖子列表 */
         .post-list {
             list-style: none;
-            border-top: 1px solid #dddddd;
+            border-top: 1px solid var(--border-color);
         }
         .post-item {
-            border-bottom: 1px solid #eeeeee;
+            border-bottom: 1px solid var(--border-color);
             padding: 1rem 0.5rem;
             cursor: pointer;
             transition: background 0.1s;
         }
         .post-item:hover {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .post-item.selected {
-            background: #f0f0f0;
+            background: var(--secondary-bg);
             border-left: 3px solid #888888;
             padding-left: calc(0.5rem - 3px);
         }
@@ -480,6 +533,7 @@
             font-weight: 500;
             font-size: 1.2rem;
             margin-bottom: 0.3rem;
+            color: var(--text-color);
         }
         .post-meta {
             display: flex;
@@ -487,11 +541,14 @@
             color: #666666;
             font-size: 0.9rem;
         }
+        body.night-mode .post-meta {
+            color: #aaaaaa;
+        }
         /* 详情卡片 */
         .detail-card {
-            border: 1px solid #dddddd;
+            border: 1px solid var(--border-color);
             border-top: none;
-            background: #fafafa;
+            background: var(--secondary-bg);
             padding: 1.5rem;
             margin-bottom: 1rem;
         }
@@ -509,16 +566,19 @@
             color: #555555;
             white-space: nowrap;
         }
+        body.night-mode .detail-label {
+            color: #aaaaaa;
+        }
         .detail-value {
-            color: #111111;
+            color: var(--text-color);
             word-break: break-word;
         }
         .detail-value.large-text {
             max-height: 200px;
             overflow-y: auto;
-            background: #ffffff;
+            background: var(--bg-color);
             padding: 0.5rem;
-            border: 1px solid #eeeeee;
+            border: 1px solid var(--border-color);
             white-space: pre-wrap;
             font-family: monospace;
             font-size: 0.9rem;
@@ -526,8 +586,8 @@
         .detail-section {
             grid-column: 1 / -1;
             font-weight: 600;
-            color: #333333;
-            border-bottom: 1px solid #cccccc;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
             margin-top: 0.5rem;
             padding-bottom: 0.2rem;
         }
@@ -541,24 +601,24 @@
             padding: 0.5rem 0;
         }
         .pagination button {
-            background: #ffffff;
-            border: 1px solid #cccccc;
+            background: var(--bg-color);
+            border: 1px solid var(--modal-border);
             padding: 0.4rem 1.2rem;
             font-size: 1rem;
             cursor: pointer;
-            color: #333333;
+            color: var(--text-color);
         }
         .pagination button:hover:not(:disabled) {
-            background: #f5f5f5;
+            background: var(--hover-bg);
         }
         .pagination button:disabled {
             color: #aaaaaa;
-            border-color: #dddddd;
+            border-color: var(--border-color);
             cursor: not-allowed;
         }
         .pagination span {
             font-size: 0.95rem;
-            color: #555555;
+            color: var(--text-color);
         }
         .loading, .error {
             text-align: center;
@@ -578,7 +638,7 @@
             display: inline-block;
             width: 90%;
             max-width: 400px;
-            background-color: #2c5e2e;
+            background-color: var(--link-color);
             color: #ffffff;
             padding: 1rem 2rem;
             border-radius: 40px;
@@ -589,7 +649,10 @@
             transition: background 0.1s;
         }
         .download-link:hover {
-            background-color: #1f4a21;
+            background-color: #1f4a21; /* 夜间模式可保持不变或调整 */
+        }
+        body.night-mode .download-link:hover {
+            background-color: #3d8c40;
         }
     </style>
 </head>
@@ -712,7 +775,7 @@
     </div>
 </div>
 
-<!-- 底部悬浮按钮组 -->
+<!-- 底部悬浮按钮组（居中） -->
 <div class="float-buttons-center">
     <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
     <div class="float-btn" id="postFloatBtn">+</div>
@@ -721,10 +784,13 @@
 <!-- 左下角搜索按钮 -->
 <div class="search-btn" id="searchBtn" title="搜索">🔍</div>
 
-<!-- 右下角个人中心按钮 -->
-<div class="profile-btn" id="profileBtn" title="个人中心">
-    <span id="profileBtnText">👤</span>
-    <img id="profileAvatar" style="display: none;" alt="avatar">
+<!-- 右下角按钮组：个人中心 + 夜间模式 -->
+<div class="right-bottom-buttons">
+    <div class="profile-btn" id="profileBtn" title="个人中心">
+        <span id="profileBtnText">👤</span>
+        <img id="profileAvatar" style="display: none;" alt="avatar">
+    </div>
+    <div class="night-mode-btn" id="nightModeBtn" title="夜间模式">🌙</div>
 </div>
 
 <!-- 发帖弹窗 -->
@@ -770,7 +836,7 @@
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
         const INBOX_URL = 'http://159.75.183.170:3000/Users/UserInbox';
 
-        // 固定的 localtoken（保持不变）
+        // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
         const LOCALTOKEN_DETAIL = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeSrD3jWBP9ED3cGhIdtbdH7Q==';
         const LOCALTOKEN_POSTADD = 'TA1DBPQ19f7sT9HWZYPVeCiVsfMqcrfHaQzk2TbN3UgI9h9ZXjlLSm0gIVTK7s/VXgOSjLcRNJf6VZur0hMVUzo+uzE5TvZRCPnTT5gdFWmhedtyWXF3TXrrP6GMUnylIa6O3V+ZojnQj91I/lHqhw==';
@@ -811,7 +877,28 @@
         let slideSecretKey = '';
         let slideOriginalBase64 = '';
         let slideJigsawBase64 = '';
-        let pendingLoginParams = {}; // 保存登录参数
+        let pendingLoginParams = {};
+
+        // 夜间模式状态
+        const nightModeBtn = document.getElementById('nightModeBtn');
+        const body = document.body;
+
+        // 从localStorage恢复夜间模式
+        const savedNightMode = localStorage.getItem('nightMode') === 'true';
+        if (savedNightMode) {
+            body.classList.add('night-mode');
+            nightModeBtn.textContent = '☀️';
+        } else {
+            nightModeBtn.textContent = '🌙';
+        }
+
+        // 夜间模式切换
+        nightModeBtn.addEventListener('click', () => {
+            body.classList.toggle('night-mode');
+            const isNight = body.classList.contains('night-mode');
+            nightModeBtn.textContent = isNight ? '☀️' : '🌙';
+            localStorage.setItem('nightMode', isNight);
+        });
 
         // DOM 元素
         const postListEl = document.getElementById('postList');

@@ -2,35 +2,40 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>酷盒社区官方网站</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>酷盒社区 · 清爽版</title>
     <style>
-        /* 基础变量 - 日间模式 */
+        /* ===== 全局变量 ===== */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #111111;
-            --border-color: #dddddd;
-            --secondary-bg: #fafafa;
-            --hover-bg: #f5f5f5;
-            --modal-bg: #ffffff;
-            --modal-border: #cccccc;
-            --toast-bg: #333333;
-            --toast-text: #ffffff;
-            --link-color: #2c5e2e;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.2s ease;
         }
 
         /* 夜间模式变量 */
         body.night-mode {
-            --bg-color: #1e1e1e;
-            --text-color: #e0e0e0;
-            --border-color: #444444;
-            --secondary-bg: #2d2d2d;
-            --hover-bg: #3a3a3a;
-            --modal-bg: #2d2d2d;
-            --modal-border: #555555;
-            --toast-bg: #555555;
-            --toast-text: #ffffff;
-            --link-color: #4caf50;
+            --bg-page: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border-light: #334155;
+            --border-medium: #475569;
+            --accent: #3b82f6;
+            --accent-hover: #60a5fa;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
         }
 
         * {
@@ -38,145 +43,148 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background: var(--bg-color);
-            color: var(--text-color);
+            background: var(--bg-page);
+            color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.5;
-            padding: 2rem 1rem 8rem;
-            max-width: 1000px;
-            margin: 0 auto;
+            padding: 1rem 1rem 6rem;
+            min-height: 100vh;
             transition: background 0.3s, color 0.3s;
         }
+
+        /* 主内容容器 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ===== 头部 ===== */
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            align-items: center;
+            padding: 1rem 0;
             margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
         }
         .header h1 {
-            font-size: 1.8rem;
-            font-weight: 400;
-            margin: 0;
-            color: var(--text-color);
+            font-size: 1.5rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+        @media (min-width: 640px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* 账户下拉菜单 */
         .account-dropdown {
             position: relative;
-            display: inline-block;
         }
         .account-btn {
-            padding: 0.4rem 1.2rem;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
+            padding: 0.5rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 0.9rem;
-            min-width: 80px;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
         .account-btn:hover {
-            background: var(--hover-bg);
+            background: var(--border-light);
         }
         .dropdown-content {
             display: none;
             position: absolute;
             right: 0;
-            background: var(--modal-bg);
-            border: 1px solid var(--modal-border);
-            min-width: 120px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 1;
+            top: 110%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-md);
+            min-width: 160px;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+            overflow: hidden;
         }
         .dropdown-content button {
             width: 100%;
-            padding: 0.6rem 1rem;
+            padding: 0.75rem 1rem;
             text-align: left;
             background: none;
             border: none;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 0.9rem;
+            transition: var(--transition);
         }
         .dropdown-content button:hover {
-            background: var(--hover-bg);
+            background: var(--border-light);
         }
         .account-dropdown:hover .dropdown-content {
             display: block;
         }
-        /* 模态框通用样式 */
+
+        /* ===== 模态框通用 ===== */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 1rem;
         }
         .modal {
-            background: var(--modal-bg);
-            border: 1px solid var(--modal-border);
-            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
             width: 500px;
-            max-width: 90%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            max-height: 80vh;
+            max-width: 100%;
+            max-height: 85vh;
             overflow-y: auto;
-            color: var(--text-color);
+            box-shadow: var(--shadow-md);
         }
         .modal h3 {
-            font-weight: 400;
+            font-weight: 500;
             margin-bottom: 1.5rem;
-            color: var(--text-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.75rem;
         }
-        .modal .info-item {
-            display: flex;
-            margin-bottom: 0.8rem;
-        }
-        .modal .info-label {
-            width: 100px;
-            flex-shrink: 0;
-            color: #555555; /* 保持中性，夜间模式可调 */
-        }
-        body.night-mode .modal .info-label {
-            color: #aaaaaa;
-        }
-        .modal .info-value {
-            flex: 1;
-            word-break: break-word;
-            color: var(--text-color);
-        }
-        .modal .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            object-fit: cover;
-            border: 1px solid var(--border-color);
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-        }
-        .modal-actions button {
-            padding: 0.4rem 1rem;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            cursor: pointer;
-            color: var(--text-color);
-        }
-        .modal-actions button:hover {
-            background: var(--hover-bg);
-        }
-        .modal input, .modal .input-group {
+
+        /* 表单元素 */
+        .modal input, .modal textarea, .modal .input-group {
             margin-bottom: 1rem;
+        }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .modal input:focus, .modal textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
         .modal .input-group {
             display: flex;
@@ -184,68 +192,81 @@
         }
         .modal .input-group input {
             flex: 1;
-        }
-        .modal input {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid var(--modal-border);
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 0.9rem;
+            margin-bottom: 0;
         }
         .modal .input-group button {
-            padding: 0.6rem 1rem;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
+            padding: 0.75rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-primary);
             white-space: nowrap;
+            transition: var(--transition);
         }
         .modal .input-group button:hover {
-            background: var(--hover-bg);
+            background: var(--border-light);
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        .modal-actions button {
+            padding: 0.6rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .modal-actions button:hover {
+            background: var(--border-light);
         }
         .modal-message {
             font-size: 0.85rem;
-            color: #aa0000;
+            color: var(--danger);
             margin-top: 0.5rem;
         }
         .modal-tabs {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
         }
         .modal-tab {
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1.2rem;
             cursor: pointer;
-            color: #555555;
+            color: var(--text-secondary);
             border: 1px solid transparent;
             border-bottom: none;
-        }
-        body.night-mode .modal-tab {
-            color: #aaaaaa;
+            border-radius: 40px 40px 0 0;
+            transition: var(--transition);
         }
         .modal-tab.active {
-            border-color: var(--modal-border);
-            border-bottom-color: var(--modal-bg);
-            background: var(--modal-bg);
-            color: var(--text-color);
+            border-color: var(--border-medium);
+            border-bottom-color: var(--bg-card);
+            background: var(--bg-card);
+            color: var(--accent);
             margin-bottom: -1px;
         }
-        /* 滑块验证样式 */
-        .slide-verify {
-            margin: 1rem 0;
-        }
+
+        /* 滑块验证 */
         .slide-images {
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
         }
         .slide-images img {
             max-width: 200px;
-            border: 1px solid var(--border-color);
-            background: var(--secondary-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            background: var(--bg-page);
         }
         .slide-control {
             display: flex;
@@ -257,92 +278,124 @@
             flex: 1;
             height: 6px;
             -webkit-appearance: none;
-            background: var(--border-color);
+            background: var(--border-medium);
             border-radius: 3px;
         }
         .slide-control input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 30px;
             height: 30px;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
         }
-        .slide-value {
+
+        /* ===== 帖子列表 ===== */
+        .post-list {
+            list-style: none;
+            border-top: 1px solid var(--border-light);
+        }
+        .post-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            margin-top: 1rem;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .post-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-medium);
+        }
+        .post-item.selected {
+            border-left: 4px solid var(--accent);
+            background: var(--border-light);
+        }
+        .post-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .post-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            color: var(--text-color);
-            min-width: 60px;
         }
-        /* 消息列表样式 */
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1rem;
+
+        /* 详情卡片 */
+        .detail-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: var(--shadow-sm);
         }
-        .message-item {
-            display: flex;
-            gap: 1rem;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            background: var(--secondary-bg);
+        .detail-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem 1.5rem;
+            align-items: start;
+            max-height: 400px;
+            overflow-y: auto;
         }
-        .message-avatar {
-            flex-shrink: 0;
-        }
-        .message-content {
-            flex: 1;
-        }
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
-            color: #666666;
-        }
-        body.night-mode .message-header {
-            color: #aaaaaa;
-        }
-        .message-name {
+        .detail-label {
             font-weight: 500;
-            color: var(--text-color);
+            color: var(--text-secondary);
         }
-        .message-time {
-            color: #999999;
+        .detail-value.large-text {
+            max-height: 250px;
+            overflow-y: auto;
+            background: var(--bg-page);
+            padding: 0.8rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
         }
-        body.night-mode .message-time {
-            color: #777777;
+        .detail-section {
+            grid-column: 1 / -1;
+            font-weight: 600;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border-light);
+            margin-top: 0.5rem;
+            padding-bottom: 0.3rem;
         }
-        .message-text {
-            color: var(--text-color);
-            word-break: break-word;
-        }
-        .message-pagination {
+
+        /* 分页 */
+        .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 1rem;
-            margin-top: 1rem;
+            margin: 2rem 0;
         }
-        .message-pagination button {
-            padding: 0.3rem 1rem;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
+        .pagination button {
+            padding: 0.5rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-primary);
+            transition: var(--transition);
         }
-        .message-pagination button:disabled {
-            color: #aaaaaa;
-            border-color: var(--border-color);
+        .pagination button:hover:not(:disabled) {
+            background: var(--border-light);
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
         }
-        .message-pagination span {
-            font-size: 0.9rem;
-            color: var(--text-color);
-        }
-        /* 底部悬浮按钮组（居中） */
+
+        /* ===== 底部浮动按钮 ===== */
         .float-buttons-center {
             position: fixed;
             bottom: 20px;
@@ -353,50 +406,49 @@
             z-index: 900;
         }
         .float-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            color: var(--text-color);
-            transition: background 0.1s;
+            color: var(--text-primary);
+            transition: var(--transition);
         }
         .float-btn:hover {
-            background: var(--hover-bg);
+            transform: scale(1.05);
+            background: var(--border-light);
         }
-        .float-btn.sign-btn {
-            font-size: 20px;
-        }
-        /* 左下角搜索按钮 */
+
         .search-btn {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            color: var(--text-color);
+            color: var(--text-primary);
             z-index: 900;
-            transition: background 0.1s;
+            transition: var(--transition);
         }
         .search-btn:hover {
-            background: var(--hover-bg);
+            transform: scale(1.05);
+            background: var(--border-light);
         }
-        /* 右下角个人中心按钮和夜间模式按钮 */
+
         .right-bottom-buttons {
             position: fixed;
             bottom: 20px;
@@ -406,43 +458,41 @@
             z-index: 900;
         }
         .profile-btn, .night-mode-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            box-shadow: var(--shadow-md);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            color: var(--text-color);
-            transition: background 0.1s;
+            color: var(--text-primary);
+            transition: var(--transition);
             overflow: hidden;
-            padding: 0;
-        }
-        .profile-btn:hover, .night-mode-btn:hover {
-            background: var(--hover-bg);
         }
         .profile-btn img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 30px;
         }
-        .night-mode-btn {
-            font-size: 24px;
+        .profile-btn:hover, .night-mode-btn:hover {
+            transform: scale(1.05);
+            background: var(--border-light);
         }
+
         /* 发帖弹窗 */
         .post-modal {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--modal-bg);
-            border-top: 1px solid var(--modal-border);
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
             transform: translateY(100%);
             transition: transform 0.3s ease;
             z-index: 1100;
@@ -457,370 +507,286 @@
             max-width: 600px;
             margin: 0 auto;
         }
-        .post-modal h3 {
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            color: var(--text-color);
-        }
-        .post-modal input, .post-modal textarea {
-            width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--modal-border);
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 0.95rem;
-            font-family: inherit;
-        }
         .post-modal textarea {
             min-height: 150px;
             resize: vertical;
         }
-        .post-modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-        .post-modal-actions button {
-            padding: 0.6rem 1.5rem;
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            cursor: pointer;
-            color: var(--text-color);
-        }
-        .post-modal-actions button:hover {
-            background: var(--hover-bg);
-        }
-        .post-message {
-            margin-bottom: 1rem;
-            color: #aa0000;
-        }
+
         /* 全局提示 */
         .global-toast {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--toast-bg);
-            color: var(--toast-text);
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
+            background: var(--text-primary);
+            color: var(--bg-card);
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
             font-size: 0.9rem;
             z-index: 1200;
             display: none;
-            white-space: nowrap;
+            box-shadow: var(--shadow-md);
         }
-        /* 帖子列表 */
-        .post-list {
-            list-style: none;
-            border-top: 1px solid var(--border-color);
-        }
-        .post-item {
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0.5rem;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-        .post-item:hover {
-            background: var(--hover-bg);
-        }
-        .post-item.selected {
-            background: var(--secondary-bg);
-            border-left: 3px solid #888888;
-            padding-left: calc(0.5rem - 3px);
-        }
-        .post-title {
-            font-weight: 500;
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
-            color: var(--text-color);
-        }
-        .post-meta {
-            display: flex;
-            gap: 1.5rem;
-            color: #666666;
-            font-size: 0.9rem;
-        }
-        body.night-mode .post-meta {
-            color: #aaaaaa;
-        }
-        /* 详情卡片 */
-        .detail-card {
-            border: 1px solid var(--border-color);
-            border-top: none;
-            background: var(--secondary-bg);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .detail-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 0.8rem 1.5rem;
-            align-items: start;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-        .detail-label {
-            font-weight: 500;
-            color: #555555;
-            white-space: nowrap;
-        }
-        body.night-mode .detail-label {
-            color: #aaaaaa;
-        }
-        .detail-value {
-            color: var(--text-color);
-            word-break: break-word;
-        }
-        .detail-value.large-text {
-            max-height: 200px;
-            overflow-y: auto;
-            background: var(--bg-color);
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            white-space: pre-wrap;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-        .detail-section {
-            grid-column: 1 / -1;
-            font-weight: 600;
-            color: var(--text-color);
-            border-bottom: 1px solid var(--border-color);
-            margin-top: 0.5rem;
-            padding-bottom: 0.2rem;
-        }
-        /* 分页 */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            padding: 0.5rem 0;
-        }
-        .pagination button {
-            background: var(--bg-color);
-            border: 1px solid var(--modal-border);
-            padding: 0.4rem 1.2rem;
-            font-size: 1rem;
-            cursor: pointer;
-            color: var(--text-color);
-        }
-        .pagination button:hover:not(:disabled) {
-            background: var(--hover-bg);
-        }
-        .pagination button:disabled {
-            color: #aaaaaa;
-            border-color: var(--border-color);
-            cursor: not-allowed;
-        }
-        .pagination span {
-            font-size: 0.95rem;
-            color: var(--text-color);
-        }
-        .loading, .error {
-            text-align: center;
-            padding: 2rem;
-            color: #666666;
-        }
-        .error {
-            color: #aa0000;
-        }
-        /* 下载横幅按钮 */
+
+        /* 下载横幅 */
         .download-banner {
             text-align: center;
-            margin: 2rem auto 1rem;
-            max-width: 600px;
+            margin: 2rem auto;
         }
         .download-link {
             display: inline-block;
-            width: 90%;
-            max-width: 400px;
-            background-color: var(--link-color);
-            color: #ffffff;
-            padding: 1rem 2rem;
+            background: var(--accent);
+            color: white;
+            padding: 1rem 2.5rem;
             border-radius: 40px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 500;
             text-decoration: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background 0.1s;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
         }
         .download-link:hover {
-            background-color: #1f4a21; /* 夜间模式可保持不变或调整 */
+            background: var(--accent-hover);
+            transform: scale(1.02);
         }
-        body.night-mode .download-link:hover {
-            background-color: #3d8c40;
+
+        /* 消息列表 */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .message-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            background: var(--bg-page);
+        }
+        .message-avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            body {
+                padding: 0.8rem 0.8rem 5rem;
+            }
+            .post-title {
+                font-size: 1.1rem;
+            }
+            .post-meta {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+            .float-btn, .search-btn, .profile-btn, .night-mode-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .modal {
+                padding: 1.2rem;
+            }
+            .modal-actions button {
+                padding: 0.5rem 1rem;
+            }
+            .slide-images img {
+                max-width: 150px;
+            }
+        }
+
+        /* 其他 */
+        .loading, .error {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        .error {
+            color: var(--danger);
         }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>酷盒社区官方网站</h1>
-    <div class="account-dropdown">
-        <button class="account-btn">账户</button>
-        <div class="dropdown-content">
-            <button id="loginBtn">登录</button>
-            <button id="registerBtn">注册</button>
-            <button id="inboxBtn">系统消息</button>
+<div class="container">
+    <div class="header">
+        <h1>酷盒社区</h1>
+        <div class="account-dropdown">
+            <button class="account-btn">账户</button>
+            <div class="dropdown-content">
+                <button id="loginBtn">登录</button>
+                <button id="registerBtn">注册</button>
+                <button id="inboxBtn">系统消息</button>
+                <button id="sendImageMsgBtn">发送图片私信</button>
+                <button id="sendTextMsgBtn">发送文本私信</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- 登录模态框（含滑块验证） -->
-<div id="loginModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <div class="modal-tabs">
-            <div class="modal-tab active" id="loginPasswordTab">密码登录</div>
-            <div class="modal-tab" id="loginTokenTab">Token登录</div>
-        </div>
-        <!-- 密码登录表单 -->
-        <div id="passwordLoginForm">
-            <input type="text" id="modalLoginName" placeholder="邮箱/用户名">
-            <input type="password" id="modalLoginPassword" placeholder="密码">
-        </div>
-        <!-- Token登录表单 -->
-        <div id="tokenLoginForm" style="display: none;">
-            <input type="text" id="modalToken" placeholder="输入Token">
-        </div>
-        <!-- 滑块验证区域（初始隐藏） -->
-        <div id="slideVerifyArea" style="display: none;">
-            <div class="slide-images">
-                <img id="slideOriginal" alt="背景图">
-                <img id="slideJigsaw" alt="缺口图">
+    <!-- 登录模态框（含滑块验证） -->
+    <div id="loginModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-tabs">
+                <div class="modal-tab active" id="loginPasswordTab">密码登录</div>
+                <div class="modal-tab" id="loginTokenTab">Token登录</div>
             </div>
-            <div class="slide-control">
-                <input type="range" id="slideRange" min="0" max="100" value="0">
-                <span class="slide-value" id="slideValue">0%</span>
+            <div id="passwordLoginForm">
+                <input type="text" id="modalLoginName" placeholder="邮箱/用户名">
+                <input type="password" id="modalLoginPassword" placeholder="密码">
             </div>
+            <div id="tokenLoginForm" style="display: none;">
+                <input type="text" id="modalToken" placeholder="输入Token">
+            </div>
+            <div id="slideVerifyArea" style="display: none;">
+                <div class="slide-images">
+                    <img id="slideOriginal" alt="背景图">
+                    <img id="slideJigsaw" alt="缺口图">
+                </div>
+                <div class="slide-control">
+                    <input type="range" id="slideRange" min="0" max="100" value="0">
+                    <span class="slide-value" id="slideValue">0%</span>
+                </div>
+                <div class="modal-actions">
+                    <button id="slideCancel">取消</button>
+                    <button id="slideConfirm">确认验证</button>
+                </div>
+                <div id="slideMessage" class="modal-message"></div>
+            </div>
+            <div id="modalMessage" class="modal-message"></div>
+            <div class="modal-actions" id="loginActions">
+                <button id="modalCancel">取消</button>
+                <button id="modalSubmit">登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div id="registerModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>注册酷盒社区</h3>
+            <div class="input-group">
+                <input type="email" id="regMail" placeholder="邮箱">
+                <button id="sendCodeBtn">获取验证码</button>
+            </div>
+            <input type="text" id="regCode" placeholder="验证码">
+            <input type="password" id="regPassword" placeholder="密码">
+            <div id="registerMessage" class="modal-message"></div>
             <div class="modal-actions">
-                <button id="slideCancel">取消</button>
-                <button id="slideConfirm">确认验证</button>
-            </div>
-            <div id="slideMessage" class="modal-message"></div>
-        </div>
-        <!-- 普通登录的消息 -->
-        <div id="modalMessage" class="modal-message"></div>
-        <div class="modal-actions" id="loginActions">
-            <button id="modalCancel">取消</button>
-            <button id="modalSubmit">登录</button>
-        </div>
-    </div>
-</div>
-
-<!-- 注册模态框 -->
-<div id="registerModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <h3>注册酷盒社区</h3>
-        <div class="input-group">
-            <input type="email" id="regMail" placeholder="邮箱">
-            <button id="sendCodeBtn">获取验证码</button>
-        </div>
-        <input type="text" id="regCode" placeholder="验证码">
-        <input type="password" id="regPassword" placeholder="密码">
-        <div id="registerMessage" class="modal-message"></div>
-        <div class="modal-actions">
-            <button id="registerCancel">取消</button>
-            <button id="registerSubmit">注册</button>
-        </div>
-    </div>
-</div>
-
-<!-- 个人中心模态框 -->
-<div id="profileModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <h3>个人中心</h3>
-        <div id="profileContent">
-            <div style="text-align: center; padding: 1rem;">加载中...</div>
-        </div>
-        <div class="modal-actions">
-            <button id="profileClose">关闭</button>
-        </div>
-    </div>
-</div>
-
-<!-- 搜索模态框 -->
-<div id="searchModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <h3>搜索帖子</h3>
-        <input type="text" id="searchKeyword" placeholder="输入关键词...">
-        <div class="modal-actions" style="justify-content: space-between;">
-            <button id="searchAllBtn">全部帖子</button>
-            <div>
-                <button id="searchCancel">取消</button>
-                <button id="searchSubmit">搜索</button>
+                <button id="registerCancel">取消</button>
+                <button id="registerSubmit">注册</button>
             </div>
         </div>
-        <div id="searchMessage" class="modal-message"></div>
     </div>
-</div>
 
-<!-- 系统消息模态框 -->
-<div id="inboxModal" class="modal-overlay" style="display: none;">
-    <div class="modal">
-        <h3>系统消息</h3>
-        <div id="inboxContent">
-            <div style="text-align: center; padding: 1rem;">加载中...</div>
-        </div>
-        <div id="inboxPagination" class="message-pagination" style="display: none;">
-            <button id="inboxPrevPage" disabled>上一页</button>
-            <span id="inboxPageInfo">第 1 / 1 页</span>
-            <button id="inboxNextPage" disabled>下一页</button>
-        </div>
-        <div class="modal-actions">
-            <button id="inboxClose">关闭</button>
+    <!-- 个人中心模态框 -->
+    <div id="profileModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>个人中心</h3>
+            <div id="profileContent"><div style="text-align:center;">加载中...</div></div>
+            <div class="modal-actions"><button id="profileClose">关闭</button></div>
         </div>
     </div>
-</div>
 
-<!-- 底部悬浮按钮组（居中） -->
-<div class="float-buttons-center">
-    <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
-    <div class="float-btn" id="postFloatBtn">+</div>
-</div>
-
-<!-- 左下角搜索按钮 -->
-<div class="search-btn" id="searchBtn" title="搜索">🔍</div>
-
-<!-- 右下角按钮组：个人中心 + 夜间模式 -->
-<div class="right-bottom-buttons">
-    <div class="profile-btn" id="profileBtn" title="个人中心">
-        <span id="profileBtnText">👤</span>
-        <img id="profileAvatar" style="display: none;" alt="avatar">
-    </div>
-    <div class="night-mode-btn" id="nightModeBtn" title="夜间模式">🌙</div>
-</div>
-
-<!-- 发帖弹窗 -->
-<div class="post-modal" id="postModal">
-    <div class="modal-content">
-        <h3>发布新帖子</h3>
-        <div id="postMessage" class="post-message"></div>
-        <input type="text" id="postTitle" placeholder="标题">
-        <textarea id="postContent" placeholder="内容..."></textarea>
-        <div class="post-modal-actions">
-            <button id="postCancel">取消</button>
-            <button id="postSubmit">发布</button>
+    <!-- 搜索模态框 -->
+    <div id="searchModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>搜索帖子</h3>
+            <input type="text" id="searchKeyword" placeholder="输入关键词...">
+            <div class="modal-actions" style="justify-content: space-between;">
+                <button id="searchAllBtn">全部帖子</button>
+                <div><button id="searchCancel">取消</button><button id="searchSubmit">搜索</button></div>
+            </div>
+            <div id="searchMessage" class="modal-message"></div>
         </div>
     </div>
-</div>
 
-<!-- 全局提示 -->
-<div class="global-toast" id="globalToast">提示</div>
+    <!-- 系统消息模态框 -->
+    <div id="inboxModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>系统消息</h3>
+            <div id="inboxContent"><div style="text-align:center;">加载中...</div></div>
+            <div id="inboxPagination" class="message-pagination" style="display: none;">
+                <button id="inboxPrevPage" disabled>上一页</button>
+                <span id="inboxPageInfo">第 1 / 1 页</span>
+                <button id="inboxNextPage" disabled>下一页</button>
+            </div>
+            <div class="modal-actions"><button id="inboxClose">关闭</button></div>
+        </div>
+    </div>
 
-<!-- 帖子列表区 -->
-<div id="listContainer">
-    <ul class="post-list" id="postList"></ul>
-    <div id="listLoading" class="loading" style="display: none;">加载中...</div>
-    <div id="listError" class="error" style="display: none;"></div>
-    <div id="pagination" class="pagination"></div>
-</div>
+    <!-- 发送图片私信模态框 -->
+    <div id="sendImageMsgModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>发送图片私信</h3>
+            <input type="text" id="imgChatId" placeholder="聊天ID (必填)">
+            <input type="text" id="imgUrl" placeholder="图片链接 (必填)">
+            <textarea id="imgMsg" placeholder="消息内容 (可选)" rows="2"></textarea>
+            <div id="sendImageMsgResult" class="modal-message"></div>
+            <div class="modal-actions">
+                <button id="sendImageMsgCancel">取消</button>
+                <button id="sendImageMsgSubmit">发送</button>
+            </div>
+        </div>
+    </div>
 
-<!-- 下载APP横幅 -->
-<div class="download-banner">
-    <a href="https://share.feijipan.com/s/sFFk9QMZ" target="_blank" rel="noopener noreferrer" class="download-link">前往酷盒app体验更佳</a>
+    <!-- 发送文本私信模态框 -->
+    <div id="sendTextMsgModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>发送文本私信</h3>
+            <input type="text" id="textChatId" placeholder="聊天ID (必填)">
+            <input type="text" id="textToUid" placeholder="对方UID (必填)">
+            <textarea id="textMsg" placeholder="消息内容 (必填)" rows="3"></textarea>
+            <div id="sendTextMsgResult" class="modal-message"></div>
+            <div class="modal-actions">
+                <button id="sendTextMsgCancel">取消</button>
+                <button id="sendTextMsgSubmit">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部浮动按钮组 -->
+    <div class="float-buttons-center">
+        <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
+        <div class="float-btn" id="postFloatBtn">+</div>
+    </div>
+    <div class="search-btn" id="searchBtn" title="搜索">🔍</div>
+    <div class="right-bottom-buttons">
+        <div class="profile-btn" id="profileBtn" title="个人中心"><span id="profileBtnText">👤</span><img id="profileAvatar" style="display:none;"></div>
+        <div class="night-mode-btn" id="nightModeBtn" title="夜间模式">🌙</div>
+    </div>
+
+    <!-- 发帖弹窗 -->
+    <div class="post-modal" id="postModal">
+        <div class="modal-content">
+            <h3>发布新帖子</h3>
+            <div id="postMessage" class="post-message"></div>
+            <input type="text" id="postTitle" placeholder="标题">
+            <textarea id="postContent" placeholder="内容..."></textarea>
+            <div class="post-modal-actions">
+                <button id="postCancel">取消</button>
+                <button id="postSubmit">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局提示 -->
+    <div class="global-toast" id="globalToast">提示</div>
+
+    <!-- 帖子列表区 -->
+    <div id="listContainer">
+        <ul class="post-list" id="postList"></ul>
+        <div id="listLoading" class="loading" style="display:none;">加载中...</div>
+        <div id="listError" class="error" style="display:none;"></div>
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <!-- 下载APP横幅 -->
+    <div class="download-banner">
+        <a href="https://share.feijipan.com/s/sFFk9QMZ" target="_blank" class="download-link">前往酷盒app体验更佳</a>
+    </div>
 </div>
 
 <script>
@@ -835,6 +801,7 @@
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
         const INBOX_URL = 'http://159.75.183.170:3000/Users/UserInbox';
+        const SEND_MSG_URL = 'http://159.75.183.170:3000/Chat/SendMsg'; // 发送私信接口（共用）
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
@@ -846,59 +813,28 @@
         const LOCALTOKEN_USERDATA = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8svaK82YHk4EgVJ5IHJ2WNuRbp6sLwKwU32ifb280M9KeA==';
         const LOCALTOKEN_SEARCH = 'S6oKa74Ez/wO+LJzPTFOdZy2iORMGkFh+ni5n1EP7gyk7phnnFd0ywBBPr+YqLHX8OZpI0c9Fk0JKLHk2jwv/peH1+owIwhupHE5nB3p7WgTyTamLC7QvSo0Luir4cXU9NTLdOYOpCky57HPkzKmqQ==';
         const LOCALTOKEN_INBOX = 'S6oKa74Ez/wO+LJzPTFOdZy2iORMGkFh+ni5n1EP7gyk7phnnFd0ywBBPr+YqLHX8OZpI0c9Fk0JKLHk2jwv/peH1+owIwhupHE5nB3p7WjDm+vPfbOrPywIsd2VeEq/di2nWPHle8q6bCGDBPcHxg==';
+        // 图片私信 localtoken（您提供的第一个）
+        const LOCALTOKEN_SEND_IMAGE = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+x3vkt2uUazFYttQKGq0fjg==';
+        // 文本私信 localtoken（您提供的第二个）
+        const LOCALTOKEN_SEND_TEXT = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+rl2SZbaSlXkbLbCazntDiw==';
 
         // 状态
         let currentAuthorization = localStorage.getItem('token') || '';
         let currentUser = null;
-
-        // 分页状态
         let currentPage = 1;
         let limit = 8;
         let totalPosts = 0;
         let posts = [];
         let expandedCid = null;
         let expandedElement = null;
-
-        // 搜索状态
         let searchMode = false;
         let searchKeyword = '';
-
-        // 系统消息分页状态
         let inboxPage = 1;
         let inboxLimit = 10;
         let inboxTotal = 0;
         let inboxMessages = [];
-
-        // 登录模态框tab状态
         let loginMode = 'password';
-
-        // 滑块验证相关变量
-        let slideToken = '';
-        let slideSecretKey = '';
-        let slideOriginalBase64 = '';
-        let slideJigsawBase64 = '';
-        let pendingLoginParams = {};
-
-        // 夜间模式状态
-        const nightModeBtn = document.getElementById('nightModeBtn');
-        const body = document.body;
-
-        // 从localStorage恢复夜间模式
-        const savedNightMode = localStorage.getItem('nightMode') === 'true';
-        if (savedNightMode) {
-            body.classList.add('night-mode');
-            nightModeBtn.textContent = '☀️';
-        } else {
-            nightModeBtn.textContent = '🌙';
-        }
-
-        // 夜间模式切换
-        nightModeBtn.addEventListener('click', () => {
-            body.classList.toggle('night-mode');
-            const isNight = body.classList.contains('night-mode');
-            nightModeBtn.textContent = isNight ? '☀️' : '🌙';
-            localStorage.setItem('nightMode', isNight);
-        });
+        let slideToken = '', slideSecretKey = '', slideOriginalBase64 = '', slideJigsawBase64 = '', pendingLoginParams = {};
 
         // DOM 元素
         const postListEl = document.getElementById('postList');
@@ -906,8 +842,6 @@
         const listError = document.getElementById('listError');
         const paginationEl = document.getElementById('pagination');
         const globalToast = document.getElementById('globalToast');
-
-        // 登录相关
         const loginBtn = document.getElementById('loginBtn');
         const loginModal = document.getElementById('loginModal');
         const modalMessage = document.getElementById('modalMessage');
@@ -921,8 +855,6 @@
         const modalLoginPassword = document.getElementById('modalLoginPassword');
         const modalToken = document.getElementById('modalToken');
         const loginActions = document.getElementById('loginActions');
-
-        // 滑块验证相关DOM
         const slideVerifyArea = document.getElementById('slideVerifyArea');
         const slideOriginal = document.getElementById('slideOriginal');
         const slideJigsaw = document.getElementById('slideJigsaw');
@@ -931,8 +863,6 @@
         const slideCancel = document.getElementById('slideCancel');
         const slideConfirm = document.getElementById('slideConfirm');
         const slideMessage = document.getElementById('slideMessage');
-
-        // 注册相关
         const registerBtn = document.getElementById('registerBtn');
         const registerModal = document.getElementById('registerModal');
         const regMail = document.getElementById('regMail');
@@ -942,8 +872,6 @@
         const registerMessage = document.getElementById('registerMessage');
         const registerCancel = document.getElementById('registerCancel');
         const registerSubmit = document.getElementById('registerSubmit');
-
-        // 发帖相关
         const postFloatBtn = document.getElementById('postFloatBtn');
         const postModal = document.getElementById('postModal');
         const postTitle = document.getElementById('postTitle');
@@ -951,19 +879,13 @@
         const postMessage = document.getElementById('postMessage');
         const postCancel = document.getElementById('postCancel');
         const postSubmit = document.getElementById('postSubmit');
-
-        // 签到按钮
         const signBtn = document.getElementById('signBtn');
-
-        // 个人中心相关
         const profileBtn = document.getElementById('profileBtn');
         const profileModal = document.getElementById('profileModal');
         const profileContent = document.getElementById('profileContent');
         const profileClose = document.getElementById('profileClose');
         const profileBtnText = document.getElementById('profileBtnText');
         const profileAvatar = document.getElementById('profileAvatar');
-
-        // 搜索相关
         const searchBtn = document.getElementById('searchBtn');
         const searchModal = document.getElementById('searchModal');
         const searchKeywordInput = document.getElementById('searchKeyword');
@@ -971,8 +893,6 @@
         const searchCancel = document.getElementById('searchCancel');
         const searchSubmit = document.getElementById('searchSubmit');
         const searchMessage = document.getElementById('searchMessage');
-
-        // 系统消息相关
         const inboxBtn = document.getElementById('inboxBtn');
         const inboxModal = document.getElementById('inboxModal');
         const inboxContent = document.getElementById('inboxContent');
@@ -981,1020 +901,487 @@
         const inboxNextPage = document.getElementById('inboxNextPage');
         const inboxPageInfo = document.getElementById('inboxPageInfo');
         const inboxClose = document.getElementById('inboxClose');
+        const nightModeBtn = document.getElementById('nightModeBtn');
+        const body = document.body;
 
-        // 工具函数：日期格式化
-        function formatDate(timestamp) {
-            if (!timestamp) return '未知';
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
+        // 图片私信相关
+        const sendImageMsgBtn = document.getElementById('sendImageMsgBtn');
+        const sendImageMsgModal = document.getElementById('sendImageMsgModal');
+        const imgChatId = document.getElementById('imgChatId');
+        const imgUrl = document.getElementById('imgUrl');
+        const imgMsg = document.getElementById('imgMsg');
+        const sendImageMsgResult = document.getElementById('sendImageMsgResult');
+        const sendImageMsgCancel = document.getElementById('sendImageMsgCancel');
+        const sendImageMsgSubmit = document.getElementById('sendImageMsgSubmit');
+
+        // 文本私信相关
+        const sendTextMsgBtn = document.getElementById('sendTextMsgBtn');
+        const sendTextMsgModal = document.getElementById('sendTextMsgModal');
+        const textChatId = document.getElementById('textChatId');
+        const textToUid = document.getElementById('textToUid');
+        const textMsg = document.getElementById('textMsg');
+        const sendTextMsgResult = document.getElementById('sendTextMsgResult');
+        const sendTextMsgCancel = document.getElementById('sendTextMsgCancel');
+        const sendTextMsgSubmit = document.getElementById('sendTextMsgSubmit');
+
+        // 夜间模式
+        const savedNightMode = localStorage.getItem('nightMode') === 'true';
+        if (savedNightMode) {
+            body.classList.add('night-mode');
+            nightModeBtn.textContent = '☀️';
+        } else {
+            nightModeBtn.textContent = '🌙';
         }
+        nightModeBtn.addEventListener('click', () => {
+            body.classList.toggle('night-mode');
+            const isNight = body.classList.contains('night-mode');
+            nightModeBtn.textContent = isNight ? '☀️' : '🌙';
+            localStorage.setItem('nightMode', isNight);
+        });
+
+        // 工具函数
+        function formatDate(t) { if (!t) return '未知'; const d = new Date(t*1000); return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-'); }
+        function escapeHtml(u) { if (!u) return ''; return u.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+        function showToast(msg, d=2000) { globalToast.textContent=msg; globalToast.style.display='block'; setTimeout(()=>globalToast.style.display='none', d); }
+        function showLoading(s) { listLoading.style.display = s?'block':'none'; if(s) postListEl.innerHTML=''; }
+        function showError(m) { listError.style.display='block'; listError.textContent=`错误: ${m}`; postListEl.innerHTML=''; }
+        function hideError() { listError.style.display='none'; }
 
         // 处理内容（用于详情）
-        function processContent(rawText) {
-            if (!rawText) return '';
+        function processContent(raw) {
+            if (!raw) return '';
             try {
-                const parsed = JSON.parse(rawText);
-                if (Array.isArray(parsed)) {
-                    let result = '';
-                    parsed.forEach((item, index) => {
-                        if (item.insert && typeof item.insert === 'string') {
-                            if (index === 0) {
-                                result += item.insert;
-                            } else if (index === 1) {
-                                result += '【该隐藏内容请在APP内查看】';
-                            }
+                const p = JSON.parse(raw);
+                if (Array.isArray(p)) {
+                    let r='';
+                    p.forEach((item,i)=>{
+                        if(item.insert && typeof item.insert==='string') {
+                            if(i===0) r+=item.insert;
+                            else if(i===1) r+='【该隐藏内容请在APP内查看】';
                         }
                     });
-                    return result;
+                    return r;
                 }
-            } catch (e) {}
-            return rawText.replace(/【隐藏内容】/g, '【该隐藏内容请在APP内查看】');
+            } catch(e){}
+            return raw.replace(/【隐藏内容】/g,'【该隐藏内容请在APP内查看】');
         }
 
         // 生成详情卡片HTML
         function generateDetailHTML(data) {
-            const author = data.authorInfo || {};
-            const sections = data.sections || {};
-            const images = data.images || [];
-
-            const fields = [
-                { label: '帖子ID', value: data.cid ?? '-' },
-                { label: '标题', value: data.title || '-' },
-                { label: '发布时间', value: formatDate(data.created) },
-                { label: '修改时间', value: formatDate(data.modified) },
-                { label: '浏览数', value: data.views ?? '-' },
-                { label: '点赞数', value: data.likes ?? '-' },
-                { label: '评论数', value: data.commentsNum ?? '-' },
-                { label: '置顶', value: data.istop === 1 ? '是' : '否' },
-                { label: '状态', value: data.status || '-' },
-                { label: '类型', value: data.type || '-' },
+            const a=data.authorInfo||{}, s=data.sections||{}, imgs=data.images||[];
+            const fields=[
+                {l:'帖子ID',v:data.cid??'-'},{l:'标题',v:data.title||'-'},{l:'发布时间',v:formatDate(data.created)},
+                {l:'修改时间',v:formatDate(data.modified)},{l:'浏览数',v:data.views??'-'},{l:'点赞数',v:data.likes??'-'},
+                {l:'评论数',v:data.commentsNum??'-'},{l:'置顶',v:data.istop===1?'是':'否'},{l:'状态',v:data.status||'-'},{l:'类型',v:data.type||'-'}
             ];
-
-            const authorFields = [
-                { label: 'UID', value: author.uid ?? '-' },
-                { label: '昵称', value: author.screenName || author.name || '-' },
-                { label: '简介', value: author.introduce || '-' },
+            const af=[
+                {l:'UID',v:a.uid??'-'},{l:'昵称',v:a.screenName||a.name||'-'},{l:'简介',v:a.introduce||'-'}
             ];
-
-            const sectionFields = [
-                { label: '分区ID', value: sections.sid ?? '-' },
-                { label: '分区名称', value: sections.name || '-' },
-                { label: '分区类型', value: sections.type || '-' },
+            const sf=[
+                {l:'分区ID',v:s.sid??'-'},{l:'分区名称',v:s.name||'-'},{l:'分区类型',v:s.type||'-'}
             ];
-
-            const imagesHtml = images.length ? `共 ${images.length} 张图片` : '无';
-            const content = processContent(data.text || '');
-
-            let html = '<div class="detail-grid">';
-            html += '<div class="detail-section">📄 帖子信息</div>';
-            fields.forEach(f => {
-                html += `<div class="detail-label">${f.label}：</div><div class="detail-value">${escapeHtml(String(f.value))}</div>`;
-            });
-            html += '<div class="detail-section">👤 发布者</div>';
-            authorFields.forEach(f => {
-                html += `<div class="detail-label">${f.label}：</div><div class="detail-value">${escapeHtml(String(f.value))}</div>`;
-            });
-            html += '<div class="detail-section">📂 分区</div>';
-            sectionFields.forEach(f => {
-                html += `<div class="detail-label">${f.label}：</div><div class="detail-value">${escapeHtml(String(f.value))}</div>`;
-            });
-            html += `<div class="detail-label">图片：</div><div class="detail-value">${imagesHtml}</div>`;
-            html += `<div class="detail-label">内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
-            html += '</div>';
+            const imgsHtml = imgs.length?`共 ${imgs.length} 张图片`:'无';
+            const content = processContent(data.text||'');
+            let html='<div class="detail-grid">';
+            html+='<div class="detail-section">📄 帖子信息</div>';
+            fields.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
+            html+='<div class="detail-section">👤 发布者</div>';
+            af.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
+            html+='<div class="detail-section">📂 分区</div>';
+            sf.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
+            html+=`<div class="detail-label">图片：</div><div class="detail-value">${imgsHtml}</div>`;
+            html+=`<div class="detail-label">内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g,'<br>')}</div>`;
+            html+='</div>';
             return `<div class="detail-card" data-cid="${data.cid}">${html}</div>`;
         }
 
-        // 移除当前展开的详情
         function removeExpanded() {
-            if (expandedElement && expandedElement.parentNode) {
-                expandedElement.remove();
-                expandedElement = null;
-            }
-            expandedCid = null;
-            document.querySelectorAll('.post-item').forEach(li => li.classList.remove('selected'));
+            if(expandedElement) expandedElement.remove();
+            expandedElement=null; expandedCid=null;
+            document.querySelectorAll('.post-item').forEach(li=>li.classList.remove('selected'));
         }
 
-        // 获取并展开详情
-        async function expandPost(cid, postItem) {
-            if (!currentAuthorization) {
-                showToast('请先登录');
-                return;
-            }
-            if (expandedCid === cid) {
-                removeExpanded();
-                return;
-            }
+        async function expandPost(cid, item) {
+            if(!currentAuthorization) return showToast('请先登录');
+            if(expandedCid===cid) return removeExpanded();
             removeExpanded();
-
             try {
-                const body = `key=${cid}`;
-                const response = await fetch(DETAIL_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_DETAIL,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const json = await response.json();
-                if (json.code === 1 && json.data) {
-                    const detailHtml = generateDetailHTML(json.data);
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = detailHtml;
-                    const detailElement = tempDiv.firstElementChild;
-                    postItem.insertAdjacentElement('afterend', detailElement);
-                    expandedElement = detailElement;
-                    expandedCid = cid;
-                    postItem.classList.add('selected');
-                } else {
-                    throw new Error(json.msg || '获取详情失败');
-                }
-            } catch (err) {
-                alert(`详情加载失败: ${err.message}`);
-            }
+                const res=await fetch(DETAIL_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_DETAIL,'Content-Type':'application/x-www-form-urlencoded'},body:`key=${cid}`});
+                if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j=await res.json();
+                if(j.code===1 && j.data) {
+                    const d=document.createElement('div'); d.innerHTML=generateDetailHTML(j.data);
+                    const de=d.firstElementChild;
+                    item.insertAdjacentElement('afterend', de);
+                    expandedElement=de; expandedCid=cid;
+                    item.classList.add('selected');
+                } else throw new Error(j.msg||'获取详情失败');
+            } catch(e){ alert(`详情加载失败: ${e.message}`); }
         }
 
-        // 获取帖子列表（支持搜索）
-        async function fetchPosts(page = 1, keyword = '') {
-            if (!currentAuthorization) {
-                showToast('请先登录');
-                return;
-            }
-            showLoading(true);
-            hideError();
-            removeExpanded();
-
+        async function fetchPosts(page=1, kw='') {
+            if(!currentAuthorization) return showToast('请先登录');
+            showLoading(true); hideError(); removeExpanded();
             let body;
-            if (keyword) {
-                const searchParams = JSON.stringify({ status: 'publish' });
-                body = `searchKey=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
-            } else {
-                const searchParams = JSON.stringify({ type: 'post' });
-                body = `page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(searchParams)}`;
-            }
-
+            if(kw) body=`searchKey=${encodeURIComponent(kw)}&page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({status:'publish'}))}`;
+            else body=`page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({type:'post'}))}`;
             try {
-                const response = await fetch(LIST_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': currentAuthorization,
-                        'localtoken': keyword ? LOCALTOKEN_SEARCH : LOCALTOKEN_LIST,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const json = await response.json();
-                if (json.code === 1) {
-                    posts = json.data || [];
-                    totalPosts = json.total || posts.length;
+                const res=await fetch(LIST_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':kw?LOCALTOKEN_SEARCH:LOCALTOKEN_LIST,'Content-Type':'application/x-www-form-urlencoded'},body});
+                if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j=await res.json();
+                if(j.code===1) {
+                    posts=j.data||[]; totalPosts=j.total||posts.length;
                     renderList(posts);
-                    renderPagination(page, totalPosts, keyword);
-                } else {
-                    throw new Error(json.msg || '获取列表失败');
-                }
-            } catch (err) {
-                showError(err.message);
-            } finally {
-                showLoading(false);
-            }
+                    const tp=Math.ceil(totalPosts/limit);
+                    paginationEl.innerHTML=`<button id="prevPage" ${page<=1?'disabled':''}>上一页</button><span>第 ${page} / ${tp} 页</span><button id="nextPage" ${page>=tp?'disabled':''}>下一页</button>`;
+                    document.getElementById('prevPage')?.addEventListener('click',()=>{ if(currentPage>1){ currentPage--; fetchPosts(currentPage, searchMode?searchKeyword:''); }});
+                    document.getElementById('nextPage')?.addEventListener('click',()=>{ if(currentPage<tp){ currentPage++; fetchPosts(currentPage, searchMode?searchKeyword:''); }});
+                } else throw new Error(j.msg||'获取列表失败');
+            } catch(e){ showError(e.message); } finally { showLoading(false); }
         }
 
-        // 渲染列表
         function renderList(posts) {
-            if (!posts || posts.length === 0) {
-                postListEl.innerHTML = '<div class="empty-detail" style="padding: 2rem; border: none;">暂无帖子</div>';
-                return;
-            }
-
-            let html = '';
-            posts.forEach(post => {
-                const cid = post.cid;
-                const title = post.title || '无标题';
-                const author = post.authorInfo?.name || '匿名';
-                const created = formatDate(post.created);
-                html += `
-                    <li class="post-item" data-cid="${cid}">
-                        <div class="post-title">${escapeHtml(title)}</div>
-                        <div class="post-meta">
-                            <span>👤 ${escapeHtml(author)}</span>
-                            <span>📅 ${escapeHtml(created)}</span>
-                        </div>
-                    </li>
-                `;
-            });
-            postListEl.innerHTML = html;
-
-            document.querySelectorAll('.post-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const cid = item.dataset.cid;
-                    if (cid) expandPost(cid, item);
-                });
-            });
+            if(!posts.length) { postListEl.innerHTML='<div class="empty" style="padding:2rem;text-align:center;">暂无帖子</div>'; return; }
+            let html='';
+            posts.forEach(p=>{ html+=`<li class="post-item" data-cid="${p.cid}"><div class="post-title">${escapeHtml(p.title||'无标题')}</div><div class="post-meta"><span>👤 ${escapeHtml(p.authorInfo?.name||'匿名')}</span><span>📅 ${formatDate(p.created)}</span></div></li>`; });
+            postListEl.innerHTML=html;
+            document.querySelectorAll('.post-item').forEach(it=>it.addEventListener('click',e=>{ const cid=it.dataset.cid; if(cid) expandPost(cid,it); }));
         }
 
-        // 分页
-        function renderPagination(page, total, keyword = '') {
-            const totalPages = Math.ceil(total / limit);
-            paginationEl.innerHTML = `
-                <button id="prevPage" ${page <= 1 ? 'disabled' : ''}>上一页</button>
-                <span>第 ${page} / ${totalPages} 页</span>
-                <button id="nextPage" ${page >= totalPages ? 'disabled' : ''}>下一页</button>
-            `;
-
-            document.getElementById('prevPage')?.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    if (searchMode) {
-                        fetchPosts(currentPage, searchKeyword);
-                    } else {
-                        fetchPosts(currentPage);
-                    }
-                }
-            });
-
-            document.getElementById('nextPage')?.addEventListener('click', () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    if (searchMode) {
-                        fetchPosts(currentPage, searchKeyword);
-                    } else {
-                        fetchPosts(currentPage);
-                    }
-                }
-            });
-        }
-
-        // 登录功能（密码登录，首次尝试）
-        async function loginWithPassword(name, password) {
-            modalMessage.textContent = '';
-            const body = `name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`;
-
+        async function loginWithPassword(name,pwd) {
+            modalMessage.textContent='';
             try {
-                const response = await fetch(LOGIN_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body
-                });
-
-                const responseText = await response.text();
-                let json;
-                try {
-                    json = JSON.parse(responseText);
-                } catch {
-                    throw new Error('服务器返回非JSON格式');
-                }
-
-                // 检查是否需要滑块验证
-                if (json.code === 20001) {
-                    // 需要滑块验证
-                    handleSlideVerification(json.data, { name, password });
-                    return;
-                }
-
-                if (response.ok && json.code === 1 && json.data && json.data.token) {
-                    currentAuthorization = json.data.token;
-                    localStorage.setItem('token', currentAuthorization);
-                    modalMessage.textContent = '登录成功！';
+                const res=await fetch(LOGIN_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`name=${encodeURIComponent(name)}&password=${encodeURIComponent(pwd)}`});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(j.code===20001) { handleSlideVerification(j.data,{name,pwd}); return; }
+                if(res.ok && j.code===1 && j.data?.token) {
+                    currentAuthorization=j.data.token; localStorage.setItem('token',currentAuthorization);
+                    modalMessage.textContent='登录成功！';
                     await fetchAndStoreUserData();
-                    setTimeout(() => {
-                        closeLoginModal();
-                        searchMode = false;
-                        searchKeyword = '';
-                        currentPage = 1;
-                        fetchPosts(currentPage);
-                    }, 500);
-                } else {
-                    modalMessage.textContent = json.msg || '登录失败';
-                }
-            } catch (err) {
-                modalMessage.textContent = `错误: ${err.message}`;
-            }
+                    setTimeout(()=>{ closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); },500);
+                } else modalMessage.textContent=j.msg||'登录失败';
+            } catch(e){ modalMessage.textContent=`错误: ${e.message}`; }
         }
 
-        // Token登录
-        async function loginWithToken(token) {
-            if (!token.trim()) {
-                modalMessage.textContent = '请输入Token';
-                return;
-            }
-            currentAuthorization = token.trim();
-            localStorage.setItem('token', currentAuthorization);
+        async function loginWithToken(t) {
+            if(!t.trim()) { modalMessage.textContent='请输入Token'; return; }
+            currentAuthorization=t.trim(); localStorage.setItem('token',currentAuthorization);
             try {
                 await fetchAndStoreUserData();
-                modalMessage.textContent = 'Token登录成功！';
-                setTimeout(() => {
-                    closeLoginModal();
-                    searchMode = false;
-                    searchKeyword = '';
-                    currentPage = 1;
-                    fetchPosts(currentPage);
-                }, 500);
-            } catch (err) {
-                modalMessage.textContent = `Token无效: ${err.message}`;
-                localStorage.removeItem('token');
-                currentAuthorization = '';
-            }
+                modalMessage.textContent='Token登录成功！';
+                setTimeout(()=>{ closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); },500);
+            } catch(e){ modalMessage.textContent=`Token无效: ${e.message}`; localStorage.removeItem('token'); currentAuthorization=''; }
         }
 
-        // 处理滑块验证
-        function handleSlideVerification(data, loginParams) {
-            pendingLoginParams = loginParams;
-            slideToken = data.token;
-            slideSecretKey = data.secretKey;
-            slideOriginalBase64 = data.originalImageBase64;
-            slideJigsawBase64 = data.jigsawImageBase64;
-
-            // 显示滑块区域，隐藏登录表单和按钮
-            passwordLoginForm.style.display = 'none';
-            tokenLoginForm.style.display = 'none';
-            loginActions.style.display = 'none';
-            modalMessage.style.display = 'none';
-            slideVerifyArea.style.display = 'block';
-
-            // 设置图片
-            if (slideOriginalBase64) {
-                slideOriginal.src = 'data:image/png;base64,' + slideOriginalBase64;
-            }
-            if (slideJigsawBase64) {
-                slideJigsaw.src = 'data:image/png;base64,' + slideJigsawBase64;
-            }
-
-            // 重置滑块
-            slideRange.value = 0;
-            slideValue.textContent = '0%';
-            slideMessage.textContent = '';
+        function handleSlideVerification(data,params) {
+            pendingLoginParams=params; slideToken=data.token; slideSecretKey=data.secretKey; slideOriginalBase64=data.originalImageBase64; slideJigsawBase64=data.jigsawImageBase64;
+            passwordLoginForm.style.display='none'; tokenLoginForm.style.display='none'; loginActions.style.display='none'; modalMessage.style.display='none'; slideVerifyArea.style.display='block';
+            if(slideOriginalBase64) slideOriginal.src='data:image/png;base64,'+slideOriginalBase64;
+            if(slideJigsawBase64) slideJigsaw.src='data:image/png;base64,'+slideJigsawBase64;
+            slideRange.value=0; slideValue.textContent='0%'; slideMessage.textContent='';
         }
 
-        // 生成 pointJson（示例，根据实际情况修改）
-        function generatePointJson(distance, secretKey) {
-            // 这里简单地拼接 distance 和 secretKey 并进行 Base64 编码
-            // 实际应根据后端算法实现
-            const raw = `${distance}:${secretKey}`;
-            return btoa(raw);
-        }
+        function generatePointJson(distance,key) { return btoa(distance+':'+key); }
 
-        // 滑块确认验证
         async function confirmSlide() {
-            const distance = parseInt(slideRange.value);
-            slideMessage.textContent = '验证中...';
-
+            const d=parseInt(slideRange.value); slideMessage.textContent='验证中...';
             try {
-                const pointJson = generatePointJson(distance, slideSecretKey);
-
-                const loginBody = new URLSearchParams();
-                loginBody.append('name', pendingLoginParams.name);
-                loginBody.append('password', pendingLoginParams.password);
-                loginBody.append('pointJson', pointJson);
-                loginBody.append('token', slideToken);
-
-                const response = await fetch(LOGIN_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: loginBody.toString()
-                });
-
-                const responseText = await response.text();
-                let json;
-                try {
-                    json = JSON.parse(responseText);
-                } catch {
-                    throw new Error('服务器返回非JSON格式');
-                }
-
-                if (json.code === 1 && json.data && json.data.token) {
-                    currentAuthorization = json.data.token;
-                    localStorage.setItem('token', currentAuthorization);
-                    await fetchAndStoreUserData();
-                    closeLoginModal();
-                    searchMode = false;
-                    searchKeyword = '';
-                    currentPage = 1;
-                    fetchPosts(currentPage);
-                    showToast('登录成功');
-                } else {
-                    slideMessage.textContent = json.msg || '登录失败';
-                }
-            } catch (err) {
-                slideMessage.textContent = `验证错误: ${err.message}`;
-            }
+                const pj=generatePointJson(d,slideSecretKey);
+                const body=new URLSearchParams(); body.append('name',pendingLoginParams.name); body.append('password',pendingLoginParams.password); body.append('pointJson',pj); body.append('token',slideToken);
+                const res=await fetch(LOGIN_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(j.code===1 && j.data?.token) {
+                    currentAuthorization=j.data.token; localStorage.setItem('token',currentAuthorization);
+                    await fetchAndStoreUserData(); closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); showToast('登录成功');
+                } else slideMessage.textContent=j.msg||'登录失败';
+            } catch(e){ slideMessage.textContent=`验证错误: ${e.message}`; }
         }
 
-        // 获取并存储用户信息
         async function fetchAndStoreUserData() {
-            if (!currentAuthorization) throw new Error('未登录');
+            if(!currentAuthorization) throw new Error('未登录');
             try {
-                const response = await fetch(USER_DATA_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_USERDATA,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: ''
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const json = await response.json();
-                if (json.code === 1 && json.data) {
-                    currentUser = {
-                        uid: json.data.uid,
-                        nickname: json.data.nickname || json.data.name || '未知',
-                        avatar: json.data.avatar || ''
-                    };
-                    localStorage.setItem('user', JSON.stringify(currentUser));
-                    updateProfileButton();
-                } else {
-                    throw new Error(json.msg || '获取用户信息失败');
-                }
-            } catch (err) {
-                console.error('获取用户信息失败', err);
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                currentAuthorization = '';
-                currentUser = null;
-                updateProfileButton();
-                throw err;
+                const res=await fetch(USER_DATA_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_USERDATA,'Content-Type':'application/x-www-form-urlencoded'},body:''});
+                if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j=await res.json();
+                if(j.code===1 && j.data) {
+                    currentUser={uid:j.data.uid, nickname:j.data.nickname||j.data.name||'未知', avatar:j.data.avatar||''};
+                    localStorage.setItem('user',JSON.stringify(currentUser));
+                    if(currentUser.avatar) { profileAvatar.src=currentUser.avatar; profileAvatar.style.display='block'; profileBtnText.style.display='none'; }
+                    else { profileAvatar.style.display='none'; profileBtnText.style.display='block'; }
+                } else throw new Error(j.msg||'获取用户信息失败');
+            } catch(e) {
+                console.error(e); localStorage.removeItem('token'); localStorage.removeItem('user'); currentAuthorization=''; currentUser=null;
+                profileAvatar.style.display='none'; profileBtnText.style.display='block'; throw e;
             }
         }
 
-        // 更新个人中心按钮
-        function updateProfileButton() {
-            if (currentUser && currentUser.avatar) {
-                profileAvatar.src = currentUser.avatar;
-                profileAvatar.style.display = 'block';
-                profileBtnText.style.display = 'none';
-            } else {
-                profileAvatar.style.display = 'none';
-                profileBtnText.style.display = 'block';
-            }
-        }
-
-        // 从 localStorage 恢复
         function restoreFromStorage() {
-            const storedToken = localStorage.getItem('token');
-            if (storedToken) {
-                currentAuthorization = storedToken;
-                const storedUser = localStorage.getItem('user');
-                if (storedUser) {
-                    try {
-                        currentUser = JSON.parse(storedUser);
-                        updateProfileButton();
-                        fetchPosts(currentPage);
-                    } catch (e) {
-                        fetchAndStoreUserData().then(() => fetchPosts(currentPage));
-                    }
-                } else {
-                    fetchAndStoreUserData().then(() => fetchPosts(currentPage));
-                }
-            } else {
-                showToast('请先登录');
-            }
+            const t=localStorage.getItem('token');
+            if(t) {
+                currentAuthorization=t;
+                const u=localStorage.getItem('user');
+                if(u) try{ currentUser=JSON.parse(u); if(currentUser.avatar){ profileAvatar.src=currentUser.avatar; profileAvatar.style.display='block'; profileBtnText.style.display='none'; } fetchPosts(1); } catch(e){ fetchAndStoreUserData().then(()=>fetchPosts(1)); }
+                else fetchAndStoreUserData().then(()=>fetchPosts(1));
+            } else showToast('请先登录');
         }
 
-        // 发送验证码
         async function sendCode(mail) {
-            if (!mail) {
-                registerMessage.textContent = '请输入邮箱';
-                return false;
-            }
-            registerMessage.textContent = '发送中...';
-            const body = `mail=${encodeURIComponent(mail)}`;
-
+            if(!mail) { registerMessage.textContent='请输入邮箱'; return false; }
+            registerMessage.textContent='发送中...';
             try {
-                const response = await fetch(SEND_CODE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'localtoken': LOCALTOKEN_SENDCODE,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body
-                });
-
-                const responseText = await response.text();
-                let json;
-                try {
-                    json = JSON.parse(responseText);
-                } catch {
-                    throw new Error('服务器返回非JSON格式');
-                }
-
-                if (response.ok && json.code === 1) {
-                    registerMessage.textContent = '验证码发送成功';
-                    return true;
-                } else {
-                    registerMessage.textContent = json.msg || '发送失败';
-                    return false;
-                }
-            } catch (err) {
-                registerMessage.textContent = `错误: ${err.message}`;
-                return false;
-            }
+                const res=await fetch(SEND_CODE_URL,{method:'POST',headers:{'localtoken':LOCALTOKEN_SENDCODE,'Content-Type':'application/x-www-form-urlencoded'},body:`mail=${encodeURIComponent(mail)}`});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(res.ok && j.code===1) { registerMessage.textContent='验证码发送成功'; return true; } else { registerMessage.textContent=j.msg||'发送失败'; return false; }
+            } catch(e){ registerMessage.textContent=`错误: ${e.message}`; return false; }
         }
 
-        // 注册
-        async function register(mail, code, password) {
-            registerMessage.textContent = '';
-            const name = mail.split('@')[0];
-            const body = new URLSearchParams();
-            body.append('name', name);
-            body.append('code', code);
-            body.append('password', password);
-            body.append('mail', mail);
-
+        async function register(mail,code,pwd) {
+            registerMessage.textContent='';
+            const name=mail.split('@')[0]; const body=new URLSearchParams(); body.append('name',name); body.append('code',code); body.append('password',pwd); body.append('mail',mail);
             try {
-                const response = await fetch(REGISTER_URL, {
-                    method: 'POST',
-                    headers: {
-                        'localtoken': LOCALTOKEN_REGISTER,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body.toString()
-                });
-
-                const responseText = await response.text();
-                let json;
-                try {
-                    json = JSON.parse(responseText);
-                } catch {
-                    throw new Error('服务器返回非JSON格式');
-                }
-
-                if (response.ok && json.code === 1) {
-                    registerMessage.textContent = '注册成功！';
-                    setTimeout(() => {
-                        closeRegisterModal();
-                        showToast('注册成功，请登录');
-                    }, 500);
-                    return true;
-                } else {
-                    registerMessage.textContent = json.msg || '注册失败';
-                    return false;
-                }
-            } catch (err) {
-                registerMessage.textContent = `错误: ${err.message}`;
-                return false;
-            }
+                const res=await fetch(REGISTER_URL,{method:'POST',headers:{'localtoken':LOCALTOKEN_REGISTER,'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(res.ok && j.code===1) { registerMessage.textContent='注册成功！'; setTimeout(()=>{ closeRegisterModal(); showToast('注册成功，请登录'); },500); return true; } else { registerMessage.textContent=j.msg||'注册失败'; return false; }
+            } catch(e){ registerMessage.textContent=`错误: ${e.message}`; return false; }
         }
 
-        // 发帖
-        async function addPost(title, content) {
-            if (!currentAuthorization) {
-                showToast('请先登录');
-                return;
-            }
-            if (!title.trim() || !content.trim()) {
-                postMessage.textContent = '标题和内容不能为空';
-                return;
-            }
-
-            postMessage.textContent = '';
-            const textDelta = JSON.stringify([{ insert: content }]);
-            const body = new URLSearchParams();
-            body.append('title', title);
-            body.append('sections', '13');
-            body.append('text', textDelta);
-            body.append('token', currentAuthorization);
-            body.append('isMd', '0');
-
+        async function addPost(title,content) {
+            if(!currentAuthorization) return showToast('请先登录');
+            if(!title.trim()||!content.trim()) { postMessage.textContent='标题和内容不能为空'; return; }
+            postMessage.textContent='';
+            const delta=JSON.stringify([{insert:content}]); const body=new URLSearchParams(); body.append('title',title); body.append('sections','13'); body.append('text',delta); body.append('token',currentAuthorization); body.append('isMd','0');
             try {
-                const response = await fetch(POST_ADD_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_POSTADD,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body.toString()
-                });
-
-                const responseText = await response.text();
-                let json;
-                try {
-                    json = JSON.parse(responseText);
-                } catch {
-                    throw new Error('服务器返回非JSON格式');
-                }
-
-                if (response.ok && json.code === 1) {
-                    showToast('发布成功');
-                    closePostModal();
-                    if (searchMode) {
-                        fetchPosts(currentPage, searchKeyword);
-                    } else {
-                        fetchPosts(currentPage);
-                    }
-                } else {
-                    postMessage.textContent = `发布失败: ${json.msg || '未知错误'}`;
-                }
-            } catch (err) {
-                postMessage.textContent = `错误: ${err.message}`;
-            }
+                const res=await fetch(POST_ADD_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_POSTADD,'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(res.ok && j.code===1) { showToast('发布成功'); closePostModal(); fetchPosts(currentPage, searchMode?searchKeyword:''); } else postMessage.textContent=`发布失败: ${j.msg||'未知错误'}`;
+            } catch(e){ postMessage.textContent=`错误: ${e.message}`; }
         }
 
-        // 签到
         async function signIn() {
-            if (!currentAuthorization) {
-                showToast('请先登录');
+            if(!currentAuthorization) return showToast('请先登录');
+            try {
+                const res=await fetch(SIGN_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_SIGN,'Content-Type':'application/x-www-form-urlencoded'},body:''});
+                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
+                if(res.ok && j.code===1) showToast(j.msg||'签到成功'); else showToast(j.msg||'签到失败');
+            } catch(e){ showToast(`错误: ${e.message}`); }
+        }
+
+        async function fetchUserDataForProfile() {
+            if(!currentAuthorization) { showToast('请先登录'); closeProfileModal(); return; }
+            profileContent.innerHTML='<div style="text-align:center;">加载中...</div>';
+            try {
+                const res=await fetch(USER_DATA_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_USERDATA,'Content-Type':'application/x-www-form-urlencoded'},body:''});
+                if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j=await res.json();
+                if(j.code===1 && j.data) {
+                    const d=j.data, created=formatDate(d.created), permsName=d.perms?.name||'未知', nickname=d.nickname||d.name||'未知', avatar=d.avatar||'';
+                    profileContent.innerHTML=`<div style="display:flex; flex-direction:column; gap:0.8rem;"><div style="display:flex; align-items:center; gap:1rem;"><img src="${escapeHtml(avatar)}" class="avatar" style="width:60px;height:60px;border-radius:30px;object-fit:cover;"><span style="font-size:1.2rem;">${escapeHtml(nickname)}</span></div><div><span class="info-label">UID：</span>${d.uid||'-'}</div><div><span class="info-label">经验：</span>${d.experience||0}</div><div><span class="info-label">粉丝：</span>${d.fanNum||0}</div><div><span class="info-label">关注：</span>${d.followNum||0}</div><div><span class="info-label">点赞数：</span>${d.totalLikes||0}</div><div><span class="info-label">注册时间：</span>${created}</div><div><span class="info-label">连续签到：</span>${d.consSignIn||0}</div><div><span class="info-label">今日签到：</span>${d.isClock?'已签':'未签'}</div><div><span class="info-label">用户组：</span>${permsName}</div></div>`;
+                } else throw new Error(j.msg||'获取失败');
+            } catch(e){ profileContent.innerHTML=`<div style="color:var(--danger);">错误: ${e.message}</div>`; }
+        }
+
+        async function fetchInbox(page=1) {
+            if(!currentAuthorization) { showToast('请先登录'); closeInboxModal(); return; }
+            inboxContent.innerHTML='<div style="text-align:center;">加载中...</div>'; inboxPagination.style.display='none';
+            try {
+                const res=await fetch(INBOX_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_INBOX,'Content-Type':'application/x-www-form-urlencoded'},body:`type=system&page=${page}&limit=${inboxLimit}`});
+                if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j=await res.json();
+                if(j.code===1 && j.data) {
+                    inboxMessages=j.data; inboxTotal=j.total||0;
+                    if(!inboxMessages.length) { inboxContent.innerHTML='<div style="text-align:center;">暂无系统消息</div>'; inboxPagination.style.display='none'; return; }
+                    let html='<div class="message-list">';
+                    inboxMessages.forEach(m=>{ const a=m.authorInfo||{}, av=a.avatar||'', nm=a.name||'系统', tm=formatDate(m.created), txt=m.text||''; html+=`<div class="message-item"><div class="message-avatar"><img src="${escapeHtml(av)}" class="avatar" onerror="this.style.display='none';this.parentElement.innerHTML='👤';"></div><div class="message-content"><div class="message-header"><span class="message-name">${escapeHtml(nm)}</span><span class="message-time">${escapeHtml(tm)}</span></div><div class="message-text">${escapeHtml(txt)}</div></div></div>`; });
+                    html+='</div>'; inboxContent.innerHTML=html;
+                    const tp=Math.ceil(inboxTotal/inboxLimit);
+                    inboxPageInfo.textContent=`第 ${page} / ${tp} 页`; inboxPrevPage.disabled=page<=1; inboxNextPage.disabled=page>=tp; inboxPagination.style.display='flex';
+                } else throw new Error(j.msg||'获取失败');
+            } catch(e){ inboxContent.innerHTML=`<div style="color:var(--danger);">错误: ${e.message}</div>`; }
+        }
+
+        // 发送图片私信
+        async function sendImageMsg() {
+            const chatId = imgChatId.value.trim();
+            const url = imgUrl.value.trim();
+            const msg = imgMsg.value.trim();
+
+            if (!chatId) {
+                sendImageMsgResult.textContent = '聊天ID不能为空';
                 return;
             }
+            if (!url) {
+                sendImageMsgResult.textContent = '图片链接不能为空';
+                return;
+            }
+
+            sendImageMsgResult.textContent = '发送中...';
             try {
-                const response = await fetch(SIGN_URL, {
+                const body = new URLSearchParams();
+                body.append('chatid', chatId);
+                body.append('type', '1'); // 图片类型
+                body.append('url', url);
+                body.append('msg', msg);
+
+                const response = await fetch(SEND_MSG_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_SIGN,
+                        'localtoken': LOCALTOKEN_SEND_IMAGE,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: ''
+                    body: body.toString()
                 });
 
-                const responseText = await response.text();
+                const text = await response.text();
                 let json;
                 try {
-                    json = JSON.parse(responseText);
+                    json = JSON.parse(text);
                 } catch {
                     throw new Error('服务器返回非JSON格式');
                 }
 
                 if (response.ok && json.code === 1) {
-                    showToast(json.msg || '签到成功');
+                    sendImageMsgResult.textContent = '发送成功！';
+                    sendImageMsgResult.style.color = 'var(--success)';
+                    setTimeout(() => {
+                        closeSendImageMsgModal();
+                    }, 1500);
                 } else {
-                    showToast(json.msg || '签到失败');
+                    sendImageMsgResult.textContent = json.msg || '发送失败';
+                    sendImageMsgResult.style.color = 'var(--danger)';
                 }
-            } catch (err) {
-                showToast(`错误: ${err.message}`);
+            } catch (e) {
+                sendImageMsgResult.textContent = `错误: ${e.message}`;
+                sendImageMsgResult.style.color = 'var(--danger)';
             }
         }
 
-        // 个人中心数据获取
-        async function fetchUserDataForProfile() {
-            if (!currentAuthorization) {
-                showToast('请先登录');
-                closeProfileModal();
+        // 发送文本私信
+        async function sendTextMsg() {
+            const chatId = textChatId.value.trim();
+            const toUid = textToUid.value.trim();
+            const msg = textMsg.value.trim();
+
+            if (!chatId) {
+                sendTextMsgResult.textContent = '聊天ID不能为空';
                 return;
             }
-            profileContent.innerHTML = '<div style="text-align: center; padding: 1rem;">加载中...</div>';
+            if (!toUid) {
+                sendTextMsgResult.textContent = '对方UID不能为空';
+                return;
+            }
+            if (!msg) {
+                sendTextMsgResult.textContent = '消息内容不能为空';
+                return;
+            }
+
+            sendTextMsgResult.textContent = '发送中...';
             try {
-                const response = await fetch(USER_DATA_URL, {
+                const body = new URLSearchParams();
+                body.append('chatid', chatId);
+                body.append('touid', toUid);
+                body.append('type', '0'); // 文本类型
+                body.append('msg', msg);
+
+                const response = await fetch(SEND_MSG_URL, {
                     method: 'POST',
                     headers: {
                         'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_USERDATA,
+                        'localtoken': LOCALTOKEN_SEND_TEXT,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: ''
+                    body: body.toString()
                 });
 
-                const responseText = await response.text();
+                const text = await response.text();
                 let json;
                 try {
-                    json = JSON.parse(responseText);
+                    json = JSON.parse(text);
                 } catch {
                     throw new Error('服务器返回非JSON格式');
                 }
 
-                if (response.ok && json.code === 1 && json.data) {
-                    renderUserData(json.data);
+                if (response.ok && json.code === 1) {
+                    sendTextMsgResult.textContent = '发送成功！';
+                    sendTextMsgResult.style.color = 'var(--success)';
+                    setTimeout(() => {
+                        closeSendTextMsgModal();
+                    }, 1500);
                 } else {
-                    throw new Error(json.msg || '获取用户信息失败');
+                    sendTextMsgResult.textContent = json.msg || '发送失败';
+                    sendTextMsgResult.style.color = 'var(--danger)';
                 }
-            } catch (err) {
-                profileContent.innerHTML = `<div style="color: #aa0000; padding: 1rem;">错误: ${err.message}</div>`;
+            } catch (e) {
+                sendTextMsgResult.textContent = `错误: ${e.message}`;
+                sendTextMsgResult.style.color = 'var(--danger)';
             }
-        }
-
-        // 渲染个人中心
-        function renderUserData(data) {
-            const created = formatDate(data.created);
-            const permsName = data.perms?.name || '未知';
-            const nickname = data.nickname || data.name || '未知';
-            const avatar = data.avatar || '';
-            const html = `
-                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <img src="${escapeHtml(avatar)}" class="avatar" alt="avatar" onerror="this.style.display='none'">
-                        <span style="font-size: 1.2rem; font-weight: 500;">${escapeHtml(nickname)}</span>
-                    </div>
-                    <div><span class="info-label">UID：</span>${data.uid || '-'}</div>
-                    <div><span class="info-label">经验：</span>${data.experience || 0}</div>
-                    <div><span class="info-label">粉丝：</span>${data.fanNum || 0}</div>
-                    <div><span class="info-label">关注：</span>${data.followNum || 0}</div>
-                    <div><span class="info-label">点赞数：</span>${data.totalLikes || 0}</div>
-                    <div><span class="info-label">注册时间：</span>${created}</div>
-                    <div><span class="info-label">连续签到：</span>${data.consSignIn || 0}</div>
-                    <div><span class="info-label">今日签到：</span>${data.isClock ? '已签' : '未签'}</div>
-                    <div><span class="info-label">用户组：</span>${permsName}</div>
-                </div>
-            `;
-            profileContent.innerHTML = html;
-        }
-
-        // 获取系统消息
-        async function fetchInbox(page = 1) {
-            if (!currentAuthorization) {
-                showToast('请先登录');
-                closeInboxModal();
-                return;
-            }
-            inboxContent.innerHTML = '<div style="text-align: center; padding: 1rem;">加载中...</div>';
-            inboxPagination.style.display = 'none';
-            const body = `type=system&page=${page}&limit=${inboxLimit}`;
-            try {
-                const response = await fetch(INBOX_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': currentAuthorization,
-                        'localtoken': LOCALTOKEN_INBOX,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: body
-                });
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const json = await response.json();
-                if (json.code === 1 && json.data) {
-                    inboxMessages = json.data;
-                    inboxTotal = json.total || 0;
-                    renderInbox(inboxMessages, page, inboxTotal);
-                } else {
-                    throw new Error(json.msg || '获取消息失败');
-                }
-            } catch (err) {
-                inboxContent.innerHTML = `<div style="color: #aa0000; padding: 1rem;">错误: ${err.message}</div>`;
-            }
-        }
-
-        // 渲染系统消息
-        function renderInbox(messages, page, total) {
-            if (!messages || messages.length === 0) {
-                inboxContent.innerHTML = '<div style="text-align: center; padding: 1rem;">暂无系统消息</div>';
-                inboxPagination.style.display = 'none';
-                return;
-            }
-
-            let html = '<div class="message-list">';
-            messages.forEach(msg => {
-                const author = msg.authorInfo || {};
-                const avatar = author.avatar || '';
-                const name = author.name || '系统';
-                const time = formatDate(msg.created);
-                const text = msg.text || '';
-                html += `
-                    <div class="message-item">
-                        <div class="message-avatar">
-                            <img src="${escapeHtml(avatar)}" class="avatar" alt="avatar" onerror="this.style.display='none';this.parentElement.innerHTML='👤';">
-                        </div>
-                        <div class="message-content">
-                            <div class="message-header">
-                                <span class="message-name">${escapeHtml(name)}</span>
-                                <span class="message-time">${escapeHtml(time)}</span>
-                            </div>
-                            <div class="message-text">${escapeHtml(text)}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            inboxContent.innerHTML = html;
-
-            const totalPages = Math.ceil(total / inboxLimit);
-            inboxPageInfo.textContent = `第 ${page} / ${totalPages} 页`;
-            inboxPrevPage.disabled = page <= 1;
-            inboxNextPage.disabled = page >= totalPages;
-            inboxPagination.style.display = 'flex';
-        }
-
-        // 显示全局提示
-        function showToast(msg, duration = 2000) {
-            globalToast.textContent = msg;
-            globalToast.style.display = 'block';
-            setTimeout(() => {
-                globalToast.style.display = 'none';
-            }, duration);
         }
 
         // 模态框控制
         function openLoginModal() {
-            loginModal.style.display = 'flex';
-            modalLoginName.value = '';
-            modalLoginPassword.value = '';
-            modalToken.value = '';
-            modalMessage.textContent = '';
-            setLoginMode('password');
-            slideVerifyArea.style.display = 'none';
-            passwordLoginForm.style.display = 'block';
-            tokenLoginForm.style.display = 'none';
-            loginActions.style.display = 'flex';
-            modalMessage.style.display = 'block';
+            loginModal.style.display='flex'; modalLoginName.value=''; modalLoginPassword.value=''; modalToken.value=''; modalMessage.textContent=''; setLoginMode('password');
+            slideVerifyArea.style.display='none'; passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; loginActions.style.display='flex'; modalMessage.style.display='block';
         }
-        function closeLoginModal() {
-            loginModal.style.display = 'none';
-        }
-        function setLoginMode(mode) {
-            loginMode = mode;
-            if (mode === 'password') {
-                loginPasswordTab.classList.add('active');
-                loginTokenTab.classList.remove('active');
-                passwordLoginForm.style.display = 'block';
-                tokenLoginForm.style.display = 'none';
-            } else {
-                loginPasswordTab.classList.remove('active');
-                loginTokenTab.classList.add('active');
-                passwordLoginForm.style.display = 'none';
-                tokenLoginForm.style.display = 'block';
-            }
-        }
-
-        function openRegisterModal() {
-            registerModal.style.display = 'flex';
-            regMail.value = '';
-            regCode.value = '';
-            regPassword.value = '';
-            registerMessage.textContent = '';
-        }
-        function closeRegisterModal() {
-            registerModal.style.display = 'none';
-        }
-
-        function openProfileModal() {
-            profileModal.style.display = 'flex';
-            fetchUserDataForProfile();
-        }
-        function closeProfileModal() {
-            profileModal.style.display = 'none';
-        }
-
-        function openPostModal() {
-            postModal.classList.add('show');
-            postTitle.value = '';
-            postContent.value = '';
-            postMessage.textContent = '';
-        }
-        function closePostModal() {
-            postModal.classList.remove('show');
-        }
-
-        function openSearchModal() {
-            searchModal.style.display = 'flex';
-            searchKeywordInput.value = searchKeyword;
-            searchMessage.textContent = '';
-        }
-        function closeSearchModal() {
-            searchModal.style.display = 'none';
-        }
-
-        function openInboxModal() {
-            inboxModal.style.display = 'flex';
-            inboxPage = 1;
-            fetchInbox(inboxPage);
-        }
-        function closeInboxModal() {
-            inboxModal.style.display = 'none';
-        }
+        function closeLoginModal() { loginModal.style.display='none'; }
+        function setLoginMode(m) { loginMode=m; if(m==='password'){ loginPasswordTab.classList.add('active'); loginTokenTab.classList.remove('active'); passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; } else { loginPasswordTab.classList.remove('active'); loginTokenTab.classList.add('active'); passwordLoginForm.style.display='none'; tokenLoginForm.style.display='block'; } }
+        function openRegisterModal() { registerModal.style.display='flex'; regMail.value=''; regCode.value=''; regPassword.value=''; registerMessage.textContent=''; }
+        function closeRegisterModal() { registerModal.style.display='none'; }
+        function openProfileModal() { profileModal.style.display='flex'; fetchUserDataForProfile(); }
+        function closeProfileModal() { profileModal.style.display='none'; }
+        function openPostModal() { postModal.classList.add('show'); postTitle.value=''; postContent.value=''; postMessage.textContent=''; }
+        function closePostModal() { postModal.classList.remove('show'); }
+        function openSearchModal() { searchModal.style.display='flex'; searchKeywordInput.value=searchKeyword; searchMessage.textContent=''; }
+        function closeSearchModal() { searchModal.style.display='none'; }
+        function openInboxModal() { inboxModal.style.display='flex'; inboxPage=1; fetchInbox(1); }
+        function closeInboxModal() { inboxModal.style.display='none'; }
+        function openSendImageMsgModal() { sendImageMsgModal.style.display='flex'; imgChatId.value=''; imgUrl.value=''; imgMsg.value=''; sendImageMsgResult.textContent=''; sendImageMsgResult.style.color='var(--danger)'; }
+        function closeSendImageMsgModal() { sendImageMsgModal.style.display='none'; }
+        function openSendTextMsgModal() { sendTextMsgModal.style.display='flex'; textChatId.value=''; textToUid.value=''; textMsg.value=''; sendTextMsgResult.textContent=''; sendTextMsgResult.style.color='var(--danger)'; }
+        function closeSendTextMsgModal() { sendTextMsgModal.style.display='none'; }
 
         // 事件绑定
-        loginBtn.addEventListener('click', openLoginModal);
-        registerBtn.addEventListener('click', openRegisterModal);
-        inboxBtn.addEventListener('click', openInboxModal);
-        modalCancel.addEventListener('click', closeLoginModal);
-        modalSubmit.addEventListener('click', () => {
-            if (loginMode === 'password') {
-                const name = modalLoginName.value.trim();
-                const password = modalLoginPassword.value.trim();
-                if (!name || !password) {
-                    modalMessage.textContent = '请输入用户名和密码';
-                    return;
-                }
-                loginWithPassword(name, password);
-            } else {
-                const token = modalToken.value.trim();
-                loginWithToken(token);
-            }
+        loginBtn.addEventListener('click',openLoginModal);
+        registerBtn.addEventListener('click',openRegisterModal);
+        inboxBtn.addEventListener('click',openInboxModal);
+        sendImageMsgBtn.addEventListener('click',openSendImageMsgModal);
+        sendTextMsgBtn.addEventListener('click',openSendTextMsgModal);
+        modalCancel.addEventListener('click',closeLoginModal);
+        modalSubmit.addEventListener('click',()=>{
+            if(loginMode==='password'){ const n=modalLoginName.value.trim(), p=modalLoginPassword.value.trim(); if(!n||!p) { modalMessage.textContent='请输入用户名和密码'; return; } loginWithPassword(n,p); }
+            else { const t=modalToken.value.trim(); loginWithToken(t); }
         });
-        loginPasswordTab.addEventListener('click', () => setLoginMode('password'));
-        loginTokenTab.addEventListener('click', () => setLoginMode('token'));
-        loginModal.addEventListener('click', (e) => {
-            if (e.target === loginModal) closeLoginModal();
-        });
-
-        slideCancel.addEventListener('click', () => {
-            slideVerifyArea.style.display = 'none';
-            passwordLoginForm.style.display = 'block';
-            tokenLoginForm.style.display = 'none';
-            loginActions.style.display = 'flex';
-            modalMessage.style.display = 'block';
-            setLoginMode(loginMode);
-        });
-        slideConfirm.addEventListener('click', confirmSlide);
-        slideRange.addEventListener('input', (e) => {
-            slideValue.textContent = e.target.value + '%';
-        });
-
-        registerCancel.addEventListener('click', closeRegisterModal);
-        sendCodeBtn.addEventListener('click', async () => {
-            const mail = regMail.value.trim();
-            await sendCode(mail);
-        });
-        registerSubmit.addEventListener('click', async () => {
-            const mail = regMail.value.trim();
-            const code = regCode.value.trim();
-            const password = regPassword.value.trim();
-            if (!mail || !code || !password) {
-                registerMessage.textContent = '请填写所有字段';
-                return;
-            }
-            await register(mail, code, password);
-        });
-        registerModal.addEventListener('click', (e) => {
-            if (e.target === registerModal) closeRegisterModal();
-        });
-
-        postFloatBtn.addEventListener('click', openPostModal);
-        postCancel.addEventListener('click', closePostModal);
-        postSubmit.addEventListener('click', () => {
-            const title = postTitle.value.trim();
-            const content = postContent.value.trim();
-            addPost(title, content);
-        });
-
-        signBtn.addEventListener('click', signIn);
-
-        profileBtn.addEventListener('click', openProfileModal);
-        profileClose.addEventListener('click', closeProfileModal);
-        profileModal.addEventListener('click', (e) => {
-            if (e.target === profileModal) closeProfileModal();
-        });
-
-        searchBtn.addEventListener('click', openSearchModal);
-        searchCancel.addEventListener('click', closeSearchModal);
-        searchSubmit.addEventListener('click', () => {
-            const keyword = searchKeywordInput.value.trim();
-            if (!keyword) {
-                searchMessage.textContent = '请输入关键词';
-                return;
-            }
-            searchMode = true;
-            searchKeyword = keyword;
-            currentPage = 1;
-            closeSearchModal();
-            fetchPosts(currentPage, keyword);
-        });
-        searchAllBtn.addEventListener('click', () => {
-            searchMode = false;
-            searchKeyword = '';
-            currentPage = 1;
-            closeSearchModal();
-            fetchPosts(currentPage);
-        });
-        searchModal.addEventListener('click', (e) => {
-            if (e.target === searchModal) closeSearchModal();
-        });
-
-        inboxPrevPage.addEventListener('click', () => {
-            if (inboxPage > 1) {
-                inboxPage--;
-                fetchInbox(inboxPage);
-            }
-        });
-        inboxNextPage.addEventListener('click', () => {
-            inboxPage++;
-            fetchInbox(inboxPage);
-        });
-        inboxClose.addEventListener('click', closeInboxModal);
-        inboxModal.addEventListener('click', (e) => {
-            if (e.target === inboxModal) closeInboxModal();
-        });
-
-        function showLoading(show) {
-            listLoading.style.display = show ? 'block' : 'none';
-            if (show) postListEl.innerHTML = '';
-        }
-        function showError(msg) {
-            listError.style.display = 'block';
-            listError.textContent = `错误: ${msg}`;
-            postListEl.innerHTML = '';
-        }
-        function hideError() {
-            listError.style.display = 'none';
-        }
-        function escapeHtml(unsafe) {
-            if (!unsafe) return '';
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        loginPasswordTab.addEventListener('click',()=>setLoginMode('password'));
+        loginTokenTab.addEventListener('click',()=>setLoginMode('token'));
+        loginModal.addEventListener('click',e=>{ if(e.target===loginModal) closeLoginModal(); });
+        slideCancel.addEventListener('click',()=>{ slideVerifyArea.style.display='none'; passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; loginActions.style.display='flex'; modalMessage.style.display='block'; setLoginMode(loginMode); });
+        slideConfirm.addEventListener('click',confirmSlide);
+        slideRange.addEventListener('input',e=>{ slideValue.textContent=e.target.value+'%'; });
+        registerCancel.addEventListener('click',closeRegisterModal);
+        sendCodeBtn.addEventListener('click',async()=>{ const m=regMail.value.trim(); await sendCode(m); });
+        registerSubmit.addEventListener('click',async()=>{ const m=regMail.value.trim(), c=regCode.value.trim(), p=regPassword.value.trim(); if(!m||!c||!p) { registerMessage.textContent='请填写所有字段'; return; } await register(m,c,p); });
+        registerModal.addEventListener('click',e=>{ if(e.target===registerModal) closeRegisterModal(); });
+        postFloatBtn.addEventListener('click',openPostModal);
+        postCancel.addEventListener('click',closePostModal);
+        postSubmit.addEventListener('click',()=>{ const t=postTitle.value.trim(), c=postContent.value.trim(); addPost(t,c); });
+        signBtn.addEventListener('click',signIn);
+        profileBtn.addEventListener('click',openProfileModal);
+        profileClose.addEventListener('click',closeProfileModal);
+        profileModal.addEventListener('click',e=>{ if(e.target===profileModal) closeProfileModal(); });
+        searchBtn.addEventListener('click',openSearchModal);
+        searchCancel.addEventListener('click',closeSearchModal);
+        searchSubmit.addEventListener('click',()=>{ const kw=searchKeywordInput.value.trim(); if(!kw){ searchMessage.textContent='请输入关键词'; return; } searchMode=true; searchKeyword=kw; currentPage=1; closeSearchModal(); fetchPosts(1,kw); });
+        searchAllBtn.addEventListener('click',()=>{ searchMode=false; searchKeyword=''; currentPage=1; closeSearchModal(); fetchPosts(1); });
+        searchModal.addEventListener('click',e=>{ if(e.target===searchModal) closeSearchModal(); });
+        inboxPrevPage.addEventListener('click',()=>{ if(inboxPage>1){ inboxPage--; fetchInbox(inboxPage); } });
+        inboxNextPage.addEventListener('click',()=>{ inboxPage++; fetchInbox(inboxPage); });
+        inboxClose.addEventListener('click',closeInboxModal);
+        inboxModal.addEventListener('click',e=>{ if(e.target===inboxModal) closeInboxModal(); });
+        sendImageMsgCancel.addEventListener('click',closeSendImageMsgModal);
+        sendImageMsgSubmit.addEventListener('click',sendImageMsg);
+        sendImageMsgModal.addEventListener('click',e=>{ if(e.target===sendImageMsgModal) closeSendImageMsgModal(); });
+        sendTextMsgCancel.addEventListener('click',closeSendTextMsgModal);
+        sendTextMsgSubmit.addEventListener('click',sendTextMsg);
+        sendTextMsgModal.addEventListener('click',e=>{ if(e.target===sendTextMsgModal) closeSendTextMsgModal(); });
 
         // 初始化
         restoreFromStorage();

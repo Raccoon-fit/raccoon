@@ -17,8 +17,10 @@
             --accent-hover: #1d4ed8;
             --danger: #dc2626;
             --success: #16a34a;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 20px;
             --transition: all 0.2s ease;
@@ -34,8 +36,9 @@
             --border-medium: #475569;
             --accent: #3b82f6;
             --accent-hover: #60a5fa;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
         }
 
         * {
@@ -71,7 +74,7 @@
         }
         .header h1 {
             font-size: 1.5rem;
-            font-weight: 500;
+            font-weight: 600;
             background: linear-gradient(135deg, var(--accent), #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -111,7 +114,7 @@
             border: 1px solid var(--border-medium);
             border-radius: var(--radius-md);
             min-width: 180px;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             z-index: 10;
             overflow: hidden;
         }
@@ -157,10 +160,10 @@
             max-width: 100%;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
         }
         .modal h3 {
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 1.5rem;
             color: var(--text-primary);
             border-bottom: 1px solid var(--border-light);
@@ -292,25 +295,26 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* ===== 帖子列表 ===== */
+        /* ===== 优化后的帖子列表 ===== */
         .post-list {
             list-style: none;
-            border-top: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         .post-item {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            margin-top: 1rem;
-            padding: 1.2rem;
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
         }
         .post-item:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--border-medium);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
         }
         .post-item.selected {
             border-left: 4px solid var(--accent);
@@ -324,42 +328,58 @@
         }
         .post-meta {
             display: flex;
-            gap: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
+        .post-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
 
-        /* 详情卡片 */
+        /* 详情卡片优化 */
         .detail-card {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
             margin: 1rem 0;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-md);
+            animation: slideDown 0.2s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .detail-grid {
             display: grid;
             grid-template-columns: auto 1fr;
             gap: 0.8rem 1.5rem;
             align-items: start;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
         .detail-label {
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
         }
+        .detail-value {
+            color: var(--text-primary);
+            word-break: break-word;
+        }
         .detail-value.large-text {
-            max-height: 250px;
+            max-height: 300px;
             overflow-y: auto;
             background: var(--bg-page);
-            padding: 0.8rem;
+            padding: 1rem;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
-            font-family: monospace;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 0.9rem;
             white-space: pre-wrap;
+            line-height: 1.6;
         }
         .detail-section {
             grid-column: 1 / -1;
@@ -369,8 +389,27 @@
             margin-top: 0.5rem;
             padding-bottom: 0.3rem;
         }
+        /* 图片预览 */
+        .post-image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+        .post-image-preview:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        /* 大图预览模态框 */
+        .image-preview-modal img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
 
-        /* 分页 */
+        /* 分页优化 */
         .pagination {
             display: flex;
             justify-content: center;
@@ -385,14 +424,21 @@
             border-radius: 40px;
             cursor: pointer;
             color: var(--text-primary);
+            font-weight: 500;
             transition: var(--transition);
+            min-width: 80px;
         }
         .pagination button:hover:not(:disabled) {
             background: var(--border-light);
+            border-color: var(--accent);
         }
         .pagination button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        .pagination span {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
         }
 
         /* ===== 底部浮动按钮 ===== */
@@ -411,7 +457,7 @@
             border-radius: 28px;
             background: var(--bg-card);
             border: 1px solid var(--border-medium);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -421,7 +467,7 @@
             transition: var(--transition);
         }
         .float-btn:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
             background: var(--border-light);
         }
 
@@ -434,7 +480,7 @@
             border-radius: 28px;
             background: var(--bg-card);
             border: 1px solid var(--border-medium);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -445,7 +491,7 @@
             transition: var(--transition);
         }
         .search-btn:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
             background: var(--border-light);
         }
 
@@ -463,7 +509,7 @@
             border-radius: 28px;
             background: var(--bg-card);
             border: 1px solid var(--border-medium);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -479,7 +525,7 @@
             object-fit: cover;
         }
         .profile-btn:hover, .night-mode-btn:hover {
-            transform: scale(1.05);
+            transform: scale(1.1);
             background: var(--border-light);
         }
 
@@ -509,7 +555,7 @@
         }
         .post-modal h3 {
             font-size: 1.4rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 1.5rem;
             color: var(--text-primary);
             border-bottom: 1px solid var(--border-light);
@@ -627,7 +673,7 @@
             font-size: 0.9rem;
             z-index: 1200;
             display: none;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
         }
 
         /* 下载横幅 */
@@ -642,7 +688,7 @@
             padding: 1rem 2.5rem;
             border-radius: 40px;
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
             box-shadow: var(--shadow-md);
             transition: var(--transition);
@@ -682,7 +728,6 @@
                 font-size: 1.1rem;
             }
             .post-meta {
-                flex-wrap: wrap;
                 gap: 0.8rem;
             }
             .float-btn, .search-btn, .profile-btn, .night-mode-btn {
@@ -709,6 +754,7 @@
             text-align: center;
             padding: 2rem;
             color: var(--text-secondary);
+            font-size: 1.1rem;
         }
         .error {
             color: var(--danger);
@@ -917,8 +963,8 @@
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
         const INBOX_URL = 'http://159.75.183.170:3000/Users/UserInbox';
-        const SEND_MSG_URL = 'http://159.75.183.170:3000/Chat/SendMsg'; // 发送私信接口
-        const CHAT_MSG_LIST_URL = 'http://159.75.183.170:3000/Chat/ChatMsgList'; // 群组消息列表接口
+        const SEND_MSG_URL = 'http://159.75.183.170:3000/Chat/SendMsg';
+        const CHAT_MSG_LIST_URL = 'http://159.75.183.170:3000/Chat/ChatMsgList';
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
@@ -1047,9 +1093,15 @@
         const chatMsgListContent = document.getElementById('chatMsgListContent');
         const chatMsgListClose = document.getElementById('chatMsgListClose');
 
-        // 夜间模式
-        const savedNightMode = localStorage.getItem('nightMode') === 'true';
-        if (savedNightMode) {
+        // 夜间模式 - 默认为夜间（没有保存时启用）
+        let savedNightMode = localStorage.getItem('nightMode');
+        if (savedNightMode === null) {
+            // 默认夜间模式
+            savedNightMode = 'true';
+            localStorage.setItem('nightMode', 'true');
+        }
+        const isNight = savedNightMode === 'true';
+        if (isNight) {
             body.classList.add('night-mode');
             nightModeBtn.textContent = '☀️';
         } else {
@@ -1057,9 +1109,9 @@
         }
         nightModeBtn.addEventListener('click', () => {
             body.classList.toggle('night-mode');
-            const isNight = body.classList.contains('night-mode');
-            nightModeBtn.textContent = isNight ? '☀️' : '🌙';
-            localStorage.setItem('nightMode', isNight);
+            const nowNight = body.classList.contains('night-mode');
+            nightModeBtn.textContent = nowNight ? '☀️' : '🌙';
+            localStorage.setItem('nightMode', nowNight);
         });
 
         // 工具函数
@@ -1090,23 +1142,22 @@
             listError.style.display = 'none';
         }
 
-        // 处理内容（用于详情）
+        // 处理帖子内容 - 完整显示
         function processContent(raw) {
             if (!raw) return '';
             try {
-                const p = JSON.parse(raw);
-                if (Array.isArray(p)) {
-                    let r = '';
-                    p.forEach((item, i) => {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    let result = '';
+                    parsed.forEach(item => {
                         if (item.insert && typeof item.insert === 'string') {
-                            if (i === 0) r += item.insert;
-                            else if (i === 1) r += '【该隐藏内容请在APP内查看】';
+                            result += item.insert;
                         }
                     });
-                    return r;
+                    return result;
                 }
-            } catch (e) { }
-            return raw.replace(/【隐藏内容】/g, '【该隐藏内容请在APP内查看】');
+            } catch (e) {}
+            return raw;
         }
 
         // 生成详情卡片HTML
@@ -1449,7 +1500,7 @@
             }
         }
 
-        // 获取群组消息记录
+        // 获取群组消息记录（恢复为 application/x-www-form-urlencoded）
         async function fetchChatMsgList() {
             if (!currentAuthorization) {
                 showToast('请先登录');

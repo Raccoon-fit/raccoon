@@ -110,7 +110,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-medium);
             border-radius: var(--radius-md);
-            min-width: 160px;
+            min-width: 180px;
             box-shadow: var(--shadow-md);
             z-index: 10;
             overflow: hidden;
@@ -153,7 +153,7 @@
             border: 1px solid var(--border-medium);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
-            width: 500px;
+            width: 600px;
             max-width: 100%;
             max-height: 85vh;
             overflow-y: auto;
@@ -483,7 +483,7 @@
             background: var(--border-light);
         }
 
-        /* 发帖弹窗 */
+        /* 发帖弹窗（优化样式） */
         .post-modal {
             position: fixed;
             bottom: 0;
@@ -492,7 +492,7 @@
             background: var(--bg-card);
             border-top: 1px solid var(--border-medium);
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
             transform: translateY(100%);
             transition: transform 0.3s ease;
             z-index: 1100;
@@ -507,9 +507,111 @@
             max-width: 600px;
             margin: 0 auto;
         }
+        .post-modal h3 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.5rem;
+        }
+        .post-modal input, .post-modal textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
         .post-modal textarea {
-            min-height: 150px;
+            min-height: 180px;
             resize: vertical;
+            border-radius: 24px;
+        }
+        .post-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .post-modal-actions button {
+            padding: 0.7rem 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 40px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .post-modal-actions button:hover {
+            background: var(--border-light);
+        }
+        .post-message {
+            margin-bottom: 1rem;
+            color: var(--danger);
+            font-size: 0.9rem;
+        }
+
+        /* 群组消息列表样式 */
+        .chat-message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .chat-message-item {
+            display: flex;
+            gap: 0.8rem;
+            padding: 0.8rem;
+            background: var(--bg-page);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+        }
+        .chat-avatar {
+            flex-shrink: 0;
+        }
+        .chat-avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+        .chat-content {
+            flex: 1;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .chat-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .chat-time {
+            color: var(--text-secondary);
+        }
+        .chat-text {
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+        .chat-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--radius-md);
+            margin-top: 0.3rem;
+            cursor: pointer;
+            border: 1px solid var(--border-light);
+        }
+        .chat-image:hover {
+            opacity: 0.9;
         }
 
         /* 全局提示 */
@@ -550,7 +652,7 @@
             transform: scale(1.02);
         }
 
-        /* 消息列表 */
+        /* 系统消息列表 */
         .message-list {
             display: flex;
             flex-direction: column;
@@ -597,6 +699,9 @@
             .slide-images img {
                 max-width: 150px;
             }
+            .chat-image {
+                max-width: 150px;
+            }
         }
 
         /* 其他 */
@@ -622,6 +727,7 @@
                 <button id="inboxBtn">系统消息</button>
                 <button id="sendImageMsgBtn">群组图片消息</button>
                 <button id="sendTextMsgBtn">群组文本消息</button>
+                <button id="chatMsgListBtn">群组消息记录</button>
             </div>
         </div>
     </div>
@@ -744,6 +850,19 @@
         </div>
     </div>
 
+    <!-- 群组消息记录模态框 -->
+    <div id="chatMsgListModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h3>群组聊天记录</h3>
+            <div id="chatMsgListContent" class="chat-message-list">
+                <div style="text-align:center;">加载中...</div>
+            </div>
+            <div class="modal-actions">
+                <button id="chatMsgListClose">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 底部浮动按钮组 -->
     <div class="float-buttons-center">
         <div class="float-btn sign-btn" id="signBtn" title="签到">🔔</div>
@@ -755,7 +874,7 @@
         <div class="night-mode-btn" id="nightModeBtn" title="夜间模式">🌙</div>
     </div>
 
-    <!-- 发帖弹窗 -->
+    <!-- 发帖弹窗（优化后） -->
     <div class="post-modal" id="postModal">
         <div class="modal-content">
             <h3>发布新帖子</h3>
@@ -798,7 +917,8 @@
         const SIGN_URL = 'http://159.75.183.170:3000/UsersLog/SignAdd';
         const USER_DATA_URL = 'http://159.75.183.170:3000/Users/UserData';
         const INBOX_URL = 'http://159.75.183.170:3000/Users/UserInbox';
-        const SEND_MSG_URL = 'http://159.75.183.170:3000/Chat/SendMsg'; // 发送私信接口（共用）
+        const SEND_MSG_URL = 'http://159.75.183.170:3000/Chat/SendMsg'; // 发送私信接口
+        const CHAT_MSG_LIST_URL = 'http://159.75.183.170:3000/Chat/ChatMsgList'; // 群组消息列表接口
 
         // 固定的 localtoken
         const LOCALTOKEN_LIST = '57MJILatB0JMYi2FOtDIJjYF2MhbLbvcUSUbIsL22gdzh1LAiYKLNvp75JcPelNlTQ64uYbeZBSk2/bsRl9oJM1aOH12DKwd3oA1PDl7Nc5cHMZLQfQzSrAv01f8XmeS5Ex5wOoROWOn9l5fBXZPcw==';
@@ -810,10 +930,9 @@
         const LOCALTOKEN_USERDATA = '3M78P4KutoUYu3v+eRLt6cdVJLdGv2K2NPsv4Bt0cCvAGxVC+Qsp3MEE4ZJ+E6LsJgMTsWREPRFCntfu072GxAA0gG/lN0OSKWgyAaHs8svaK82YHk4EgVJ5IHJ2WNuRbp6sLwKwU32ifb280M9KeA==';
         const LOCALTOKEN_SEARCH = 'S6oKa74Ez/wO+LJzPTFOdZy2iORMGkFh+ni5n1EP7gyk7phnnFd0ywBBPr+YqLHX8OZpI0c9Fk0JKLHk2jwv/peH1+owIwhupHE5nB3p7WgTyTamLC7QvSo0Luir4cXU9NTLdOYOpCky57HPkzKmqQ==';
         const LOCALTOKEN_INBOX = 'S6oKa74Ez/wO+LJzPTFOdZy2iORMGkFh+ni5n1EP7gyk7phnnFd0ywBBPr+YqLHX8OZpI0c9Fk0JKLHk2jwv/peH1+owIwhupHE5nB3p7WjDm+vPfbOrPywIsd2VeEq/di2nWPHle8q6bCGDBPcHxg==';
-        // 图片私信 localtoken（您提供的第一个）
         const LOCALTOKEN_SEND_IMAGE = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+x3vkt2uUazFYttQKGq0fjg==';
-        // 文本私信 localtoken（您提供的第二个）
         const LOCALTOKEN_SEND_TEXT = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+rl2SZbaSlXkbLbCazntDiw==';
+        const LOCALTOKEN_CHAT_LIST = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpXvfys5+MaT88DIih2flwg+ocXTEiPVpfF9UATPq3Mug7SdBO2R5+4pcVy2dB1YeFE=';
 
         // 固定群组参数
         const GROUP_CHAT_ID = '14';
@@ -922,6 +1041,12 @@
         const sendTextMsgCancel = document.getElementById('sendTextMsgCancel');
         const sendTextMsgSubmit = document.getElementById('sendTextMsgSubmit');
 
+        // 群组消息记录相关
+        const chatMsgListBtn = document.getElementById('chatMsgListBtn');
+        const chatMsgListModal = document.getElementById('chatMsgListModal');
+        const chatMsgListContent = document.getElementById('chatMsgListContent');
+        const chatMsgListClose = document.getElementById('chatMsgListClose');
+
         // 夜间模式
         const savedNightMode = localStorage.getItem('nightMode') === 'true';
         if (savedNightMode) {
@@ -938,12 +1063,32 @@
         });
 
         // 工具函数
-        function formatDate(t) { if (!t) return '未知'; const d = new Date(t*1000); return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-'); }
-        function escapeHtml(u) { if (!u) return ''; return u.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-        function showToast(msg, d=2000) { globalToast.textContent=msg; globalToast.style.display='block'; setTimeout(()=>globalToast.style.display='none', d); }
-        function showLoading(s) { listLoading.style.display = s?'block':'none'; if(s) postListEl.innerHTML=''; }
-        function showError(m) { listError.style.display='block'; listError.textContent=`错误: ${m}`; postListEl.innerHTML=''; }
-        function hideError() { listError.style.display='none'; }
+        function formatDate(t) {
+            if (!t) return '未知';
+            const d = new Date(t * 1000);
+            return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-');
+        }
+        function escapeHtml(u) {
+            if (!u) return '';
+            return u.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+        function showToast(msg, d = 2000) {
+            globalToast.textContent = msg;
+            globalToast.style.display = 'block';
+            setTimeout(() => globalToast.style.display = 'none', d);
+        }
+        function showLoading(s) {
+            listLoading.style.display = s ? 'block' : 'none';
+            if (s) postListEl.innerHTML = '';
+        }
+        function showError(m) {
+            listError.style.display = 'block';
+            listError.textContent = `错误: ${m}`;
+            postListEl.innerHTML = '';
+        }
+        function hideError() {
+            listError.style.display = 'none';
+        }
 
         // 处理内容（用于详情）
         function processContent(raw) {
@@ -951,250 +1096,254 @@
             try {
                 const p = JSON.parse(raw);
                 if (Array.isArray(p)) {
-                    let r='';
-                    p.forEach((item,i)=>{
-                        if(item.insert && typeof item.insert==='string') {
-                            if(i===0) r+=item.insert;
-                            else if(i===1) r+='【该隐藏内容请在APP内查看】';
+                    let r = '';
+                    p.forEach((item, i) => {
+                        if (item.insert && typeof item.insert === 'string') {
+                            if (i === 0) r += item.insert;
+                            else if (i === 1) r += '【该隐藏内容请在APP内查看】';
                         }
                     });
                     return r;
                 }
-            } catch(e){}
-            return raw.replace(/【隐藏内容】/g,'【该隐藏内容请在APP内查看】');
+            } catch (e) { }
+            return raw.replace(/【隐藏内容】/g, '【该隐藏内容请在APP内查看】');
         }
 
         // 生成详情卡片HTML
         function generateDetailHTML(data) {
-            const a=data.authorInfo||{}, s=data.sections||{}, imgs=data.images||[];
-            const fields=[
-                {l:'帖子ID',v:data.cid??'-'},{l:'标题',v:data.title||'-'},{l:'发布时间',v:formatDate(data.created)},
-                {l:'修改时间',v:formatDate(data.modified)},{l:'浏览数',v:data.views??'-'},{l:'点赞数',v:data.likes??'-'},
-                {l:'评论数',v:data.commentsNum??'-'},{l:'置顶',v:data.istop===1?'是':'否'},{l:'状态',v:data.status||'-'},{l:'类型',v:data.type||'-'}
+            const a = data.authorInfo || {}, s = data.sections || {}, imgs = data.images || [];
+            const fields = [
+                { l: '帖子ID', v: data.cid ?? '-' }, { l: '标题', v: data.title || '-' }, { l: '发布时间', v: formatDate(data.created) },
+                { l: '修改时间', v: formatDate(data.modified) }, { l: '浏览数', v: data.views ?? '-' }, { l: '点赞数', v: data.likes ?? '-' },
+                { l: '评论数', v: data.commentsNum ?? '-' }, { l: '置顶', v: data.istop === 1 ? '是' : '否' }, { l: '状态', v: data.status || '-' }, { l: '类型', v: data.type || '-' }
             ];
-            const af=[
-                {l:'UID',v:a.uid??'-'},{l:'昵称',v:a.screenName||a.name||'-'},{l:'简介',v:a.introduce||'-'}
+            const af = [
+                { l: 'UID', v: a.uid ?? '-' }, { l: '昵称', v: a.screenName || a.name || '-' }, { l: '简介', v: a.introduce || '-' }
             ];
-            const sf=[
-                {l:'分区ID',v:s.sid??'-'},{l:'分区名称',v:s.name||'-'},{l:'分区类型',v:s.type||'-'}
+            const sf = [
+                { l: '分区ID', v: s.sid ?? '-' }, { l: '分区名称', v: s.name || '-' }, { l: '分区类型', v: s.type || '-' }
             ];
-            const imgsHtml = imgs.length?`共 ${imgs.length} 张图片`:'无';
-            const content = processContent(data.text||'');
-            let html='<div class="detail-grid">';
-            html+='<div class="detail-section">📄 帖子信息</div>';
-            fields.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
-            html+='<div class="detail-section">👤 发布者</div>';
-            af.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
-            html+='<div class="detail-section">📂 分区</div>';
-            sf.forEach(f=>{html+=`<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`;});
-            html+=`<div class="detail-label">图片：</div><div class="detail-value">${imgsHtml}</div>`;
-            html+=`<div class="detail-label">内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g,'<br>')}</div>`;
-            html+='</div>';
+            const imgsHtml = imgs.length ? `共 ${imgs.length} 张图片` : '无';
+            const content = processContent(data.text || '');
+            let html = '<div class="detail-grid">';
+            html += '<div class="detail-section">📄 帖子信息</div>';
+            fields.forEach(f => { html += `<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`; });
+            html += '<div class="detail-section">👤 发布者</div>';
+            af.forEach(f => { html += `<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`; });
+            html += '<div class="detail-section">📂 分区</div>';
+            sf.forEach(f => { html += `<div class="detail-label">${f.l}：</div><div class="detail-value">${escapeHtml(String(f.v))}</div>`; });
+            html += `<div class="detail-label">图片：</div><div class="detail-value">${imgsHtml}</div>`;
+            html += `<div class="detail-label">内容：</div><div class="detail-value large-text">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
+            html += '</div>';
             return `<div class="detail-card" data-cid="${data.cid}">${html}</div>`;
         }
 
         function removeExpanded() {
-            if(expandedElement) expandedElement.remove();
-            expandedElement=null; expandedCid=null;
-            document.querySelectorAll('.post-item').forEach(li=>li.classList.remove('selected'));
+            if (expandedElement) expandedElement.remove();
+            expandedElement = null; expandedCid = null;
+            document.querySelectorAll('.post-item').forEach(li => li.classList.remove('selected'));
         }
 
         async function expandPost(cid, item) {
-            if(!currentAuthorization) return showToast('请先登录');
-            if(expandedCid===cid) return removeExpanded();
+            if (!currentAuthorization) return showToast('请先登录');
+            if (expandedCid === cid) return removeExpanded();
             removeExpanded();
             try {
-                const res=await fetch(DETAIL_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_DETAIL,'Content-Type':'application/x-www-form-urlencoded'},body:`key=${cid}`});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j=await res.json();
-                if(j.code===1 && j.data) {
-                    const d=document.createElement('div'); d.innerHTML=generateDetailHTML(j.data);
-                    const de=d.firstElementChild;
+                const res = await fetch(DETAIL_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_DETAIL, 'Content-Type': 'application/x-www-form-urlencoded' }, body: `key=${cid}` });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j = await res.json();
+                if (j.code === 1 && j.data) {
+                    const d = document.createElement('div'); d.innerHTML = generateDetailHTML(j.data);
+                    const de = d.firstElementChild;
                     item.insertAdjacentElement('afterend', de);
-                    expandedElement=de; expandedCid=cid;
+                    expandedElement = de; expandedCid = cid;
                     item.classList.add('selected');
-                } else throw new Error(j.msg||'获取详情失败');
-            } catch(e){ alert(`详情加载失败: ${e.message}`); }
+                } else throw new Error(j.msg || '获取详情失败');
+            } catch (e) { alert(`详情加载失败: ${e.message}`); }
         }
 
-        async function fetchPosts(page=1, kw='') {
-            if(!currentAuthorization) return showToast('请先登录');
+        async function fetchPosts(page = 1, kw = '') {
+            if (!currentAuthorization) return showToast('请先登录');
             showLoading(true); hideError(); removeExpanded();
             let body;
-            if(kw) body=`searchKey=${encodeURIComponent(kw)}&page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({status:'publish'}))}`;
-            else body=`page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({type:'post'}))}`;
+            if (kw) body = `searchKey=${encodeURIComponent(kw)}&page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({ status: 'publish' }))}`;
+            else body = `page=${page}&limit=${limit}&order=created&searchParams=${encodeURIComponent(JSON.stringify({ type: 'post' }))}`;
             try {
-                const res=await fetch(LIST_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':kw?LOCALTOKEN_SEARCH:LOCALTOKEN_LIST,'Content-Type':'application/x-www-form-urlencoded'},body});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j=await res.json();
-                if(j.code===1) {
-                    posts=j.data||[]; totalPosts=j.total||posts.length;
+                const res = await fetch(LIST_URL, {
+                    method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': kw ? LOCALTOKEN_SEARCH : LOCALTOKEN_LIST, 'Content-Type': 'application/x-www-form-urlencoded' }, body
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j = await res.json();
+                if (j.code === 1) {
+                    posts = j.data || []; totalPosts = j.total || posts.length;
                     renderList(posts);
-                    const tp=Math.ceil(totalPosts/limit);
-                    paginationEl.innerHTML=`<button id="prevPage" ${page<=1?'disabled':''}>上一页</button><span>第 ${page} / ${tp} 页</span><button id="nextPage" ${page>=tp?'disabled':''}>下一页</button>`;
-                    document.getElementById('prevPage')?.addEventListener('click',()=>{ if(currentPage>1){ currentPage--; fetchPosts(currentPage, searchMode?searchKeyword:''); }});
-                    document.getElementById('nextPage')?.addEventListener('click',()=>{ if(currentPage<tp){ currentPage++; fetchPosts(currentPage, searchMode?searchKeyword:''); }});
-                } else throw new Error(j.msg||'获取列表失败');
-            } catch(e){ showError(e.message); } finally { showLoading(false); }
+                    const tp = Math.ceil(totalPosts / limit);
+                    paginationEl.innerHTML = `<button id="prevPage" ${page <= 1 ? 'disabled' : ''}>上一页</button><span>第 ${page} / ${tp} 页</span><button id="nextPage" ${page >= tp ? 'disabled' : ''}>下一页</button>`;
+                    document.getElementById('prevPage')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; fetchPosts(currentPage, searchMode ? searchKeyword : ''); } });
+                    document.getElementById('nextPage')?.addEventListener('click', () => { if (currentPage < tp) { currentPage++; fetchPosts(currentPage, searchMode ? searchKeyword : ''); } });
+                } else throw new Error(j.msg || '获取列表失败');
+            } catch (e) { showError(e.message); } finally { showLoading(false); }
         }
 
         function renderList(posts) {
-            if(!posts.length) { postListEl.innerHTML='<div class="empty" style="padding:2rem;text-align:center;">暂无帖子</div>'; return; }
-            let html='';
-            posts.forEach(p=>{ html+=`<li class="post-item" data-cid="${p.cid}"><div class="post-title">${escapeHtml(p.title||'无标题')}</div><div class="post-meta"><span>👤 ${escapeHtml(p.authorInfo?.name||'匿名')}</span><span>📅 ${formatDate(p.created)}</span></div></li>`; });
-            postListEl.innerHTML=html;
-            document.querySelectorAll('.post-item').forEach(it=>it.addEventListener('click',e=>{ const cid=it.dataset.cid; if(cid) expandPost(cid,it); }));
+            if (!posts.length) { postListEl.innerHTML = '<div class="empty" style="padding:2rem;text-align:center;">暂无帖子</div>'; return; }
+            let html = '';
+            posts.forEach(p => {
+                html += `<li class="post-item" data-cid="${p.cid}"><div class="post-title">${escapeHtml(p.title || '无标题')}</div><div class="post-meta"><span>👤 ${escapeHtml(p.authorInfo?.name || '匿名')}</span><span>📅 ${formatDate(p.created)}</span></div></li>`;
+            });
+            postListEl.innerHTML = html;
+            document.querySelectorAll('.post-item').forEach(it => it.addEventListener('click', e => { const cid = it.dataset.cid; if (cid) expandPost(cid, it); }));
         }
 
-        async function loginWithPassword(name,pwd) {
-            modalMessage.textContent='';
+        async function loginWithPassword(name, pwd) {
+            modalMessage.textContent = '';
             try {
-                const res=await fetch(LOGIN_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`name=${encodeURIComponent(name)}&password=${encodeURIComponent(pwd)}`});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(j.code===20001) { handleSlideVerification(j.data,{name,pwd}); return; }
-                if(res.ok && j.code===1 && j.data?.token) {
-                    currentAuthorization=j.data.token; localStorage.setItem('token',currentAuthorization);
-                    modalMessage.textContent='登录成功！';
+                const res = await fetch(LOGIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `name=${encodeURIComponent(name)}&password=${encodeURIComponent(pwd)}` });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (j.code === 20001) { handleSlideVerification(j.data, { name, pwd }); return; }
+                if (res.ok && j.code === 1 && j.data?.token) {
+                    currentAuthorization = j.data.token; localStorage.setItem('token', currentAuthorization);
+                    modalMessage.textContent = '登录成功！';
                     await fetchAndStoreUserData();
-                    setTimeout(()=>{ closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); },500);
-                } else modalMessage.textContent=j.msg||'登录失败';
-            } catch(e){ modalMessage.textContent=`错误: ${e.message}`; }
+                    setTimeout(() => { closeLoginModal(); searchMode = false; searchKeyword = ''; currentPage = 1; fetchPosts(1); }, 500);
+                } else modalMessage.textContent = j.msg || '登录失败';
+            } catch (e) { modalMessage.textContent = `错误: ${e.message}`; }
         }
 
         async function loginWithToken(t) {
-            if(!t.trim()) { modalMessage.textContent='请输入Token'; return; }
-            currentAuthorization=t.trim(); localStorage.setItem('token',currentAuthorization);
+            if (!t.trim()) { modalMessage.textContent = '请输入Token'; return; }
+            currentAuthorization = t.trim(); localStorage.setItem('token', currentAuthorization);
             try {
                 await fetchAndStoreUserData();
-                modalMessage.textContent='Token登录成功！';
-                setTimeout(()=>{ closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); },500);
-            } catch(e){ modalMessage.textContent=`Token无效: ${e.message}`; localStorage.removeItem('token'); currentAuthorization=''; }
+                modalMessage.textContent = 'Token登录成功！';
+                setTimeout(() => { closeLoginModal(); searchMode = false; searchKeyword = ''; currentPage = 1; fetchPosts(1); }, 500);
+            } catch (e) { modalMessage.textContent = `Token无效: ${e.message}`; localStorage.removeItem('token'); currentAuthorization = ''; }
         }
 
-        function handleSlideVerification(data,params) {
-            pendingLoginParams=params; slideToken=data.token; slideSecretKey=data.secretKey; slideOriginalBase64=data.originalImageBase64; slideJigsawBase64=data.jigsawImageBase64;
-            passwordLoginForm.style.display='none'; tokenLoginForm.style.display='none'; loginActions.style.display='none'; modalMessage.style.display='none'; slideVerifyArea.style.display='block';
-            if(slideOriginalBase64) slideOriginal.src='data:image/png;base64,'+slideOriginalBase64;
-            if(slideJigsawBase64) slideJigsaw.src='data:image/png;base64,'+slideJigsawBase64;
-            slideRange.value=0; slideValue.textContent='0%'; slideMessage.textContent='';
+        function handleSlideVerification(data, params) {
+            pendingLoginParams = params; slideToken = data.token; slideSecretKey = data.secretKey; slideOriginalBase64 = data.originalImageBase64; slideJigsawBase64 = data.jigsawImageBase64;
+            passwordLoginForm.style.display = 'none'; tokenLoginForm.style.display = 'none'; loginActions.style.display = 'none'; modalMessage.style.display = 'none'; slideVerifyArea.style.display = 'block';
+            if (slideOriginalBase64) slideOriginal.src = 'data:image/png;base64,' + slideOriginalBase64;
+            if (slideJigsawBase64) slideJigsaw.src = 'data:image/png;base64,' + slideJigsawBase64;
+            slideRange.value = 0; slideValue.textContent = '0%'; slideMessage.textContent = '';
         }
 
-        function generatePointJson(distance,key) { return btoa(distance+':'+key); }
+        function generatePointJson(distance, key) { return btoa(distance + ':' + key); }
 
         async function confirmSlide() {
-            const d=parseInt(slideRange.value); slideMessage.textContent='验证中...';
+            const d = parseInt(slideRange.value); slideMessage.textContent = '验证中...';
             try {
-                const pj=generatePointJson(d,slideSecretKey);
-                const body=new URLSearchParams(); body.append('name',pendingLoginParams.name); body.append('password',pendingLoginParams.password); body.append('pointJson',pj); body.append('token',slideToken);
-                const res=await fetch(LOGIN_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(j.code===1 && j.data?.token) {
-                    currentAuthorization=j.data.token; localStorage.setItem('token',currentAuthorization);
-                    await fetchAndStoreUserData(); closeLoginModal(); searchMode=false; searchKeyword=''; currentPage=1; fetchPosts(1); showToast('登录成功');
-                } else slideMessage.textContent=j.msg||'登录失败';
-            } catch(e){ slideMessage.textContent=`验证错误: ${e.message}`; }
+                const pj = generatePointJson(d, slideSecretKey);
+                const body = new URLSearchParams(); body.append('name', pendingLoginParams.name); body.append('password', pendingLoginParams.password); body.append('pointJson', pj); body.append('token', slideToken);
+                const res = await fetch(LOGIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (j.code === 1 && j.data?.token) {
+                    currentAuthorization = j.data.token; localStorage.setItem('token', currentAuthorization);
+                    await fetchAndStoreUserData(); closeLoginModal(); searchMode = false; searchKeyword = ''; currentPage = 1; fetchPosts(1); showToast('登录成功');
+                } else slideMessage.textContent = j.msg || '登录失败';
+            } catch (e) { slideMessage.textContent = `验证错误: ${e.message}`; }
         }
 
         async function fetchAndStoreUserData() {
-            if(!currentAuthorization) throw new Error('未登录');
+            if (!currentAuthorization) throw new Error('未登录');
             try {
-                const res=await fetch(USER_DATA_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_USERDATA,'Content-Type':'application/x-www-form-urlencoded'},body:''});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j=await res.json();
-                if(j.code===1 && j.data) {
-                    currentUser={uid:j.data.uid, nickname:j.data.nickname||j.data.name||'未知', avatar:j.data.avatar||''};
-                    localStorage.setItem('user',JSON.stringify(currentUser));
-                    if(currentUser.avatar) { profileAvatar.src=currentUser.avatar; profileAvatar.style.display='block'; profileBtnText.style.display='none'; }
-                    else { profileAvatar.style.display='none'; profileBtnText.style.display='block'; }
-                } else throw new Error(j.msg||'获取用户信息失败');
-            } catch(e) {
-                console.error(e); localStorage.removeItem('token'); localStorage.removeItem('user'); currentAuthorization=''; currentUser=null;
-                profileAvatar.style.display='none'; profileBtnText.style.display='block'; throw e;
+                const res = await fetch(USER_DATA_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_USERDATA, 'Content-Type': 'application/x-www-form-urlencoded' }, body: '' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j = await res.json();
+                if (j.code === 1 && j.data) {
+                    currentUser = { uid: j.data.uid, nickname: j.data.nickname || j.data.name || '未知', avatar: j.data.avatar || '' };
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    if (currentUser.avatar) { profileAvatar.src = currentUser.avatar; profileAvatar.style.display = 'block'; profileBtnText.style.display = 'none'; }
+                    else { profileAvatar.style.display = 'none'; profileBtnText.style.display = 'block'; }
+                } else throw new Error(j.msg || '获取用户信息失败');
+            } catch (e) {
+                console.error(e); localStorage.removeItem('token'); localStorage.removeItem('user'); currentAuthorization = ''; currentUser = null;
+                profileAvatar.style.display = 'none'; profileBtnText.style.display = 'block'; throw e;
             }
         }
 
         function restoreFromStorage() {
-            const t=localStorage.getItem('token');
-            if(t) {
-                currentAuthorization=t;
-                const u=localStorage.getItem('user');
-                if(u) try{ currentUser=JSON.parse(u); if(currentUser.avatar){ profileAvatar.src=currentUser.avatar; profileAvatar.style.display='block'; profileBtnText.style.display='none'; } fetchPosts(1); } catch(e){ fetchAndStoreUserData().then(()=>fetchPosts(1)); }
-                else fetchAndStoreUserData().then(()=>fetchPosts(1));
+            const t = localStorage.getItem('token');
+            if (t) {
+                currentAuthorization = t;
+                const u = localStorage.getItem('user');
+                if (u) try { currentUser = JSON.parse(u); if (currentUser.avatar) { profileAvatar.src = currentUser.avatar; profileAvatar.style.display = 'block'; profileBtnText.style.display = 'none'; } fetchPosts(1); } catch (e) { fetchAndStoreUserData().then(() => fetchPosts(1)); }
+                else fetchAndStoreUserData().then(() => fetchPosts(1));
             } else showToast('请先登录');
         }
 
         async function sendCode(mail) {
-            if(!mail) { registerMessage.textContent='请输入邮箱'; return false; }
-            registerMessage.textContent='发送中...';
+            if (!mail) { registerMessage.textContent = '请输入邮箱'; return false; }
+            registerMessage.textContent = '发送中...';
             try {
-                const res=await fetch(SEND_CODE_URL,{method:'POST',headers:{'localtoken':LOCALTOKEN_SENDCODE,'Content-Type':'application/x-www-form-urlencoded'},body:`mail=${encodeURIComponent(mail)}`});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(res.ok && j.code===1) { registerMessage.textContent='验证码发送成功'; return true; } else { registerMessage.textContent=j.msg||'发送失败'; return false; }
-            } catch(e){ registerMessage.textContent=`错误: ${e.message}`; return false; }
+                const res = await fetch(SEND_CODE_URL, { method: 'POST', headers: { 'localtoken': LOCALTOKEN_SENDCODE, 'Content-Type': 'application/x-www-form-urlencoded' }, body: `mail=${encodeURIComponent(mail)}` });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (res.ok && j.code === 1) { registerMessage.textContent = '验证码发送成功'; return true; } else { registerMessage.textContent = j.msg || '发送失败'; return false; }
+            } catch (e) { registerMessage.textContent = `错误: ${e.message}`; return false; }
         }
 
-        async function register(mail,code,pwd) {
-            registerMessage.textContent='';
-            const name=mail.split('@')[0]; const body=new URLSearchParams(); body.append('name',name); body.append('code',code); body.append('password',pwd); body.append('mail',mail);
+        async function register(mail, code, pwd) {
+            registerMessage.textContent = '';
+            const name = mail.split('@')[0]; const body = new URLSearchParams(); body.append('name', name); body.append('code', code); body.append('password', pwd); body.append('mail', mail);
             try {
-                const res=await fetch(REGISTER_URL,{method:'POST',headers:{'localtoken':LOCALTOKEN_REGISTER,'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(res.ok && j.code===1) { registerMessage.textContent='注册成功！'; setTimeout(()=>{ closeRegisterModal(); showToast('注册成功，请登录'); },500); return true; } else { registerMessage.textContent=j.msg||'注册失败'; return false; }
-            } catch(e){ registerMessage.textContent=`错误: ${e.message}`; return false; }
+                const res = await fetch(REGISTER_URL, { method: 'POST', headers: { 'localtoken': LOCALTOKEN_REGISTER, 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (res.ok && j.code === 1) { registerMessage.textContent = '注册成功！'; setTimeout(() => { closeRegisterModal(); showToast('注册成功，请登录'); }, 500); return true; } else { registerMessage.textContent = j.msg || '注册失败'; return false; }
+            } catch (e) { registerMessage.textContent = `错误: ${e.message}`; return false; }
         }
 
-        async function addPost(title,content) {
-            if(!currentAuthorization) return showToast('请先登录');
-            if(!title.trim()||!content.trim()) { postMessage.textContent='标题和内容不能为空'; return; }
-            postMessage.textContent='';
-            const delta=JSON.stringify([{insert:content}]); const body=new URLSearchParams(); body.append('title',title); body.append('sections','13'); body.append('text',delta); body.append('token',currentAuthorization); body.append('isMd','0');
+        async function addPost(title, content) {
+            if (!currentAuthorization) return showToast('请先登录');
+            if (!title.trim() || !content.trim()) { postMessage.textContent = '标题和内容不能为空'; return; }
+            postMessage.textContent = '';
+            const delta = JSON.stringify([{ insert: content }]); const body = new URLSearchParams(); body.append('title', title); body.append('sections', '13'); body.append('text', delta); body.append('token', currentAuthorization); body.append('isMd', '0');
             try {
-                const res=await fetch(POST_ADD_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_POSTADD,'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(res.ok && j.code===1) { showToast('发布成功'); closePostModal(); fetchPosts(currentPage, searchMode?searchKeyword:''); } else postMessage.textContent=`发布失败: ${j.msg||'未知错误'}`;
-            } catch(e){ postMessage.textContent=`错误: ${e.message}`; }
+                const res = await fetch(POST_ADD_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_POSTADD, 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (res.ok && j.code === 1) { showToast('发布成功'); closePostModal(); fetchPosts(currentPage, searchMode ? searchKeyword : ''); } else postMessage.textContent = `发布失败: ${j.msg || '未知错误'}`;
+            } catch (e) { postMessage.textContent = `错误: ${e.message}`; }
         }
 
         async function signIn() {
-            if(!currentAuthorization) return showToast('请先登录');
+            if (!currentAuthorization) return showToast('请先登录');
             try {
-                const res=await fetch(SIGN_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_SIGN,'Content-Type':'application/x-www-form-urlencoded'},body:''});
-                const txt=await res.text(); let j; try{j=JSON.parse(txt);}catch{throw new Error('非JSON');}
-                if(res.ok && j.code===1) showToast(j.msg||'签到成功'); else showToast(j.msg||'签到失败');
-            } catch(e){ showToast(`错误: ${e.message}`); }
+                const res = await fetch(SIGN_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_SIGN, 'Content-Type': 'application/x-www-form-urlencoded' }, body: '' });
+                const txt = await res.text(); let j; try { j = JSON.parse(txt); } catch { throw new Error('非JSON'); }
+                if (res.ok && j.code === 1) showToast(j.msg || '签到成功'); else showToast(j.msg || '签到失败');
+            } catch (e) { showToast(`错误: ${e.message}`); }
         }
 
         async function fetchUserDataForProfile() {
-            if(!currentAuthorization) { showToast('请先登录'); closeProfileModal(); return; }
-            profileContent.innerHTML='<div style="text-align:center;">加载中...</div>';
+            if (!currentAuthorization) { showToast('请先登录'); closeProfileModal(); return; }
+            profileContent.innerHTML = '<div style="text-align:center;">加载中...</div>';
             try {
-                const res=await fetch(USER_DATA_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_USERDATA,'Content-Type':'application/x-www-form-urlencoded'},body:''});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j=await res.json();
-                if(j.code===1 && j.data) {
-                    const d=j.data, created=formatDate(d.created), permsName=d.perms?.name||'未知', nickname=d.nickname||d.name||'未知', avatar=d.avatar||'';
-                    profileContent.innerHTML=`<div style="display:flex; flex-direction:column; gap:0.8rem;"><div style="display:flex; align-items:center; gap:1rem;"><img src="${escapeHtml(avatar)}" class="avatar" style="width:60px;height:60px;border-radius:30px;object-fit:cover;"><span style="font-size:1.2rem;">${escapeHtml(nickname)}</span></div><div><span class="info-label">UID：</span>${d.uid||'-'}</div><div><span class="info-label">经验：</span>${d.experience||0}</div><div><span class="info-label">粉丝：</span>${d.fanNum||0}</div><div><span class="info-label">关注：</span>${d.followNum||0}</div><div><span class="info-label">点赞数：</span>${d.totalLikes||0}</div><div><span class="info-label">注册时间：</span>${created}</div><div><span class="info-label">连续签到：</span>${d.consSignIn||0}</div><div><span class="info-label">今日签到：</span>${d.isClock?'已签':'未签'}</div><div><span class="info-label">用户组：</span>${permsName}</div></div>`;
-                } else throw new Error(j.msg||'获取失败');
-            } catch(e){ profileContent.innerHTML=`<div style="color:var(--danger);">错误: ${e.message}</div>`; }
+                const res = await fetch(USER_DATA_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_USERDATA, 'Content-Type': 'application/x-www-form-urlencoded' }, body: '' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j = await res.json();
+                if (j.code === 1 && j.data) {
+                    const d = j.data, created = formatDate(d.created), permsName = d.perms?.name || '未知', nickname = d.nickname || d.name || '未知', avatar = d.avatar || '';
+                    profileContent.innerHTML = `<div style="display:flex; flex-direction:column; gap:0.8rem;"><div style="display:flex; align-items:center; gap:1rem;"><img src="${escapeHtml(avatar)}" class="avatar" style="width:60px;height:60px;border-radius:30px;object-fit:cover;"><span style="font-size:1.2rem;">${escapeHtml(nickname)}</span></div><div><span class="info-label">UID：</span>${d.uid || '-'}</div><div><span class="info-label">经验：</span>${d.experience || 0}</div><div><span class="info-label">粉丝：</span>${d.fanNum || 0}</div><div><span class="info-label">关注：</span>${d.followNum || 0}</div><div><span class="info-label">点赞数：</span>${d.totalLikes || 0}</div><div><span class="info-label">注册时间：</span>${created}</div><div><span class="info-label">连续签到：</span>${d.consSignIn || 0}</div><div><span class="info-label">今日签到：</span>${d.isClock ? '已签' : '未签'}</div><div><span class="info-label">用户组：</span>${permsName}</div></div>`;
+                } else throw new Error(j.msg || '获取失败');
+            } catch (e) { profileContent.innerHTML = `<div style="color:var(--danger);">错误: ${e.message}</div>`; }
         }
 
-        async function fetchInbox(page=1) {
-            if(!currentAuthorization) { showToast('请先登录'); closeInboxModal(); return; }
-            inboxContent.innerHTML='<div style="text-align:center;">加载中...</div>'; inboxPagination.style.display='none';
+        async function fetchInbox(page = 1) {
+            if (!currentAuthorization) { showToast('请先登录'); closeInboxModal(); return; }
+            inboxContent.innerHTML = '<div style="text-align:center;">加载中...</div>'; inboxPagination.style.display = 'none';
             try {
-                const res=await fetch(INBOX_URL,{method:'POST',headers:{'Authorization':currentAuthorization,'localtoken':LOCALTOKEN_INBOX,'Content-Type':'application/x-www-form-urlencoded'},body:`type=system&page=${page}&limit=${inboxLimit}`});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const j=await res.json();
-                if(j.code===1 && j.data) {
-                    inboxMessages=j.data; inboxTotal=j.total||0;
-                    if(!inboxMessages.length) { inboxContent.innerHTML='<div style="text-align:center;">暂无系统消息</div>'; inboxPagination.style.display='none'; return; }
-                    let html='<div class="message-list">';
-                    inboxMessages.forEach(m=>{ const a=m.authorInfo||{}, av=a.avatar||'', nm=a.name||'系统', tm=formatDate(m.created), txt=m.text||''; html+=`<div class="message-item"><div class="message-avatar"><img src="${escapeHtml(av)}" class="avatar" onerror="this.style.display='none';this.parentElement.innerHTML='👤';"></div><div class="message-content"><div class="message-header"><span class="message-name">${escapeHtml(nm)}</span><span class="message-time">${escapeHtml(tm)}</span></div><div class="message-text">${escapeHtml(txt)}</div></div></div>`; });
-                    html+='</div>'; inboxContent.innerHTML=html;
-                    const tp=Math.ceil(inboxTotal/inboxLimit);
-                    inboxPageInfo.textContent=`第 ${page} / ${tp} 页`; inboxPrevPage.disabled=page<=1; inboxNextPage.disabled=page>=tp; inboxPagination.style.display='flex';
-                } else throw new Error(j.msg||'获取失败');
-            } catch(e){ inboxContent.innerHTML=`<div style="color:var(--danger);">错误: ${e.message}</div>`; }
+                const res = await fetch(INBOX_URL, { method: 'POST', headers: { 'Authorization': currentAuthorization, 'localtoken': LOCALTOKEN_INBOX, 'Content-Type': 'application/x-www-form-urlencoded' }, body: `type=system&page=${page}&limit=${inboxLimit}` });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const j = await res.json();
+                if (j.code === 1 && j.data) {
+                    inboxMessages = j.data; inboxTotal = j.total || 0;
+                    if (!inboxMessages.length) { inboxContent.innerHTML = '<div style="text-align:center;">暂无系统消息</div>'; inboxPagination.style.display = 'none'; return; }
+                    let html = '<div class="message-list">';
+                    inboxMessages.forEach(m => { const a = m.authorInfo || {}, av = a.avatar || '', nm = a.name || '系统', tm = formatDate(m.created), txt = m.text || ''; html += `<div class="message-item"><div class="message-avatar"><img src="${escapeHtml(av)}" class="avatar" onerror="this.style.display='none';this.parentElement.innerHTML='👤';"></div><div class="message-content"><div class="message-header"><span class="message-name">${escapeHtml(nm)}</span><span class="message-time">${escapeHtml(tm)}</span></div><div class="message-text">${escapeHtml(txt)}</div></div></div>`; });
+                    html += '</div>'; inboxContent.innerHTML = html;
+                    const tp = Math.ceil(inboxTotal / inboxLimit);
+                    inboxPageInfo.textContent = `第 ${page} / ${tp} 页`; inboxPrevPage.disabled = page <= 1; inboxNextPage.disabled = page >= tp; inboxPagination.style.display = 'flex';
+                } else throw new Error(j.msg || '获取失败');
+            } catch (e) { inboxContent.innerHTML = `<div style="color:var(--danger);">错误: ${e.message}</div>`; }
         }
 
         // 发送群组图片消息
@@ -1211,7 +1360,7 @@
             try {
                 const body = new URLSearchParams();
                 body.append('chatid', GROUP_CHAT_ID);
-                body.append('type', '1'); // 图片类型
+                body.append('type', '1');
                 body.append('url', url);
                 body.append('msg', msg);
 
@@ -1263,7 +1412,7 @@
                 const body = new URLSearchParams();
                 body.append('chatid', GROUP_CHAT_ID);
                 body.append('touid', GROUP_TO_UID);
-                body.append('type', '0'); // 文本类型
+                body.append('type', '0');
                 body.append('msg', msg);
 
                 const response = await fetch(SEND_MSG_URL, {
@@ -1300,71 +1449,143 @@
             }
         }
 
+        // 获取群组消息记录
+        async function fetchChatMsgList() {
+            if (!currentAuthorization) {
+                showToast('请先登录');
+                closeChatMsgListModal();
+                return;
+            }
+            chatMsgListContent.innerHTML = '<div style="text-align:center;">加载中...</div>';
+            try {
+                const body = `chatid=${GROUP_CHAT_ID}&page=1&limit=200`;
+                const response = await fetch(CHAT_MSG_LIST_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': currentAuthorization,
+                        'localtoken': LOCALTOKEN_CHAT_LIST,
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: body
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const json = await response.json();
+                if (json.code === 1 && json.data) {
+                    renderChatMsgList(json.data);
+                } else {
+                    throw new Error(json.msg || '获取消息失败');
+                }
+            } catch (e) {
+                chatMsgListContent.innerHTML = `<div style="color:var(--danger);">错误: ${e.message}</div>`;
+            }
+        }
+
+        // 渲染群组消息列表
+        function renderChatMsgList(messages) {
+            if (!messages || messages.length === 0) {
+                chatMsgListContent.innerHTML = '<div style="text-align:center;">暂无消息</div>';
+                return;
+            }
+
+            let html = '';
+            messages.forEach(msg => {
+                const user = msg.userJson || {};
+                const avatar = user.avatar || '';
+                const name = user.name || '未知用户';
+                const time = formatDate(msg.created);
+                const type = msg.type;
+                const text = msg.text || '';
+                const url = msg.url || '';
+
+                html += '<div class="chat-message-item">';
+                html += `<div class="chat-avatar"><img src="${escapeHtml(avatar)}" onerror="this.style.display='none';this.parentElement.innerHTML='👤';"></div>`;
+                html += '<div class="chat-content">';
+                html += `<div class="chat-header"><span class="chat-name">${escapeHtml(name)}</span><span class="chat-time">${escapeHtml(time)}</span></div>`;
+                if (type === 0) {
+                    html += `<div class="chat-text">${escapeHtml(text)}</div>`;
+                } else if (type === 1) {
+                    html += `<div><img src="${escapeHtml(url)}" class="chat-image" onclick="window.open('${escapeHtml(url)}','_blank')"></div>`;
+                } else if (type === 2) {
+                    html += `<div class="chat-text" style="color:var(--danger);">[系统] ${escapeHtml(text)}</div>`;
+                }
+                html += '</div></div>';
+            });
+            chatMsgListContent.innerHTML = html;
+        }
+
         // 模态框控制
         function openLoginModal() {
-            loginModal.style.display='flex'; modalLoginName.value=''; modalLoginPassword.value=''; modalToken.value=''; modalMessage.textContent=''; setLoginMode('password');
-            slideVerifyArea.style.display='none'; passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; loginActions.style.display='flex'; modalMessage.style.display='block';
+            loginModal.style.display = 'flex'; modalLoginName.value = ''; modalLoginPassword.value = ''; modalToken.value = ''; modalMessage.textContent = ''; setLoginMode('password');
+            slideVerifyArea.style.display = 'none'; passwordLoginForm.style.display = 'block'; tokenLoginForm.style.display = 'none'; loginActions.style.display = 'flex'; modalMessage.style.display = 'block';
         }
-        function closeLoginModal() { loginModal.style.display='none'; }
-        function setLoginMode(m) { loginMode=m; if(m==='password'){ loginPasswordTab.classList.add('active'); loginTokenTab.classList.remove('active'); passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; } else { loginPasswordTab.classList.remove('active'); loginTokenTab.classList.add('active'); passwordLoginForm.style.display='none'; tokenLoginForm.style.display='block'; } }
-        function openRegisterModal() { registerModal.style.display='flex'; regMail.value=''; regCode.value=''; regPassword.value=''; registerMessage.textContent=''; }
-        function closeRegisterModal() { registerModal.style.display='none'; }
-        function openProfileModal() { profileModal.style.display='flex'; fetchUserDataForProfile(); }
-        function closeProfileModal() { profileModal.style.display='none'; }
-        function openPostModal() { postModal.classList.add('show'); postTitle.value=''; postContent.value=''; postMessage.textContent=''; }
+        function closeLoginModal() { loginModal.style.display = 'none'; }
+        function setLoginMode(m) {
+            loginMode = m; if (m === 'password') { loginPasswordTab.classList.add('active'); loginTokenTab.classList.remove('active'); passwordLoginForm.style.display = 'block'; tokenLoginForm.style.display = 'none'; } else { loginPasswordTab.classList.remove('active'); loginTokenTab.classList.add('active'); passwordLoginForm.style.display = 'none'; tokenLoginForm.style.display = 'block'; }
+        }
+        function openRegisterModal() { registerModal.style.display = 'flex'; regMail.value = ''; regCode.value = ''; regPassword.value = ''; registerMessage.textContent = ''; }
+        function closeRegisterModal() { registerModal.style.display = 'none'; }
+        function openProfileModal() { profileModal.style.display = 'flex'; fetchUserDataForProfile(); }
+        function closeProfileModal() { profileModal.style.display = 'none'; }
+        function openPostModal() { postModal.classList.add('show'); postTitle.value = ''; postContent.value = ''; postMessage.textContent = ''; }
         function closePostModal() { postModal.classList.remove('show'); }
-        function openSearchModal() { searchModal.style.display='flex'; searchKeywordInput.value=searchKeyword; searchMessage.textContent=''; }
-        function closeSearchModal() { searchModal.style.display='none'; }
-        function openInboxModal() { inboxModal.style.display='flex'; inboxPage=1; fetchInbox(1); }
-        function closeInboxModal() { inboxModal.style.display='none'; }
-        function openSendImageMsgModal() { sendImageMsgModal.style.display='flex'; imgUrl.value=''; imgMsg.value=''; sendImageMsgResult.textContent=''; sendImageMsgResult.style.color='var(--danger)'; }
-        function closeSendImageMsgModal() { sendImageMsgModal.style.display='none'; }
-        function openSendTextMsgModal() { sendTextMsgModal.style.display='flex'; textMsg.value=''; sendTextMsgResult.textContent=''; sendTextMsgResult.style.color='var(--danger)'; }
-        function closeSendTextMsgModal() { sendTextMsgModal.style.display='none'; }
+        function openSearchModal() { searchModal.style.display = 'flex'; searchKeywordInput.value = searchKeyword; searchMessage.textContent = ''; }
+        function closeSearchModal() { searchModal.style.display = 'none'; }
+        function openInboxModal() { inboxModal.style.display = 'flex'; inboxPage = 1; fetchInbox(1); }
+        function closeInboxModal() { inboxModal.style.display = 'none'; }
+        function openSendImageMsgModal() { sendImageMsgModal.style.display = 'flex'; imgUrl.value = ''; imgMsg.value = ''; sendImageMsgResult.textContent = ''; sendImageMsgResult.style.color = 'var(--danger)'; }
+        function closeSendImageMsgModal() { sendImageMsgModal.style.display = 'none'; }
+        function openSendTextMsgModal() { sendTextMsgModal.style.display = 'flex'; textMsg.value = ''; sendTextMsgResult.textContent = ''; sendTextMsgResult.style.color = 'var(--danger)'; }
+        function closeSendTextMsgModal() { sendTextMsgModal.style.display = 'none'; }
+        function openChatMsgListModal() { chatMsgListModal.style.display = 'flex'; fetchChatMsgList(); }
+        function closeChatMsgListModal() { chatMsgListModal.style.display = 'none'; }
 
         // 事件绑定
-        loginBtn.addEventListener('click',openLoginModal);
-        registerBtn.addEventListener('click',openRegisterModal);
-        inboxBtn.addEventListener('click',openInboxModal);
-        sendImageMsgBtn.addEventListener('click',openSendImageMsgModal);
-        sendTextMsgBtn.addEventListener('click',openSendTextMsgModal);
-        modalCancel.addEventListener('click',closeLoginModal);
-        modalSubmit.addEventListener('click',()=>{
-            if(loginMode==='password'){ const n=modalLoginName.value.trim(), p=modalLoginPassword.value.trim(); if(!n||!p) { modalMessage.textContent='请输入用户名和密码'; return; } loginWithPassword(n,p); }
-            else { const t=modalToken.value.trim(); loginWithToken(t); }
+        loginBtn.addEventListener('click', openLoginModal);
+        registerBtn.addEventListener('click', openRegisterModal);
+        inboxBtn.addEventListener('click', openInboxModal);
+        sendImageMsgBtn.addEventListener('click', openSendImageMsgModal);
+        sendTextMsgBtn.addEventListener('click', openSendTextMsgModal);
+        chatMsgListBtn.addEventListener('click', openChatMsgListModal);
+        modalCancel.addEventListener('click', closeLoginModal);
+        modalSubmit.addEventListener('click', () => {
+            if (loginMode === 'password') { const n = modalLoginName.value.trim(), p = modalLoginPassword.value.trim(); if (!n || !p) { modalMessage.textContent = '请输入用户名和密码'; return; } loginWithPassword(n, p); }
+            else { const t = modalToken.value.trim(); loginWithToken(t); }
         });
-        loginPasswordTab.addEventListener('click',()=>setLoginMode('password'));
-        loginTokenTab.addEventListener('click',()=>setLoginMode('token'));
-        loginModal.addEventListener('click',e=>{ if(e.target===loginModal) closeLoginModal(); });
-        slideCancel.addEventListener('click',()=>{ slideVerifyArea.style.display='none'; passwordLoginForm.style.display='block'; tokenLoginForm.style.display='none'; loginActions.style.display='flex'; modalMessage.style.display='block'; setLoginMode(loginMode); });
-        slideConfirm.addEventListener('click',confirmSlide);
-        slideRange.addEventListener('input',e=>{ slideValue.textContent=e.target.value+'%'; });
-        registerCancel.addEventListener('click',closeRegisterModal);
-        sendCodeBtn.addEventListener('click',async()=>{ const m=regMail.value.trim(); await sendCode(m); });
-        registerSubmit.addEventListener('click',async()=>{ const m=regMail.value.trim(), c=regCode.value.trim(), p=regPassword.value.trim(); if(!m||!c||!p) { registerMessage.textContent='请填写所有字段'; return; } await register(m,c,p); });
-        registerModal.addEventListener('click',e=>{ if(e.target===registerModal) closeRegisterModal(); });
-        postFloatBtn.addEventListener('click',openPostModal);
-        postCancel.addEventListener('click',closePostModal);
-        postSubmit.addEventListener('click',()=>{ const t=postTitle.value.trim(), c=postContent.value.trim(); addPost(t,c); });
-        signBtn.addEventListener('click',signIn);
-        profileBtn.addEventListener('click',openProfileModal);
-        profileClose.addEventListener('click',closeProfileModal);
-        profileModal.addEventListener('click',e=>{ if(e.target===profileModal) closeProfileModal(); });
-        searchBtn.addEventListener('click',openSearchModal);
-        searchCancel.addEventListener('click',closeSearchModal);
-        searchSubmit.addEventListener('click',()=>{ const kw=searchKeywordInput.value.trim(); if(!kw){ searchMessage.textContent='请输入关键词'; return; } searchMode=true; searchKeyword=kw; currentPage=1; closeSearchModal(); fetchPosts(1,kw); });
-        searchAllBtn.addEventListener('click',()=>{ searchMode=false; searchKeyword=''; currentPage=1; closeSearchModal(); fetchPosts(1); });
-        searchModal.addEventListener('click',e=>{ if(e.target===searchModal) closeSearchModal(); });
-        inboxPrevPage.addEventListener('click',()=>{ if(inboxPage>1){ inboxPage--; fetchInbox(inboxPage); } });
-        inboxNextPage.addEventListener('click',()=>{ inboxPage++; fetchInbox(inboxPage); });
-        inboxClose.addEventListener('click',closeInboxModal);
-        inboxModal.addEventListener('click',e=>{ if(e.target===inboxModal) closeInboxModal(); });
-        sendImageMsgCancel.addEventListener('click',closeSendImageMsgModal);
-        sendImageMsgSubmit.addEventListener('click',sendImageMsg);
-        sendImageMsgModal.addEventListener('click',e=>{ if(e.target===sendImageMsgModal) closeSendImageMsgModal(); });
-        sendTextMsgCancel.addEventListener('click',closeSendTextMsgModal);
-        sendTextMsgSubmit.addEventListener('click',sendTextMsg);
-        sendTextMsgModal.addEventListener('click',e=>{ if(e.target===sendTextMsgModal) closeSendTextMsgModal(); });
+        loginPasswordTab.addEventListener('click', () => setLoginMode('password'));
+        loginTokenTab.addEventListener('click', () => setLoginMode('token'));
+        loginModal.addEventListener('click', e => { if (e.target === loginModal) closeLoginModal(); });
+        slideCancel.addEventListener('click', () => { slideVerifyArea.style.display = 'none'; passwordLoginForm.style.display = 'block'; tokenLoginForm.style.display = 'none'; loginActions.style.display = 'flex'; modalMessage.style.display = 'block'; setLoginMode(loginMode); });
+        slideConfirm.addEventListener('click', confirmSlide);
+        slideRange.addEventListener('input', e => { slideValue.textContent = e.target.value + '%'; });
+        registerCancel.addEventListener('click', closeRegisterModal);
+        sendCodeBtn.addEventListener('click', async () => { const m = regMail.value.trim(); await sendCode(m); });
+        registerSubmit.addEventListener('click', async () => { const m = regMail.value.trim(), c = regCode.value.trim(), p = regPassword.value.trim(); if (!m || !c || !p) { registerMessage.textContent = '请填写所有字段'; return; } await register(m, c, p); });
+        registerModal.addEventListener('click', e => { if (e.target === registerModal) closeRegisterModal(); });
+        postFloatBtn.addEventListener('click', openPostModal);
+        postCancel.addEventListener('click', closePostModal);
+        postSubmit.addEventListener('click', () => { const t = postTitle.value.trim(), c = postContent.value.trim(); addPost(t, c); });
+        signBtn.addEventListener('click', signIn);
+        profileBtn.addEventListener('click', openProfileModal);
+        profileClose.addEventListener('click', closeProfileModal);
+        profileModal.addEventListener('click', e => { if (e.target === profileModal) closeProfileModal(); });
+        searchBtn.addEventListener('click', openSearchModal);
+        searchCancel.addEventListener('click', closeSearchModal);
+        searchSubmit.addEventListener('click', () => { const kw = searchKeywordInput.value.trim(); if (!kw) { searchMessage.textContent = '请输入关键词'; return; } searchMode = true; searchKeyword = kw; currentPage = 1; closeSearchModal(); fetchPosts(1, kw); });
+        searchAllBtn.addEventListener('click', () => { searchMode = false; searchKeyword = ''; currentPage = 1; closeSearchModal(); fetchPosts(1); });
+        searchModal.addEventListener('click', e => { if (e.target === searchModal) closeSearchModal(); });
+        inboxPrevPage.addEventListener('click', () => { if (inboxPage > 1) { inboxPage--; fetchInbox(inboxPage); } });
+        inboxNextPage.addEventListener('click', () => { inboxPage++; fetchInbox(inboxPage); });
+        inboxClose.addEventListener('click', closeInboxModal);
+        inboxModal.addEventListener('click', e => { if (e.target === inboxModal) closeInboxModal(); });
+        sendImageMsgCancel.addEventListener('click', closeSendImageMsgModal);
+        sendImageMsgSubmit.addEventListener('click', sendImageMsg);
+        sendImageMsgModal.addEventListener('click', e => { if (e.target === sendImageMsgModal) closeSendImageMsgModal(); });
+        sendTextMsgCancel.addEventListener('click', closeSendTextMsgModal);
+        sendTextMsgSubmit.addEventListener('click', sendTextMsg);
+        sendTextMsgModal.addEventListener('click', e => { if (e.target === sendTextMsgModal) closeSendTextMsgModal(); });
+        chatMsgListClose.addEventListener('click', closeChatMsgListModal);
+        chatMsgListModal.addEventListener('click', e => { if (e.target === chatMsgListModal) closeChatMsgListModal(); });
 
         // 初始化
         restoreFromStorage();

@@ -620,8 +620,8 @@
                 <button id="loginBtn">登录</button>
                 <button id="registerBtn">注册</button>
                 <button id="inboxBtn">系统消息</button>
-                <button id="sendImageMsgBtn">发送图片私信</button>
-                <button id="sendTextMsgBtn">发送文本私信</button>
+                <button id="sendImageMsgBtn">群组图片消息</button>
+                <button id="sendTextMsgBtn">群组文本消息</button>
             </div>
         </div>
     </div>
@@ -717,11 +717,10 @@
         </div>
     </div>
 
-    <!-- 发送图片私信模态框 -->
+    <!-- 群组图片消息模态框 -->
     <div id="sendImageMsgModal" class="modal-overlay" style="display: none;">
         <div class="modal">
-            <h3>发送图片私信</h3>
-            <input type="text" id="imgChatId" placeholder="聊天ID (必填)">
+            <h3>群组图片消息</h3>
             <input type="text" id="imgUrl" placeholder="图片链接 (必填)">
             <textarea id="imgMsg" placeholder="消息内容 (可选)" rows="2"></textarea>
             <div id="sendImageMsgResult" class="modal-message"></div>
@@ -732,13 +731,11 @@
         </div>
     </div>
 
-    <!-- 发送文本私信模态框 -->
+    <!-- 群组文本消息模态框 -->
     <div id="sendTextMsgModal" class="modal-overlay" style="display: none;">
         <div class="modal">
-            <h3>发送文本私信</h3>
-            <input type="text" id="textChatId" placeholder="聊天ID (必填)">
-            <input type="text" id="textToUid" placeholder="对方UID (必填)">
-            <textarea id="textMsg" placeholder="消息内容 (必填)" rows="3"></textarea>
+            <h3>群组文本消息</h3>
+            <textarea id="textMsg" placeholder="消息内容 (必填)" rows="4"></textarea>
             <div id="sendTextMsgResult" class="modal-message"></div>
             <div class="modal-actions">
                 <button id="sendTextMsgCancel">取消</button>
@@ -817,6 +814,10 @@
         const LOCALTOKEN_SEND_IMAGE = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+x3vkt2uUazFYttQKGq0fjg==';
         // 文本私信 localtoken（您提供的第二个）
         const LOCALTOKEN_SEND_TEXT = 'fXDRrwQ+90IyeHSKSsIC94HVoUKTAEeMs6OeCl+fGj7Y2YjFDjL1+1lMauSjk2o/055h2aTVXWMLmzSEKKiPxhaqwJ2hlqVzr0m9iu4tDpWBkm3jVlOKc+0WAorplIK+rl2SZbaSlXkbLbCazntDiw==';
+
+        // 固定群组参数
+        const GROUP_CHAT_ID = '14';
+        const GROUP_TO_UID = '1';
 
         // 状态
         let currentAuthorization = localStorage.getItem('token') || '';
@@ -904,21 +905,18 @@
         const nightModeBtn = document.getElementById('nightModeBtn');
         const body = document.body;
 
-        // 图片私信相关
+        // 图片群聊相关
         const sendImageMsgBtn = document.getElementById('sendImageMsgBtn');
         const sendImageMsgModal = document.getElementById('sendImageMsgModal');
-        const imgChatId = document.getElementById('imgChatId');
         const imgUrl = document.getElementById('imgUrl');
         const imgMsg = document.getElementById('imgMsg');
         const sendImageMsgResult = document.getElementById('sendImageMsgResult');
         const sendImageMsgCancel = document.getElementById('sendImageMsgCancel');
         const sendImageMsgSubmit = document.getElementById('sendImageMsgSubmit');
 
-        // 文本私信相关
+        // 文本群聊相关
         const sendTextMsgBtn = document.getElementById('sendTextMsgBtn');
         const sendTextMsgModal = document.getElementById('sendTextMsgModal');
-        const textChatId = document.getElementById('textChatId');
-        const textToUid = document.getElementById('textToUid');
         const textMsg = document.getElementById('textMsg');
         const sendTextMsgResult = document.getElementById('sendTextMsgResult');
         const sendTextMsgCancel = document.getElementById('sendTextMsgCancel');
@@ -1199,16 +1197,11 @@
             } catch(e){ inboxContent.innerHTML=`<div style="color:var(--danger);">错误: ${e.message}</div>`; }
         }
 
-        // 发送图片私信
+        // 发送群组图片消息
         async function sendImageMsg() {
-            const chatId = imgChatId.value.trim();
             const url = imgUrl.value.trim();
             const msg = imgMsg.value.trim();
 
-            if (!chatId) {
-                sendImageMsgResult.textContent = '聊天ID不能为空';
-                return;
-            }
             if (!url) {
                 sendImageMsgResult.textContent = '图片链接不能为空';
                 return;
@@ -1217,7 +1210,7 @@
             sendImageMsgResult.textContent = '发送中...';
             try {
                 const body = new URLSearchParams();
-                body.append('chatid', chatId);
+                body.append('chatid', GROUP_CHAT_ID);
                 body.append('type', '1'); // 图片类型
                 body.append('url', url);
                 body.append('msg', msg);
@@ -1256,20 +1249,10 @@
             }
         }
 
-        // 发送文本私信
+        // 发送群组文本消息
         async function sendTextMsg() {
-            const chatId = textChatId.value.trim();
-            const toUid = textToUid.value.trim();
             const msg = textMsg.value.trim();
 
-            if (!chatId) {
-                sendTextMsgResult.textContent = '聊天ID不能为空';
-                return;
-            }
-            if (!toUid) {
-                sendTextMsgResult.textContent = '对方UID不能为空';
-                return;
-            }
             if (!msg) {
                 sendTextMsgResult.textContent = '消息内容不能为空';
                 return;
@@ -1278,8 +1261,8 @@
             sendTextMsgResult.textContent = '发送中...';
             try {
                 const body = new URLSearchParams();
-                body.append('chatid', chatId);
-                body.append('touid', toUid);
+                body.append('chatid', GROUP_CHAT_ID);
+                body.append('touid', GROUP_TO_UID);
                 body.append('type', '0'); // 文本类型
                 body.append('msg', msg);
 
@@ -1334,9 +1317,9 @@
         function closeSearchModal() { searchModal.style.display='none'; }
         function openInboxModal() { inboxModal.style.display='flex'; inboxPage=1; fetchInbox(1); }
         function closeInboxModal() { inboxModal.style.display='none'; }
-        function openSendImageMsgModal() { sendImageMsgModal.style.display='flex'; imgChatId.value=''; imgUrl.value=''; imgMsg.value=''; sendImageMsgResult.textContent=''; sendImageMsgResult.style.color='var(--danger)'; }
+        function openSendImageMsgModal() { sendImageMsgModal.style.display='flex'; imgUrl.value=''; imgMsg.value=''; sendImageMsgResult.textContent=''; sendImageMsgResult.style.color='var(--danger)'; }
         function closeSendImageMsgModal() { sendImageMsgModal.style.display='none'; }
-        function openSendTextMsgModal() { sendTextMsgModal.style.display='flex'; textChatId.value=''; textToUid.value=''; textMsg.value=''; sendTextMsgResult.textContent=''; sendTextMsgResult.style.color='var(--danger)'; }
+        function openSendTextMsgModal() { sendTextMsgModal.style.display='flex'; textMsg.value=''; sendTextMsgResult.textContent=''; sendTextMsgResult.style.color='var(--danger)'; }
         function closeSendTextMsgModal() { sendTextMsgModal.style.display='none'; }
 
         // 事件绑定

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>软软的小窝 · 反馈（分类版）</title>
+    <title>软软的小窝 · 反馈</title>
     <style>
         * {
             margin: 0;
@@ -33,7 +33,6 @@
             color: #aaa;
             letter-spacing: 1px;
         }
-        /* 分类控件组 */
         .feedback-meta {
             background: #0a0a0a;
             border-radius: 16px;
@@ -75,7 +74,9 @@
             background: #111;
             color: #eee;
         }
-        /* 动态容器 */
+        .meta-row select option:disabled {
+            color: #555;
+        }
         .dynamic-container {
             margin-top: 0.5rem;
             border-left: 2px solid #2a5c2a;
@@ -150,39 +151,47 @@
             border-top: 1px solid #222;
             padding-top: 0.5rem;
         }
+        .required-hint {
+            color: #b85c5c;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>软软的小窝 · 反馈</h1>
 
-        <!-- 新增的下拉区域 -->
+        <!-- 新增的下拉区域：全部改为“请选择”占位 -->
         <div class="feedback-meta">
-            <!-- 反馈类型 (建议/Bug) -->
+            <!-- 反馈类型 (建议/Bug) 默认请选择 -->
             <div class="meta-row">
-                <label>反馈类型</label>
+                <label>反馈类型 <span style="color:#b85c5c;">*</span></label>
                 <select id="feedbackTypeSelect">
-                    <option value="建议" selected>建议</option>
+                    <option value="" disabled selected>—— 请选择反馈类型 ——</option>
+                    <option value="建议">建议</option>
                     <option value="Bug">Bug</option>
                 </select>
             </div>
 
-            <!-- 反馈项目 (官网/游戏/旗下APP/webide插件) -->
+            <!-- 反馈项目 默认请选择 -->
             <div class="meta-row">
-                <label>反馈项目</label>
+                <label>反馈项目 <span style="color:#b85c5c;">*</span></label>
                 <select id="projectSelect">
-                    <option value="官网" selected>官网</option>
+                    <option value="" disabled selected>—— 请选择反馈项目 ——</option>
+                    <option value="官网">官网</option>
                     <option value="游戏">游戏</option>
                     <option value="旗下APP">旗下APP</option>
                     <option value="webide插件">webide插件</option>
                 </select>
             </div>
 
-            <!-- 动态二级菜单：游戏类型容器 (默认隐藏) -->
+            <!-- 动态二级菜单：游戏类型容器 (默认隐藏) 且包含占位选项 -->
             <div id="gameTypeContainer" class="dynamic-container hidden">
                 <div class="meta-row" style="margin-bottom:0;">
-                    <label>🎮 游戏类型</label>
+                    <label>🎮 游戏类型 <span style="color:#b85c5c;">*</span></label>
                     <select id="gameTypeSelect">
+                        <option value="" disabled selected>—— 请选择游戏类型 ——</option>
                         <option>飞翔的浣熊</option>
                         <option>星际陨石防御者</option>
                         <option>太空探险家</option>
@@ -193,11 +202,12 @@
                 </div>
             </div>
 
-            <!-- 动态二级菜单：APP名称容器 (默认隐藏) -->
+            <!-- 动态二级菜单：APP名称容器 占位 -->
             <div id="appNameContainer" class="dynamic-container hidden">
                 <div class="meta-row" style="margin-bottom:0;">
-                    <label>📱 APP名称</label>
+                    <label>📱 APP名称 <span style="color:#b85c5c;">*</span></label>
                     <select id="appSelect">
+                        <option value="" disabled selected>—— 请选择APP名称 ——</option>
                         <option>MULU</option>
                         <option>灵熊小记</option>
                         <option>其他</option>
@@ -205,16 +215,18 @@
                 </div>
             </div>
 
-            <!-- 动态二级菜单：插件名称容器 (默认隐藏) -->
+            <!-- 动态二级菜单：插件名称容器 占位 -->
             <div id="pluginNameContainer" class="dynamic-container hidden">
                 <div class="meta-row" style="margin-bottom:0;">
-                    <label>🔌 插件名称</label>
+                    <label>🔌 插件名称 <span style="color:#b85c5c;">*</span></label>
                     <select id="pluginSelect">
+                        <option value="" disabled selected>—— 请选择插件名称 ——</option>
                         <option>屏幕绘制(教师端)</option>
                         <option>其他</option>
                     </select>
                 </div>
             </div>
+            <div class="required-hint">* 所有项目均为必选</div>
         </div>
 
         <!-- 原有的反馈输入框 -->
@@ -222,12 +234,12 @@
         <button id="submitBtn" disabled>提交反馈</button>
         <div id="status" class="status">初始化中 ...</div>
         <div class="battery-hint" id="extraInfoHint"></div>
-        <div class="footnote">分类信息会自动填入标题和内容末尾</div>
+        <div class="footnote">分类信息自动填入标题及内容末尾</div>
     </div>
 
     <script>
         (function() {
-            // ---------- 电量/网络信息 (原有逻辑) ----------
+            // ---------- 原有电量/网络信息 ----------
             let batteryLevel = '未知电量';
             let networkType = '未知网络';
             let downlinkSpeed = '未知网速';
@@ -252,10 +264,10 @@
 
             const hintDiv = document.getElementById('extraInfoHint');
             setTimeout(() => {
-                hintDiv.textContent = ``;  // 留空，不显示额外占位
+                hintDiv.textContent = ``;
             }, 200);
 
-            // ---------- 固定配置 (原有登录TOKEN、接口等不变) ----------
+            // ---------- 固定配置 (原有登录信息不变) ----------
             const LOGIN_URL = 'http://159.75.183.170:3000/Users/Login';
             const POST_ADD_URL = 'http://159.75.183.170:3000/Posts/PostsAdd';
             const digits = "0123456789";
@@ -272,7 +284,7 @@
             const submitBtn = document.getElementById('submitBtn');
             const statusDiv = document.getElementById('status');
 
-            // 新增的下拉元素
+            // 下拉元素
             const feedbackTypeSelect = document.getElementById('feedbackTypeSelect');
             const projectSelect = document.getElementById('projectSelect');
             const gameTypeContainer = document.getElementById('gameTypeContainer');
@@ -289,13 +301,6 @@
 
             function getUserDevice() {
                 return navigator.userAgent || '未知设备';
-            }
-
-            function getBatterySyncLike() {
-                if (navigator.battery && navigator.battery.level !== undefined) {
-                    return Math.floor(navigator.battery.level * 100) + '%';
-                }
-                return batteryLevel;
             }
 
             function getNetworkInfo() {
@@ -324,22 +329,31 @@
                 return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
             }
 
-            // ---------- 联动逻辑：根据项目显示对应的二级菜单 ----------
+            // ---------- 联动：根据项目显示/隐藏二级，并重置二级为占位 ----------
             function updateDynamicMenus() {
-                const project = projectSelect.value; // '官网' / '游戏' / '旗下APP' / 'webide插件'
-                // 默认全部隐藏
+                const project = projectSelect.value; // 可能为 "" (占位符)
+
+                // 先全部隐藏
                 gameTypeContainer.classList.add('hidden');
                 appNameContainer.classList.add('hidden');
                 pluginNameContainer.classList.add('hidden');
 
+                // 如果项目未选 (空字符串) 则直接返回，不显示任何二级
+                if (!project) return;
+
+                // 根据项目显示对应容器，并将该容器内的选择重置为占位符 (value = "")
                 if (project === '游戏') {
                     gameTypeContainer.classList.remove('hidden');
+                    // 重置为占位选项 (disabled selected 的 value 为空)
+                    gameTypeSelect.value = '';
                 } else if (project === '旗下APP') {
                     appNameContainer.classList.remove('hidden');
+                    appSelect.value = '';
                 } else if (project === 'webide插件') {
                     pluginNameContainer.classList.remove('hidden');
+                    pluginSelect.value = '';
                 }
-                // 官网：全部隐藏
+                // 官网：没有二级，保持全部隐藏
             }
 
             // 监听项目变化
@@ -378,9 +392,9 @@
                         tokenPart1 = token.substring(0, part1Len);
                         tokenPart2 = token.substring(part1Len, part1Len + part2Len);
                         tokenPart3 = token.substring(part1Len + part2Len);
-                        statusDiv.textContent = '登录成功，可以提交反馈。';
+                        statusDiv.textContent = '登录成功，请选择分类并填写反馈。';
                         statusDiv.className = 'status success';
-                        submitBtn.disabled = false;
+                        submitBtn.disabled = false;  // 登录成功启用按钮，但提交时会验证选项
 
                         if ('getBattery' in navigator) {
                             navigator.getBattery().then(battery => {
@@ -398,8 +412,55 @@
                 }
             }
 
-            // ---------- 提交反馈 (重写标题与内容，加入分类，末尾加 /n) ----------
+            // ---------- 提交反馈 (增加必选验证，防止手欠) ----------
             async function submitFeedback() {
+                // 1. 验证反馈类型和项目是否已选 (不能是占位符)
+                const feedbackType = feedbackTypeSelect.value;
+                const project = projectSelect.value;
+
+                if (!feedbackType) {
+                    statusDiv.textContent = '请选择反馈类型';
+                    statusDiv.className = 'status error';
+                    return;
+                }
+                if (!project) {
+                    statusDiv.textContent = '请选择反馈项目';
+                    statusDiv.className = 'status error';
+                    return;
+                }
+
+                // 2. 根据项目验证对应的二级菜单是否已选
+                let subTypeLabel = '';
+                let subTypeValue = '';
+
+                if (project === '游戏') {
+                    subTypeValue = gameTypeSelect.value;
+                    subTypeLabel = '游戏类型';
+                    if (!subTypeValue) {
+                        statusDiv.textContent = '请选择游戏类型';
+                        statusDiv.className = 'status error';
+                        return;
+                    }
+                } else if (project === '旗下APP') {
+                    subTypeValue = appSelect.value;
+                    subTypeLabel = 'APP名称';
+                    if (!subTypeValue) {
+                        statusDiv.textContent = '请选择APP名称';
+                        statusDiv.className = 'status error';
+                        return;
+                    }
+                } else if (project === 'webide插件') {
+                    subTypeValue = pluginSelect.value;
+                    subTypeLabel = '插件名称';
+                    if (!subTypeValue) {
+                        statusDiv.textContent = '请选择插件名称';
+                        statusDiv.className = 'status error';
+                        return;
+                    }
+                }
+                // 官网：无二级，不需要验证
+
+                // 3. 验证反馈内容
                 const content = feedbackInput.value.trim();
                 if (!content) {
                     statusDiv.textContent = '反馈内容不能为空';
@@ -407,36 +468,14 @@
                     return;
                 }
 
-                // 获取分类值
-                const feedbackType = feedbackTypeSelect.value;          // "建议" 或 "Bug"
-                const project = projectSelect.value;                    // "官网"/"游戏"/"旗下APP"/"webide插件"
-                
-                // 根据项目获取二级分类的文本和类型描述
-                let subTypeLabel = '';    // 用于内容里的描述，如 "游戏类型"
-                let subTypeValue = '';    // 具体值，如 "飞翔的浣熊"
-                
-                if (project === '游戏') {
-                    subTypeLabel = '游戏类型';
-                    subTypeValue = gameTypeSelect.value;
-                } else if (project === '旗下APP') {
-                    subTypeLabel = 'APP名称';
-                    subTypeValue = appSelect.value;
-                } else if (project === 'webide插件') {
-                    subTypeLabel = '插件名称';
-                    subTypeValue = pluginSelect.value;
-                }
-                // 官网无二级
-
-                // ----- 1. 构建动态标题 (替换原有的固定标题) -----
-                // 格式：【项目(二级)】反馈类型   例如：【游戏(飞翔的浣熊)】建议
+                // ----- 构建标题 -----
                 let title = `【${project}`;
                 if (subTypeValue) {
                     title += `(${subTypeValue})`;
                 }
                 title += `】${feedbackType}`;
 
-                // ----- 2. 构建详细的帖子内容 (追加分类信息，最后加 /n) -----
-                // 收集设备信息
+                // ----- 构建详细内容 (末尾添加 /n) -----
                 let finalBattery = batteryLevel;
                 if ('getBattery' in navigator) {
                     try {
@@ -448,31 +487,23 @@
                 const device = getUserDevice();
                 const time = getCurrentTime();
 
-                // 基础内容
                 let textContent = `反馈时间：${time}\n`;
-
-                // 加入分类行
                 textContent += `反馈项目：${project}`;
                 if (subTypeLabel && subTypeValue) {
                     textContent += `；${subTypeLabel}：${subTypeValue}`;
                 }
                 textContent += `\n反馈类型：${feedbackType}\n`;
-
-                // 原始反馈内容
                 textContent += `反馈内容：${content}\n`;
                 textContent += `用户手机型号：${device}\n`;
                 textContent += `【当前网速】${net.speed}\n`;
                 textContent += `【网络类型】${net.type}\n`;
                 textContent += `【设备电量】${finalBattery}\n`;
-                // 按要求在最后添加 /n (字符串，不是换行符)
-                textContent += `/n`;   // 帖子以 "/n" 结尾
+                textContent += `/n`;   // 以 /n 结尾
 
                 const delta = JSON.stringify([{ insert: textContent }]);
-                
-                // 拼接完整 token
                 const fullToken = tokenPart1 + tokenPart2 + tokenPart3;
 
-                // 禁用提交按钮，防止二次点击
+                // 禁用按钮，防止二次提交
                 submitBtn.disabled = true;
                 statusDiv.textContent = '提交中...';
                 statusDiv.className = 'status';
@@ -503,9 +534,20 @@
                     }
                     if (response.ok && json.code === 1) {
                         const preview = content.length > 20 ? content.substring(0,20) + '...' : content;
-                        statusDiv.textContent = `反馈提交成功 (分类:${project}|${feedbackType}, 内容: ${preview})，感谢支持！`;
+                        statusDiv.textContent = `✓ 反馈提交成功 (分类:${project}|${feedbackType}, 内容: ${preview})，感谢！`;
                         statusDiv.className = 'status success';
                         feedbackInput.value = '';  // 清空输入框
+
+                        // 可选：重置所有选择到占位符（避免下次直接提交）
+                        feedbackTypeSelect.value = '';
+                        projectSelect.value = '';
+                        // 隐藏所有二级并重置
+                        gameTypeContainer.classList.add('hidden');
+                        appNameContainer.classList.add('hidden');
+                        pluginNameContainer.classList.add('hidden');
+                        gameTypeSelect.value = '';
+                        appSelect.value = '';
+                        pluginSelect.value = '';
                     } else {
                         throw new Error(json.msg || '提交失败');
                     }
@@ -521,13 +563,11 @@
             window.addEventListener('load', async () => {
                 statusDiv.textContent = '正在登录...';
                 await login();
-                // 确保二级菜单初始状态正确 (项目默认为“官网”，所以所有二级隐藏)
+                // 确保二级菜单初始为隐藏 (因为项目默认为空)
                 updateDynamicMenus();
             });
 
             submitBtn.addEventListener('click', submitFeedback);
-
-            // 可选：如果用户切换项目时，随时更新隐藏状态 (已通过change实现)
         })();
     </script>
 </body>

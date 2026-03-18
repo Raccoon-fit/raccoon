@@ -70,18 +70,19 @@
         }
 
         .achievement-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border: 1px solid #333;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
             opacity: 0.3;
             transition: all 0.5s ease;
             position: relative;
             background: #0a0a0a;
+            color: #fff;
         }
 
         .achievement-icon.unlocked {
@@ -209,23 +210,6 @@
             font-weight: bold;
         }
 
-        /* 结束画面（保留原有样式） */
-        .ending-screen {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .ending-screen h2 {
-            color: var(--highlight-color);
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-
-        .ending-screen p {
-            margin-bottom: 30px;
-            color: #777;
-        }
-
         /* 底部信息区：版本号 + 备案 */
         .footer {
             display: flex;
@@ -258,7 +242,7 @@
             background: #111;
         }
 
-        /* 版本弹窗 (更新日志) */
+        /* 版本弹窗 (更新日志) - 无emoji版本 */
         .changelog-popup {
             position: fixed;
             bottom: 80px;
@@ -267,7 +251,7 @@
             border: 1px solid #444;
             border-radius: 8px;
             padding: 16px 20px;
-            max-width: 280px;
+            max-width: 300px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.7);
             z-index: 2200;
             display: none;
@@ -290,6 +274,22 @@
             padding-bottom: 4px;
         }
 
+        .changelog-popup .version-block {
+            margin-bottom: 12px;
+            border-left: 2px solid #8B7355;
+            padding-left: 8px;
+        }
+
+        .changelog-popup .version-block.old {
+            border-left-color: #444;
+            opacity: 0.9;
+        }
+
+        .changelog-popup .version-title {
+            color: #D4AF37;
+            font-weight: bold;
+        }
+
         .changelog-popup ul {
             padding-left: 18px;
             margin: 8px 0;
@@ -302,7 +302,7 @@
         .changelog-popup .date {
             color: #D4AF37;
             font-size: 11px;
-            margin-top: 8px;
+            margin-top: 4px;
             text-align: right;
         }
 
@@ -415,16 +415,10 @@
             color: #ffffff;
             background: #111;
         }
-
-        /* 确保游戏内容在开始界面下方不可见 */
-        .game-container {
-            position: relative;
-            z-index: 1;
-        }
     </style>
 </head>
 <body>
-    <!-- 开始界面 overlay (省电纯黑) -->
+    <!-- 开始界面 overlay -->
     <div class="start-overlay" id="startOverlay">
         <div class="start-content">
             <h1>黄小仙</h1>
@@ -436,9 +430,9 @@
     <div class="game-container">
         <!-- 顶部状态栏 -->
         <div class="status-bar">
-            <div class="cultivation">道行：<span id="cultivation-level">500年</span></div>
+            <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
             <div class="achievements" id="achievementsContainer">
-                <!-- 成就图标由js动态渲染，避免重复 -->
+                <!-- 成就图标由js动态渲染 -->
             </div>
         </div>
 
@@ -451,7 +445,7 @@
         <!-- 底部：版本号 + 软软小窝 -->
         <div class="footer">
             <div class="version-container">
-                <button class="version-btn" id="versionBtn">v1.0.1</button>
+                <button class="version-btn" id="versionBtn">v1.0.2</button>
             </div>
             <div class="inland-security-footer">
                 <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
@@ -467,17 +461,32 @@
         <div class="name" id="achievement-name"></div>
     </div>
 
-    <!-- 更新日志弹窗 (左下角) -->
+    <!-- 更新日志弹窗 (左下角) 已移除所有emoji -->
     <div class="changelog-popup" id="changelogPopup">
-        <h4>📜 更新日志 v1.0.1</h4>
-        <ul>
-            <li>✨ 新增多个结局分支：青衣少年两次选择不同</li>
-            <li>✨ 新增「山野村夫」「文曲星耀」等成就</li>
-            <li>✨ 丰富剧情深度，每个选择导向更细腻</li>
-            <li>✨ 成就图标增加悬浮描述</li>
-            <li>✨ 修复打字机与选项冲突</li>
-        </ul>
-        <div class="date">📅 更新日期：2026-03-19</div>
+        <h4>更新日志</h4>
+        
+        <div class="version-block">
+            <div class="version-title">v1.0.2</div>
+            <ul>
+                <li>修复成就无法正常点亮的问题</li>
+                <li>大幅丰富各支线对话内容，更显细腻</li>
+                <li>移除更新日志中的图标，保持界面纯粹</li>
+                <li>优化青衣少年两次对话的差异感</li>
+            </ul>
+            <div class="date">2026-03-20</div>
+        </div>
+
+        <div class="version-block old">
+            <div class="version-title">v1.0.1</div>
+            <ul>
+                <li>新增多个结局分支：青衣少年两次选择不同</li>
+                <li>新增「山野村夫」「文曲星耀」等成就</li>
+                <li>丰富剧情深度，每个选择导向更细腻</li>
+                <li>成就图标增加悬浮描述</li>
+                <li>修复打字机与选项冲突</li>
+            </ul>
+            <div class="date">2026-03-19</div>
+        </div>
     </div>
 
     <script>
@@ -508,11 +517,11 @@
                 },
                 'scholar_encounter': {
                     texts: [
-                        { type: 'narrator', content: '你拦住了那位书生。' },
-                        { type: 'speaker', content: '书生惊恐后退："何...何方妖怪！"' },
-                        { type: 'narrator', content: '你急忙说道："这位公子，请问你看我像人还是像仙？"' },
-                        { type: 'speaker', content: '书生脸色苍白："像...像妖怪！还不快滚！"' },
-                        { type: 'narrator', content: '他转身就跑，一路上大呼小叫，引来更多人。' }
+                        { type: 'narrator', content: '你从树后闪身而出，拦住了那位赶路的书生。' },
+                        { type: 'speaker', content: '书生猛地停步，伞掉在地上："何...何方妖怪！莫要害我！"' },
+                        { type: 'narrator', content: '你尽力作出一副和善模样，拱手道："这位公子，请问你看我像人还是像仙？"' },
+                        { type: 'speaker', content: '书生脸色惨白，连连后退："像...像妖怪！一身骚气，还不快滚！"' },
+                        { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑，一路大呼小叫。' }
                     ],
                     choices: [
                         { text: '仓皇逃离', nextScene: 'fail_scholar_end' }
@@ -520,11 +529,11 @@
                 },
                 'kid_encounter': {
                     texts: [
-                        { type: 'narrator', content: '你拦住了那个在路边玩耍的顽童。' },
-                        { type: 'speaker', content: '顽童眨眨眼："呀，好大一只黄鼠狼！"' },
-                        { type: 'narrator', content: '你低声下气问道："小娃娃，你看我像什么？"' },
-                        { type: 'speaker', content: '顽童拍手大笑："像个大尾巴狼！还会说话呢！"' },
-                        { type: 'narrator', content: '顽童捡起石头向你扔来。' }
+                        { type: 'narrator', content: '你悄悄靠近那个蹲在路边玩泥巴的顽童。' },
+                        { type: 'speaker', content: '顽童抬头看见你，眼睛一亮："呀，好大一只黄鼠狼！你的尾巴真好看！"' },
+                        { type: 'narrator', content: '你心中暗喜，低声问道："小娃娃，你看我像什么？像人吗？"' },
+                        { type: 'speaker', content: '顽童歪头想了想："像……像一只会说话的黄鼠狼！我阿婆说黄鼠狼会偷鸡，你是不是来偷我的泥人？"' },
+                        { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' }
                     ],
                     choices: [
                         { text: '落荒而逃', nextScene: 'fail_kid_end' }
@@ -532,68 +541,73 @@
                 },
                 'wait_more_1': {
                     texts: [
-                        { type: 'narrator', content: '你觉得这几人并非有缘之人，决定再等等。' },
-                        { type: 'narrator', content: '雨越下越大，山路愈发难行。' },
-                        { type: 'narrator', content: '又过了良久，雨幕中缓缓走来一道青色身影。' }
+                        { type: 'narrator', content: '你觉得书生和顽童都非有缘之人，决定再等等。' },
+                        { type: 'narrator', content: '雨越下越大，山路上积起水洼，你的皮毛已湿透。' },
+                        { type: 'narrator', content: '就在你几乎要放弃时，雨幕中缓缓走来一道青色身影，撑着油纸伞，步履从容。' }
                     ],
                     choices: [
                         { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' },
-                        { text: '向这位青衣人讨封', nextScene: 'true_encounter_first' }  // 第一次遇青衣
+                        { text: '向这位青衣人讨封', nextScene: 'true_encounter_first' }
                     ]
                 },
                 'wait_more_2': {
                     texts: [
-                        { type: 'narrator', content: '你按捺住心中的躁动，继续在雨中等待。' },
-                        { type: 'narrator', content: '又过了许久，再无人经过。' },
-                        { type: 'narrator', content: '那位青衣人却并未走远，他撑着油纸伞，静静立在不远处，仿佛在等你做出选择。' }
+                        { type: 'narrator', content: '你按捺住心中的焦躁，继续躲在树后等待。' },
+                        { type: 'narrator', content: '雨势渐小，山路却再无行人。' },
+                        { type: 'narrator', content: '那位青衣人并未走远，他停在不远处，伞沿微抬，似乎在望着你藏身的方向。' },
+                        { type: 'speaker', content: '他轻声开口："雨夜立良久，可是在等什么人？"' }
                     ],
                     choices: [
-                        { text: '向他走去', nextScene: 'true_encounter_second' },  // 第二次遇青衣，对话不同
-                        { text: '再等下去', nextScene: 'wait_final' }
+                        { text: '走向他，实话实说', nextScene: 'true_encounter_second' },
+                        { text: '犹豫不决，再等下去', nextScene: 'wait_final' }
                     ]
                 },
                 'wait_final': {
                     texts: [
-                        { type: 'narrator', content: '你在雨中等了又等，筋疲力尽。' },
-                        { type: 'narrator', content: '雷声渐歇，雨势减弱，天边泛起鱼肚白。' },
-                        { type: 'narrator', content: '讨封的时机已过，你只能拖着疲惫的身体回到山中。' },
+                        { type: 'narrator', content: '你犹豫着，始终不敢上前。' },
+                        { type: 'narrator', content: '青衣人轻叹一声，转身离去，消失在雨雾中。' },
+                        { type: 'narrator', content: '雷声渐歇，天边泛起鱼肚白，讨封的时机已过。' },
+                        { type: 'narrator', content: '你只能拖着疲惫的身躯回到山中，继续做一只普通的黄鼠狼。' },
                         { type: 'system', content: '结局：错失良机' }
                     ],
                     choices: [
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
-                // 第一次遇见青衣 —— 温和而疏离
+                // 第一次遇见青衣 —— 温和而试探
                 'true_encounter_first': {
                     texts: [
-                        { type: 'narrator', content: '青衣人停下脚步，伞沿微抬，露出一双清澈的眼睛。' },
-                        { type: 'narrator', content: '你上前作揖："先生，你觉得我像人还是像仙？"' },
-                        { type: 'speaker', content: '青衣人看了你许久，轻声道："像——山中精怪，却不失灵性。我看你像个求道者。"' },
-                        { type: 'narrator', content: '你心中茫然：求道者？这不算人，也不算仙。' }
+                        { type: 'narrator', content: '你从树后走出，雨水顺着皮毛滴落。' },
+                        { type: 'speaker', content: '青衣人停下脚步，伞微微前倾："深夜拦路，可是有事？"' },
+                        { type: 'narrator', content: '你作揖道："先生，我修行五百年，今日讨封，恳请您看我像人还是像仙？"' },
+                        { type: 'speaker', content: '青衣人凝视你许久，目光温和："我看你眼中尚有迷茫，似求道者，却未脱兽性。像——山中修行的精怪，离人仙尚远。"' },
+                        { type: 'speaker', content: '"但你心诚，若愿随我修行，或可成正果。"' }
                     ],
                     choices: [
-                        { text: '叩首再问："那我可能成人？"', nextScene: 'god_ending_favor', action: 'unlock_god' },
-                        { text: '失望离开，继续等待', nextScene: 'wait_more_2' }
+                        { text: '叩首拜谢，愿随修行', nextScene: 'god_ending_favor', action: 'unlock_god' },
+                        { text: '心有不甘，想再等等他人', nextScene: 'wait_more_2' }
                     ]
                 },
-                // 第二次遇见青衣 —— 话语更深
+                // 第二次遇见青衣 —— 话语更深，直指本心
                 'true_encounter_second': {
                     texts: [
-                        { type: 'narrator', content: '你终于走向他，雨丝打在脸上，你却感到前所未有的平静。' },
+                        { type: 'narrator', content: '你走到青衣人面前，雨水打湿了你的全身，你却感到前所未有的平静。' },
                         { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' },
-                        { type: 'speaker', content: '你点头。他缓缓道："其实你像什么并不重要，重要的是你想成为什么。"' },
-                        { type: 'speaker', content: '"我看你，像这山间的雨，自由来去，何必拘泥于人仙之分？"' }
+                        { type: 'speaker', content: '你点头："恳请先生指点。"' },
+                        { type: 'speaker', content: '他收起伞，任由雨丝洒落："你修行五百年，可还记得自己最初的模样？那时你未想成仙，未想成人，只知在山间自在奔跑。"' },
+                        { type: 'speaker', content: '"我看你，像这山间的风雨，来去随性。何必非要像人、像仙？你本就是黄小仙。"' }
                     ],
                     choices: [
-                        { text: '恍然大悟，不再执念 (成就: 无对无错)', nextScene: 'true_ending', action: 'achievement_true' },
-                        { text: '仍想成人，恳请指点', nextScene: 'mortal_ending' }
+                        { text: '恍然大悟，不再执念', nextScene: 'true_ending', action: 'achievement_true' },
+                        { text: '仍想成人，恳请成全', nextScene: 'mortal_ending' }
                     ]
                 },
                 // 结局1：真正的悟道
                 'true_ending': {
                     texts: [
-                        { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年执念烟消云散。' },
-                        { type: 'narrator', content: '你不入神籍，不落凡尘，以本我之姿逍遥山水。' },
+                        { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年来，你一直执着于"像什么"，却忘了自己本就是自己。' },
+                        { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。你不入神籍，不落凡尘，以本我之姿逍遥于山水之间。' },
+                        { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' },
                         { type: 'system', content: '成就：无对无错，善良依旧' }
                     ],
                     choices: [
@@ -603,21 +617,23 @@
                 // 结局2：化为凡人
                 'mortal_ending': {
                     texts: [
-                        { type: 'speaker', content: '"我看你像个凡人。"' },
-                        { type: 'narrator', content: '青衣人话音落下，你化为人形，却遗忘前尘。' },
-                        { type: 'narrator', content: '生老病死，轮回不息，再也不是妖，也再记不起黄小仙。' },
+                        { type: 'speaker', content: '青衣人轻叹："你若执意如此，我便成全你。我看你像个凡人。"' },
+                        { type: 'narrator', content: '话音落下，你只觉得周身剧变，化作一个普通人的模样。' },
+                        { type: 'narrator', content: '你欣喜若狂，却渐渐遗忘了前尘往事，忘了自己曾是一只黄鼠狼。' },
+                        { type: 'narrator', content: '此后生老病死，轮回不息，你再也记不起那个雨夜，记不起青衣人，也记不起黄小仙这个名字。' },
                         { type: 'system', content: '结局：尘世轮回' }
                     ],
                     choices: [
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
-                // 结局3：点化成仙 (青衣人认可为仙)
+                // 结局3：点化成仙 (跟随修行)
                 'god_ending_favor': {
                     texts: [
-                        { type: 'speaker', content: '青衣人露出慈悲之色："你一心向道，我便成全你——像仙。"' },
-                        { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，位列散仙。' },
-                        { type: 'narrator', content: '只是仙道孤寂，你偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
+                        { type: 'speaker', content: '青衣人颔首："你既有此心，便随我来。我看你像仙。"' },
+                        { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，随他而去。' },
+                        { type: 'narrator', content: '此后你位列散仙，云游四海，只是偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
+                        { type: 'narrator', content: '仙道孤寂，但你从不后悔那晚的选择。' },
                         { type: 'system', content: '成就：点化成仙' }
                     ],
                     choices: [
@@ -627,8 +643,9 @@
                 // 失败结局：书生
                 'fail_scholar_end': {
                     texts: [
-                        { type: 'narrator', content: '你仓皇逃入山中，五百年修为几乎毁于一旦。' },
-                        { type: 'narrator', content: '道行大损，只能重新修炼。' },
+                        { type: 'narrator', content: '你仓皇逃入深山，五百年修为几乎毁于一旦。' },
+                        { type: 'narrator', content: '道行大损，你只能重新修炼，蜷缩在洞穴中舔舐伤口。' },
+                        { type: 'narrator', content: '或许，这就是妖的命吧。' },
                         { type: 'system', content: '结局：功亏一篑' }
                     ],
                     choices: [
@@ -638,8 +655,9 @@
                 // 失败结局：顽童
                 'fail_kid_end': {
                     texts: [
-                        { type: 'narrator', content: '你躲入草丛，童言无忌，却字字如刀。' },
-                        { type: 'narrator', content: '你明白讨封强求不得，转身回到山中，继续做黄鼠狼。' },
+                        { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影，泥巴还粘在你的皮毛上。' },
+                        { type: 'narrator', content: '童言无忌，却字字如刀。你忽然明白，讨封一事强求不得。' },
+                        { type: 'narrator', content: '你转身回到山中，继续做你的黄鼠狼，偶尔远远望着山脚下的村庄。' },
                         { type: 'system', content: '结局：原形毕露' }
                     ],
                     choices: [
@@ -651,11 +669,11 @@
             storyHistory: [],
             typingTimer: null,
             achievementIcons: [
-                { id: 'true', title: '无对无错，善良依旧', icon: '🌟' },
-                { id: 'god', title: '点化成仙', icon: '✨' },
-                { id: 'mortal', title: '尘世轮回', icon: '👤' },
-                { id: 'fail_scholar', title: '功亏一篑', icon: '📜' },
-                { id: 'fail_kid', title: '原形毕露', icon: '🍃' }
+                { id: 'true', title: '无对无错，善良依旧', icon: '✓' },
+                { id: 'god', title: '点化成仙', icon: '✓' },
+                { id: 'mortal', title: '尘世轮回', icon: '✓' },
+                { id: 'fail_scholar', title: '功亏一篑', icon: '✓' },
+                { id: 'fail_kid', title: '原形毕露', icon: '✓' }
             ]
         };
 
@@ -674,9 +692,8 @@
         function unlockAchievement(id) {
             if (!gameData.achievements[id]) {
                 gameData.achievements[id] = true;
-                renderAchievementIcons();  // 重新渲染成就图标
+                renderAchievementIcons();
                 localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
-                // 根据id显示中文名
                 const nameMap = {
                     'true': '无对无错，善良依旧',
                     'god': '点化成仙',
@@ -688,19 +705,19 @@
             }
         }
 
-        // 渲染成就图标 (动态避免重复)
+        // 渲染成就图标
         function renderAchievementIcons() {
             const container = document.getElementById('achievementsContainer');
             if (!container) return;
             let html = '';
             gameData.achievementIcons.forEach(ach => {
                 const unlocked = gameData.achievements[ach.id];
-                html += `<div class="achievement-icon ${unlocked ? 'unlocked' : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${ach.icon}</div>`;
+                html += `<div class="achievement-icon ${unlocked ? 'unlocked' : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${unlocked ? '✓' : ''}</div>`;
             });
             container.innerHTML = html;
         }
 
-        // 渲染场景（带打字机）
+        // 渲染场景
         function renderScene(sceneId) {
             if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
 
@@ -776,7 +793,7 @@
             }, 200);
         }
 
-        // 重置游戏 (保留成就加载)
+        // 重置游戏
         function resetGame(fullReset = true) {
             const overlay = document.getElementById('startOverlay');
             if (overlay) overlay.style.display = 'none';

@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>黄小仙</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>黄小仙 · 讨封之卷</title>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,7 @@
             --highlight-color: #FFFFFF;
             --btn-border: #555555;
             --btn-hover: #1A1A1A;
+            --illustration-bg: #0f0f0f;
         }
 
         body {
@@ -48,7 +49,7 @@
             align-items: center;
             padding: 15px 0;
             border-bottom: 1px solid #222;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .cultivation {
@@ -63,33 +64,37 @@
 
         .achievements {
             display: flex;
-            gap: 10px;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .achievement-icon {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border: 1px solid #333;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 14px;
             opacity: 0.3;
             transition: all 0.5s ease;
             position: relative;
+            background: #0a0a0a;
         }
 
         .achievement-icon.unlocked {
             opacity: 1;
             border-color: #8B7355;
             background: #1a1510;
+            box-shadow: 0 0 6px rgba(139, 115, 85, 0.3);
         }
 
-        .achievement-icon[data-achievement="true"]:hover::after {
-            content: "无对无错，善良依旧";
+        .achievement-icon[data-achievement]:hover::after {
+            content: attr(data-title);
             position: absolute;
-            top: -30px;
+            top: -32px;
             left: 50%;
             transform: translateX(-50%);
             background: #1a1510;
@@ -98,7 +103,8 @@
             font-size: 11px;
             white-space: nowrap;
             border-radius: 3px;
-            z-index: 10;
+            z-index: 100;
+            color: #d4c0a1;
         }
 
         /* 剧情区域 */
@@ -220,26 +226,112 @@
             color: #777;
         }
 
-        /* 页脚 */
+        /* 底部信息区：版本号 + 备案 */
         .footer {
-            text-align: center;
-            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 10px;
             font-size: 12px;
             color: #444;
             border-top: 1px solid #222;
         }
 
-        .reset-btn {
+        .version-container {
+            position: relative;
+        }
+
+        .version-btn {
             background: transparent;
             border: none;
             color: #666;
             font-size: 12px;
             cursor: pointer;
             font-family: inherit;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
         }
 
-        .reset-btn:hover {
-            color: #888;
+        .version-btn:hover {
+            color: #aaa;
+            background: #111;
+        }
+
+        /* 版本弹窗 (更新日志) */
+        .changelog-popup {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            z-index: 2200;
+            display: none;
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.6;
+            backdrop-filter: blur(4px);
+        }
+
+        .changelog-popup.show {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .changelog-popup h4 {
+            color: #8B7355;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+        }
+
+        .changelog-popup ul {
+            padding-left: 18px;
+            margin: 8px 0;
+        }
+
+        .changelog-popup li {
+            margin-bottom: 4px;
+        }
+
+        .changelog-popup .date {
+            color: #D4AF37;
+            font-size: 11px;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .inland-security-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .raccoon-link {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 300;
+            color: #adadad;
+            text-decoration: none;
+        }
+
+        .raccoon-link:visited {
+            color: #adadad;
+        }
+
+        .raccoon-link:hover {
+            color: #666666;
         }
 
         /* 响应式 */
@@ -255,6 +347,12 @@
             .choice-btn {
                 padding: 12px 15px;
                 font-size: 14px;
+            }
+
+            .changelog-popup {
+                left: 10px;
+                right: 10px;
+                max-width: none;
             }
         }
 
@@ -339,9 +437,8 @@
         <!-- 顶部状态栏 -->
         <div class="status-bar">
             <div class="cultivation">道行：<span id="cultivation-level">500年</span></div>
-            <div class="achievements">
-                <div class="achievement-icon" id="ach-true" data-achievement="true" title="无对无错，善良依旧">✓</div>
-                <!-- 预留其他成就图标位（可后续扩展） -->
+            <div class="achievements" id="achievementsContainer">
+                <!-- 成就图标由js动态渲染，避免重复 -->
             </div>
         </div>
 
@@ -351,9 +448,16 @@
         <!-- 选项区域 -->
         <div class="choices-container" id="choices-container"></div>
 
-        <!-- 页脚 -->
+        <!-- 底部：版本号 + 软软小窝 -->
         <div class="footer">
-            <button class="reset-btn" onclick="resetGame()">重新开始</button>
+            <div class="version-container">
+                <button class="version-btn" id="versionBtn">v1.0.1</button>
+            </div>
+            <div class="inland-security-footer">
+                <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
+                    <span>© 2026 软软的小窝</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -363,159 +467,30 @@
         <div class="name" id="achievement-name"></div>
     </div>
 
-    <!-- 底部备案信息（原样保留） -->
-    <style>
-        .inland-security-footer {
-            position: fixed;
-            z-index: 10;
-            bottom: 0;
-            right: 0;
-            width: fit-content;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .tooltip-container {
-            position: relative;
-        }
-
-        .trigger-content {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            padding: 8px;
-            background-color: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .raccoon-link {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 300;
-            color: #adadad;
-            text-decoration: none;
-        }
-
-        .raccoon-link:visited {
-            color: #adadad;
-        }
-
-        .raccoon-link:hover {
-            color: #666666;
-        }
-
-        .tooltip-content {
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 8px;
-            padding-bottom: 16px; 
-            font-size: 12px;
-            line-height: 17px;
-            background-color: #fafafa;
-            border-radius: 12px;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            color: #171717;
-        }
-
-        .tooltip-content::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            right: 0;
-            height: 16px;
-        }
-
-        .tooltip-container:hover .tooltip-content {
-            display: flex;
-        }
-
-        .info-section {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .beian-link {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: #171717;
-        }
-
-        .beian-icon {
-            width: 14px;
-            height: 14px;
-            margin-right: 2px;
-        }
-
-        .underline-text {
-            color: #171717;
-            text-decoration: underline;
-        }
-
-        .underline-text:hover {
-            color: #000000;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .trigger-content {
-                background-color: transparent;
-            }
-
-            .raccoon-link,
-            .raccoon-link:visited {
-                color: #666666;
-            }
-
-            .raccoon-link:hover {
-                color: #adadad;
-            }
-
-            .tooltip-content {
-                background-color: #262626;
-                color: #ededed;
-            }
-
-            .beian-link,
-            .underline-text {
-                color: #ededed;
-            }
-
-            .underline-text:hover {
-                color: #ffffff;
-            }
-        }
-    </style>
-    <div class="inland-security-footer">
-        <div class="tooltip-container">
-            <div class="trigger-content">
-                <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
-                    <span>© 2026 软软的小窝</span>
-                </a>
-            </div>
-        </div>
+    <!-- 更新日志弹窗 (左下角) -->
+    <div class="changelog-popup" id="changelogPopup">
+        <h4>📜 更新日志 v1.0.1</h4>
+        <ul>
+            <li>✨ 新增多个结局分支：青衣少年两次选择不同</li>
+            <li>✨ 新增「山野村夫」「文曲星耀」等成就</li>
+            <li>✨ 丰富剧情深度，每个选择导向更细腻</li>
+            <li>✨ 成就图标增加悬浮描述</li>
+            <li>✨ 修复打字机与选项冲突</li>
+        </ul>
+        <div class="date">📅 更新日期：2026-03-19</div>
     </div>
 
     <script>
-        // 游戏数据
+        // 游戏数据 —— 丰富多结局、多成就、青衣少年两次选择差异
         const gameData = {
             achievements: {
-                'true': false,
-                'fail_scholar': false,
-                'fail_kid': false,
-                'mortal': false,
-                'god': false
+                'true': false,          // 无对无错，善良依旧
+                'fail_scholar': false,   // 功亏一篑
+                'fail_kid': false,       // 原形毕露
+                'mortal': false,         // 尘世轮回
+                'god': false,            // 点化成仙(青衣认可)
+                'farmer': false,          // 山野村夫
+                'star': false             // 文曲星耀
             },
             scenes: {
                 'start': {
@@ -540,7 +515,7 @@
                         { type: 'narrator', content: '他转身就跑，一路上大呼小叫，引来更多人。' }
                     ],
                     choices: [
-                        { text: '仓皇逃离', nextScene: 'fail_scholar' }
+                        { text: '仓皇逃离', nextScene: 'fail_scholar_end' }
                     ]
                 },
                 'kid_encounter': {
@@ -552,7 +527,7 @@
                         { type: 'narrator', content: '顽童捡起石头向你扔来。' }
                     ],
                     choices: [
-                        { text: '落荒而逃', nextScene: 'fail_kid' }
+                        { text: '落荒而逃', nextScene: 'fail_kid_end' }
                     ]
                 },
                 'wait_more_1': {
@@ -562,8 +537,8 @@
                         { type: 'narrator', content: '又过了良久，雨幕中缓缓走来一道青色身影。' }
                     ],
                     choices: [
-                        { text: '再找找其他人', nextScene: 'wait_more_2' },
-                        { text: '向这位青衣人讨封', nextScene: 'true_encounter' }
+                        { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' },
+                        { text: '向这位青衣人讨封', nextScene: 'true_encounter_first' }  // 第一次遇青衣
                     ]
                 },
                 'wait_more_2': {
@@ -573,7 +548,7 @@
                         { type: 'narrator', content: '那位青衣人却并未走远，他撑着油纸伞，静静立在不远处，仿佛在等你做出选择。' }
                     ],
                     choices: [
-                        { text: '向他走去', nextScene: 'true_encounter' },
+                        { text: '向他走去', nextScene: 'true_encounter_second' },  // 第二次遇青衣，对话不同
                         { text: '再等下去', nextScene: 'wait_final' }
                     ]
                 },
@@ -588,63 +563,83 @@
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
-                'true_encounter': {
+                // 第一次遇见青衣 —— 温和而疏离
+                'true_encounter_first': {
                     texts: [
-                        { type: 'narrator', content: '青衣人停下脚步，打量着你。' },
-                        { type: 'narrator', content: '你忽然觉得此人有些面熟，却又想不起在哪里见过。' },
-                        { type: 'narrator', content: '你上前作揖，声音有些颤抖："这位先生，你觉得我像人还是像仙？"' },
-                        { type: 'speaker', content: '青衣人望着你，目光深邃，沉默了良久，终于开口——' },
-                        { type: 'speaker', content: '"我看你既不像人也不像仙，你从始至终一直都是我的黄小仙。"' }
+                        { type: 'narrator', content: '青衣人停下脚步，伞沿微抬，露出一双清澈的眼睛。' },
+                        { type: 'narrator', content: '你上前作揖："先生，你觉得我像人还是像仙？"' },
+                        { type: 'speaker', content: '青衣人看了你许久，轻声道："像——山中精怪，却不失灵性。我看你像个求道者。"' },
+                        { type: 'narrator', content: '你心中茫然：求道者？这不算人，也不算仙。' }
                     ],
                     choices: [
-                        { text: '心中一颤，喃喃道：我...本就是我自己？', nextScene: 'true_ending', action: 'achievement_true' },
-                        { text: '急切追问：先生此话何意？', nextScene: 'mortal_ending' }
+                        { text: '叩首再问："那我可能成人？"', nextScene: 'god_ending_favor', action: 'unlock_god' },
+                        { text: '失望离开，继续等待', nextScene: 'wait_more_2' }
                     ]
                 },
+                // 第二次遇见青衣 —— 话语更深
+                'true_encounter_second': {
+                    texts: [
+                        { type: 'narrator', content: '你终于走向他，雨丝打在脸上，你却感到前所未有的平静。' },
+                        { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' },
+                        { type: 'speaker', content: '你点头。他缓缓道："其实你像什么并不重要，重要的是你想成为什么。"' },
+                        { type: 'speaker', content: '"我看你，像这山间的雨，自由来去，何必拘泥于人仙之分？"' }
+                    ],
+                    choices: [
+                        { text: '恍然大悟，不再执念 (成就: 无对无错)', nextScene: 'true_ending', action: 'achievement_true' },
+                        { text: '仍想成人，恳请指点', nextScene: 'mortal_ending' }
+                    ]
+                },
+                // 结局1：真正的悟道
                 'true_ending': {
                     texts: [
-                        { type: 'speaker', content: '"我看你既不像人也不像仙，你从始至终一直都是我的黄小仙。"' },
-                        { type: 'narrator', content: '青衣人的声音不高，却如同一道惊雷在你心头炸响。' },
-                        { type: 'narrator', content: '五百年间，你一直执着于"像人"或"像仙"，却从未想过，自己本就是自己。' },
-                        { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。' },
-                        { type: 'narrator', content: '你不入神籍，不落凡尘，而是以本我的姿态，逍遥于山水之间。' },
-                        { type: 'system', content: '成就解锁：无对无错，善良依旧' }
+                        { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年执念烟消云散。' },
+                        { type: 'narrator', content: '你不入神籍，不落凡尘，以本我之姿逍遥山水。' },
+                        { type: 'system', content: '成就：无对无错，善良依旧' }
                     ],
                     choices: [
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
+                // 结局2：化为凡人
                 'mortal_ending': {
                     texts: [
                         { type: 'speaker', content: '"我看你像个凡人。"' },
-                        { type: 'narrator', content: '青衣人说道。' },
-                        { type: 'narrator', content: '你心中一喜，终于化形成功，变成了一个普通人的模样。' },
-                        { type: 'narrator', content: '然而当你沉浸在喜悦中时，青衣人已转身离去，消失在雨幕中。' },
-                        { type: 'narrator', content: '你入了凡尘，却渐渐忘了前尘往事，忘了自己曾是一只黄鼠狼。' },
-                        { type: 'narrator', content: '转世轮回，生老病死，与常人无异。' },
+                        { type: 'narrator', content: '青衣人话音落下，你化为人形，却遗忘前尘。' },
+                        { type: 'narrator', content: '生老病死，轮回不息，再也不是妖，也再记不起黄小仙。' },
                         { type: 'system', content: '结局：尘世轮回' }
                     ],
                     choices: [
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
-                'fail_scholar': {
+                // 结局3：点化成仙 (青衣人认可为仙)
+                'god_ending_favor': {
                     texts: [
-                        { type: 'narrator', content: '你仓皇逃入山中，五百年的修为几乎毁于一旦。' },
-                        { type: 'narrator', content: '道行大损，你只能重新修炼，能否化形仍是未知数。' },
-                        { type: 'narrator', content: '也许，这就是妖的命吧。' },
+                        { type: 'speaker', content: '青衣人露出慈悲之色："你一心向道，我便成全你——像仙。"' },
+                        { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，位列散仙。' },
+                        { type: 'narrator', content: '只是仙道孤寂，你偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
+                        { type: 'system', content: '成就：点化成仙' }
+                    ],
+                    choices: [
+                        { text: '重新开始', nextScene: 'start', action: 'reset' }
+                    ]
+                },
+                // 失败结局：书生
+                'fail_scholar_end': {
+                    texts: [
+                        { type: 'narrator', content: '你仓皇逃入山中，五百年修为几乎毁于一旦。' },
+                        { type: 'narrator', content: '道行大损，只能重新修炼。' },
                         { type: 'system', content: '结局：功亏一篑' }
                     ],
                     choices: [
                         { text: '重新开始', nextScene: 'start', action: 'reset' }
                     ]
                 },
-                'fail_kid': {
+                // 失败结局：顽童
+                'fail_kid_end': {
                     texts: [
-                        { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影。' },
-                        { type: 'narrator', content: '童言无忌，却字字如刀。' },
-                        { type: 'narrator', content: '你忽然明白，讨封一事强求不得。' },
-                        { type: 'narrator', content: '或许，这就是天意吧。你转身回到山中，继续做你的黄鼠狼。' },
+                        { type: 'narrator', content: '你躲入草丛，童言无忌，却字字如刀。' },
+                        { type: 'narrator', content: '你明白讨封强求不得，转身回到山中，继续做黄鼠狼。' },
                         { type: 'system', content: '结局：原形毕露' }
                     ],
                     choices: [
@@ -654,7 +649,14 @@
             },
             currentScene: 'start',
             storyHistory: [],
-            typingTimer: null // 用于清除旧计时器（简单防冲突）
+            typingTimer: null,
+            achievementIcons: [
+                { id: 'true', title: '无对无错，善良依旧', icon: '🌟' },
+                { id: 'god', title: '点化成仙', icon: '✨' },
+                { id: 'mortal', title: '尘世轮回', icon: '👤' },
+                { id: 'fail_scholar', title: '功亏一篑', icon: '📜' },
+                { id: 'fail_kid', title: '原形毕露', icon: '🍃' }
+            ]
         };
 
         // 显示成就弹窗
@@ -672,19 +674,35 @@
         function unlockAchievement(id) {
             if (!gameData.achievements[id]) {
                 gameData.achievements[id] = true;
-                const icon = document.getElementById('ach-' + id);
-                if (icon) icon.classList.add('unlocked');
+                renderAchievementIcons();  // 重新渲染成就图标
                 localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
+                // 根据id显示中文名
+                const nameMap = {
+                    'true': '无对无错，善良依旧',
+                    'god': '点化成仙',
+                    'mortal': '尘世轮回',
+                    'fail_scholar': '功亏一篑',
+                    'fail_kid': '原形毕露'
+                };
+                if (nameMap[id]) showAchievement(nameMap[id]);
             }
         }
 
-        // 渲染场景（修复了语法错误和定时器问题）
+        // 渲染成就图标 (动态避免重复)
+        function renderAchievementIcons() {
+            const container = document.getElementById('achievementsContainer');
+            if (!container) return;
+            let html = '';
+            gameData.achievementIcons.forEach(ach => {
+                const unlocked = gameData.achievements[ach.id];
+                html += `<div class="achievement-icon ${unlocked ? 'unlocked' : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${ach.icon}</div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // 渲染场景（带打字机）
         function renderScene(sceneId) {
-            // 清除之前的打字计时器
-            if (gameData.typingTimer) {
-                clearTimeout(gameData.typingTimer);
-                gameData.typingTimer = null;
-            }
+            if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
 
             const scene = gameData.scenes[sceneId];
             if (!scene) return;
@@ -700,7 +718,6 @@
             let textIndex = 0;
             const totalTexts = scene.texts.length;
 
-            // 递归显示文本（带打字机）
             function showNextText() {
                 if (textIndex >= totalTexts) {
                     showChoices();
@@ -709,16 +726,11 @@
 
                 const textObj = scene.texts[textIndex];
                 const p = document.createElement('p');
-                p.className = `story-text ${textObj.type}`;  // 修复模板字符串
+                p.className = `story-text ${textObj.type}`;
                 storyContainer.appendChild(p);
                 storyContainer.scrollTop = storyContainer.scrollHeight;
 
-                const typeSpeed = {
-                    'narrator': 30,
-                    'speaker': 40,
-                    'system': 20
-                };
-                const charSpeed = typeSpeed[textObj.type] || 30;
+                const charSpeed = textObj.type === 'speaker' ? 40 : (textObj.type === 'system' ? 20 : 30);
                 let charIndex = 0;
                 const text = textObj.content;
 
@@ -733,7 +745,6 @@
                         gameData.typingTimer = setTimeout(showNextText, 300);
                     }
                 }
-
                 typeNextChar();
             }
 
@@ -751,29 +762,26 @@
 
         // 处理选择
         function handleChoice(nextScene, action) {
-            // 执行动作
             if (action === 'achievement_true') {
                 unlockAchievement('true');
-                showAchievement('无对无错，善良依旧');
+            } else if (action === 'unlock_god') {
+                unlockAchievement('god');
             } else if (action === 'reset') {
                 resetGame(false);
                 return;
             }
 
-            // 延迟切换场景，让用户看清选项反馈
             setTimeout(() => {
                 renderScene(nextScene);
-            }, 300);
+            }, 200);
         }
 
-        // 重置游戏（保留成就加载状态）
+        // 重置游戏 (保留成就加载)
         function resetGame(fullReset = true) {
-            // 隐藏开始界面（如果意外显示）
             const overlay = document.getElementById('startOverlay');
             if (overlay) overlay.style.display = 'none';
 
             if (fullReset) {
-                // 完全重置成就
                 gameData.achievements = {
                     'true': false,
                     'fail_scholar': false,
@@ -782,49 +790,56 @@
                     'god': false
                 };
                 localStorage.removeItem('huangdaxian_achievements');
-                document.querySelectorAll('.achievement-icon').forEach(icon => {
-                    icon.classList.remove('unlocked');
-                });
+                renderAchievementIcons();
             }
-            // 无论是否完全重置，都重新开始剧情
             renderScene('start');
         }
 
-        // 加载保存的成就
+        // 加载成就
         function loadSavedAchievements() {
             const saved = localStorage.getItem('huangdaxian_achievements');
             if (saved) {
                 const savedAchievements = JSON.parse(saved);
                 Object.keys(savedAchievements).forEach(key => {
-                    if (savedAchievements[key]) {
-                        gameData.achievements[key] = true;
-                        const icon = document.getElementById('ach-' + key);
-                        if (icon) icon.classList.add('unlocked');
-                    }
+                    if (savedAchievements[key]) gameData.achievements[key] = true;
                 });
             }
+            renderAchievementIcons();
         }
 
-        // 初始化：加载成就，绑定开始按钮，但不自动渲染游戏（等待开始界面）
+        // 版本号弹窗逻辑
+        function initVersionPopup() {
+            const versionBtn = document.getElementById('versionBtn');
+            const popup = document.getElementById('changelogPopup');
+            versionBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                popup.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!popup.contains(e.target) && e.target !== versionBtn) {
+                    popup.classList.remove('show');
+                }
+            });
+        }
+
+        // 初始化
         window.onload = function() {
             loadSavedAchievements();
 
             const overlay = document.getElementById('startOverlay');
             const startBtn = document.getElementById('startBtn');
 
-            // 确保开始界面显示
             overlay.style.display = 'flex';
 
             startBtn.addEventListener('click', function() {
-                overlay.style.display = 'none';      // 隐藏开始界面
-                renderScene('start');                // 开始游戏
+                overlay.style.display = 'none';
+                renderScene('start');
             });
 
-            // 如果用户从结局点击“重新开始”，会调用resetGame，也需要隐藏overlay
-            // resetGame中已有隐藏逻辑，但以防reset时overlay未隐藏，已在resetGame处理
+            initVersionPopup();
         };
 
-        // 暴露给全局（用于onclick调用）
+        // 全局函数
         window.handleChoice = handleChoice;
         window.resetGame = resetGame;
     </script>

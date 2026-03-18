@@ -92,6 +92,14 @@
             box-shadow: 0 0 6px rgba(139, 115, 85, 0.3);
         }
 
+        /* 特殊成就金色样式 */
+        .achievement-icon.unlocked.golden {
+            border-color: #D4AF37;
+            background: #3a2e1a;
+            box-shadow: 0 0 8px #D4AF37;
+            color: #fff;
+        }
+
         .achievement-icon[data-achievement]:hover::after {
             content: attr(data-title);
             position: absolute;
@@ -242,7 +250,7 @@
             background: #111;
         }
 
-        /* 版本弹窗 (更新日志) - 无emoji版本 */
+        /* 版本弹窗 (更新日志) - 无emoji */
         .changelog-popup {
             position: fixed;
             bottom: 80px;
@@ -356,7 +364,7 @@
             }
         }
 
-        /* ---------- 开始界面（省电风格 · 纯黑极简） ---------- */
+        /* ---------- 开始界面 ---------- */
         .start-overlay {
             position: fixed;
             top: 0;
@@ -472,6 +480,8 @@
                 <li>大幅丰富各支线对话内容，更显细腻</li>
                 <li>移除更新日志中的图标，保持界面纯粹</li>
                 <li>优化青衣少年两次对话的差异感</li>
+                <li>特殊成就「无对无错，善良依旧」变为金色</li>
+                <li>修复失败结局未解锁成就的bug</li>
             </ul>
             <div class="date">2026-03-20</div>
         </div>
@@ -524,7 +534,7 @@
                         { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑，一路大呼小叫。' }
                     ],
                     choices: [
-                        { text: '仓皇逃离', nextScene: 'fail_scholar_end' }
+                        { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' }
                     ]
                 },
                 'kid_encounter': {
@@ -536,7 +546,7 @@
                         { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' }
                     ],
                     choices: [
-                        { text: '落荒而逃', nextScene: 'fail_kid_end' }
+                        { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' }
                     ]
                 },
                 'wait_more_1': {
@@ -712,7 +722,9 @@
             let html = '';
             gameData.achievementIcons.forEach(ach => {
                 const unlocked = gameData.achievements[ach.id];
-                html += `<div class="achievement-icon ${unlocked ? 'unlocked' : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${unlocked ? '✓' : ''}</div>`;
+                // 特殊处理金色成就 (true)
+                const goldenClass = (ach.id === 'true' && unlocked) ? 'golden' : '';
+                html += `<div class="achievement-icon ${unlocked ? 'unlocked ' + goldenClass : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${unlocked ? '✓' : ''}</div>`;
             });
             container.innerHTML = html;
         }
@@ -779,10 +791,15 @@
 
         // 处理选择
         function handleChoice(nextScene, action) {
+            // 根据action解锁对应成就
             if (action === 'achievement_true') {
                 unlockAchievement('true');
             } else if (action === 'unlock_god') {
                 unlockAchievement('god');
+            } else if (action === 'unlock_fail_scholar') {
+                unlockAchievement('fail_scholar');
+            } else if (action === 'unlock_fail_kid') {
+                unlockAchievement('fail_kid');
             } else if (action === 'reset') {
                 resetGame(false);
                 return;

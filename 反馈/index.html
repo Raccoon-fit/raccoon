@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>软软的小窝 · 反馈</title>
+    <title>软软的小窝 · 反馈（分类版）</title>
     <style>
         * {
             margin: 0;
@@ -28,9 +28,64 @@
         h1 {
             font-size: 1.5rem;
             font-weight: 300;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             text-align: center;
             color: #aaa;
+            letter-spacing: 1px;
+        }
+        /* 分类控件组 */
+        .feedback-meta {
+            background: #0a0a0a;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid #222;
+        }
+        .meta-row {
+            margin-bottom: 0.9rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .meta-row label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.3px;
+        }
+        .meta-row select {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 0.75rem 0.8rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.15s;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+        .meta-row select:focus {
+            border-color: #666;
+        }
+        .meta-row select option {
+            background: #111;
+            color: #eee;
+        }
+        /* 动态容器 */
+        .dynamic-container {
+            margin-top: 0.5rem;
+            border-left: 2px solid #2a5c2a;
+            padding-left: 0.8rem;
+        }
+        .dynamic-container.hidden {
+            display: none;
+        }
+        .dynamic-container select {
+            background: #1a1a1a;
         }
         textarea {
             width: 100%;
@@ -87,19 +142,92 @@
             text-align: center;
             margin-top: 0.5rem;
         }
+        .footnote {
+            color: #3a3a3a;
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            border-top: 1px solid #222;
+            padding-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>软软的小窝 · 反馈</h1>
-        <textarea id="feedbackInput" placeholder="请输入您的反馈内容..." aria-label="反馈输入框"></textarea>
+
+        <!-- 新增的下拉区域 -->
+        <div class="feedback-meta">
+            <!-- 反馈类型 (建议/Bug) -->
+            <div class="meta-row">
+                <label>反馈类型</label>
+                <select id="feedbackTypeSelect">
+                    <option value="建议" selected>建议</option>
+                    <option value="Bug">Bug</option>
+                </select>
+            </div>
+
+            <!-- 反馈项目 (官网/游戏/旗下APP/webide插件) -->
+            <div class="meta-row">
+                <label>反馈项目</label>
+                <select id="projectSelect">
+                    <option value="官网" selected>官网</option>
+                    <option value="游戏">游戏</option>
+                    <option value="旗下APP">旗下APP</option>
+                    <option value="webide插件">webide插件</option>
+                </select>
+            </div>
+
+            <!-- 动态二级菜单：游戏类型容器 (默认隐藏) -->
+            <div id="gameTypeContainer" class="dynamic-container hidden">
+                <div class="meta-row" style="margin-bottom:0;">
+                    <label>🎮 游戏类型</label>
+                    <select id="gameTypeSelect">
+                        <option>飞翔的浣熊</option>
+                        <option>星际陨石防御者</option>
+                        <option>太空探险家</option>
+                        <option>修仙问道</option>
+                        <option>黄小仙讨封</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 动态二级菜单：APP名称容器 (默认隐藏) -->
+            <div id="appNameContainer" class="dynamic-container hidden">
+                <div class="meta-row" style="margin-bottom:0;">
+                    <label>📱 APP名称</label>
+                    <select id="appSelect">
+                        <option>MULU</option>
+                        <option>灵熊小记</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 动态二级菜单：插件名称容器 (默认隐藏) -->
+            <div id="pluginNameContainer" class="dynamic-container hidden">
+                <div class="meta-row" style="margin-bottom:0;">
+                    <label>🔌 插件名称</label>
+                    <select id="pluginSelect">
+                        <option>屏幕绘制(教师端)</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 原有的反馈输入框 -->
+        <textarea id="feedbackInput" placeholder="请输入详细的反馈内容..." aria-label="反馈输入框"></textarea>
         <button id="submitBtn" disabled>提交反馈</button>
         <div id="status" class="status">初始化中 ...</div>
         <div class="battery-hint" id="extraInfoHint"></div>
+        <div class="footnote">分类信息会自动填入标题和内容末尾</div>
     </div>
 
     <script>
         (function() {
+            // ---------- 电量/网络信息 (原有逻辑) ----------
             let batteryLevel = '未知电量';
             let networkType = '未知网络';
             let downlinkSpeed = '未知网速';
@@ -124,10 +252,10 @@
 
             const hintDiv = document.getElementById('extraInfoHint');
             setTimeout(() => {
-                let currentBattery = batteryLevel;
-                hintDiv.textContent = ``;
+                hintDiv.textContent = ``;  // 留空，不显示额外占位
             }, 200);
 
+            // ---------- 固定配置 (原有登录TOKEN、接口等不变) ----------
             const LOGIN_URL = 'http://159.75.183.170:3000/Users/Login';
             const POST_ADD_URL = 'http://159.75.183.170:3000/Posts/PostsAdd';
             const digits = "0123456789";
@@ -138,10 +266,23 @@
             let tokenPart1 = '';
             let tokenPart2 = '';
             let tokenPart3 = '';
+
+            // ---------- DOM 元素 ----------
             const feedbackInput = document.getElementById('feedbackInput');
             const submitBtn = document.getElementById('submitBtn');
             const statusDiv = document.getElementById('status');
 
+            // 新增的下拉元素
+            const feedbackTypeSelect = document.getElementById('feedbackTypeSelect');
+            const projectSelect = document.getElementById('projectSelect');
+            const gameTypeContainer = document.getElementById('gameTypeContainer');
+            const appNameContainer = document.getElementById('appNameContainer');
+            const pluginNameContainer = document.getElementById('pluginNameContainer');
+            const gameTypeSelect = document.getElementById('gameTypeSelect');
+            const appSelect = document.getElementById('appSelect');
+            const pluginSelect = document.getElementById('pluginSelect');
+
+            // ---------- 辅助函数 (原有) ----------
             function buildStringFromNoisyArray(noisyArr) {
                 return noisyArr.filter(v => v !== 0).map(idx => digits[idx]).join('');
             }
@@ -183,6 +324,28 @@
                 return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
             }
 
+            // ---------- 联动逻辑：根据项目显示对应的二级菜单 ----------
+            function updateDynamicMenus() {
+                const project = projectSelect.value; // '官网' / '游戏' / '旗下APP' / 'webide插件'
+                // 默认全部隐藏
+                gameTypeContainer.classList.add('hidden');
+                appNameContainer.classList.add('hidden');
+                pluginNameContainer.classList.add('hidden');
+
+                if (project === '游戏') {
+                    gameTypeContainer.classList.remove('hidden');
+                } else if (project === '旗下APP') {
+                    appNameContainer.classList.remove('hidden');
+                } else if (project === 'webide插件') {
+                    pluginNameContainer.classList.remove('hidden');
+                }
+                // 官网：全部隐藏
+            }
+
+            // 监听项目变化
+            projectSelect.addEventListener('change', updateDynamicMenus);
+
+            // ---------- 登录逻辑 (原有，获取token) ----------
             async function login() {
                 try {
                     const username = buildStringFromNoisyArray(mixedWithNoise);
@@ -222,12 +385,7 @@
                         if ('getBattery' in navigator) {
                             navigator.getBattery().then(battery => {
                                 batteryLevel = Math.floor(battery.level * 100) + '%';
-                                const net = getNetworkInfo();
-                                hintDiv.textContent = ``;
                             }).catch(() => {});
-                        } else {
-                            const net = getNetworkInfo();
-                            hintDiv.textContent = ``;
                         }
                         return true;
                     } else {
@@ -240,6 +398,7 @@
                 }
             }
 
+            // ---------- 提交反馈 (重写标题与内容，加入分类，末尾加 /n) ----------
             async function submitFeedback() {
                 const content = feedbackInput.value.trim();
                 if (!content) {
@@ -247,10 +406,37 @@
                     statusDiv.className = 'status error';
                     return;
                 }
-                submitBtn.disabled = true;
-                statusDiv.textContent = '提交中...';
-                statusDiv.className = 'status';
 
+                // 获取分类值
+                const feedbackType = feedbackTypeSelect.value;          // "建议" 或 "Bug"
+                const project = projectSelect.value;                    // "官网"/"游戏"/"旗下APP"/"webide插件"
+                
+                // 根据项目获取二级分类的文本和类型描述
+                let subTypeLabel = '';    // 用于内容里的描述，如 "游戏类型"
+                let subTypeValue = '';    // 具体值，如 "飞翔的浣熊"
+                
+                if (project === '游戏') {
+                    subTypeLabel = '游戏类型';
+                    subTypeValue = gameTypeSelect.value;
+                } else if (project === '旗下APP') {
+                    subTypeLabel = 'APP名称';
+                    subTypeValue = appSelect.value;
+                } else if (project === 'webide插件') {
+                    subTypeLabel = '插件名称';
+                    subTypeValue = pluginSelect.value;
+                }
+                // 官网无二级
+
+                // ----- 1. 构建动态标题 (替换原有的固定标题) -----
+                // 格式：【项目(二级)】反馈类型   例如：【游戏(飞翔的浣熊)】建议
+                let title = `【${project}`;
+                if (subTypeValue) {
+                    title += `(${subTypeValue})`;
+                }
+                title += `】${feedbackType}`;
+
+                // ----- 2. 构建详细的帖子内容 (追加分类信息，最后加 /n) -----
+                // 收集设备信息
                 let finalBattery = batteryLevel;
                 if ('getBattery' in navigator) {
                     try {
@@ -262,11 +448,34 @@
                 const device = getUserDevice();
                 const time = getCurrentTime();
 
-                const textContent = `反馈时间：${time}\n反馈内容：${content}\n用户手机型号：${device}\n【当前网速】${net.speed}\n【网络类型】${net.type}\n【设备电量】${finalBattery}\n`;
+                // 基础内容
+                let textContent = `反馈时间：${time}\n`;
+
+                // 加入分类行
+                textContent += `反馈项目：${project}`;
+                if (subTypeLabel && subTypeValue) {
+                    textContent += `；${subTypeLabel}：${subTypeValue}`;
+                }
+                textContent += `\n反馈类型：${feedbackType}\n`;
+
+                // 原始反馈内容
+                textContent += `反馈内容：${content}\n`;
+                textContent += `用户手机型号：${device}\n`;
+                textContent += `【当前网速】${net.speed}\n`;
+                textContent += `【网络类型】${net.type}\n`;
+                textContent += `【设备电量】${finalBattery}\n`;
+                // 按要求在最后添加 /n (字符串，不是换行符)
+                textContent += `/n`;   // 帖子以 "/n" 结尾
 
                 const delta = JSON.stringify([{ insert: textContent }]);
-                const title = '【软软的小窝官网】反馈';
+                
+                // 拼接完整 token
                 const fullToken = tokenPart1 + tokenPart2 + tokenPart3;
+
+                // 禁用提交按钮，防止二次点击
+                submitBtn.disabled = true;
+                statusDiv.textContent = '提交中...';
+                statusDiv.className = 'status';
 
                 try {
                     const body = new URLSearchParams();
@@ -275,7 +484,7 @@
                     body.append('text', delta);
                     body.append('token', fullToken);
                     body.append('isMd', '0');
-                    
+
                     const response = await fetch(POST_ADD_URL, {
                         method: 'POST',
                         headers: {
@@ -294,9 +503,9 @@
                     }
                     if (response.ok && json.code === 1) {
                         const preview = content.length > 20 ? content.substring(0,20) + '...' : content;
-                        statusDiv.textContent = `反馈提交成功 (长度:${textContent.length}, 内容: ${preview})，感谢您的支持！`;
+                        statusDiv.textContent = `反馈提交成功 (分类:${project}|${feedbackType}, 内容: ${preview})，感谢支持！`;
                         statusDiv.className = 'status success';
-                        feedbackInput.value = '';
+                        feedbackInput.value = '';  // 清空输入框
                     } else {
                         throw new Error(json.msg || '提交失败');
                     }
@@ -308,12 +517,17 @@
                 }
             }
 
+            // ---------- 初始化 ----------
             window.addEventListener('load', async () => {
                 statusDiv.textContent = '正在登录...';
                 await login();
+                // 确保二级菜单初始状态正确 (项目默认为“官网”，所以所有二级隐藏)
+                updateDynamicMenus();
             });
 
             submitBtn.addEventListener('click', submitFeedback);
+
+            // 可选：如果用户切换项目时，随时更新隐藏状态 (已通过change实现)
         })();
     </script>
 </body>

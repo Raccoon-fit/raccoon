@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>黄小仙 · 讨封之卷</title>
+    <title>黄小仙 · 讨封之卷 (深泽重制)</title>
     <style>
         * {
             margin: 0;
@@ -92,7 +92,6 @@
             box-shadow: 0 0 6px rgba(139, 115, 85, 0.3);
         }
 
-        /* 特殊成就金色样式 */
         .achievement-icon.unlocked.golden {
             border-color: #D4AF37;
             background: #3a2e1a;
@@ -218,7 +217,7 @@
             font-weight: bold;
         }
 
-        /* 底部信息区：版本号 + 备案 */
+        /* 底部信息区：版本号 + 快进 + 备案 */
         .footer {
             display: flex;
             justify-content: space-between;
@@ -231,9 +230,11 @@
 
         .version-container {
             position: relative;
+            display: flex;
+            gap: 12px;
         }
 
-        .version-btn {
+        .version-btn, .skip-btn {
             background: transparent;
             border: none;
             color: #666;
@@ -245,12 +246,12 @@
             transition: all 0.2s;
         }
 
-        .version-btn:hover {
+        .version-btn:hover, .skip-btn:hover {
             color: #aaa;
             background: #111;
         }
 
-        /* 版本弹窗 (更新日志) - 无emoji */
+        /* 版本弹窗 (更新日志) */
         .changelog-popup {
             position: fixed;
             bottom: 80px;
@@ -364,7 +365,7 @@
             }
         }
 
-        /* ---------- 开始界面 ---------- */
+        /* 开始界面 */
         .start-overlay {
             position: fixed;
             top: 0;
@@ -429,8 +430,8 @@
     <!-- 开始界面 overlay -->
     <div class="start-overlay" id="startOverlay">
         <div class="start-content">
-            <h1>黄小仙</h1>
-            <p class="start-subtitle">五百年修行为一朝</p>
+            <h1>黄小仙·深泽</h1>
+            <p class="start-subtitle">五百年修为一念之间</p>
             <button class="start-btn" id="startBtn">开始讨封</button>
         </div>
     </div>
@@ -439,9 +440,7 @@
         <!-- 顶部状态栏 -->
         <div class="status-bar">
             <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
-            <div class="achievements" id="achievementsContainer">
-                <!-- 成就图标由js动态渲染 -->
-            </div>
+            <div class="achievements" id="achievementsContainer"></div>
         </div>
 
         <!-- 剧情区域 -->
@@ -450,10 +449,11 @@
         <!-- 选项区域 -->
         <div class="choices-container" id="choices-container"></div>
 
-        <!-- 底部：版本号 + 软软小窝 -->
+        <!-- 底部：版本号 + 快进 + 软软小窝 -->
         <div class="footer">
             <div class="version-container">
-                <button class="version-btn" id="versionBtn">v1.0.2</button>
+                <button class="version-btn" id="versionBtn">v1.2.0</button>
+                <button class="skip-btn" id="skipBtn">⏩ 快进</button>
             </div>
             <div class="inland-security-footer">
                 <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
@@ -469,413 +469,533 @@
         <div class="name" id="achievement-name"></div>
     </div>
 
-    <!-- 更新日志弹窗 (左下角) 已移除所有emoji -->
+    <!-- 更新日志弹窗 (左下角) -->
     <div class="changelog-popup" id="changelogPopup">
-        <h4>更新日志</h4>
-        
+        <h4>更新日志 · 深泽重制</h4>
         <div class="version-block">
-            <div class="version-title">v1.0.2</div>
+            <div class="version-title">v1.2.0</div>
             <ul>
-                <li>修复成就无法正常点亮的问题</li>
-                <li>大幅丰富各支线对话内容，更显细腻</li>
-                <li>移除更新日志中的图标，保持界面纯粹</li>
-                <li>优化青衣少年两次对话的差异感</li>
-                <li>特殊成就「无对无错，善良依旧」变为金色</li>
-                <li>修复失败结局未解锁成就的bug</li>
+                <li>新增「分支回溯」：可从结局一键返回上一个选择点</li>
+                <li>快进功能：瞬间读完当前段落</li>
+                <li>两大全新结局：「山野村夫」「文曲星耀」及对应成就</li>
+                <li>书生/顽童支线增加正面反转选项</li>
+                <li>农夫隐藏人物线，带来意外温暖</li>
+                <li>大幅扩充文本细节，分支更繁茂</li>
+                <li>修复成就无法全部点亮的遗留问题</li>
             </ul>
-            <div class="date">2026-03-20</div>
+            <div class="date">2026-03-21</div>
         </div>
-
         <div class="version-block old">
-            <div class="version-title">v1.0.1</div>
-            <ul>
-                <li>新增多个结局分支：青衣少年两次选择不同</li>
-                <li>新增「山野村夫」「文曲星耀」等成就</li>
-                <li>丰富剧情深度，每个选择导向更细腻</li>
-                <li>成就图标增加悬浮描述</li>
-                <li>修复打字机与选项冲突</li>
-            </ul>
-            <div class="date">2026-03-19</div>
+            <div class="version-title">v1.0.2</div>
+            <ul><li>基础版本：五结局 + 成就系统</li></ul>
         </div>
     </div>
 
     <script>
-        // 游戏数据 —— 丰富多结局、多成就、青衣少年两次选择差异
-        const gameData = {
-            achievements: {
-                'true': false,          // 无对无错，善良依旧
-                'fail_scholar': false,   // 功亏一篑
-                'fail_kid': false,       // 原形毕露
-                'mortal': false,         // 尘世轮回
-                'god': false,            // 点化成仙(青衣认可)
-                'farmer': false,          // 山野村夫
-                'star': false             // 文曲星耀
-            },
-            scenes: {
-                'start': {
-                    texts: [
-                        { type: 'narrator', content: '雷雨夜，山路泥泞。' },
-                        { type: 'narrator', content: '你是一只修炼了五百年的黄鼠狼精，今日正是你的讨封之期。' },
-                        { type: 'narrator', content: '只要能让人说一声"像人"或"像仙"，你便能化形成功，脱离妖身。' },
-                        { type: 'narrator', content: '雨幕中，远远走来几个人影。你该向谁开口？' }
-                    ],
-                    choices: [
-                        { text: '向前面那个赶路的书生讨封', nextScene: 'scholar_encounter' },
-                        { text: '向路边的顽童讨封', nextScene: 'kid_encounter' },
-                        { text: '再找找其他人', nextScene: 'wait_more_1' }
-                    ]
+        (function() {
+            // 游戏数据 —— 丰富多结局、隐藏反转、分支回溯
+            const gameData = {
+                achievements: {
+                    'true': false,          // 无对无错，善良依旧 (金色)
+                    'god': false,            // 点化成仙
+                    'mortal': false,         // 尘世轮回
+                    'fail_scholar': false,   // 功亏一篑
+                    'fail_kid': false,       // 原形毕露
+                    'farmer': false,         // 山野村夫 (新)
+                    'star': false             // 文曲星耀 (新)
                 },
-                'scholar_encounter': {
-                    texts: [
-                        { type: 'narrator', content: '你从树后闪身而出，拦住了那位赶路的书生。' },
-                        { type: 'speaker', content: '书生猛地停步，伞掉在地上："何...何方妖怪！莫要害我！"' },
-                        { type: 'narrator', content: '你尽力作出一副和善模样，拱手道："这位公子，请问你看我像人还是像仙？"' },
-                        { type: 'speaker', content: '书生脸色惨白，连连后退："像...像妖怪！一身骚气，还不快滚！"' },
-                        { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑，一路大呼小叫。' }
-                    ],
-                    choices: [
-                        { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' }
-                    ]
-                },
-                'kid_encounter': {
-                    texts: [
-                        { type: 'narrator', content: '你悄悄靠近那个蹲在路边玩泥巴的顽童。' },
-                        { type: 'speaker', content: '顽童抬头看见你，眼睛一亮："呀，好大一只黄鼠狼！你的尾巴真好看！"' },
-                        { type: 'narrator', content: '你心中暗喜，低声问道："小娃娃，你看我像什么？像人吗？"' },
-                        { type: 'speaker', content: '顽童歪头想了想："像……像一只会说话的黄鼠狼！我阿婆说黄鼠狼会偷鸡，你是不是来偷我的泥人？"' },
-                        { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' }
-                    ],
-                    choices: [
-                        { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' }
-                    ]
-                },
-                'wait_more_1': {
-                    texts: [
-                        { type: 'narrator', content: '你觉得书生和顽童都非有缘之人，决定再等等。' },
-                        { type: 'narrator', content: '雨越下越大，山路上积起水洼，你的皮毛已湿透。' },
-                        { type: 'narrator', content: '就在你几乎要放弃时，雨幕中缓缓走来一道青色身影，撑着油纸伞，步履从容。' }
-                    ],
-                    choices: [
-                        { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' },
-                        { text: '向这位青衣人讨封', nextScene: 'true_encounter_first' }
-                    ]
-                },
-                'wait_more_2': {
-                    texts: [
-                        { type: 'narrator', content: '你按捺住心中的焦躁，继续躲在树后等待。' },
-                        { type: 'narrator', content: '雨势渐小，山路却再无行人。' },
-                        { type: 'narrator', content: '那位青衣人并未走远，他停在不远处，伞沿微抬，似乎在望着你藏身的方向。' },
-                        { type: 'speaker', content: '他轻声开口："雨夜立良久，可是在等什么人？"' }
-                    ],
-                    choices: [
-                        { text: '走向他，实话实说', nextScene: 'true_encounter_second' },
-                        { text: '犹豫不决，再等下去', nextScene: 'wait_final' }
-                    ]
-                },
-                'wait_final': {
-                    texts: [
-                        { type: 'narrator', content: '你犹豫着，始终不敢上前。' },
-                        { type: 'narrator', content: '青衣人轻叹一声，转身离去，消失在雨雾中。' },
-                        { type: 'narrator', content: '雷声渐歇，天边泛起鱼肚白，讨封的时机已过。' },
-                        { type: 'narrator', content: '你只能拖着疲惫的身躯回到山中，继续做一只普通的黄鼠狼。' },
-                        { type: 'system', content: '结局：错失良机' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                },
-                // 第一次遇见青衣 —— 温和而试探
-                'true_encounter_first': {
-                    texts: [
-                        { type: 'narrator', content: '你从树后走出，雨水顺着皮毛滴落。' },
-                        { type: 'speaker', content: '青衣人停下脚步，伞微微前倾："深夜拦路，可是有事？"' },
-                        { type: 'narrator', content: '你作揖道："先生，我修行五百年，今日讨封，恳请您看我像人还是像仙？"' },
-                        { type: 'speaker', content: '青衣人凝视你许久，目光温和："我看你眼中尚有迷茫，似求道者，却未脱兽性。像——山中修行的精怪，离人仙尚远。"' },
-                        { type: 'speaker', content: '"但你心诚，若愿随我修行，或可成正果。"' }
-                    ],
-                    choices: [
-                        { text: '叩首拜谢，愿随修行', nextScene: 'god_ending_favor', action: 'unlock_god' },
-                        { text: '心有不甘，想再等等他人', nextScene: 'wait_more_2' }
-                    ]
-                },
-                // 第二次遇见青衣 —— 话语更深，直指本心
-                'true_encounter_second': {
-                    texts: [
-                        { type: 'narrator', content: '你走到青衣人面前，雨水打湿了你的全身，你却感到前所未有的平静。' },
-                        { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' },
-                        { type: 'speaker', content: '你点头："恳请先生指点。"' },
-                        { type: 'speaker', content: '他收起伞，任由雨丝洒落："你修行五百年，可还记得自己最初的模样？那时你未想成仙，未想成人，只知在山间自在奔跑。"' },
-                        { type: 'speaker', content: '"我看你，像这山间的风雨，来去随性。何必非要像人、像仙？你本就是黄小仙。"' }
-                    ],
-                    choices: [
-                        { text: '恍然大悟，不再执念', nextScene: 'true_ending', action: 'achievement_true' },
-                        { text: '仍想成人，恳请成全', nextScene: 'mortal_ending' }
-                    ]
-                },
-                // 结局1：真正的悟道
-                'true_ending': {
-                    texts: [
-                        { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年来，你一直执着于"像什么"，却忘了自己本就是自己。' },
-                        { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。你不入神籍，不落凡尘，以本我之姿逍遥于山水之间。' },
-                        { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' },
-                        { type: 'system', content: '成就：无对无错，善良依旧' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                },
-                // 结局2：化为凡人
-                'mortal_ending': {
-                    texts: [
-                        { type: 'speaker', content: '青衣人轻叹："你若执意如此，我便成全你。我看你像个凡人。"' },
-                        { type: 'narrator', content: '话音落下，你只觉得周身剧变，化作一个普通人的模样。' },
-                        { type: 'narrator', content: '你欣喜若狂，却渐渐遗忘了前尘往事，忘了自己曾是一只黄鼠狼。' },
-                        { type: 'narrator', content: '此后生老病死，轮回不息，你再也记不起那个雨夜，记不起青衣人，也记不起黄小仙这个名字。' },
-                        { type: 'system', content: '结局：尘世轮回' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                },
-                // 结局3：点化成仙 (跟随修行)
-                'god_ending_favor': {
-                    texts: [
-                        { type: 'speaker', content: '青衣人颔首："你既有此心，便随我来。我看你像仙。"' },
-                        { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，随他而去。' },
-                        { type: 'narrator', content: '此后你位列散仙，云游四海，只是偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
-                        { type: 'narrator', content: '仙道孤寂，但你从不后悔那晚的选择。' },
-                        { type: 'system', content: '成就：点化成仙' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                },
-                // 失败结局：书生
-                'fail_scholar_end': {
-                    texts: [
-                        { type: 'narrator', content: '你仓皇逃入深山，五百年修为几乎毁于一旦。' },
-                        { type: 'narrator', content: '道行大损，你只能重新修炼，蜷缩在洞穴中舔舐伤口。' },
-                        { type: 'narrator', content: '或许，这就是妖的命吧。' },
-                        { type: 'system', content: '结局：功亏一篑' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                },
-                // 失败结局：顽童
-                'fail_kid_end': {
-                    texts: [
-                        { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影，泥巴还粘在你的皮毛上。' },
-                        { type: 'narrator', content: '童言无忌，却字字如刀。你忽然明白，讨封一事强求不得。' },
-                        { type: 'narrator', content: '你转身回到山中，继续做你的黄鼠狼，偶尔远远望着山脚下的村庄。' },
-                        { type: 'system', content: '结局：原形毕露' }
-                    ],
-                    choices: [
-                        { text: '重新开始', nextScene: 'start', action: 'reset' }
-                    ]
-                }
-            },
-            currentScene: 'start',
-            storyHistory: [],
-            typingTimer: null,
-            achievementIcons: [
-                { id: 'true', title: '无对无错，善良依旧', icon: '✓' },
-                { id: 'god', title: '点化成仙', icon: '✓' },
-                { id: 'mortal', title: '尘世轮回', icon: '✓' },
-                { id: 'fail_scholar', title: '功亏一篑', icon: '✓' },
-                { id: 'fail_kid', title: '原形毕露', icon: '✓' }
-            ]
-        };
-
-        // 显示成就弹窗
-        function showAchievement(name) {
-            const popup = document.getElementById('achievement-popup');
-            const nameEl = document.getElementById('achievement-name');
-            nameEl.textContent = name;
-            popup.classList.add('show');
-            setTimeout(() => {
-                popup.classList.remove('show');
-            }, 3000);
-        }
-
-        // 解锁成就
-        function unlockAchievement(id) {
-            if (!gameData.achievements[id]) {
-                gameData.achievements[id] = true;
-                renderAchievementIcons();
-                localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
-                const nameMap = {
-                    'true': '无对无错，善良依旧',
-                    'god': '点化成仙',
-                    'mortal': '尘世轮回',
-                    'fail_scholar': '功亏一篑',
-                    'fail_kid': '原形毕露'
-                };
-                if (nameMap[id]) showAchievement(nameMap[id]);
-            }
-        }
-
-        // 渲染成就图标
-        function renderAchievementIcons() {
-            const container = document.getElementById('achievementsContainer');
-            if (!container) return;
-            let html = '';
-            gameData.achievementIcons.forEach(ach => {
-                const unlocked = gameData.achievements[ach.id];
-                // 特殊处理金色成就 (true)
-                const goldenClass = (ach.id === 'true' && unlocked) ? 'golden' : '';
-                html += `<div class="achievement-icon ${unlocked ? 'unlocked ' + goldenClass : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${unlocked ? '✓' : ''}</div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        // 渲染场景
-        function renderScene(sceneId) {
-            if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
-
-            const scene = gameData.scenes[sceneId];
-            if (!scene) return;
-
-            gameData.currentScene = sceneId;
-
-            const storyContainer = document.getElementById('story-container');
-            const choicesContainer = document.getElementById('choices-container');
-
-            storyContainer.innerHTML = '';
-            choicesContainer.innerHTML = '';
-
-            let textIndex = 0;
-            const totalTexts = scene.texts.length;
-
-            function showNextText() {
-                if (textIndex >= totalTexts) {
-                    showChoices();
-                    return;
-                }
-
-                const textObj = scene.texts[textIndex];
-                const p = document.createElement('p');
-                p.className = `story-text ${textObj.type}`;
-                storyContainer.appendChild(p);
-                storyContainer.scrollTop = storyContainer.scrollHeight;
-
-                const charSpeed = textObj.type === 'speaker' ? 40 : (textObj.type === 'system' ? 20 : 30);
-                let charIndex = 0;
-                const text = textObj.content;
-
-                function typeNextChar() {
-                    if (charIndex < text.length) {
-                        p.textContent += text[charIndex];
-                        charIndex++;
-                        storyContainer.scrollTop = storyContainer.scrollHeight;
-                        gameData.typingTimer = setTimeout(typeNextChar, charSpeed);
-                    } else {
-                        textIndex++;
-                        gameData.typingTimer = setTimeout(showNextText, 300);
+                // 成就图标配置
+                achievementIcons: [
+                    { id: 'true', title: '无对无错，善良依旧', icon: '✓' },
+                    { id: 'god', title: '点化成仙', icon: '✓' },
+                    { id: 'mortal', title: '尘世轮回', icon: '✓' },
+                    { id: 'fail_scholar', title: '功亏一篑', icon: '✓' },
+                    { id: 'fail_kid', title: '原形毕露', icon: '✓' },
+                    { id: 'farmer', title: '山野村夫', icon: '🌾' },
+                    { id: 'star', title: '文曲星耀', icon: '⭐' }
+                ],
+                // 场景库
+                scenes: {
+                    'start': {
+                        texts: [
+                            { type: 'narrator', content: '雷雨夜，山路泥泞。' },
+                            { type: 'narrator', content: '你是一只修炼了五百年的黄鼠狼精，今日正是你的讨封之期。' },
+                            { type: 'narrator', content: '只要能让人说一声"像人"或"像仙"，你便能化形成功，脱离妖身。' },
+                            { type: 'narrator', content: '雨幕中，远远走来几个人影。你该向谁开口？' }
+                        ],
+                        choices: [
+                            { text: '向前面那个赶路的书生讨封', nextScene: 'scholar_encounter' },
+                            { text: '向路边的顽童讨封', nextScene: 'kid_encounter' },
+                            { text: '再找找其他人', nextScene: 'wait_more_1' }
+                        ]
+                    },
+                    // 书生初始（负面）
+                    'scholar_encounter': {
+                        texts: [
+                            { type: 'narrator', content: '你从树后闪身而出，拦住了那位赶路的书生。' },
+                            { type: 'speaker', content: '书生猛地停步，伞掉在地上："何...何方妖怪！莫要害我！"' },
+                            { type: 'narrator', content: '你尽力作出一副和善模样，拱手道："这位公子，请问你看我像人还是像仙？"' },
+                            { type: 'speaker', content: '书生脸色惨白，连连后退："像...像妖怪！一身骚气，还不快滚！"' },
+                            { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑。' }
+                        ],
+                        choices: [
+                            { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' },
+                            { text: '追上去，拼命解释', nextScene: 'scholar_follow' }  // 新分支：反转可能
+                        ]
+                    },
+                    // 书生后续 —— 反转线
+                    'scholar_follow': {
+                        texts: [
+                            { type: 'narrator', content: '你不甘心，追上去挡在他面前，口吐人言："公子莫怕，我修行五百年从不害人，只求一句认可。"' },
+                            { type: 'speaker', content: '书生跌坐泥地，见你并无恶意，颤抖着问："你……你真的不偷鸡？"' },
+                            { type: 'narrator', content: '你摇头，将近日捕鼠护粮之事道来。书生渐渐平静，眼中竟有几分敬意。' },
+                            { type: 'speaker', content: '他沉吟良久："我自幼读书，从不信妖邪，今日见你通人性、守本分，倒像是……像是文曲星君座下的灵兽。"' },
+                            { type: 'narrator', content: '话音刚落，一道灵光没入你体内。你感觉灵智大开，虽未化人，却得了文气。' }
+                        ],
+                        choices: [
+                            { text: '拜谢书生', nextScene: 'star_ending', action: 'unlock_star' }
+                        ]
+                    },
+                    // 顽童初始（负面）
+                    'kid_encounter': {
+                        texts: [
+                            { type: 'narrator', content: '你悄悄靠近那个蹲在路边玩泥巴的顽童。' },
+                            { type: 'speaker', content: '顽童抬头看见你，眼睛一亮："呀，好大一只黄鼠狼！你的尾巴真好看！"' },
+                            { type: 'narrator', content: '你心中暗喜，低声问道："小娃娃，你看我像什么？像人吗？"' },
+                            { type: 'speaker', content: '顽童歪头想了想："像……像一只会说话的黄鼠狼！我阿婆说黄鼠狼会偷鸡，你是不是来偷我的泥人？"' },
+                            { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' }
+                        ],
+                        choices: [
+                            { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' },
+                            { text: '变成小猫逗他开心', nextScene: 'kid_play' }   // 新分支：友善路线
+                        ]
+                    },
+                    'kid_play': {
+                        texts: [
+                            { type: 'narrator', content: '你灵机一动，使出小法术变成一只小花猫，喵喵叫着蹭顽童的腿。' },
+                            { type: 'speaker', content: '顽童惊喜："哇！你还会变猫！太好玩了！"他抱起你，完全忘了刚才的害怕。' },
+                            { type: 'narrator', content: '顽童带你回家，他的奶奶是个慈祥老人，见猫通人性，笑着说："这猫有灵性，像保家的黄大仙呢。"' },
+                            { type: 'narrator', content: '你心头一暖，虽然没能化人，却从此留在农家，成为一只真正的保家仙。' }
+                        ],
+                        choices: [
+                            { text: '留在农家', nextScene: 'farmer_ending', action: 'unlock_farmer' }
+                        ]
+                    },
+                    // 等待分支1
+                    'wait_more_1': {
+                        texts: [
+                            { type: 'narrator', content: '你觉得书生和顽童都非有缘之人，决定再等等。' },
+                            { type: 'narrator', content: '雨越下越大，山路上积起水洼，你的皮毛已湿透。' },
+                            { type: 'narrator', content: '就在你几乎要放弃时，雨幕中缓缓走来一道青色身影，撑着油纸伞，步履从容。' },
+                            { type: 'narrator', content: '另有一个农夫挑着柴，从山道拐角冒雨跑来。' }
+                        ],
+                        choices: [
+                            { text: '向青衣人讨封', nextScene: 'true_encounter_first' },
+                            { text: '向农夫讨封', nextScene: 'farmer_encounter' },
+                            { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' }
+                        ]
+                    },
+                    // 农夫新支线
+                    'farmer_encounter': {
+                        texts: [
+                            { type: 'narrator', content: '你拦住农夫，他吓了一跳，柴担差点掉地。' },
+                            { type: 'speaker', content: '农夫瞪大眼："黄……黄大仙？俺娘说过，山里有修行的黄仙，不能得罪。"' },
+                            { type: 'narrator', content: '你作揖道："大哥，我修行五百年，今日讨封，你看我像人还是像仙？"' },
+                            { type: 'speaker', content: '农夫挠头，憨厚一笑："俺看您像山里的土地爷，护着咱们庄稼人。像，像保家仙！"' }
+                        ],
+                        choices: [
+                            { text: '感激不尽', nextScene: 'farmer_ending', action: 'unlock_farmer' }
+                        ]
+                    },
+                    // 等待分支2
+                    'wait_more_2': {
+                        texts: [
+                            { type: 'narrator', content: '你按捺住心中的焦躁，继续躲在树后等待。' },
+                            { type: 'narrator', content: '雨势渐小，山路却再无行人。' },
+                            { type: 'narrator', content: '那位青衣人并未走远，他停在不远处，伞沿微抬，似乎在望着你藏身的方向。' },
+                            { type: 'speaker', content: '他轻声开口："雨夜立良久，可是在等什么人？"' }
+                        ],
+                        choices: [
+                            { text: '走向他，实话实说', nextScene: 'true_encounter_second' },
+                            { text: '犹豫不决，再等下去', nextScene: 'wait_final' }
+                        ]
+                    },
+                    'wait_final': {
+                        texts: [
+                            { type: 'narrator', content: '你犹豫着，始终不敢上前。' },
+                            { type: 'narrator', content: '青衣人轻叹一声，转身离去，消失在雨雾中。' },
+                            { type: 'narrator', content: '雷声渐歇，天边泛起鱼肚白，讨封的时机已过。' },
+                            { type: 'narrator', content: '你只能拖着疲惫的身躯回到山中，继续做一只普通的黄鼠狼。' },
+                            { type: 'system', content: '结局：错失良机' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 青衣人初遇
+                    'true_encounter_first': {
+                        texts: [
+                            { type: 'narrator', content: '你从树后走出，雨水顺着皮毛滴落。' },
+                            { type: 'speaker', content: '青衣人停下脚步，伞微微前倾："深夜拦路，可是有事？"' },
+                            { type: 'narrator', content: '你作揖道："先生，我修行五百年，今日讨封，恳请您看我像人还是像仙？"' },
+                            { type: 'speaker', content: '青衣人凝视你许久，目光温和："我看你眼中尚有迷茫，似求道者，却未脱兽性。像——山中修行的精怪，离人仙尚远。"' },
+                            { type: 'speaker', content: '"但你心诚，若愿随我修行，或可成正果。"' }
+                        ],
+                        choices: [
+                            { text: '叩首拜谢，愿随修行', nextScene: 'god_ending_favor', action: 'unlock_god' },
+                            { text: '心有不甘，想再等等他人', nextScene: 'wait_more_2' }
+                        ]
+                    },
+                    // 青衣人再遇 (第二次)
+                    'true_encounter_second': {
+                        texts: [
+                            { type: 'narrator', content: '你走到青衣人面前，雨水打湿了你的全身，你却感到前所未有的平静。' },
+                            { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' },
+                            { type: 'speaker', content: '你点头："恳请先生指点。"' },
+                            { type: 'speaker', content: '他收起伞，任由雨丝洒落："你修行五百年，可还记得自己最初的模样？那时你未想成仙，未想成人，只知在山间自在奔跑。"' },
+                            { type: 'speaker', content: '"我看你，像这山间的风雨，来去随性。何必非要像人、像仙？你本就是黄小仙。"' }
+                        ],
+                        choices: [
+                            { text: '恍然大悟，不再执念', nextScene: 'true_ending', action: 'achievement_true' },
+                            { text: '仍想成人，恳请成全', nextScene: 'mortal_ending' },
+                            { text: '怀疑他的用意，质问', nextScene: 'suspicious_ending' }   // 新增反转
+                        ]
+                    },
+                    // 怀疑青衣人——反转结局
+                    'suspicious_ending': {
+                        texts: [
+                            { type: 'speaker', content: '你后退一步："你为何帮我？莫不是想骗我元神？"' },
+                            { type: 'speaker', content: '青衣人先是一愣，随即大笑："有趣，有趣！五百年的小妖竟有这般戒心。"' },
+                            { type: 'narrator', content: '他摇身一变，竟是一位白发仙人："我乃北山真君，特来点化于你，可惜你疑心太重。罢了，缘尽于此。"' },
+                            { type: 'narrator', content: '仙人化作清风离去，你呆立原地，追悔莫及。此后你道心破碎，修为再难精进。' },
+                            { type: 'system', content: '结局：疑心失缘' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 结局1：真正的悟道
+                    'true_ending': {
+                        texts: [
+                            { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年来，你一直执着于"像什么"，却忘了自己本就是自己。' },
+                            { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。你不入神籍，不落凡尘，以本我之姿逍遥于山水之间。' },
+                            { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' },
+                            { type: 'system', content: '成就：无对无错，善良依旧' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 结局2：化为凡人
+                    'mortal_ending': {
+                        texts: [
+                            { type: 'speaker', content: '青衣人轻叹："你若执意如此，我便成全你。我看你像个凡人。"' },
+                            { type: 'narrator', content: '话音落下，你只觉得周身剧变，化作一个普通人的模样。' },
+                            { type: 'narrator', content: '你欣喜若狂，却渐渐遗忘了前尘往事，忘了自己曾是一只黄鼠狼。' },
+                            { type: 'narrator', content: '此后生老病死，轮回不息，你再也记不起那个雨夜。' },
+                            { type: 'system', content: '结局：尘世轮回' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 结局3：点化成仙
+                    'god_ending_favor': {
+                        texts: [
+                            { type: 'speaker', content: '青衣人颔首："你既有此心，便随我来。我看你像仙。"' },
+                            { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，随他而去。' },
+                            { type: 'narrator', content: '此后你位列散仙，云游四海，只是偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
+                            { type: 'system', content: '成就：点化成仙' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 结局4：山野村夫
+                    'farmer_ending': {
+                        texts: [
+                            { type: 'narrator', content: '农夫的话朴实而真诚，你感到一股暖流涌入身体。虽未化形，却与这片土地结了善缘。' },
+                            { type: 'narrator', content: '从此你常驻山村，护佑五谷牲畜，成了远近闻名的"黄大仙"。逢年过节，总有村民来供香火。' },
+                            { type: 'system', content: '成就：山野村夫' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 结局5：文曲星耀
+                    'star_ending': {
+                        texts: [
+                            { type: 'narrator', content: '得了书生的文气，你灵智大开，虽还是黄鼠狼之身，却能口吐诗词，通晓文章。' },
+                            { type: 'narrator', content: '后来书生高中状元，为你立了"文兽祠"；你的故事被写入志怪，流传千年。' },
+                            { type: 'system', content: '成就：文曲星耀' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 失败结局：书生
+                    'fail_scholar_end': {
+                        texts: [
+                            { type: 'narrator', content: '你仓皇逃入深山，五百年修为几乎毁于一旦。' },
+                            { type: 'narrator', content: '道行大损，你只能重新修炼，蜷缩在洞穴中舔舐伤口。' },
+                            { type: 'system', content: '结局：功亏一篑' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
+                    },
+                    // 失败结局：顽童
+                    'fail_kid_end': {
+                        texts: [
+                            { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影，泥巴还粘在你的皮毛上。' },
+                            { type: 'narrator', content: '童言无忌，却字字如刀。你忽然明白，讨封一事强求不得。' },
+                            { type: 'narrator', content: '你转身回到山中，继续做你的黄鼠狼，偶尔远远望着山脚下的村庄。' },
+                            { type: 'system', content: '结局：原形毕露' }
+                        ],
+                        choices: [
+                            { text: '重新开始', nextScene: 'start', action: 'reset' },
+                            { text: '回到上一个选择点', nextScene: 'checkpoint' }
+                        ]
                     }
-                }
-                typeNextChar();
+                },
+                currentScene: 'start',
+                storyHistory: [],
+                typingTimer: null,
+                checkpointScene: 'start',        // 存档点（上一个有意义的选择场景）
+                skipMode: false
+            };
+
+            // 显示成就弹窗
+            function showAchievement(name) {
+                const popup = document.getElementById('achievement-popup');
+                const nameEl = document.getElementById('achievement-name');
+                nameEl.textContent = name;
+                popup.classList.add('show');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
             }
 
-            function showChoices() {
+            // 解锁成就
+            function unlockAchievement(id) {
+                if (!gameData.achievements[id]) {
+                    gameData.achievements[id] = true;
+                    renderAchievementIcons();
+                    localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
+                    const nameMap = {
+                        'true': '无对无错，善良依旧',
+                        'god': '点化成仙',
+                        'mortal': '尘世轮回',
+                        'fail_scholar': '功亏一篑',
+                        'fail_kid': '原形毕露',
+                        'farmer': '山野村夫',
+                        'star': '文曲星耀'
+                    };
+                    if (nameMap[id]) showAchievement(nameMap[id]);
+                }
+            }
+
+            // 渲染成就图标
+            function renderAchievementIcons() {
+                const container = document.getElementById('achievementsContainer');
+                if (!container) return;
+                let html = '';
+                gameData.achievementIcons.forEach(ach => {
+                    const unlocked = gameData.achievements[ach.id];
+                    const goldenClass = (ach.id === 'true' && unlocked) ? 'golden' : '';
+                    html += `<div class="achievement-icon ${unlocked ? 'unlocked ' + goldenClass : ''}" data-achievement="${ach.id}" data-title="${ach.title}">${unlocked ? ach.icon : ''}</div>`;
+                });
+                container.innerHTML = html;
+            }
+
+            // 完全显示当前场景（快进）
+            function skipCurrentScene() {
+                if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
+                const scene = gameData.scenes[gameData.currentScene];
+                if (!scene) return;
+                const storyContainer = document.getElementById('story-container');
+                const choicesContainer = document.getElementById('choices-container');
+                // 直接清空并一次性显示所有文本
+                storyContainer.innerHTML = '';
+                scene.texts.forEach(textObj => {
+                    const p = document.createElement('p');
+                    p.className = `story-text ${textObj.type}`;
+                    p.textContent = textObj.content;
+                    storyContainer.appendChild(p);
+                });
+                storyContainer.scrollTop = storyContainer.scrollHeight;
+                // 显示选项
+                showChoicesDirect(scene);
+            }
+
+            function showChoicesDirect(scene) {
+                const choicesContainer = document.getElementById('choices-container');
                 let html = '';
                 scene.choices.forEach((choice, index) => {
+                    // 如果选项是返回checkpoint但checkpoint无效，则不显示
+                    if (choice.nextScene === 'checkpoint' && !gameData.checkpointScene) return;
                     const actionParam = choice.action ? `'${choice.action}'` : 'null';
-                    html += `<button class="choice-btn" onclick="handleChoice('${choice.nextScene}', ${actionParam})" style="animation-delay: ${index * 0.1}s">${choice.text}</button>`;
+                    const nextParam = choice.nextScene === 'checkpoint' ? `'${gameData.checkpointScene}'` : `'${choice.nextScene}'`;
+                    html += `<button class="choice-btn" onclick="handleChoice(${nextParam}, ${actionParam})" style="animation-delay: ${index * 0.1}s">${choice.text}</button>`;
                 });
                 choicesContainer.innerHTML = html;
             }
 
-            showNextText();
-        }
+            // 渲染场景 (打字机)
+            function renderScene(sceneId) {
+                if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
 
-        // 处理选择
-        function handleChoice(nextScene, action) {
-            // 根据action解锁对应成就
-            if (action === 'achievement_true') {
-                unlockAchievement('true');
-            } else if (action === 'unlock_god') {
-                unlockAchievement('god');
-            } else if (action === 'unlock_fail_scholar') {
-                unlockAchievement('fail_scholar');
-            } else if (action === 'unlock_fail_kid') {
-                unlockAchievement('fail_kid');
-            } else if (action === 'reset') {
-                resetGame(false);
-                return;
+                const scene = gameData.scenes[sceneId];
+                if (!scene) return;
+
+                gameData.currentScene = sceneId;
+
+                // 更新存档点：如果当前场景有选项（且不是纯重置场景），则设为检查点
+                if (scene.choices && scene.choices.length > 0 && scene.choices[0].text !== '重新开始' && scene.choices[0].text !== '回到上一个选择点') {
+                    gameData.checkpointScene = sceneId;
+                }
+
+                const storyContainer = document.getElementById('story-container');
+                const choicesContainer = document.getElementById('choices-container');
+
+                storyContainer.innerHTML = '';
+                choicesContainer.innerHTML = '';
+
+                let textIndex = 0;
+                const totalTexts = scene.texts.length;
+
+                function showNextText() {
+                    if (textIndex >= totalTexts) {
+                        showChoicesDirect(scene);
+                        return;
+                    }
+
+                    const textObj = scene.texts[textIndex];
+                    const p = document.createElement('p');
+                    p.className = `story-text ${textObj.type}`;
+                    storyContainer.appendChild(p);
+                    storyContainer.scrollTop = storyContainer.scrollHeight;
+
+                    const charSpeed = textObj.type === 'speaker' ? 40 : (textObj.type === 'system' ? 20 : 30);
+                    let charIndex = 0;
+                    const text = textObj.content;
+
+                    function typeNextChar() {
+                        if (charIndex < text.length) {
+                            p.textContent += text[charIndex];
+                            charIndex++;
+                            storyContainer.scrollTop = storyContainer.scrollHeight;
+                            gameData.typingTimer = setTimeout(typeNextChar, charSpeed);
+                        } else {
+                            textIndex++;
+                            gameData.typingTimer = setTimeout(showNextText, 300);
+                        }
+                    }
+                    typeNextChar();
+                }
+
+                showNextText();
             }
 
-            setTimeout(() => {
-                renderScene(nextScene);
-            }, 200);
-        }
+            // 处理选择
+            window.handleChoice = function(nextScene, action) {
+                // 处理特殊action
+                if (action === 'achievement_true') unlockAchievement('true');
+                else if (action === 'unlock_god') unlockAchievement('god');
+                else if (action === 'unlock_fail_scholar') unlockAchievement('fail_scholar');
+                else if (action === 'unlock_fail_kid') unlockAchievement('fail_kid');
+                else if (action === 'unlock_farmer') unlockAchievement('farmer');
+                else if (action === 'unlock_star') unlockAchievement('star');
+                else if (action === 'reset') {
+                    resetGame(false);
+                    return;
+                }
 
-        // 重置游戏
-        function resetGame(fullReset = true) {
-            const overlay = document.getElementById('startOverlay');
-            if (overlay) overlay.style.display = 'none';
+                // 延迟加载下一场景
+                setTimeout(() => {
+                    renderScene(nextScene);
+                }, 200);
+            };
 
-            if (fullReset) {
-                gameData.achievements = {
-                    'true': false,
-                    'fail_scholar': false,
-                    'fail_kid': false,
-                    'mortal': false,
-                    'god': false
-                };
-                localStorage.removeItem('huangdaxian_achievements');
+            // 重置游戏 (不重置成就)
+            function resetGame(fullReset = false) {
+                const overlay = document.getElementById('startOverlay');
+                if (overlay) overlay.style.display = 'none';
+
+                if (fullReset) {
+                    gameData.achievements = {
+                        'true': false, 'god': false, 'mortal': false,
+                        'fail_scholar': false, 'fail_kid': false,
+                        'farmer': false, 'star': false
+                    };
+                    localStorage.removeItem('huangdaxian_achievements');
+                    renderAchievementIcons();
+                }
+                gameData.checkpointScene = 'start';
+                renderScene('start');
+            }
+
+            // 加载成就
+            function loadSavedAchievements() {
+                const saved = localStorage.getItem('huangdaxian_achievements');
+                if (saved) {
+                    const savedAchievements = JSON.parse(saved);
+                    Object.keys(savedAchievements).forEach(key => {
+                        if (savedAchievements[key]) gameData.achievements[key] = true;
+                    });
+                }
                 renderAchievementIcons();
             }
-            renderScene('start');
-        }
 
-        // 加载成就
-        function loadSavedAchievements() {
-            const saved = localStorage.getItem('huangdaxian_achievements');
-            if (saved) {
-                const savedAchievements = JSON.parse(saved);
-                Object.keys(savedAchievements).forEach(key => {
-                    if (savedAchievements[key]) gameData.achievements[key] = true;
+            // 初始化版本弹窗 + 快进
+            function initControls() {
+                const versionBtn = document.getElementById('versionBtn');
+                const popup = document.getElementById('changelogPopup');
+                versionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    popup.classList.toggle('show');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!popup.contains(e.target) && e.target !== versionBtn) {
+                        popup.classList.remove('show');
+                    }
+                });
+
+                // 快进按钮
+                const skipBtn = document.getElementById('skipBtn');
+                skipBtn.addEventListener('click', () => {
+                    skipCurrentScene();
                 });
             }
-            renderAchievementIcons();
-        }
 
-        // 版本号弹窗逻辑
-        function initVersionPopup() {
-            const versionBtn = document.getElementById('versionBtn');
-            const popup = document.getElementById('changelogPopup');
-            versionBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                popup.classList.toggle('show');
-            });
-            document.addEventListener('click', (e) => {
-                if (!popup.contains(e.target) && e.target !== versionBtn) {
-                    popup.classList.remove('show');
-                }
-            });
-        }
+            // 启动
+            window.onload = function() {
+                loadSavedAchievements();
 
-        // 初始化
-        window.onload = function() {
-            loadSavedAchievements();
+                const overlay = document.getElementById('startOverlay');
+                const startBtn = document.getElementById('startBtn');
 
-            const overlay = document.getElementById('startOverlay');
-            const startBtn = document.getElementById('startBtn');
+                overlay.style.display = 'flex';
 
-            overlay.style.display = 'flex';
+                startBtn.addEventListener('click', function() {
+                    overlay.style.display = 'none';
+                    renderScene('start');
+                });
 
-            startBtn.addEventListener('click', function() {
-                overlay.style.display = 'none';
-                renderScene('start');
-            });
+                initControls();
+            };
 
-            initVersionPopup();
-        };
-
-        // 全局函数
-        window.handleChoice = handleChoice;
-        window.resetGame = resetGame;
+            // 暴露reset给全局（可选）
+            window.resetGame = resetGame;
+        })();
     </script>
 </body>
 </html>

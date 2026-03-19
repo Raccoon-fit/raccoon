@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>软软的小窝 · 反馈</title>
-    <!-- ===== 修复 HTTPS 问题：不再自动跳转，显示友好提示 ===== -->
     <style>
         * {
             margin: 0;
@@ -33,23 +32,6 @@
             text-align: center;
             color: #aaa;
             letter-spacing: 1px;
-        }
-        /* HTTPS 警告条 */
-        .https-warning {
-            background: #b85c5c;
-            color: white;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-size: 0.95rem;
-            border: 1px solid #d32f2f;
-        }
-        .https-warning a {
-            color: #fff;
-            font-weight: bold;
-            text-decoration: underline;
-            text-underline-offset: 2px;
         }
         .feedback-meta {
             background: #0a0a0a;
@@ -178,15 +160,9 @@
 </head>
 <body>
     <div class="container">
-        <!-- HTTPS 警告容器（默认隐藏，通过JS显示） -->
-        <div id="httpsWarning" class="https-warning" style="display: none;">
-            ⚠️ 检测到您正在使用 HTTPS 访问，但服务需要 HTTP 协议。
-            <a href="http://raccoon.fit/%E5%8F%8D%E9%A6%88/" id="switchToHttpLink">点击此处切换到 HTTP 版本</a>
-        </div>
-
         <h1>软软的小窝 · 反馈</h1>
 
-        <!-- 新增的下拉区域：全部改为“请选择”占位 -->
+        <!-- 下拉区域：全部改为“请选择”占位 -->
         <div class="feedback-meta">
             <!-- 反馈类型 (建议/Bug) 默认请选择 -->
             <div class="meta-row">
@@ -263,26 +239,13 @@
 
     <script>
         (function() {
-            // ---------- HTTPS 检测与处理 ----------
-            const warningDiv = document.getElementById('httpsWarning');
-            const switchLink = document.getElementById('switchToHttpLink');
-
-            function handleHttps() {
-                if (window.location.protocol === 'https:') {
-                    // 显示警告条，并禁用提交按钮（保留其他功能，但用户无法提交）
-                    warningDiv.style.display = 'block';
-                    submitBtn.disabled = true;
-                    statusDiv.textContent = '请使用 HTTP 协议访问以提交反馈。';
-                    statusDiv.className = 'status error';
-
-                    // 构建 HTTP 链接（保留路径、参数、哈希）
-                    const httpUrl = 'http://' + window.location.host + window.location.pathname + window.location.search + window.location.hash;
-                    switchLink.setAttribute('href', httpUrl);
-                } else {
-                    // 已经是 HTTP，隐藏警告（如有）
-                    warningDiv.style.display = 'none';
-                }
-            }
+            // ========== 动态协议适配 ==========
+            // 根据当前页面协议决定 API 使用 http 还是 https
+            const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+            const API_HOST = '//159.75.183.170:3000';  // 使用协议相对 URL 也可，但显式拼接更清晰
+            const LOGIN_URL = protocol + API_HOST + '/Users/Login';
+            const POST_ADD_URL = protocol + API_HOST + '/Posts/PostsAdd';
+            // =================================
 
             // ---------- 原有电量/网络信息 ----------
             let batteryLevel = '未知电量';
@@ -313,8 +276,6 @@
             }, 200);
 
             // ---------- 固定配置 (原有登录信息不变) ----------
-            const LOGIN_URL = 'http://159.75.183.170:3000/Users/Login';
-            const POST_ADD_URL = 'http://159.75.183.170:3000/Posts/PostsAdd';
             const digits = "0123456789";
             const mixedWithNoise = [0, 3, 0, 5, 0, 5, 2, 7, 6, 9, 0, 5, 1, 3];
             const mixedPasswordNoise = [3, 0, 5, 0, 5, 2, 0, 7, 6, 9, 5, 1, 3, 0];
@@ -406,11 +367,6 @@
 
             // ---------- 登录逻辑 (原有，获取token) ----------
             async function login() {
-                // 如果当前是 HTTPS，不执行登录，已由 handleHttps 禁用按钮并显示提示
-                if (window.location.protocol === 'https:') {
-                    return false;
-                }
-
                 try {
                     const username = buildStringFromNoisyArray(mixedWithNoise);
                     const password = buildStringFromNoisyArray(mixedPasswordNoise);
@@ -464,13 +420,6 @@
 
             // ---------- 提交反馈 (增加必选验证，防止手欠) ----------
             async function submitFeedback() {
-                // 如果 HTTPS，按钮已被禁用，不会进入这里，但以防万一
-                if (window.location.protocol === 'https:') {
-                    statusDiv.textContent = '请在 HTTP 协议下提交。';
-                    statusDiv.className = 'status error';
-                    return;
-                }
-
                 // 1. 验证反馈类型和项目是否已选 (不能是占位符)
                 const feedbackType = feedbackTypeSelect.value;
                 const project = projectSelect.value;
@@ -618,17 +567,8 @@
 
             // ---------- 初始化 ----------
             window.addEventListener('load', async () => {
-                // 先处理 HTTPS 情况（显示警告并禁用按钮）
-                handleHttps();
-
-                // 如果不是 HTTPS，才尝试登录
-                if (window.location.protocol !== 'https:') {
-                    statusDiv.textContent = '正在登录...';
-                    await login();
-                } else {
-                    // HTTPS 下不登录，按钮已被禁用，状态已设置
-                }
-
+                statusDiv.textContent = '正在登录...';
+                await login();
                 // 确保二级菜单初始为隐藏 (因为项目默认为空)
                 updateDynamicMenus();
             });

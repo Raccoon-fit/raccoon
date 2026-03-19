@@ -452,8 +452,8 @@
         <!-- 底部：版本号 + 快进 + 软软小窝 -->
         <div class="footer">
             <div class="version-container">
-                <button class="version-btn" id="versionBtn">v1.2.0</button>
-                <button class="skip-btn" id="skipBtn">⏩ 快进</button>
+                <button class="version-btn" id="versionBtn">v1.2.1</button>
+                <button class="skip-btn" id="skipBtn">快进</button>
             </div>
             <div class="inland-security-footer">
                 <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
@@ -471,23 +471,23 @@
 
     <!-- 更新日志弹窗 (左下角) -->
     <div class="changelog-popup" id="changelogPopup">
-        <h4>更新日志 · 深泽重制</h4>
+        <h4>更新日志</h4>
         <div class="version-block">
-            <div class="version-title">v1.2.0</div>
+            <div class="version-title">v1.2.1</div>
             <ul>
-                <li>新增「分支回溯」：可从结局一键返回上一个选择点</li>
-                <li>快进功能：瞬间读完当前段落</li>
-                <li>两大全新结局：「山野村夫」「文曲星耀」及对应成就</li>
-                <li>书生/顽童支线增加正面反转选项</li>
-                <li>农夫隐藏人物线，带来意外温暖</li>
-                <li>大幅扩充文本细节，分支更繁茂</li>
-                <li>修复成就无法全部点亮的遗留问题</li>
+                <li>修复「回到上一个选择点」功能：现在会正确返回到真正有多个选项的分支点</li>
+                <li>快进按钮移除表情符号</li>
+                <li>标题恢复原名「黄小仙」</li>
+                <li>优化回溯逻辑，避免陷入单选项循环</li>
             </ul>
-            <div class="date">2026-03-21</div>
+            <div class="date">2026-03-19</div>
         </div>
         <div class="version-block old">
             <div class="version-title">v1.0.2</div>
-            <ul><li>基础版本：五结局 + 成就系统</li></ul>
+            <ul>
+                <li>基础版本：五结局 + 成就系统</li>
+            </ul>
+            <div class="date">2026-03-18</div>
         </div>
     </div>
 
@@ -501,8 +501,8 @@
                     'mortal': false,         // 尘世轮回
                     'fail_scholar': false,   // 功亏一篑
                     'fail_kid': false,       // 原形毕露
-                    'farmer': false,         // 山野村夫 (新)
-                    'star': false             // 文曲星耀 (新)
+                    'farmer': false,         // 山野村夫
+                    'star': false             // 文曲星耀
                 },
                 // 成就图标配置
                 achievementIcons: [
@@ -540,7 +540,7 @@
                         ],
                         choices: [
                             { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' },
-                            { text: '追上去，拼命解释', nextScene: 'scholar_follow' }  // 新分支：反转可能
+                            { text: '追上去，拼命解释', nextScene: 'scholar_follow' }
                         ]
                     },
                     // 书生后续 —— 反转线
@@ -567,7 +567,7 @@
                         ],
                         choices: [
                             { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' },
-                            { text: '变成小猫逗他开心', nextScene: 'kid_play' }   // 新分支：友善路线
+                            { text: '变成小猫逗他开心', nextScene: 'kid_play' }
                         ]
                     },
                     'kid_play': {
@@ -659,7 +659,7 @@
                         choices: [
                             { text: '恍然大悟，不再执念', nextScene: 'true_ending', action: 'achievement_true' },
                             { text: '仍想成人，恳请成全', nextScene: 'mortal_ending' },
-                            { text: '怀疑他的用意，质问', nextScene: 'suspicious_ending' }   // 新增反转
+                            { text: '怀疑他的用意，质问', nextScene: 'suspicious_ending' }
                         ]
                     },
                     // 怀疑青衣人——反转结局
@@ -769,7 +769,7 @@
                 currentScene: 'start',
                 storyHistory: [],
                 typingTimer: null,
-                checkpointScene: 'start',        // 存档点（上一个有意义的选择场景）
+                checkpointScene: 'start',        // 存档点（上一个真正有多个选项的分支场景）
                 skipMode: false
             };
 
@@ -840,11 +840,18 @@
                 const choicesContainer = document.getElementById('choices-container');
                 let html = '';
                 scene.choices.forEach((choice, index) => {
-                    // 如果选项是返回checkpoint但checkpoint无效，则不显示
-                    if (choice.nextScene === 'checkpoint' && !gameData.checkpointScene) return;
-                    const actionParam = choice.action ? `'${choice.action}'` : 'null';
-                    const nextParam = choice.nextScene === 'checkpoint' ? `'${gameData.checkpointScene}'` : `'${choice.nextScene}'`;
-                    html += `<button class="choice-btn" onclick="handleChoice(${nextParam}, ${actionParam})" style="animation-delay: ${index * 0.1}s">${choice.text}</button>`;
+                    // 如果选项是返回checkpoint但checkpoint不存在，则跳转到start（兜底）
+                    if (choice.nextScene === 'checkpoint') {
+                        if (!gameData.checkpointScene) {
+                            // 如果没有存档点，则返回开始
+                            html += `<button class="choice-btn" onclick="handleChoice('start', 'reset')" style="animation-delay: ${index * 0.1}s">重新开始</button>`;
+                        } else {
+                            html += `<button class="choice-btn" onclick="handleChoice('${gameData.checkpointScene}', null)" style="animation-delay: ${index * 0.1}s">${choice.text}</button>`;
+                        }
+                    } else {
+                        const actionParam = choice.action ? `'${choice.action}'` : 'null';
+                        html += `<button class="choice-btn" onclick="handleChoice('${choice.nextScene}', ${actionParam})" style="animation-delay: ${index * 0.1}s">${choice.text}</button>`;
+                    }
                 });
                 choicesContainer.innerHTML = html;
             }
@@ -858,9 +865,12 @@
 
                 gameData.currentScene = sceneId;
 
-                // 更新存档点：如果当前场景有选项（且不是纯重置场景），则设为检查点
-                if (scene.choices && scene.choices.length > 0 && scene.choices[0].text !== '重新开始' && scene.choices[0].text !== '回到上一个选择点') {
-                    gameData.checkpointScene = sceneId;
+                // 更新存档点：只有那些真正有多个有效选项的场景才作为checkpoint
+                if (scene.choices) {
+                    const validChoices = scene.choices.filter(c => c.text !== '重新开始' && c.text !== '回到上一个选择点');
+                    if (validChoices.length >= 2) {
+                        gameData.checkpointScene = sceneId;
+                    }
                 }
 
                 const storyContainer = document.getElementById('story-container');
@@ -993,7 +1003,7 @@
                 initControls();
             };
 
-            // 暴露reset给全局（可选）
+            // 暴露reset给全局
             window.resetGame = resetGame;
         })();
     </script>

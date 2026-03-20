@@ -4,11 +4,12 @@
 <meta name="baidu-site-verification" content="codeva-W73olbd25f" />
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="软软的小窝 - 数字创意空间" name="description"/>
-<title>软软的小窝 | Raccoon's Creative Space</title>
+<meta content="软软的小窝 - 数字创意空间 | 焕新设计 沉浸体验" name="description"/>
+<title>软软的小窝 | 浣熊创意空间 · 焕新版</title>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🦝&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
-<!-- Fonts (Inter and Noto Sans SC via fallback) -->
-<!-- Tailwind CSS -->
+<!-- Google Fonts + 更优雅字体体系 -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<!-- Tailwind CSS 重构 -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
     tailwind.config = {
@@ -17,468 +18,330 @@
           colors: {
             raccoon: {
               orange: '#FF7F50',
-              brown: '#8B4513',
-              dark: '#0A0A0A',
-              surface: '#121212',
-              accent: '#CD853F',
+              brown: '#CD7A4A',
+              dark: '#030303',
+              surface: '#0F0F12',
+              accent: '#FF9F6E',
+              glow: 'rgba(255, 127, 80, 0.6)'
             },
             newyear: {
-              red: '#E53935',
-              gold: '#FFD700',
-              'red-dark': '#B71C1C',
+              red: '#E53E3E',
+              gold: '#F6BD38',
             }
           },
           fontFamily: {
-            sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+            display: ['Inter', 'Noto Sans SC', 'sans-serif'],
           },
           animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'shimmer': 'shimmer 2s linear infinite',
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float-soft': 'floatSoft 8s ease-in-out infinite',
+            'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+            'shimmer-slow': 'shimmerSlow 2.8s infinite',
+            'scale-subtle': 'scaleSubtle 2s ease-in-out infinite',
           },
           keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-20px)' },
+            floatSoft: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-12px) rotate(1deg)' },
             },
-            shimmer: {
+            glowPulse: {
+              '0%, 100%': { textShadow: '0 0 0px rgba(255,127,80,0)' },
+              '50%': { textShadow: '0 0 12px rgba(255,127,80,0.5)' },
+            },
+            shimmerSlow: {
               '100%': { transform: 'translateX(100%)' },
             },
+            scaleSubtle: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.02)' },
+            }
+          },
+          backgroundImage: {
+            'gradient-radial': 'radial-gradient(circle at 50% 30%, var(--tw-gradient-stops))',
+            'noise-pattern': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E\")",
           }
         }
       }
     }
   </script>
-<style data-purpose="custom-layout">
-    :root {
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
+<style>
+    /* 极简奢华 + 毛玻璃强化 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-
     body {
-      background-color: #050505;
-      color: #ffffff;
-      overflow-x: hidden;
+      background-color: #020202;
+      background-image: radial-gradient(circle at 15% 30%, rgba(255, 127, 80, 0.08) 0%, transparent 35%),
+                        radial-gradient(circle at 85% 70%, rgba(205, 132, 63, 0.05) 0%, transparent 40%);
+      color: #f1f1f1;
+      font-smooth: antialiased;
     }
-
-    .glass-effect {
-      background: var(--glass-bg);
+    /* 精致玻璃面板 */
+    .glass-premium {
+      background: rgba(12, 12, 18, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5);
+    }
+    .glass-card {
+      background: rgba(18, 18, 24, 0.6);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
+      border: 1px solid rgba(255, 127, 80, 0.2);
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
-
-    .hero-gradient {
-      background: radial-gradient(circle at 50% 50%, rgba(255, 127, 80, 0.15) 0%, transparent 50%);
+    .glass-card:hover {
+      border-color: rgba(255, 127, 80, 0.6);
+      background: rgba(25, 25, 35, 0.7);
+      transform: translateY(-6px);
+      box-shadow: 0 30px 40px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,127,80,0.2);
     }
-
-    .text-gradient {
-      background: linear-gradient(135deg, #fff 30%, #FF7F50 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .hero-glow {
+      background: radial-gradient(ellipse 70% 40% at 50% 40%, rgba(255,127,80,0.2), transparent 70%);
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
     }
-
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 5px;
+    .text-balance {
+      text-wrap: balance;
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #0a0a0a;
+    .nav-blur {
+      background: rgba(5, 5, 8, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 127, 80, 0.25);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #333;
-      border-radius: 10px;
+    .skill-progress {
+      transition: width 1s ease-out;
+      box-shadow: 0 0 8px rgba(255,127,80,0.5);
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    .hover-lift {
+      transition: transform 0.2s ease, box-shadow 0.2s;
+    }
+    .hover-lift:hover {
+      transform: translateY(-3px);
+    }
+    /* 自定义滚动条 (优雅) */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0c0c10;
+    }
+    ::-webkit-scrollbar-thumb {
       background: #FF7F50;
+      border-radius: 12px;
     }
-
-    /* 简约背景图案 (无动态特效) */
-    .bg-pattern {
-      background-image: radial-gradient(rgba(255, 127, 80, 0.1) 1px, transparent 1px);
-      background-size: 40px 40px;
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff9a6e;
     }
-
-    .skill-progress-glow {
-      box-shadow: 0 0 15px rgba(255, 127, 80, 0.4);
-    }
-
-    .modal-backdrop {
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-    }
-
-    /* 移除所有新年特效相关样式，只保留常规样式 */
-    
-    /* 福字装饰 (仅用于可能保留的文本) */
-    .fu-character {
-      font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
-      font-weight: bold;
-      font-size: 3rem;
-      background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-    }
-
-    /* 左下角悬浮按钮样式 */
-    .bug-fab {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      z-index: 100;
-      background: rgba(20, 20, 20, 0.8);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 127, 80, 0.3);
-      border-radius: 9999px;
-      padding: 0.75rem 1.5rem;
-      color: #FF7F50;
-      font-weight: 600;
-      font-size: 0.95rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      letter-spacing: 0.3px;
-    }
-    .bug-fab:hover {
-      background: #FF7F50;
-      color: #000;
+    /* 输入框焦点 */
+    .focus-ring-orange:focus {
+      outline: none;
+      ring: 2px solid #FF7F50;
       border-color: #FF7F50;
-      transform: scale(1.05);
-      box-shadow: 0 12px 28px rgba(255, 127, 80, 0.4);
     }
-    .bug-fab:active {
-      transform: scale(0.98);
+    .animated-border {
+      position: relative;
+    }
+    .animated-border::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #FF7F50, #FFB88C);
+      transition: width 0.3s ease;
+    }
+    .animated-border:hover::after {
+      width: 100%;
     }
   </style>
 </head>
-<body class="font-sans custom-scrollbar">
-<!-- BEGIN: IE兼容版链接 -->
-<div class="fixed top-0 left-0 z-[9998] w-full bg-gradient-to-r from-red-900/90 to-red-800/90 backdrop-blur-sm border-b border-red-700/50">
-  <div class="container mx-auto px-4 py-2 flex items-center justify-between">
-    <a href="index-ie.html" class="inline-flex items-center gap-2 text-yellow-200 hover:text-yellow-100 transition-colors text-sm font-medium">
-      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-      </svg>
-      IE兼容版请点击这里进入
-    </a>
-    <div class="flex items-center gap-4 text-yellow-200/80 text-xs">
-      <span>🎊 恭贺新禧 · 马年大吉 🎊</span>
+<body class="font-sans antialiased overflow-x-hidden">
+  <!-- IE兼容版提示栏 精致微调 -->
+  <div class="fixed top-0 left-0 z-[9998] w-full bg-black/50 backdrop-blur-md border-b border-white/10 text-sm">
+    <div class="container mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
+      <a href="index-ie.html" class="inline-flex items-center gap-2 text-amber-200/90 hover:text-amber-100 transition-all font-medium">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        IE兼容版入口
+      </a>
+      <div class="flex items-center gap-3 text-yellow-200/80 text-xs font-mono tracking-wide">
+        <span>🐴 丙午新禧 · 马到功成</span>
+        <span class="hidden sm:inline">✨</span>
+      </div>
     </div>
   </div>
-</div>
-<!-- END: IE兼容版链接 -->
 
-<!-- BEGIN: GlobalBackground (完全静态，无动画粒子) -->
-<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-<div class="absolute inset-0 bg-pattern opacity-30"></div>
-<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-raccoon-orange/10 blur-[120px] rounded-full"></div>
-<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-raccoon-brown/10 blur-[100px] rounded-full"></div>
-<!-- 移除所有动态发光和浮动红包，只保留静态背景 -->
-</div>
-<!-- END: GlobalBackground -->
+  <!-- 静态极简背景 (无动态粒子) -->
+  <div class="fixed inset-0 -z-10 pointer-events-none">
+    <div class="absolute inset-0 bg-noise-pattern opacity-20"></div>
+    <div class="absolute top-1/4 left-1/5 w-[500px] h-[500px] bg-raccoon-orange/5 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-1/3 right-1/6 w-[400px] h-[400px] bg-amber-700/10 blur-[100px] rounded-full"></div>
+  </div>
 
-<!-- 新年灯笼/装饰全部移除，只保留纯静态结构 -->
+  <!-- Loading 极简 -->
+  <div class="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center transition-opacity duration-800 backdrop-blur-sm" id="loadingOverlay">
+    <div class="text-center space-y-4">
+      <div class="text-7xl animate-bounce drop-shadow-2xl">🦝</div>
+      <div class="w-56 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-raccoon-orange to-amber-400 w-0 animate-[shimmerSlow_1.2s_ease-in-out_infinite]"></div>
+      </div>
+      <p class="text-raccoon-orange/80 text-xs tracking-widest font-mono">LOADING CREATIVE SPACE</p>
+    </div>
+  </div>
 
-<!-- BEGIN: LoadingOverlay (无特效，仅保留必要加载) -->
-<div class="fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-700" id="loadingOverlay">
-<div class="text-center">
-<div class="text-6xl animate-bounce mb-4">🦝</div>
-<div class="w-48 h-1 bg-zinc-900 rounded-full overflow-hidden relative">
-<div class="absolute inset-0 bg-raccoon-orange w-1/2 animate-[shimmer_1.5s_infinite] origin-left"></div>
-</div>
-<!-- 简单加载文字 -->
-<div class="mt-4 text-red-400 text-sm font-medium">正在进入软软的小窝...</div>
-</div>
-</div>
-<!-- END: LoadingOverlay -->
+  <!-- 左下角 Bug 反馈按钮 磨砂质感增强 -->
+  <a href="http://raccoon.fit/反馈/" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 left-6 z-[100] flex items-center gap-2.5 bg-black/50 backdrop-blur-md border border-raccoon-orange/40 rounded-full py-2.5 px-5 text-raccoon-orange font-semibold text-sm transition-all hover:bg-raccoon-orange hover:text-black hover:border-transparent shadow-2xl group">
+    <span class="text-xl group-hover:rotate-12 transition-transform">🐞</span>
+    <span>反馈建议</span>
+  </a>
 
-<!-- 左下角悬浮 Bug 反馈按钮 (符合要求) -->
-<a href="http://raccoon.fit/反馈/" class="bug-fab" target="_blank" rel="noopener noreferrer">
-  <span style="font-size:1.4rem; line-height:1;">🐞</span>
-  <span>Bug反馈</span>
-</a>
-
-<!-- BEGIN: Navigation -->
-<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl" style="top: calc(6px + 36px);">
-<div class="glass-effect rounded-full px-6 py-3 flex items-center justify-between shadow-2xl">
-<div class="flex items-center gap-3 cursor-pointer group" data-purpose="brand-logo" id="navBrandTrigger">
-<div class="w-10 h-10 bg-gradient-to-br from-raccoon-orange to-raccoon-brown rounded-xl flex items-center justify-center text-xl shadow-lg shadow-raccoon-orange/20 transition-transform group-hover:rotate-12" id="navIcon">🦝</div>
-<span class="font-bold text-lg tracking-tight hidden sm:block" id="navBrand">软软的小窝</span>
-</div>
-<div class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-<a class="hover:text-raccoon-orange transition-colors" href="#home">首页</a>
-<a class="hover:text-raccoon-orange transition-colors" href="#projects">项目</a>
-<a class="hover:text-raccoon-orange transition-colors" href="#lab">实验室</a>
-<a class="hover:text-raccoon-orange transition-colors" href="#about">关于</a>
-</div>
-<div class="flex items-center gap-4">
-<div class="hidden lg:flex flex-col items-end text-[10px] font-mono text-zinc-500 mr-2">
-<span id="liveClock">00:00:00</span>
-<span class="text-raccoon-orange opacity-50 uppercase tracking-widest">Active</span>
-</div>
-<a class="bg-white text-black text-xs font-bold px-5 py-2.5 rounded-full hover:bg-raccoon-orange hover:text-white transition-all duration-300" href="https://raccoon.fit/mobile" target="_blank">
-          客服合集
-        </a>
-</div>
-</div>
-</nav>
-<!-- END: Navigation -->
-
-<main id="home">
-<!-- BEGIN: HeroSection (移除所有新年浮动图标) -->
-<section class="min-h-screen flex flex-col items-center justify-center pt-24 px-6 relative overflow-hidden">
-<div class="hero-gradient absolute inset-0 pointer-events-none"></div>
-<!-- 移除所有absolute内的新年装饰：🎉🎊✨🧧等，只保留干净背景 -->
-
-<div class="relative z-10 text-center max-w-4xl mx-auto">
-<!-- 简单横幅，无特效 -->
-<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-effect text-xs font-medium text-newyear-gold mb-8 border-newyear-red/20">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span>
-</span>
-          🎊 丙午马年 · 新春快乐 🎊
+  <!-- 导航栏 全新光晕 -->
+  <nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300" style="top: calc(6px + 42px);">
+    <div class="nav-blur rounded-full px-5 py-2.5 flex items-center justify-between shadow-2xl">
+      <div class="flex items-center gap-3 cursor-pointer group" id="navBrandTrigger">
+        <div class="w-11 h-11 bg-gradient-to-tr from-raccoon-orange to-[#E8642E] rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/30 transition-all group-hover:scale-110 group-hover:rotate-6">🦝</div>
+        <span class="font-black text-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent hidden sm:block">软软的小窝</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative animated-border" href="#home">首页</a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative animated-border" href="#projects">项目</a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative animated-border" href="#lab">实验室</a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative animated-border" href="#about">关于</a>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="hidden lg:flex flex-col items-end text-[11px] font-mono text-gray-400 tracking-wider">
+          <span id="liveClock" class="text-raccoon-orange/90 font-bold">--:--:--</span>
+          <span class="text-[9px] uppercase text-gray-500">active studio</span>
         </div>
-<h1 class="text-5xl md:text-8xl font-black mb-8 tracking-tighter text-gradient leading-tight">
-          探索代码的<br/><span class="italic text-raccoon-orange">无限可能</span>
-</h1>
-<p class="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-          这里是软软的数字空间，一个专注于创造、学习和分享的地方。通过代码探索未知，用技术解决现实问题。
-        </p>
-<!-- 静态祝福语，无动画 -->
-<div class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-red-900/30 to-yellow-900/30 border border-red-500/20 inline-block">
-  <p class="text-yellow-200 text-sm font-medium">✨ 愿新的一年代码无bug，创意无极限 ✨</p>
-</div>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-<a class="w-full sm:w-auto px-10 py-4 bg-raccoon-orange text-white font-bold rounded-2xl shadow-xl shadow-raccoon-orange/20 hover:scale-105 transition-transform active:scale-95" href="#projects">
-            探索项目
-          </a>
-<a class="w-full sm:w-auto px-10 py-4 glass-effect text-white font-bold rounded-2xl hover:bg-white/10 transition-colors" href="https://github.com/raccoon-fit" target="_blank">
-            GITHUB
-          </a>
-</div>
-</div>
-<!-- Mascot Preview 保留纯浮动，但无额外装饰 -->
-<div class="mt-20 relative animate-float">
-<div class="absolute -inset-10 bg-raccoon-orange/20 blur-3xl rounded-full"></div>
-</div>
-</section>
-<!-- END: HeroSection -->
+        <a class="bg-white/10 hover:bg-raccoon-orange text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all duration-300 border border-white/10 hover:border-raccoon-orange backdrop-blur-sm" href="https://raccoon.fit/mobile" target="_blank">客服合集</a>
+      </div>
+    </div>
+  </nav>
 
-<!-- BEGIN: ProjectsSection -->
-<section class="py-32 px-6 container mx-auto max-w-7xl" id="projects">
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-<div class="max-w-xl">
-<h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">精选作品</h2>
-<p class="text-zinc-500">每个项目都是对技术深度的探索和对用户体验的思考</p>
-</div>
-<div class="h-px flex-1 bg-zinc-800 mx-8 hidden md:block"></div>
-<div class="text-raccoon-orange font-mono text-sm tracking-widest uppercase">Portfolio 2025</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- 项目卡片内容保持不变，仅移除项目内的特效类如opacity动画，但保留Intersection Observer动画 -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-raccoon-orange/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">💻</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-raccoon-orange/10 text-raccoon-orange text-[10px] font-bold uppercase rounded-md">在线IDE</span><span class="px-3 py-1 bg-zinc-800 text-zinc-400 text-[10px] font-bold uppercase rounded-md">PRO</span></div>
-<h3 class="text-2xl font-bold mb-4 group-hover:text-raccoon-orange transition-colors">Ride</h3>
-<p class="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">站在开发之巅 - 一个强大的在线开发环境，让编码更高效。</p>
-<a class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 group-hover:bg-raccoon-orange transition-colors text-sm font-bold" href="https://raccoon.fit/Ride" target="_blank"><span>立即体验</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
-</div>
-<!-- 项目2 -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-raccoon-orange/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">📺</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase rounded-md">直播辅助</span></div>
-<h3 class="text-2xl font-bold mb-4 group-hover:text-raccoon-orange transition-colors">哔哩哔哩直播流获取</h3>
-<p class="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">一键获取哔哩哔哩直播流地址和直播信息，专注开发者效率。</p>
-<a class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 group-hover:bg-raccoon-orange transition-colors text-sm font-bold" href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank"><span>立即体验</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
-</div>
-<!-- 项目3: MULU 归档 -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-zinc-500/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden grayscale hover:grayscale-0" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">📱</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-zinc-800 text-zinc-500 text-[10px] font-bold uppercase rounded-md">已归档</span></div>
-<h3 class="text-2xl font-bold mb-4">MULU</h3>
-<p class="text-zinc-500 text-sm mb-8 flex-grow leading-relaxed">一个已归档的移动应用项目，探索了从 UI/UX 到 React Native 的完整流程。</p>
-<button class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 cursor-not-allowed text-zinc-600 text-sm font-bold"><span>归档详情</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
-</div>
-<!-- 项目4: LingXiong -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-raccoon-orange/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">🐻</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase rounded-md">VUE.JS</span></div>
-<h3 class="text-2xl font-bold mb-4 group-hover:text-raccoon-orange transition-colors">灵熊小记</h3>
-<p class="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">你的神奇小伙伴「灵熊」已就位！帮你悄无声息地搞定日常笔记与计划。</p>
-<a class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 group-hover:bg-raccoon-orange transition-colors text-sm font-bold" href="https://link3.cc/training_fengfeng_games" target="_blank"><span>访问项目</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
-</div>
-<!-- 项目5: Game Hub -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-raccoon-orange/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">🎮</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-purple-500/10 text-purple-400 text-[10px] font-bold uppercase rounded-md">HTML5 GAME</span></div>
-<h3 class="text-2xl font-bold mb-4 group-hover:text-raccoon-orange transition-colors">小游戏库</h3>
-<p class="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">探索前端开发的结合，关注想法的诞生与趣味性的实现。</p>
-<a class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 group-hover:bg-raccoon-orange transition-colors text-sm font-bold" href="https://raccoon.fit/game" target="_blank"><span>查看详情</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
-</div>
-<!-- 项目6: Raccoon AI -->
-<div class="group glass-effect rounded-3xl p-8 hover:border-raccoon-orange/40 transition-all duration-500 flex flex-col h-full relative overflow-hidden" data-purpose="project-card">
-<div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity"><span class="text-6xl">🤖</span></div>
-<div class="flex items-center gap-2 mb-6"><span class="px-3 py-1 bg-raccoon-orange/20 text-raccoon-orange text-[10px] font-bold uppercase rounded-md">ARTIFICIAL INTELLIGENCE</span></div>
-<h3 class="text-2xl font-bold mb-4 group-hover:text-raccoon-orange transition-colors">RACCOON AI</h3>
-<p class="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">欢迎体验 RACCOON AI，与智能对话的未来，探索大语言模型的无限应用。</p>
-<a class="flex items-center justify-between w-full p-4 rounded-xl bg-zinc-900 group-hover:bg-raccoon-orange transition-colors text-sm font-bold" href="https://raccoon.fit/ai" target="_blank"><span>立即体验</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
-</div>
-</div>
-</section>
-<!-- END: ProjectsSection -->
+  <main>
+    <!-- HERO 新貌 典雅纯净 -->
+    <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden">
+      <div class="hero-glow"></div>
+      <div class="relative z-10 text-center max-w-5xl mx-auto">
+        <div class="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-5 py-2 border border-white/10 text-sm font-medium text-amber-200 mb-8">
+          <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span></span>
+          <span>🐎 丙午马年 · 灵感奔腾</span>
+        </div>
+        <h1 class="text-6xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
+          <span class="bg-gradient-to-r from-white via-amber-100 to-raccoon-orange bg-clip-text text-transparent">探索代码的</span><br/>
+          <span class="text-raccoon-orange italic drop-shadow-[0_0_15px_rgba(255,127,80,0.5)]">无限可能</span>
+        </h1>
+        <p class="text-gray-300 text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
+        <div class="mb-10 inline-block px-6 py-2 rounded-full bg-gradient-to-r from-orange-950/30 to-amber-950/20 border border-amber-500/30">
+          <p class="text-amber-300 text-sm font-medium tracking-wide">✨ 丙午新春 · 代码无bug · 创意绽放 ✨</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-5 justify-center">
+          <a class="group relative px-10 py-4 bg-raccoon-orange text-black font-extrabold rounded-2xl shadow-2xl shadow-orange-600/40 hover:scale-105 transition-transform duration-300 active:scale-95" href="#projects">探索项目</a>
+          <a class="px-10 py-4 glass-premium text-white font-bold rounded-2xl hover:bg-white/10 transition-all border border-white/20" href="https://github.com/raccoon-fit" target="_blank">GitHub 星系</a>
+        </div>
+      </div>
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40"><span class="text-raccoon-orange text-2xl">⌵</span></div>
+    </section>
 
-<!-- BEGIN: LabSection -->
-<section class="py-32 bg-zinc-950/50" id="lab">
-<div class="container mx-auto px-6 max-w-7xl">
-<div class="text-center mb-20">
-<h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tight">创意实验室</h2>
-<p class="text-zinc-500 max-w-xl mx-auto">这里存放着正在进行中的实验、原型和创意构想，探索技术与艺术的边界。</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="glass-effect p-8 rounded-[2rem] border-white/5 hover:bg-white/5 transition-all"><div class="w-12 h-12 bg-raccoon-orange/10 rounded-2xl flex items-center justify-center text-2xl mb-6">🔮</div><h3 class="text-xl font-bold mb-3">AI 辅助设计</h3><p class="text-zinc-500 text-sm leading-relaxed">探索人工智能在设计流程中的应用，尝试自动生成 UI 组件和设计系统。</p></div>
-<div class="glass-effect p-8 rounded-[2rem] border-white/5 hover:bg-white/5 transition-all"><div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-2xl mb-6">⚡</div><h3 class="text-xl font-bold mb-3">交互原型</h3><p class="text-zinc-500 text-sm leading-relaxed">创建高级交互动画和微交互，提升数字产品的体验质感与流畅度。</p></div>
-<div class="glass-effect p-8 rounded-[2rem] border-white/5 hover:bg-white/5 transition-all"><div class="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-2xl mb-6">📊</div><h3 class="text-xl font-bold mb-3">数据可视化</h3><p class="text-zinc-500 text-sm leading-relaxed">将复杂数据转化为直观的视觉故事，探索信息设计的表达方式。</p></div>
-</div>
-</div>
-</section>
-<!-- END: LabSection -->
+    <!-- 项目集 焕新卡片 -->
+    <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+        <div><h2 class="text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">精选作品</h2><p class="text-gray-400 mt-3 text-lg">匠心独运 · 每一行代码皆有灵魂</p></div>
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-raccoon-orange/40 to-transparent hidden md:block"></div>
+        <span class="text-raccoon-orange font-mono text-sm tracking-widest">PORTFOLIO · 2025</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 项目卡片组 动态渐显保留，UI升级 -->
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full transition-all" data-purpose="project-card"><div class="text-5xl mb-4 opacity-80">💻</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-raccoon-orange/20 text-raccoon-orange">在线IDE</span><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-white/5 text-gray-400">PRO</span></div><h3 class="text-2xl font-bold mb-3 group-hover:text-raccoon-orange">Ride</h3><p class="text-gray-400 text-sm mb-8 flex-grow">高性能云端开发环境，极速部署，让编码行云流水。</p><a href="https://raccoon.fit/Ride" target="_blank" class="mt-auto flex items-center justify-between w-full p-3.5 rounded-xl bg-black/30 border border-white/10 hover:bg-raccoon-orange hover:border-raccoon-orange transition-all font-bold">立即体验 →</a></div>
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full" data-purpose="project-card"><div class="text-5xl mb-4">📺</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-blue-500/20 text-blue-300">直播工具</span></div><h3 class="text-2xl font-bold mb-3">B站直播流获取</h3><p class="text-gray-400 text-sm mb-8 flex-grow">开发者专属 · 一键获取直播源信息，高效集成。</p><a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="mt-auto flex items-center justify-between w-full p-3.5 rounded-xl bg-black/30 border border-white/10 hover:bg-raccoon-orange transition-all font-bold">立即体验 →</a></div>
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full grayscale hover:grayscale-0 transition-all" data-purpose="project-card"><div class="text-5xl mb-4">📱</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-zinc-700/50 text-zinc-300">归档库</span></div><h3 class="text-2xl font-bold mb-3">MULU</h3><p class="text-gray-400 text-sm mb-8 flex-grow">移动应用探索史 · React Native 全流程实践。</p><button class="mt-auto w-full p-3.5 rounded-xl bg-black/30 text-gray-500 cursor-not-allowed font-bold">已归档</button></div>
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full" data-purpose="project-card"><div class="text-5xl mb-4">🐻</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300">Vue3</span></div><h3 class="text-2xl font-bold mb-3">灵熊小记</h3><p class="text-gray-400 text-sm mb-8 flex-grow">你的神奇笔记助手，温和整理灵感与计划。</p><a href="https://link3.cc/training_fengfeng_games" target="_blank" class="mt-auto flex items-center justify-between w-full p-3.5 rounded-xl bg-black/30 border border-white/10 hover:bg-raccoon-orange transition-all font-bold">访问项目 →</a></div>
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full" data-purpose="project-card"><div class="text-5xl mb-4">🎮</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-purple-500/20 text-purple-300">HTML5</span></div><h3 class="text-2xl font-bold mb-3">小游戏库</h3><p class="text-gray-400 text-sm mb-8 flex-grow">趣味创意与前端技术的碰撞，轻量级互动体验。</p><a href="https://raccoon.fit/game" target="_blank" class="mt-auto flex items-center justify-between w-full p-3.5 rounded-xl bg-black/30 border border-white/10 hover:bg-raccoon-orange transition-all font-bold">试玩 →</a></div>
+        <div class="glass-card rounded-3xl p-7 flex flex-col h-full" data-purpose="project-card"><div class="text-5xl mb-4">🤖</div><div class="flex gap-2 mb-4"><span class="text-[11px] font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300">AI 先锋</span></div><h3 class="text-2xl font-bold mb-3">RACCOON AI</h3><p class="text-gray-400 text-sm mb-8 flex-grow">对话大模型，探索智能交互的未来边界。</p><a href="https://raccoon.fit/ai" target="_blank" class="mt-auto flex items-center justify-between w-full p-3.5 rounded-xl bg-black/30 border border-white/10 hover:bg-raccoon-orange transition-all font-bold">体验AI →</a></div>
+      </div>
+    </section>
 
-<!-- BEGIN: AboutSection -->
-<section class="py-32 px-6 container mx-auto max-w-7xl" id="about">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-<div class="glass-effect rounded-[2.5rem] p-10 md:p-16 relative overflow-hidden">
-<div class="absolute top-0 right-0 p-12 text-9xl opacity-5">🦝</div>
-<h3 class="text-3xl md:text-4xl font-black mb-8">关于软软</h3>
-<div class="space-y-6 text-zinc-400 font-light leading-relaxed"><p>一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，更是创造美和价值的艺术形式。</p><p>选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——这些特质正是技术探索者所需要的核心品质。</p><p class="text-raccoon-orange font-medium">Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、追求卓越的技术哲学。</p></div>
-<div class="mt-12"><a class="inline-flex items-center gap-2 text-white font-bold group" href="me"><span class="pb-1 border-b-2 border-raccoon-orange group-hover:pr-4 transition-all">点这里进入软软的个人主页</span><svg class="w-5 h-5 text-raccoon-orange" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div>
-</div>
-<div class="space-y-12 py-6">
-<h4 class="text-2xl font-black tracking-tight flex items-center gap-3"><span class="w-8 h-[2px] bg-raccoon-orange"></span>技术专长</h4>
-<div class="space-y-8">
-<div class="skill-container" data-purpose="skill-bar"><div class="flex justify-between mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500"><span>前端开发</span><span class="text-white">85%</span></div><div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange skill-progress-glow rounded-full" style="width: 85%"></div></div></div>
-<div class="skill-container" data-purpose="skill-bar"><div class="flex justify-between mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500"><span>UI/UX 设计</span><span class="text-white">75%</span></div><div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange skill-progress-glow rounded-full" style="width: 75%"></div></div></div>
-<div class="skill-container" data-purpose="skill-bar"><div class="flex justify-between mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500"><span>产品思维</span><span class="text-white">80%</span></div><div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange skill-progress-glow rounded-full" style="width: 80%"></div></div></div>
-<div class="skill-container" data-purpose="skill-bar"><div class="flex justify-between mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500"><span>创意编程</span><span class="text-white">70%</span></div><div class="w-full h-2 bg-zinc-900 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange skill-progress-glow rounded-full" style="width: 70%"></div></div></div>
-</div>
-</div>
-</div>
-</section>
-<!-- END: AboutSection -->
-</main>
+    <!-- 创意实验室 更具质感 -->
+    <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-black/20 to-transparent">
+      <div class="container mx-auto px-6 max-w-7xl">
+        <div class="text-center mb-20"><h2 class="text-5xl font-black mb-5 tracking-tight">✨ 创意实验室</h2><p class="text-gray-400 text-lg max-w-2xl mx-auto">原型 · 跨界 · 未来感，技术实验田</p></div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="glass-premium p-9 rounded-3xl text-center transition-all hover:bg-white/5"><div class="w-16 h-16 bg-raccoon-orange/20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">🔮</div><h3 class="text-2xl font-bold mb-3">AI 辅助设计</h3><p class="text-gray-400 text-sm">生成式UI探索，设计系统智能迭代。</p></div>
+          <div class="glass-premium p-9 rounded-3xl text-center transition-all hover:bg-white/5"><div class="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">⚡</div><h3 class="text-2xl font-bold mb-3">交互原型</h3><p class="text-gray-400 text-sm">高级微动效 · 沉浸式体验研究。</p></div>
+          <div class="glass-premium p-9 rounded-3xl text-center transition-all hover:bg-white/5"><div class="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">📊</div><h3 class="text-2xl font-bold mb-3">数据可视化</h3><p class="text-gray-400 text-sm">动态叙事，将数据转化为洞察艺术。</p></div>
+        </div>
+      </div>
+    </section>
 
-<!-- BEGIN: Footer -->
-<footer class="pb-16 pt-32 px-6" id="contact">
-<div class="container mx-auto max-w-7xl">
-<div class="glass-effect rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden">
-<div class="absolute inset-0 bg-raccoon-orange/5 pointer-events-none"></div>
-<!-- 完全移除装饰角标，保持干净 -->
-<div class="inline-flex w-20 h-20 bg-gradient-to-br from-raccoon-orange to-raccoon-brown rounded-3xl items-center justify-center text-4xl shadow-2xl shadow-raccoon-orange/30 mb-8 mx-auto">🦝</div>
-<h2 class="text-4xl md:text-5xl font-black mb-6">软软的小窝</h2>
-<p class="text-zinc-500 max-w-md mx-auto mb-12">探索、创造、成长。欢迎与我联系，交流想法，合作创新。</p>
-<div class="flex flex-wrap justify-center gap-6 mb-16">
-<a class="text-zinc-400 hover:text-raccoon-orange transition-colors font-medium" href="mailto:2051775505@qq.com">邮箱</a>
-<a class="text-zinc-400 hover:text-raccoon-orange transition-colors font-medium" href="https://github.com/raccoon-fit" target="_blank">GitHub</a>
-<a class="text-zinc-400 hover:text-raccoon-orange transition-colors font-medium" href="https://raccoon.fit" target="_blank">官方网站</a>
-<a class="text-zinc-400 hover:text-raccoon-orange transition-colors font-medium" href="#home">返回顶部</a>
-</div>
-<div class="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6"><p class="text-zinc-600 text-xs tracking-widest uppercase">© 2025-2026 软软. 本网站由浣熊设计与开发</p><div class="flex gap-4 opacity-30"><span class="w-10 h-px bg-zinc-600"></span><span class="text-[10px] font-mono text-zinc-500">STAY HUNGRY STAY FOOLISH</span></div></div>
-<div class="mt-8 pt-8 border-t border-white/5"><p class="text-yellow-500/60 text-sm">🎊 恭贺新禧 · 马年大吉 · 万事如意 · 新春快乐 🎊</p></div>
-</div>
-</div>
-</footer>
-<!-- END: Footer -->
+    <!-- 关于 + 技能栏 高级展示 -->
+    <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div class="glass-premium p-12 rounded-3xl relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 text-9xl opacity-10">🦝</div>
+          <h3 class="text-4xl font-black mb-6">关于软软</h3>
+          <div class="space-y-5 text-gray-300 leading-relaxed"><p>技术与设计的狂热信徒，信奉「简洁即力量」。以浣熊的机敏与好奇持续迭代自我。</p><p>Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p><p class="text-raccoon-orange font-semibold">保持好奇 · 永远优雅地解决问题</p></div>
+          <div class="mt-10"><a class="inline-flex items-center gap-2 text-white font-bold group" href="me"><span class="border-b-2 border-raccoon-orange pb-1 group-hover:pr-3 transition-all">探索个人主页</span><svg class="w-5 h-5 text-raccoon-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></a></div>
+        </div>
+        <div><h4 class="text-2xl font-black flex items-center gap-3 mb-10"><span class="w-10 h-[2px] bg-raccoon-orange"></span>核心能力</h4>
+          <div class="space-y-7"><div><div class="flex justify-between mb-2"><span class="font-bold">前端架构</span><span class="text-raccoon-orange">90%</span></div><div class="h-2 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange rounded-full skill-progress" style="width: 90%"></div></div></div>
+          <div><div class="flex justify-between mb-2"><span class="font-bold">UI/UX 设计</span><span class="text-raccoon-orange">82%</span></div><div class="h-2 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange rounded-full skill-progress" style="width: 82%"></div></div></div>
+          <div><div class="flex justify-between mb-2"><span class="font-bold">产品思维</span><span class="text-raccoon-orange">85%</span></div><div class="h-2 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange rounded-full skill-progress" style="width: 85%"></div></div></div>
+          <div><div class="flex justify-between mb-2"><span class="font-bold">创意编程</span><span class="text-raccoon-orange">78%</span></div><div class="h-2 bg-zinc-800 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-raccoon-brown to-raccoon-orange rounded-full skill-progress" style="width: 78%"></div></div></div></div></div>
+      </div>
+    </section>
+  </main>
 
-<!-- BEGIN: PasswordModal -->
-<div class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-6 modal-backdrop" id="passwordModal">
-<div class="glass-effect w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl border-white/10 animate-scale-up" data-purpose="debug-modal">
-<div class="text-center mb-8"><div class="w-16 h-16 bg-raccoon-orange/10 rounded-2xl flex items-center justify-center text-3xl mb-6 mx-auto">🔑</div><h3 class="text-2xl font-black mb-2">开发者身份验证</h3><p class="text-zinc-500 text-sm">请输入调试密码以访问系统工具</p></div>
-<div class="space-y-6"><input class="w-full bg-black/50 border-white/5 rounded-2xl px-6 py-4 text-center text-white focus:ring-2 focus:ring-raccoon-orange focus:border-transparent transition-all outline-none" id="passwordInput" maxlength="20" placeholder="••••••••" type="password"/><p class="text-red-400 text-xs text-center hidden" id="errorMessage">密码错误，请重新输入</p><div class="flex gap-3"><button class="flex-1 px-6 py-4 glass-effect rounded-2xl font-bold hover:bg-white/5 transition-all" id="cancelBtn">取消</button><button class="flex-1 px-6 py-4 bg-raccoon-orange text-white rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all" id="confirmBtn">确认</button></div></div>
-</div>
-</div>
-<!-- END: PasswordModal -->
+  <!-- 底部区域 奢雅质感 -->
+  <footer class="pb-20 pt-28 px-6">
+    <div class="container mx-auto max-w-6xl">
+      <div class="glass-premium p-12 md:p-16 text-center relative">
+        <div class="w-20 h-20 mx-auto bg-gradient-to-br from-raccoon-orange to-[#B9512A] rounded-3xl flex items-center justify-center text-4xl shadow-2xl mb-8">🦝</div>
+        <h2 class="text-4xl font-black mb-4">软软的小窝</h2>
+        <p class="text-gray-400 max-w-md mx-auto mb-12">探索 · 创造 · 成长 — 期待与你共鸣。</p>
+        <div class="flex flex-wrap justify-center gap-8 mb-12">
+          <a class="text-gray-300 hover:text-raccoon-orange transition font-medium" href="mailto:2051775505@qq.com">✉️ 邮箱</a>
+          <a class="text-gray-300 hover:text-raccoon-orange transition font-medium" href="https://github.com/raccoon-fit" target="_blank">🐙 GitHub</a>
+          <a class="text-gray-300 hover:text-raccoon-orange transition font-medium" href="https://raccoon.fit" target="_blank">🌐 官网</a>
+          <a class="text-gray-300 hover:text-raccoon-orange transition font-medium" href="#home">⬆️ 返回顶部</a>
+        </div>
+        <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between gap-4 items-center"><p class="text-gray-500 text-xs">© 2025-2026 软软 · 浣熊设计哲学</p><p class="text-[10px] font-mono text-gray-600 tracking-widest">STAY CURIOUS · STAY CREATIVE</p></div>
+        <div class="mt-6"><p class="text-amber-600/50 text-sm">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p></div>
+      </div>
+    </div>
+  </footer>
 
-<script data-purpose="logic">
-    // Loading Animation
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const overlay = document.getElementById('loadingOverlay');
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.classList.add('hidden'), 700);
-      }, 1000);
-    });
+  <!-- 密码模态窗 优雅升级 -->
+  <div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/70 backdrop-blur-md transition-all" id="passwordModal">
+    <div class="glass-premium w-full max-w-md p-10 rounded-3xl border-raccoon-orange/40 shadow-2xl">
+      <div class="text-center"><div class="w-16 h-16 bg-raccoon-orange/20 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div><h3 class="text-2xl font-bold">开发者验证</h3><p class="text-gray-400 text-sm mt-1">输入调试密码</p></div>
+      <input type="password" id="passwordInput" class="w-full mt-6 bg-black/40 border border-white/20 rounded-2xl px-5 py-3 text-center text-white focus:border-raccoon-orange focus:ring-1 focus:ring-raccoon-orange outline-none transition" placeholder="••••••••">
+      <p id="errorMessage" class="text-red-400 text-xs text-center mt-2 hidden">密码错误，再试试看~</p>
+      <div class="flex gap-3 mt-8"><button id="cancelBtn" class="flex-1 py-3 glass-premium rounded-xl hover:bg-white/5">取消</button><button id="confirmBtn" class="flex-1 py-3 bg-raccoon-orange text-black font-bold rounded-xl hover:shadow-lg transition">确认</button></div>
+    </div>
+  </div>
 
-    // Clock Logic
-    function updateClock() {
-      const clockEl = document.getElementById('liveClock');
-      const now = new Date();
-      clockEl.textContent = now.toLocaleTimeString('en-GB', { hour12: false });
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Password Modal Logic
-    const correctPassword = 'RuanRuan';
-    const trigger = document.getElementById('navBrandTrigger');
-    const modal = document.getElementById('passwordModal');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const input = document.getElementById('passwordInput');
-    const error = document.getElementById('errorMessage');
-
-    trigger.addEventListener('click', () => {
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      input.focus();
-    });
-
-    cancelBtn.addEventListener('click', () => {
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      error.classList.add('hidden');
-      input.value = '';
-    });
-
-    confirmBtn.addEventListener('click', () => {
-      if (input.value === correctPassword) {
-        window.location.href = 'debug_raccoon_sztskj.html';
-      } else {
-        error.classList.remove('hidden');
-        input.value = '';
-        input.classList.add('ring-2', 'ring-red-500');
-        setTimeout(() => input.classList.remove('ring-2', 'ring-red-500'), 1000);
-      }
-    });
-
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') confirmBtn.click();
-    });
-
-    // Scroll Fade-in logic (保留项目渐进显示，但删除烟花特效)
-    const observerOptions = { threshold: 0.1 };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('opacity-100', 'translate-y-0');
-          entry.target.classList.remove('opacity-0', 'translate-y-10');
-        }
-      });
-    }, observerOptions);
-    document.querySelectorAll('[data-purpose="project-card"], [data-purpose="skill-bar"]').forEach(el => {
-      el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
-      observer.observe(el);
-    });
-
-    // 移除新年烟花效果的全部代码 (setInterval createFirework 等已删除)
-
-    console.log('%c🦝 软软的小窝 | Raccoon Space', 'color: #FF7F50; font-size: 20px; font-weight: bold;');
-    console.log('欢迎来到创意实验室！如果你看到了这条消息，或许你可以试试点击顶部的浣熊头像。');
+  <script>
+    (function() {
+      const overlay = document.getElementById('loadingOverlay');
+      window.addEventListener('load', () => { setTimeout(() => { overlay.style.opacity = '0'; setTimeout(() => overlay.classList.add('hidden'), 600); }, 800); });
+      setInterval(() => { const clock = document.getElementById('liveClock'); if(clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); }, 1000);
+      const pwdModal = document.getElementById('passwordModal'), trigger = document.getElementById('navBrandTrigger'), confirm = document.getElementById('confirmBtn'), cancel = document.getElementById('cancelBtn'), pwdInput = document.getElementById('passwordInput'), errMsg = document.getElementById('errorMessage');
+      trigger.addEventListener('click', () => { pwdModal.classList.remove('hidden'); pwdModal.classList.add('flex'); pwdInput.focus(); });
+      const closeModal = () => { pwdModal.classList.add('hidden'); pwdModal.classList.remove('flex'); errMsg.classList.add('hidden'); pwdInput.value = ''; };
+      cancel.addEventListener('click', closeModal);
+      confirm.addEventListener('click', () => { if(pwdInput.value === 'RuanRuan') window.location.href = 'debug_raccoon_sztskj.html'; else { errMsg.classList.remove('hidden'); pwdInput.value = ''; pwdInput.classList.add('ring-2','ring-red-500'); setTimeout(()=>pwdInput.classList.remove('ring-2','ring-red-500'),800); } });
+      pwdInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') confirm.click(); });
+      const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if(entry.isIntersecting) { entry.target.classList.add('opacity-100','translate-y-0'); entry.target.classList.remove('opacity-0','translate-y-10'); } }); }, { threshold: 0.2 });
+      document.querySelectorAll('[data-purpose="project-card"], [data-purpose="skill-bar"]').forEach(el => { el.classList.add('opacity-0','translate-y-10','transition-all','duration-700','ease-out'); observer.observe(el); });
+      document.querySelectorAll('.skill-progress').forEach(bar => { const width = bar.style.width; bar.style.width = '0%'; setTimeout(() => bar.style.width = width, 200); });
+      console.log("%c🦝 焕新版 · 软软的小窝 | 设计美学 x 技术力量", "color:#FF7F50; font-size:16px; font-weight:bold;");
+    })();
   </script>
-
-<!-- 左下角悬浮按钮已在 <body> 开头添加，此处不再重复 -->
 </body>
 </html>

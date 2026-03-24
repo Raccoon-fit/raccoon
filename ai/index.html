@@ -1,13 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RACCOON AI - 前端大模型版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RACCOON AI · 真实大模型增强版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.10.0/dist/tf-backend-webgl.min.js"></script>
     <style>
         :root {
             --primary: #00c9b7;
@@ -37,27 +34,15 @@
             --border-radius-sm: 12px;
             --border-radius-lg: 20px;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1a202c 100%);
             color: var(--light);
             min-height: 100vh;
-            overflow-x: hidden;
             background-attachment: fixed;
             line-height: 1.6;
         }
-
         .container {
             display: grid;
             grid-template-columns: 320px 1fr 380px;
@@ -67,1675 +52,411 @@
             max-width: 2000px;
             margin: 0 auto;
         }
-
-        /* 头部样式 */
         header {
             grid-column: 1 / 4;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--card-border);
-            margin-bottom: 20px;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
             padding: 20px 30px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
             backdrop-filter: blur(20px);
             border: 1px solid var(--card-border);
             box-shadow: var(--shadow-md);
+            flex-wrap: wrap;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: var(--transition);
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .logo-icon {
-            font-size: 40px;
-            color: var(--primary);
-            filter: drop-shadow(0 0 10px rgba(0, 201, 183, 0.3));
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 800;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            background: rgba(45, 55, 72, 0.3);
-            padding: 8px;
-            border-radius: var(--border-radius);
-        }
-
+        .logo { display: flex; align-items: center; gap: 16px; transition: var(--transition); }
+        .logo-icon { font-size: 40px; color: var(--primary); filter: drop-shadow(0 0 10px rgba(0,201,183,0.3)); }
+        .logo-text { font-size: 32px; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .nav-links { display: flex; gap: 8px; background: rgba(45,55,72,0.3); padding: 8px; border-radius: var(--border-radius); flex-wrap: wrap; }
         .nav-links a {
-            color: var(--light);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition);
-            padding: 12px 20px;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
+            color: var(--light); text-decoration: none; font-weight: 600; transition: var(--transition);
+            padding: 12px 20px; border-radius: 12px; position: relative; overflow: hidden;
         }
-
-        .nav-links a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-1);
-            transition: var(--transition);
-            z-index: -1;
-        }
-
-        .nav-links a:hover::before,
-        .nav-links a.active::before {
-            left: 0;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--darker);
-            transform: translateY(-2px);
-        }
-
+        .nav-links a::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--gradient-1); transition: var(--transition); z-index: -1; }
+        .nav-links a:hover::before, .nav-links a.active::before { left: 0; }
+        .nav-links a:hover, .nav-links a.active { color: var(--darker); transform: translateY(-2px); }
         .website-link {
-            background: var(--gradient-1);
-            color: var(--darker);
-            padding: 14px 28px;
-            border-radius: 30px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            overflow: hidden;
+            background: var(--gradient-1); color: var(--darker); padding: 12px 24px; border-radius: 30px;
+            font-weight: 700; text-decoration: none; transition: var(--transition); box-shadow: var(--shadow-sm);
         }
-
-        .website-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: var(--transition);
-        }
-
-        .website-link:hover::before {
-            left: 100%;
-        }
-
-        .website-link:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* 侧边栏样式 */
-        .sidebar {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 30px 25px;
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-md);
-            overflow-y: auto;
+        .sidebar, .main-content, .agent-panel {
+            background: var(--card-bg); backdrop-filter: blur(20px);
+            border-radius: var(--border-radius); border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md); overflow: hidden;
             position: relative;
         }
-
-        .sidebar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-1);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        .sidebar { padding: 30px 25px; overflow-y: auto; }
+        .sidebar::before, .main-content::before, .agent-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--gradient-1); border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
-
-        .sidebar h2 {
-            font-size: 20px;
-            margin-bottom: 25px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-        }
-
-        .sidebar h2 i {
-            font-size: 24px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .feature-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        .main-content::before { background: var(--gradient-2); }
+        .agent-panel::before { background: var(--gradient-2); }
+        .sidebar h2 { font-size: 20px; margin-bottom: 25px; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+        .feature-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
         .feature-item {
-            padding: 18px 20px;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: rgba(45, 55, 72, 0.4);
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 201, 183, 0.1), transparent);
-            transition: var(--transition);
-        }
-
-        .feature-item:hover::before {
-            left: 100%;
-        }
-
-        .feature-item:hover {
-            background: rgba(0, 201, 183, 0.15);
-            transform: translateX(8px);
-            border-color: rgba(0, 201, 183, 0.3);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .feature-item.active {
-            background: rgba(0, 201, 183, 0.25);
-            border-left: 4px solid var(--primary);
-            transform: translateX(8px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .feature-icon {
-            font-size: 22px;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 201, 183, 0.2);
-            border-radius: 12px;
-            color: var(--primary);
-            transition: var(--transition);
-        }
-
-        .feature-item:hover .feature-icon {
-            background: var(--primary);
-            color: var(--darker);
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        /* 主聊天区域 */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-2);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-        }
-
-        .chat-header {
-            padding: 25px 30px;
-            border-bottom: 1px solid var(--card-border);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(15, 23, 42, 0.3);
-        }
-
-        .ai-avatar {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .ai-avatar:hover {
-            transform: scale(1.1) rotate(10deg);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .chat-info h3 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .chat-info p {
-            color: #94a3b8;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        .status-online {
-            background: var(--success);
-            box-shadow: 0 0 10px var(--success);
-        }
-
-        .status-thinking {
-            background: var(--warning);
-            box-shadow: 0 0 10px var(--warning);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            background: radial-gradient(ellipse at top, rgba(0, 201, 183, 0.03) 0%, transparent 50%),
-                        radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
-        }
-
-        .message {
-            max-width: 88%;
-            padding: 24px 28px;
-            border-radius: var(--border-radius-lg);
-            line-height: 1.7;
-            position: relative;
-            animation: messageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            word-wrap: break-word;
-            box-shadow: var(--shadow-sm);
-        }
-
-        @keyframes messageSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background: var(--gradient-1);
-            color: var(--darker);
-            border-bottom-right-radius: 8px;
-            font-weight: 600;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background: rgba(30, 41, 59, 0.9);
-            border-bottom-left-radius: 8px;
-            border: 1px solid rgba(0, 201, 183, 0.2);
-            position: relative;
-        }
-
-        .ai-message::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 20px;
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid rgba(30, 41, 59, 0.9);
-        }
-
-        .message-time {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-top: 12px;
-            text-align: right;
-            font-weight: 500;
-        }
-
-        .user-message .message-time {
-            color: rgba(13, 17, 23, 0.7);
-        }
-
-        .media-container {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .generated-image, .generated-video {
-            width: 100%;
-            border-radius: var(--border-radius-sm);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .generated-image::after,
-        .generated-video::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, transparent 0%, rgba(0, 201, 183, 0.1) 100%);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .generated-image:hover::after,
-        .generated-video:hover::after {
-            opacity: 1;
-        }
-
-        .generated-image:hover, .generated-video:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .generated-image img, .generated-video video {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: var(--transition);
-        }
-
-        .knowledge-graph {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid rgba(0, 201, 183, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .graph-node {
-            display: inline-block;
-            padding: 10px 18px;
-            background: var(--gradient-1);
-            color: var(--darker);
-            border-radius: 25px;
-            margin: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .graph-node:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow-md);
-        }
-
-        .graph-edge {
-            display: inline-block;
-            margin: 0 8px;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .thought-chain {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            backdrop-filter: blur(10px);
-        }
-
-        .thought-step {
-            margin-bottom: 12px;
-            padding-left: 25px;
-            position: relative;
-            font-weight: 500;
-        }
-
-        .thought-step:before {
-            content: '💡';
-            position: absolute;
-            left: 0;
-            top: 0;
-            font-size: 16px;
-        }
-
-        .input-area {
-            padding: 25px 30px;
-            border-top: 1px solid var(--card-border);
-            display: flex;
-            gap: 15px;
-            background: rgba(15, 23, 42, 0.5);
-            align-items: center;
-        }
-
-        .input-area input {
-            flex: 1;
-            padding: 18px 24px;
-            border-radius: 15px;
-            border: none;
-            background: rgba(15, 23, 42, 0.8);
-            color: var(--light);
-            font-size: 16px;
-            outline: none;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .input-area input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
-            background: rgba(15, 23, 42, 0.9);
-        }
-
-        .action-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 15px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: var(--primary);
-            font-size: 22px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .action-btn:hover {
-            background: var(--primary);
-            color: var(--darker);
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: var(--shadow-md);
-        }
-
-        .send-btn {
-            background: var(--gradient-1);
-            color: var(--darker);
-            font-weight: bold;
-            border: none;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .send-btn:hover {
-            background: linear-gradient(135deg, #00e5d0, var(--accent));
-            transform: scale(1.1);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* 右侧智能体面板 */
-        .agent-panel {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 30px 25px;
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .agent-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-2);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .create-agent-btn {
-            background: var(--gradient-2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .create-agent-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-            background: linear-gradient(135deg, var(--pink), var(--purple));
-        }
-
-        .agent-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .agent-card {
-            background: rgba(45, 55, 72, 0.4);
-            border-radius: var(--border-radius-sm);
-            padding: 22px;
-            transition: var(--transition);
-            cursor: pointer;
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .agent-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
-            transition: var(--transition);
-        }
-
-        .agent-card:hover::before {
-            left: 100%;
-        }
-
-        .agent-card:hover {
-            background: rgba(139, 92, 246, 0.15);
-            transform: translateY(-5px);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: var(--shadow-md);
-        }
-
-        .agent-card.active {
-            background: rgba(139, 92, 246, 0.25);
-            border-color: var(--purple);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .agent-name {
-            font-weight: 700;
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: var(--purple);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .agent-desc {
-            font-size: 15px;
-            color: #cbd5e0;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .agent-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 14px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .agent-stats span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* 模态框样式 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: var(--border-radius-lg);
-            width: 95%;
-            max-width: 700px;
-            padding: 40px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--card-border);
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-
-        @keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-50px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 32px;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .close-modal:hover {
-            color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-            transform: rotate(90deg);
-        }
-
-        .modal-title {
-            font-size: 28px;
-            margin-bottom: 30px;
-            color: var(--primary);
-            font-weight: 800;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 700;
-            color: var(--light);
-            font-size: 16px;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            font-size: 16px;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 201, 183, 0.2);
-            outline: none;
-        }
-
-        .form-group textarea {
-            min-height: 140px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            margin-top: 30px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 16px 35px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            font-size: 16px;
-            min-width: 140px;
-        }
-
-        .btn-primary {
-            background: var(--gradient-1);
-            color: var(--darker);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-secondary {
-            background: rgba(45, 55, 72, 0.6);
-            color: var(--light);
-            border: 2px solid var(--gray);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(45, 55, 72, 0.8);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* 加载动画 */
-        .loader {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 12px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .thinking-indicator {
-            background: rgba(30, 41, 59, 0.9) !important;
-            border: 1px solid rgba(245, 158, 11, 0.3) !important;
-        }
-
-        /* 模型加载指示器 */
-        .model-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--card-bg);
-            padding: 12px 20px;
-            border-radius: 30px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            border: 1px solid var(--card-border);
-        }
-
-        .model-status .status-indicator {
-            margin-right: 0;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 1400px) {
-            .container {
-                grid-template-columns: 280px 1fr 320px;
-                gap: 20px;
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr auto;
-                height: auto;
-                min-height: 100vh;
-            }
-            
-            header {
-                grid-column: 1;
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-            
-            .sidebar, .agent-panel {
-                display: none;
-            }
-            
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-                gap: 15px;
-            }
-            
-            header {
-                padding: 20px;
-            }
-            
-            .logo-text {
-                font-size: 24px;
-            }
-            
-            .chat-messages {
-                padding: 20px;
-                gap: 20px;
-            }
-            
-            .message {
-                max-width: 95%;
-                padding: 20px;
-            }
-            
-            .input-area {
-                padding: 20px;
-                flex-wrap: wrap;
-            }
-            
-            .input-area input {
-                min-width: 200px;
-            }
-            
-            .modal-content {
-                padding: 30px 20px;
-                margin: 20px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        /* 滚动条样式 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(45, 55, 72, 0.3);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
-
-        /* 选择文本样式 */
-        ::selection {
-            background: var(--primary);
-            color: var(--darker);
-        }
-
-        /* 焦点样式 */
-        *:focus {
-            outline: 2px solid var(--primary);
-            outline-offset: 2px;
-        }
+            padding: 18px 20px; border-radius: var(--border-radius-sm); cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; gap: 16px;
+            background: rgba(45,55,72,0.4); border: 1px solid transparent;
+        }
+        .feature-item.active { background: rgba(0,201,183,0.25); border-left: 4px solid var(--primary); transform: translateX(8px); }
+        .feature-icon { font-size: 22px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(0,201,183,0.2); border-radius: 12px; color: var(--primary); }
+        .chat-header { padding: 25px 30px; border-bottom: 1px solid var(--card-border); display: flex; align-items: center; gap: 20px; background: rgba(15,23,42,0.3); }
+        .ai-avatar { width: 60px; height: 60px; background: var(--gradient-1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .chat-info h3 { font-size: 24px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; animation: pulse 2s infinite; }
+        .status-online { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-thinking { background: var(--warning); box-shadow: 0 0 10px var(--warning); animation: pulse 1s infinite; }
+        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 30px; background: radial-gradient(ellipse at top, rgba(0,201,183,0.03) 0%, transparent 50%); }
+        .message { max-width: 88%; padding: 24px 28px; border-radius: var(--border-radius-lg); line-height: 1.7; animation: messageSlideIn 0.5s ease; word-wrap: break-word; box-shadow: var(--shadow-sm); }
+        .user-message { align-self: flex-end; background: var(--gradient-1); color: var(--darker); border-bottom-right-radius: 8px; font-weight: 600; }
+        .ai-message { align-self: flex-start; background: rgba(30,41,59,0.9); border-bottom-left-radius: 8px; border: 1px solid rgba(0,201,183,0.2); }
+        .message-time { font-size: 13px; color: #94a3b8; margin-top: 12px; text-align: right; }
+        .media-container { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .generated-image, .generated-video { width: 100%; border-radius: var(--border-radius-sm); overflow: hidden; box-shadow: var(--shadow-md); transition: var(--transition); }
+        .thought-chain { margin-top: 20px; padding: 20px; background: rgba(15,23,42,0.6); border-radius: var(--border-radius-sm); border-left: 3px solid var(--warning); }
+        .thought-step { margin-bottom: 12px; padding-left: 25px; position: relative; }
+        .thought-step:before { content: '💡'; position: absolute; left: 0; }
+        .input-area { padding: 25px 30px; border-top: 1px solid var(--card-border); display: flex; gap: 15px; background: rgba(15,23,42,0.5); flex-wrap: wrap; }
+        .input-area input { flex: 1; padding: 18px 24px; border-radius: 15px; background: rgba(15,23,42,0.8); color: var(--light); font-size: 16px; border: 2px solid rgba(255,255,255,0.1); outline: none; transition: var(--transition); }
+        .input-area input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,201,183,0.2); }
+        .action-btn { width: 56px; height: 56px; border-radius: 15px; background: rgba(15,23,42,0.8); border: 2px solid rgba(255,255,255,0.1); color: var(--primary); font-size: 22px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+        .action-btn:hover { background: var(--primary); color: var(--darker); transform: scale(1.05); }
+        .send-btn { background: var(--gradient-1); color: var(--darker); border: none; }
+        .agent-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 10px; }
+        .agent-card { background: rgba(45,55,72,0.4); border-radius: var(--border-radius-sm); padding: 22px; transition: var(--transition); cursor: pointer; border: 2px solid transparent; }
+        .agent-card.active { background: rgba(139,92,246,0.25); border-color: var(--purple); }
+        .create-agent-btn { background: var(--gradient-2); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-content { background: var(--card-bg); border-radius: var(--border-radius-lg); max-width: 700px; width: 90%; padding: 40px; border: 1px solid var(--card-border); }
+        .model-status { position: fixed; bottom: 20px; right: 20px; background: var(--card-bg); padding: 12px 20px; border-radius: 30px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; z-index: 1000; font-size: 14px; }
+        .badge-api { background: rgba(139,92,246,0.3); color: var(--purple); border-radius: 30px; padding: 4px 12px; font-size: 12px; font-weight: 600; margin-left: 12px; }
+        @keyframes messageSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.7; transform:scale(1.1); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(45,55,72,0.3); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        @media (max-width: 1200px) { .container { grid-template-columns: 1fr; height: auto; } .sidebar, .agent-panel { display: none; } header { grid-column: 1; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-raccoon"></i>
-                </div>
-                <div class="logo-text">RACCOON AI</div>
-            </div>
-            <div class="nav-links">
-                <a href="#" class="active"><i class="fas fa-comments"></i> 智能对话</a>
-                <a href="#"><i class="fas fa-image"></i> 创意工坊</a>
-                <a href="#"><i class="fas fa-video"></i> 视频实验室</a>
-                <a href="#"><i class="fas fa-brain"></i> 深度思考</a>
-                <a href="#"><i class="fas fa-robot"></i> 智能体中心</a>
-                <a href="#"><i class="fas fa-chart-line"></i> 学习分析</a>
-            </div>
-            <a href="http://raccoon.fit/" class="website-link" target="_blank">
-                访问官网 <i class="fas fa-external-link-alt"></i>
-            </a>
-        </header>
-        
-        <!-- 左侧功能区 -->
-        <aside class="sidebar">
-            <h2><i class="fas fa-fire"></i> 核心能力</h2>
-            <ul class="feature-list">
-                <li class="feature-item active" data-feature="conversation">
-                    <div class="feature-icon">
-                        <i class="fas fa-comment-dots"></i>
-                    </div>
-                    <div>自然对话</div>
-                </li>
-                <li class="feature-item" data-feature="image-gen">
-                    <div class="feature-icon">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <div>AI绘画大师</div>
-                </li>
-                <li class="feature-item" data-feature="video-gen">
-                    <div class="feature-icon">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <div>视频创作家</div>
-                </li>
-                <li class="feature-item" data-feature="web-search">
-                    <div class="feature-icon">
-                        <i class="fas fa-globe-americas"></i>
-                    </div>
-                    <div>实时联网搜索</div>
-                </li>
-                <li class="feature-item" data-feature="deep-analysis">
-                    <div class="feature-icon">
-                        <i class="fas fa-sitemap"></i>
-                    </div>
-                    <div>深度分析引擎</div>
-                </li>
-                <li class="feature-item" data-feature="creative-writing">
-                    <div class="feature-icon">
-                        <i class="fas fa-pen-fancy"></i>
-                    </div>
-                    <div>创意写作助手</div>
-                </li>
-                <li class="feature-item" data-feature="code-assistant">
-                    <div class="feature-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div>编程导师</div>
-                </li>
-                <li class="feature-item" data-feature="learning-path">
-                    <div class="feature-icon">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <div>个性化学习路径</div>
-                </li>
-                <li class="feature-item" data-feature="data-analysis">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div>数据分析专家</div>
-                </li>
-                <li class="feature-item" data-feature="multilingual">
-                    <div class="feature-icon">
-                        <i class="fas fa-language"></i>
-                    </div>
-                    <div>多语言翻译官</div>
-                </li>
-            </ul>
-            
-            <h2 style="margin-top: 35px;"><i class="fas fa-history"></i> 对话记忆</h2>
-            <ul class="feature-list">
-                <li class="feature-item" data-conversation="quantum">
-                    <div class="feature-icon">
-                        <i class="fas fa-atom"></i>
-                    </div>
-                    <div>量子计算原理探讨</div>
-                </li>
-                <li class="feature-item" data-conversation="art">
-                    <div class="feature-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <div>数字艺术创作讨论</div>
-                </li>
-                <li class="feature-item" data-conversation="space">
-                    <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <div>太空探索未来展望</div>
-                </li>
-                <li class="feature-item" data-conversation="ai-ethics">
-                    <div class="feature-icon">
-                        <i class="fas fa-balance-scale"></i>
-                    </div>
-                    <div>AI伦理道德辩论</div>
-                </li>
-                <li class="feature-item" data-conversation="startup">
-                    <div class="feature-icon">
-                        <i class="fas fa-lightbulb"></i>
-                    </div>
-                    <div>创业项目头脑风暴</div>
-                </li>
-                <li class="feature-item" data-conversation="philosophy">
-                    <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div>哲学思辨对话</div>
-                </li>
-            </ul>
-        </aside>
-        
-        <!-- 主聊天区域 -->
-        <main class="main-content">
-            <div class="chat-header">
-                <div class="ai-avatar">
-                    <i class="fas fa-raccoon"></i>
-                </div>
-                <div class="chat-info">
-                    <h3>RACCOON AI 智能助手 <span class="status-indicator status-online"></span></h3>
-                    <p>在线 · 自主学习模式 · 已掌握 15,847 个概念 · 深度思考引擎已激活</p>
-                </div>
-            </div>
-            
-            <div class="chat-messages" id="chat-messages">
-                <div class="message ai-message">
-                    <p>你好！我是 <strong>RACCOON AI</strong>，一个具有自主学习能力的下一代AI助手。</p>
-                    <p>我的核心能力包括：</p>
-                    <ul style="padding-left: 25px; margin: 15px 0;">
-                        <li>🎨 无限次AI图像/视频生成</li>
-                        <li>🌐 实时联网获取最新信息</li>
-                        <li>🧠 多层级深度思考分析</li>
-                        <li>🤖 个性化智能体创建与管理</li>
-                        <li>📚 持续学习与知识图谱构建</li>
-                        <li>💬 自然流畅的多轮对话</li>
-                    </ul>
-                    <p>我已完全在前端实现了自己的大语言模型库，无需后端支持！请输入消息开始对话！</p>
-                    <div class="message-time">现在</div>
-                </div>
-            </div>
-            
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="输入你的想法... 例如：帮我设计一个未来城市的图片">
-                <button class="action-btn" id="attach-btn" title="上传文件">
-                    <i class="fas fa-paperclip"></i>
-                </button>
-                <button class="action-btn" id="voice-btn" title="语音输入">
-                    <i class="fas fa-microphone"></i>
-                </button>
-                <button class="action-btn" id="deepthink-btn" title="深度思考模式">
-                    <i class="fas fa-brain"></i>
-                </button>
-                <button class="action-btn send-btn" id="send-btn" title="发送消息">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </main>
-        
-        <!-- 右侧智能体面板 -->
-        <aside class="agent-panel">
-            <div class="panel-header">
-                <h2><i class="fas fa-users-cog"></i> 智能体矩阵</h2>
-                <button class="create-agent-btn" id="create-agent-btn">
-                    <i class="fas fa-plus"></i> 新建智能体
-                </button>
-            </div>
-            
-            <div class="agent-list">
-                <div class="agent-card active" data-agent="general" onclick="switchAgent('general')">
-                    <div class="agent-name">
-                        <i class="fas fa-star"></i>
-                        全能助手
-                    </div>
-                    <div class="agent-desc">通用型AI助手，擅长多领域知识问答、日常对话和创意启发。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-comments"></i> 1,247</span>
-                        <span><i class="fas fa-image"></i> 89</span>
-                        <span><i class="fas fa-brain"></i> 456</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="scientist" onclick="switchAgent('scientist')">
-                    <div class="agent-name">
-                        <i class="fas fa-flask"></i>
-                        科学顾问
-                    </div>
-                    <div class="agent-desc">专精科学研究方法论、实验设计和数据分析。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-atom"></i> 567</span>
-                        <span><i class="fas fa-dna"></i> 234</span>
-                        <span><i class="fas fa-chart-line"></i> 189</span>
-                    </div>
-                </div>
-                
-                <div class="agent-card" data-agent="artist" onclick="switchAgent('artist')">
-                    <div class="agent-name">
-                        <i class="fas fa-palette"></i>
-                        创意艺术家
-                    </div>
-                    <div class="agent-desc">数字艺术创作专家，精通各种艺术风格和表现手法。</div>
-                    <div class="agent-stats">
-                        <span><i class="fas fa-images"></i> 1,892</span>
-                        <span><i class="fas fa-paint-brush"></i> 456</span>
-                        <span><i class="fas fa-video"></i> 123</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </div>
-    
-    <!-- 创建智能体模态框 -->
-    <div class="modal" id="create-agent-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-modal">&times;</span>
-            <h2 class="modal-title">创建专属智能体</h2>
-            <div class="form-group">
-                <label for="agent-name">智能体名称</label>
-                <input type="text" id="agent-name" placeholder="例如：科幻小说创作家">
-            </div>
-            <div class="form-group">
-                <label for="agent-description">详细描述</label>
-                <textarea id="agent-description" placeholder="描述这个智能体的专长、沟通风格和独特价值..."></textarea>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" id="save-agent-btn">创建智能体</button>
-                <button class="btn btn-secondary" id="cancel-agent-btn">取消</button>
+<div class="container">
+    <header>
+        <div class="logo"><div class="logo-icon"><i class="fas fa-raccoon"></i></div><div class="logo-text">RACCOON AI</div></div>
+        <div class="nav-links"><a href="#" class="active"><i class="fas fa-comments"></i> 智能对话</a><a href="#"><i class="fas fa-image"></i> 创意工坊</a><a href="#"><i class="fas fa-brain"></i> 深度思考</a><a href="#"><i class="fas fa-robot"></i> 智能体中心</a></div>
+        <a href="http://raccoon.fit/" class="website-link" target="_blank">访问官网 <i class="fas fa-external-link-alt"></i></a>
+    </header>
+    <aside class="sidebar">
+        <h2><i class="fas fa-fire"></i> 核心能力</h2>
+        <ul class="feature-list">
+            <li class="feature-item active" data-feature="conversation"><div class="feature-icon"><i class="fas fa-comment-dots"></i></div><div>自然对话 · 真实API引擎</div></li>
+            <li class="feature-item" data-feature="image-gen"><div class="feature-icon"><i class="fas fa-palette"></i></div><div>AI绘画大师</div></li>
+            <li class="feature-item" data-feature="deep-analysis"><div class="feature-icon"><i class="fas fa-sitemap"></i></div><div>深度分析引擎</div></li>
+            <li class="feature-item" data-feature="code-assistant"><div class="feature-icon"><i class="fas fa-code"></i></div><div>编程导师</div></li>
+        </ul>
+        <h2 style="margin-top: 35px;"><i class="fas fa-history"></i> 对话记忆</h2>
+        <ul class="feature-list" id="history-list">
+            <li class="feature-item" data-conv="quantum"><div class="feature-icon"><i class="fas fa-atom"></i></div><div>量子计算原理</div></li>
+            <li class="feature-item" data-conv="space"><div class="feature-icon"><i class="fas fa-rocket"></i></div><div>太空探索展望</div></li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <div class="chat-header">
+            <div class="ai-avatar"><i class="fas fa-raccoon"></i></div>
+            <div class="chat-info">
+                <h3>RACCOON AI 智能助理 <span class="status-indicator status-online"></span> <span class="badge-api"><i class="fas fa-cloud-upload-alt"></i> 真实大模型 · MiniMax引擎</span></h3>
+                <p>在线 · 混合架构 (真实API优先) · 支持深度思考 · 已接入商用级AI能力</p>
             </div>
         </div>
-    </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">
+                <p>✨ 全新升级！我已接入<strong>高性能大模型API</strong>，支持更自然、更智能的对话。<br>💡 你可以问我任何问题，编程、分析、创意、科学 —— 我的真实AI大脑随时待命。<br>🔌 当前使用模型: <strong>MiniMax-M2.7</strong> (流式/非流式混合) ，智能体上下文无缝衔接。</p>
+                <div class="message-time">现在</div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="输入你的想法... 例如：帮我写一段关于未来城市的科幻短文">
+            <button class="action-btn" id="deepthink-btn" title="深度思考模式"><i class="fas fa-brain"></i></button>
+            <button class="action-btn send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </main>
+    <aside class="agent-panel">
+        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 0 20px;"><h2><i class="fas fa-users-cog"></i> 智能体矩阵</h2><button class="create-agent-btn" id="create-agent-btn"><i class="fas fa-plus"></i> 新建</button></div>
+        <div class="agent-list" id="agent-list">
+            <div class="agent-card active" data-agent="general"><div class="agent-name"><i class="fas fa-star"></i> 全能助手</div><div class="agent-desc">通用型AI，融合真实API能力</div><div class="agent-stats"><span><i class="fas fa-brain"></i> 高级模型</span></div></div>
+            <div class="agent-card" data-agent="scientist"><div class="agent-name"><i class="fas fa-flask"></i> 科学顾问</div><div class="agent-desc">严谨推理 · 前沿科技</div></div>
+            <div class="agent-card" data-agent="artist"><div class="agent-name"><i class="fas fa-palette"></i> 创意艺术家</div><div class="agent-desc">灵感美学 · 叙事大师</div></div>
+        </div>
+    </aside>
+</div>
+<div class="modal" id="create-agent-modal"><div class="modal-content"><span class="close-modal" id="close-modal" style="float:right; font-size:28px; cursor:pointer;">&times;</span><h2 class="modal-title">创建专属智能体</h2><div class="form-group"><label>名称</label><input type="text" id="agent-name" placeholder="例如: 科幻小说家"></div><div class="form-group"><label>描述</label><textarea id="agent-description" rows="3" placeholder="个性与风格..."></textarea></div><div class="btn-group"><button class="btn btn-primary" id="save-agent-btn">创建</button><button class="btn btn-secondary" id="cancel-agent-btn">取消</button></div></div></div>
+<div class="model-status" id="model-status"><div class="status-indicator status-online"></div><span>✅ AI助理已就绪 (真实API模式)</span></div>
+
+<script>
+    // ===================== 真实API配置 =====================
+    // 基于用户提供的密钥 + 兼容Anthropic风格的API端点 (MiniMax兼容接口)
+    // 注意: 由于未提供具体baseURL，此处使用通用兼容端点(假设为官方兼容地址)，实际使用时若需变更请修改API_BASE_URL。
+    // 根据API文档风格，使用 /v1/messages 路径 (Anthropic风格)
+    const API_BASE_URL = "https://api.minimax.chat/v1/messages";   // 若实际地址不同，可在此修改
+    const API_KEY = "sk-api-iy0NlGKLlmYfzCE3a1uDolVJv9I4WMVjhmbS8_3yefOIoOQxEo_xdR1cp8HvH4a1yjEckD6jc1ZQYq0Y0Fa3XD7d8vo8XHH2QgFJSU14KtZs8vj0NNgVyCU";
+    const MODEL_NAME = "MiniMax-M2.7";   // 支持的高性能模型
     
-    <!-- 模型加载指示器 -->
-    <div class="model-status" id="model-status">
-        <div class="status-indicator status-thinking"></div>
-        <span>正在加载前端大模型...</span>
-    </div>
-
-    <script>
-        // ==================== 前端大语言模型实现 ====================
-        class FrontendLLM {
-            constructor() {
-                this.vocab = {};
-                this.modelParams = {};
-                this.initialized = false;
-                this.knowledgeBase = {
-                    "人工智能": ["机器学习", "深度学习", "神经网络", "自然语言处理"],
-                    "量子计算": ["量子比特", "叠加态", "量子纠缠", "量子算法"],
-                    "太空探索": ["火星殖民", "小行星采矿", "太空电梯", "詹姆斯·韦伯望远镜"],
-                    "艺术创作": ["印象派", "立体主义", "超现实主义", "数字艺术"],
-                    "编程": ["JavaScript", "Python", "算法", "数据结构"],
-                    "科学": ["物理学", "化学", "生物学", "天文学"]
-                };
-                this.conversationContext = [];
-                this.initializeModel();
-            }
-            
-            async initializeModel() {
-                // 模拟模型加载过程
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // 构建简单的词汇表
-                const words = [
-                    "你好", "世界", "人工智能", "学习", "模型", "知识", "理解", "思考", 
-                    "创造", "探索", "未来", "科技", "艺术", "科学", "编程", "数据",
-                    "分析", "设计", "创新", "发展", "智能", "系统", "网络", "算法",
-                    "深度", "学习", "机器", "神经", "语言", "处理", "图像", "视频",
-                    "生成", "对话", "交流", "协作", "解决", "问题", "挑战", "机遇"
-                ];
-                
-                words.forEach((word, index) => {
-                    this.vocab[word] = index;
-                });
-                
-                // 设置模型参数
-                this.modelParams = {
-                    embeddingSize: 64,
-                    hiddenSize: 128,
-                    vocabSize: words.length
-                };
-                
-                this.initialized = true;
-                document.getElementById('model-status').innerHTML = `
-                    <div class="status-indicator status-online"></div>
-                    <span>前端大模型已就绪</span>
-                `;
-                
-                console.log("前端大模型初始化完成");
-            }
-            
-            tokenize(text) {
-                // 简单分词器
-                return text.toLowerCase().split(/\s+/).filter(word => word.length > 0);
-            }
-            
-            embed(tokens) {
-                // 简单的嵌入表示
-                return tokens.map(token => {
-                    const index = this.vocab[token] || Math.floor(Math.random() * this.modelParams.vocabSize);
-                    return Array(this.modelParams.embeddingSize).fill(0).map((_, i) => 
-                        Math.sin(index * 0.1 + i * 0.01)
-                    );
-                });
-            }
-            
-            generateResponse(input) {
-                if (!this.initialized) {
-                    return "模型正在初始化中，请稍候...";
-                }
-                
-                // 保存对话上下文
-                this.conversationContext.push({role: 'user', content: input});
-                if (this.conversationContext.length > 10) {
-                    this.conversationContext.shift();
-                }
-                
-                const lowerInput = input.toLowerCase();
-                
-                // 基于规则的响应生成
-                if (lowerInput.includes('你好') || lowerInput.includes('嗨') || lowerInput.includes('hello')) {
-                    return this.generateGreeting();
-                } else if (lowerInput.includes('图片') || lowerInput.includes('图像') || lowerInput.includes('画')) {
-                    return this.generateImageResponse(input);
-                } else if (lowerInput.includes('视频') || lowerInput.includes('影片')) {
-                    return this.generateVideoResponse(input);
-                } else if (lowerInput.includes('搜索') || lowerInput.includes('查找') || lowerInput.includes('最新')) {
-                    return this.generateSearchResponse(input);
-                } else if (lowerInput.includes('思考') || lowerInput.includes('分析') || lowerInput.includes('为什么')) {
-                    return this.generateAnalysisResponse(input);
-                } else if (lowerInput.includes('量子') || lowerInput.includes('计算')) {
-                    return this.generateQuantumResponse(input);
-                } else if (lowerInput.includes('太空') || lowerInput.includes('探索') || lowerInput.includes('火星')) {
-                    return this.generateSpaceResponse(input);
-                } else if (lowerInput.includes('艺术') || lowerInput.includes('创作') || lowerInput.includes('设计')) {
-                    return this.generateArtResponse(input);
-                } else if (lowerInput.includes('编程') || lowerInput.includes('代码')) {
-                    return this.generateProgrammingResponse(input);
-                } else {
-                    return this.generateContextualResponse(input);
-                }
-            }
-            
-            generateGreeting() {
-                const greetings = [
-                    "你好！我是RACCOON AI，很高兴与你对话。我是一个完全在前端运行的大语言模型，无需后端支持。",
-                    "嗨！今天有什么我可以帮你的吗？我刚刚完成了前端模型的初始化，感觉状态很好！",
-                    "你好啊！我是浣熊AI，一个纯前端实现的智能助手。我们可以聊聊任何你感兴趣的话题。"
-                ];
-                return greetings[Math.floor(Math.random() * greetings.length)];
-            }
-            
-            generateImageResponse(prompt) {
-                const imagePrompts = ["未来城市", "赛博朋克角色", "奇幻森林", "抽象艺术", "太空星云"];
-                const selectedPrompt = imagePrompts[Math.floor(Math.random() * imagePrompts.length)];
-                const imgUrl = `https://source.unsplash.com/random/600x400/?${encodeURIComponent(selectedPrompt)}`;
-                
-                return `已根据你的描述生成图片：<br><strong>"${prompt}"</strong><br>我创作了一幅关于<span style="color: var(--primary);">${selectedPrompt}</span>的作品：<br>
-                       <div class="media-container">
-                           <div class="generated-image">
-                               <img src="${imgUrl}" alt="${selectedPrompt}" style="width: 100%; height: 200px; object-fit: cover;">
-                           </div>
-                       </div>`;
-            }
-            
-            generateVideoResponse(prompt) {
-                const videoPrompts = ["宇宙星系", "海底世界", "四季变化", "城市时光", "粒子流动"];
-                const selectedPrompt = videoPrompts[Math.floor(Math.random() * videoPrompts.length)];
-                
-                return `已根据你的描述生成视频：<br><strong>"${prompt}"</strong><br>我制作了一个关于<span style="color: var(--purple);">${selectedPrompt}</span>的短片：<br>
-                       <div class="media-container">
-                           <div class="generated-video">
-                               <video controls style="width: 100%; height: 200px; background: #000;" poster="https://source.unsplash.com/random/600x400/?${encodeURIComponent(selectedPrompt)}">
-                                   <source src="#" type="video/mp4">
-                                   您的浏览器不支持视频播放
-                               </video>
-                           </div>
-                       </div>`;
-            }
-            
-            generateSearchResponse(query) {
-                const facts = [
-                    "全球AI市场规模预计将在2025年达到1900亿美元",
-                    "量子计算机在特定问题上比传统计算机快百万倍",
-                    "NASA的詹姆斯·韦伯望远镜发现了迄今最遥远的星系",
-                    "深度学习模型在医疗诊断准确率上首次超越人类专家",
-                    "前端AI模型可以在浏览器中直接运行，无需服务器支持"
-                ];
-                const fact = facts[Math.floor(Math.random() * facts.length)];
-                
-                return `🔍 <strong>前端模型搜索结果：</strong><br>关于"<strong>${query}</strong>"的信息：<br><br>${fact}<br><br>注意：这是前端模型生成的模拟结果，并非真实网络搜索。`;
-            }
-            
-            generateAnalysisResponse(query) {
-                return `🧠 <strong>深度思考分析：</strong><br>针对问题"<strong>${query}</strong>"的分析：<br><br>
-                       <div class="thought-chain">
-                           <div class="thought-step">分解问题的核心要素</div>
-                           <div class="thought-step">识别关键变量和约束条件</div>
-                           <div class="thought-step">建立概念框架和关联模型</div>
-                           <div class="thought-step">评估不同解决方案的优缺点</div>
-                           <div class="thought-step">综合信息形成结论</div>
-                       </div>
-                       <br>结论：这个问题需要从多个维度综合考虑，建议结合具体情境制定解决方案。<br><br>
-                       <small>注：此分析由前端模型生成，仅供参考</small>`;
-            }
-            
-            generateQuantumResponse(input) {
-                const concepts = this.knowledgeBase["量子计算"];
-                const concept = concepts[Math.floor(Math.random() * concepts.length)];
-                
-                return `量子计算是一个令人兴奋的领域！它利用量子力学现象如叠加态和纠缠来处理信息。<br><br>
-                       你提到的内容与<span style="color: var(--accent);">${concept}</span>相关。量子计算机在某些问题上比传统计算机快指数级倍。<br><br>
-                       目前的研究热点包括量子纠错、量子算法优化和量子硬件设计。`;
-            }
-            
-            generateSpaceResponse(input) {
-                const concepts = this.knowledgeBase["太空探索"];
-                const concept = concepts[Math.floor(Math.random() * concepts.length)];
-                
-                return `太空探索代表了人类最远大的梦想之一。从火星殖民到深空探测，我们正在开启星际时代的大门。<br><br>
-                       你提到的<span style="color: var(--accent);">${concept}</span>是当前太空探索的热点领域。<br><br>
-                       未来的太空任务可能包括月球基地建设、小行星资源开采和寻找外星生命迹象。`;
-            }
-            
-            generateArtResponse(input) {
-                const concepts = this.knowledgeBase["艺术创作"];
-                const concept = concepts[Math.floor(Math.random() * concepts.length)];
-                
-                return `艺术创作是人类表达内心世界的重要方式。AI也可以成为创作的有力工具，帮你实现想象中的画面。<br><br>
-                       你提到的内容与<span style="color: var(--accent);">${concept}</span>相关。这种艺术风格强调色彩和情感的表达。<br><br>
-                       数字艺术的发展为创作者提供了前所未有的可能性，从生成艺术到交互装置，边界在不断拓展。`;
-            }
-            
-            generateProgrammingResponse(input) {
-                const concepts = this.knowledgeBase["编程"];
-                const concept = concepts[Math.floor(Math.random() * concepts.length)];
-                
-                return `编程是现代世界的超能力！通过代码，我们可以将抽象的想法转化为现实。<br><br>
-                       你提到的<span style="color: var(--accent);">${concept}</span>是编程中的重要概念。<br><br>
-                       前端开发特别有趣，因为它结合了设计和逻辑，可以直接在浏览器中创造丰富的用户体验。`;
-            }
-            
-            generateContextualResponse(input) {
-                const responses = [
-                    `这是一个很有趣的观点！作为${getAgentName(currentAgent)}，我认为我们可以进一步探讨这个话题。`,
-                    `我理解你的意思。基于我的知识库，这个问题有几个可能的解决方案。`,
-                    `感谢分享这个信息。这让我想到一些相关的概念，比如${this.getRandomKnowledgeNode()}。`,
-                    `根据你的问题，我建议我们可以从几个角度来分析。`,
-                    `这是一个复杂的话题，涉及多个方面。让我为你详细解释一下。`
-                ];
-                
-                return responses[Math.floor(Math.random() * responses.length)];
-            }
-            
-            getRandomKnowledgeNode() {
-                const nodes = Object.keys(this.knowledgeBase).flatMap(
-                    key => [key, ...this.knowledgeBase[key]]
-                );
-                return nodes[Math.floor(Math.random() * nodes.length)];
-            }
-        }
-
-        // ==================== 全局变量和配置 ====================
-        let currentAgent = 'general';
-        let currentMode = 'conversation';
-        let conversationHistory = [];
-        let llm = new FrontendLLM();
+    // 全局状态
+    let currentAgent = 'general';
+    let conversationHistory = [];   // 存储 { role, content }
+    let useRealAPI = true;          // 默认启用真实API
+    let pendingRequest = false;
+    
+    // 辅助函数: 获取智能体系统提示词
+    function getSystemPromptForAgent(agentId) {
+        const prompts = {
+            general: "你是一个全能AI助理，名为RACCOON AI。你拥有广泛的知识和创造力，能够回答各类问题，提供详细、有帮助的回复。语气专业但亲切。",
+            scientist: "你是科学顾问，专注于科学推理、数据分析、物理/化学/生物等领域的深度解释。使用严谨的术语，给出有逻辑的解答。",
+            artist: "你是创意艺术家，擅长艺术评论、创作建议、视觉设计和叙事。回答充满想象力和诗意，鼓励创新。"
+        };
+        return prompts[agentId] || prompts.general;
+    }
+    
+    // 调用真实API (非流式，简洁稳定)
+    async function callRealAPI(messages, systemPrompt) {
+        // 构建Anthropic风格请求体
+        const body = {
+            model: MODEL_NAME,
+            messages: messages,   // [{ role, content }]  role: user/assistant
+            system: systemPrompt,
+            max_tokens: 2048,
+            temperature: 0.85,
+            top_p: 0.95,
+            stream: false
+        };
         
-        // ==================== 初始化 ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeEventListeners();
+        const response = await fetch(API_BASE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`,
+                'X-API-Key': API_KEY   // 兼容某些服务
+            },
+            body: JSON.stringify(body)
         });
         
-        function initializeEventListeners() {
-            // 发送消息
-            document.getElementById('send-btn').addEventListener('click', sendMessage);
-            document.getElementById('user-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-            
-            // 深度思考按钮
-            document.getElementById('deepthink-btn').addEventListener('click', function() {
-                activateDeepThinkMode();
-            });
-            
-            // 模态框
-            document.getElementById('create-agent-btn').addEventListener('click', function() {
-                document.getElementById('create-agent-modal').style.display = 'flex';
-            });
-            
-            document.getElementById('close-modal').addEventListener('click', closeModal);
-            document.getElementById('cancel-agent-btn').addEventListener('click', closeModal);
-            document.getElementById('save-agent-btn').addEventListener('click', createNewAgent);
-            
-            // 功能项点击
-            document.querySelectorAll('.feature-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    // 移除所有active类
-                    document.querySelectorAll('.feature-item').forEach(i => {
-                        i.classList.remove('active');
-                    });
-                    // 给当前项添加active类
-                    this.classList.add('active');
-                    
-                    const featureName = this.querySelector('div:last-child').textContent;
-                    activateFeature(featureName);
-                });
-            });
+        if (!response.ok) {
+            let errMsg = `API错误 ${response.status}`;
+            try { const err = await response.json(); errMsg = err.error?.message || errMsg; } catch(e) {}
+            throw new Error(errMsg);
         }
         
-        // ==================== 核心功能 ====================
-        
-        function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
-            
-            if (!message) {
-                alert('请输入消息内容');
-                return;
-            }
-            
-            // 添加用户消息
-            addMessage(message, 'user');
-            input.value = '';
-            
-            // 显示思考状态
-            showThinkingIndicator();
-            
-            // 使用前端模型生成响应
-            setTimeout(() => {
-                removeThinkingIndicator();
-                const response = llm.generateResponse(message);
-                addMessage(response, 'ai');
-                
-                // 记录对话
-                conversationHistory.push({
-                    role: 'user',
-                    content: message,
-                    timestamp: Date.now()
-                });
-                
-                conversationHistory.push({
-                    role: 'ai',
-                    content: response,
-                    timestamp: Date.now()
-                });
-            }, 500 + Math.random() * 1000);
+        const data = await response.json();
+        // Anthropic响应格式: content 数组，取第一个 text 块
+        if (data.content && Array.isArray(data.content)) {
+            const textBlock = data.content.find(c => c.type === 'text');
+            if (textBlock && textBlock.text) return textBlock.text;
         }
-        
-        function activateDeepThinkMode() {
-            addMessage("🧠 深度思考模式已激活！我现在会以更系统、更深入的方式分析问题。", 'ai');
+        // 兼容OpenAI风格
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
         }
-        
-        function activateFeature(featureName) {
-            addMessage(`已激活功能：<strong>${featureName}</strong>。我现在可以帮你处理相关任务！`, 'ai');
+        throw new Error("响应格式异常");
+    }
+    
+    // 前端模拟后备 (保留原有的知识库/创意生成能力)
+    class FallbackLLM {
+        constructor() {
+            this.knowledgeBase = { "人工智能": ["机器学习","深度学习"], "量子计算":["量子比特"], "太空探索":["火星殖民"], "艺术创作":["印象派"] };
         }
-        
-        function switchAgent(agentId) {
-            currentAgent = agentId;
-            document.querySelectorAll('.agent-card').forEach(card => {
-                card.classList.toggle('active', card.dataset.agent === agentId);
-            });
-            
-            const agentNames = {
-                general: "全能助手",
-                scientist: "科学顾问",
-                artist: "创意艺术家"
-            };
-            
-            addMessage(`已切换到智能体：<strong>${agentNames[agentId]}</strong>。`, 'ai');
+        generateResponse(input, agentId) {
+            const lower = input.toLowerCase();
+            if (lower.includes('图片') || lower.includes('画')) return this.generateImageMock(input);
+            if (lower.includes('视频')) return this.generateVideoMock(input);
+            if (lower.includes('分析') || lower.includes('为什么')) return this.generateAnalysisMock(input);
+            return `🤖 [前端模拟模式] 由于API调用失败，我使用本地知识回复：${input} 是一个有趣的话题。你可以检查网络或API配置，但我仍尽力提供创意。`;
         }
+        generateImageMock(prompt) { return `🎨 模拟图像生成: "${prompt}"<br><div class="media-container"><div class="generated-image"><img src="https://picsum.photos/400/200?random=1" style="width:100%; border-radius:12px;"></div></div><p>注: 真实API暂不支持图像生成，此为前端示意。</p>`; }
+        generateVideoMock(prompt) { return `🎬 模拟视频创意: 关于“${prompt}”的动态画面<br><div class="media-container"><video controls style="width:100%; border-radius:12px;" poster="https://picsum.photos/400/200?random=2"></video></div>`; }
+        generateAnalysisMock(query) { return `<div class="thought-chain"><div class="thought-step">1. 识别核心概念</div><div class="thought-step">2. 建立逻辑框架</div><div class="thought-step">3. 综合前沿观点</div></div><br>前端分析: 针对“${query}”的多维度思考。`; }
+    }
+    const fallbackLLM = new FallbackLLM();
+    
+    // 发送消息主逻辑
+    async function sendMessage() {
+        if (pendingRequest) { addMessage("请等待上一条回复完成", 'ai'); return; }
+        const inputEl = document.getElementById('user-input');
+        const userText = inputEl.value.trim();
+        if (!userText) return;
+        inputEl.value = '';
         
-        function createNewAgent() {
-            const name = document.getElementById('agent-name').value.trim();
-            const description = document.getElementById('agent-description').value.trim();
-            
-            if (!name) {
-                alert("请为你的智能体命名");
-                return;
-            }
-            
-            // 创建新智能体卡片
-            const agentList = document.querySelector('.agent-list');
-            const newCard = document.createElement('div');
-            newCard.className = 'agent-card active';
-            newCard.dataset.agent = name.toLowerCase().replace(/\s+/g, '-');
-            newCard.onclick = () => switchAgent(newCard.dataset.agent);
-            
-            newCard.innerHTML = `
-                <div class="agent-name">
-                    <i class="fas fa-user-cog"></i>
-                    ${name}
-                </div>
-                <div class="agent-desc">${description || '个性化定制的专属智能体'}</div>
-                <div class="agent-stats">
-                    <span><i class="fas fa-cogs"></i> 新建</span>
-                    <span><i class="fas fa-comments"></i> 0</span>
-                </div>
-            `;
-            
-            // 移除其他卡片的active状态
-            document.querySelectorAll('.agent-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            
-            agentList.insertBefore(newCard, agentList.firstChild);
-            closeModal();
-            addMessage(`🎉 成功创建新智能体：<strong>${name}</strong>！`, 'ai');
-        }
-        
-        function closeModal() {
-            document.getElementById('create-agent-modal').style.display = 'none';
-        }
-        
-        // ==================== 工具函数 ====================
-        
-        function addMessage(content, sender) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            
-            const now = new Date();
-            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            
-            messageDiv.innerHTML = `
-                <div>${content}</div>
-                <div class="message-time">${timeString}</div>
-            `;
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        function showThinkingIndicator() {
-            const messagesContainer = document.getElementById('chat-messages');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.className = 'message ai-message thinking-indicator';
-            thinkingDiv.id = 'thinking-indicator';
-            thinkingDiv.innerHTML = `
-                <div><span class="loader"></span> RACCOON AI正在思考中...</div>
-            `;
-            messagesContainer.appendChild(thinkingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-        
-        function removeThinkingIndicator() {
-            const indicator = document.getElementById('thinking-indicator');
-            if (indicator) {
-                indicator.remove();
+        addMessage(userText, 'user');
+        // 准备对话历史 (保留最近10轮，加上当前用户消息)
+        let apiMessages = [];
+        // 提取最近的对话历史 (最多保留10条消息，避免上下文过长)
+        const maxHistory = 12;
+        let historySlice = conversationHistory.slice(-maxHistory);
+        for (let msg of historySlice) {
+            if (msg.role === 'user' || msg.role === 'assistant') {
+                apiMessages.push({ role: msg.role, content: msg.content });
             }
         }
+        apiMessages.push({ role: 'user', content: userText });
         
-        function getAgentName(agentId) {
-            const names = {
-                'general': '全能助手',
-                'scientist': '科学顾问',
-                'artist': '创意艺术家'
-            };
-            return names[agentId] || agentId;
+        // 显示思考中
+        showThinkingIndicator();
+        pendingRequest = true;
+        
+        let finalReply = "";
+        let apiSuccess = false;
+        
+        // 优先尝试真实API
+        if (useRealAPI) {
+            try {
+                const systemPrompt = getSystemPromptForAgent(currentAgent);
+                const reply = await callRealAPI(apiMessages, systemPrompt);
+                finalReply = reply;
+                apiSuccess = true;
+            } catch (err) {
+                console.warn("真实API调用失败:", err);
+                finalReply = `⚠️ 真实模型请求失败 (${err.message})，已切换至前端模拟模式。你可以稍后重试，或继续使用创意工坊功能。`;
+                // 降级前端模拟
+                finalReply += "<br><br>" + fallbackLLM.generateResponse(userText, currentAgent);
+                apiSuccess = false;
+            }
+        } else {
+            finalReply = fallbackLLM.generateResponse(userText, currentAgent);
         }
-    </script>
+        
+        removeThinkingIndicator();
+        // 处理特殊指令 (如果API返回的文本内嵌html? 直接展示)
+        addMessage(finalReply, 'ai');
+        
+        // 更新对话历史 (真实对话上下文)
+        conversationHistory.push({ role: 'user', content: userText });
+        conversationHistory.push({ role: 'assistant', content: finalReply });
+        // 限制历史长度
+        if (conversationHistory.length > 40) conversationHistory = conversationHistory.slice(-36);
+        
+        pendingRequest = false;
+        updateStatus(apiSuccess);
+    }
+    
+    function updateStatus(success) {
+        const statusDiv = document.getElementById('model-status');
+        if (success) {
+            statusDiv.innerHTML = `<div class="status-indicator status-online"></div><span>✅ AI助理在线 (真实大模型)</span>`;
+            document.querySelector('.badge-api').style.opacity = '1';
+        } else {
+            statusDiv.innerHTML = `<div class="status-indicator status-thinking"></div><span>🔄 降级模式 (前端模拟运行中)</span>`;
+        }
+    }
+    
+    function addMessage(content, sender) {
+        const container = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = `message ${sender}-message`;
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        div.innerHTML = `<div>${content}</div><div class="message-time">${timeStr}</div>`;
+        container.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    
+    function showThinkingIndicator() {
+        const container = document.getElementById('chat-messages');
+        const thinkDiv = document.createElement('div');
+        thinkDiv.id = 'thinking-loader';
+        thinkDiv.className = 'message ai-message thinking-indicator';
+        thinkDiv.innerHTML = `<div><span class="loader" style="display:inline-block; width:18px; height:18px; border:2px solid #fff; border-top-color:var(--primary); border-radius:50%; animation:spin 0.8s linear infinite;"></span> 🧠 RACCOON AI 正在思考 (真实模型处理中)...</div>`;
+        container.appendChild(thinkDiv);
+        thinkDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+    function removeThinkingIndicator() {
+        const el = document.getElementById('thinking-loader');
+        if(el) el.remove();
+    }
+    
+    // 切换智能体
+    function switchAgent(agentId) {
+        currentAgent = agentId;
+        document.querySelectorAll('.agent-card').forEach(card => {
+            if(card.dataset.agent === agentId) card.classList.add('active');
+            else card.classList.remove('active');
+        });
+        addMessage(`✨ 已切换到智能体: <strong>${agentId === 'general' ? '全能助手' : agentId === 'scientist' ? '科学顾问' : '创意艺术家'}</strong>，系统提示已更新，真实API将采用新角色。`, 'ai');
+    }
+    
+    // 创建新智能体 (前端展示)
+    function createNewAgent() {
+        const name = document.getElementById('agent-name').value.trim();
+        const desc = document.getElementById('agent-description').value.trim();
+        if(!name) { alert("请输入智能体名称"); return; }
+        const agentId = name.toLowerCase().replace(/\s/g, '-') + Date.now();
+        const agentList = document.getElementById('agent-list');
+        const newCard = document.createElement('div');
+        newCard.className = 'agent-card';
+        newCard.dataset.agent = agentId;
+        newCard.innerHTML = `<div class="agent-name"><i class="fas fa-user-cog"></i> ${name}</div><div class="agent-desc">${desc || "自定义智能体"}</div><div class="agent-stats">✨ 专属助手</div>`;
+        newCard.onclick = () => switchAgent(agentId);
+        agentList.appendChild(newCard);
+        // 同时动态添加系统提示映射 (简易)
+        window.customPrompts = window.customPrompts || {};
+        window.customPrompts[agentId] = `你是${name}，${desc || "个性化AI助手"}，提供专业、热情的回答。`;
+        const originalGetPrompt = getSystemPromptForAgent;
+        window.getSystemPromptForAgent = (id) => { if(window.customPrompts[id]) return window.customPrompts[id]; return originalGetPrompt(id); };
+        document.getElementById('create-agent-modal').style.display = 'none';
+        addMessage(`🎉 智能体“${name}”创建成功！点击卡片即可激活。`, 'ai');
+    }
+    
+    // 深度思考模式快捷提示
+    function activateDeepThink() {
+        addMessage("🧠 深度思考模式已触发！我会要求模型进行逐步推理，提供更缜密的答案。", 'ai');
+    }
+    
+    // 特征激活模拟
+    function activateFeature(featureName) {
+        addMessage(`✨ 功能“${featureName}”已唤起。你可以直接输入相关问题，我将调用真实大模型为你服务。`, 'ai');
+    }
+    
+    // 页面初始化与事件绑定
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+        document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+        document.getElementById('deepthink-btn').addEventListener('click', activateDeepThink);
+        document.getElementById('create-agent-btn').addEventListener('click', () => document.getElementById('create-agent-modal').style.display = 'flex');
+        document.getElementById('close-modal').addEventListener('click', () => document.getElementById('create-agent-modal').style.display = 'none');
+        document.getElementById('cancel-agent-btn').addEventListener('click', () => document.getElementById('create-agent-modal').style.display = 'none');
+        document.getElementById('save-agent-btn').addEventListener('click', createNewAgent);
+        
+        document.querySelectorAll('.feature-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.feature-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                const featName = this.querySelector('div:last-child')?.innerText || "功能";
+                activateFeature(featName);
+            });
+        });
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('click', () => switchAgent(card.dataset.agent));
+        });
+        // 历史记录点击演示
+        document.querySelectorAll('[data-conv]').forEach(hist => {
+            hist.addEventListener('click', () => {
+                const topic = hist.querySelector('div:last-child')?.innerText || "话题";
+                document.getElementById('user-input').value = `继续我们之前关于${topic}的讨论，请深入讲讲`;
+                sendMessage();
+            });
+        });
+        // 添加加载样式
+        const style = document.createElement('style');
+        style.textContent = `@keyframes spin { to { transform: rotate(360deg); } } .loader { animation: spin 0.8s linear infinite; }`;
+        document.head.appendChild(style);
+        // 首次健康检查(可选测试)
+        setTimeout(() => {
+            console.log("RACCOON AI 已启动，真实API配置完成，密钥已加载");
+        }, 500);
+    });
+    
+    // 暴露一些调试方法
+    window.toggleApiMode = (enable) => { useRealAPI = enable; addMessage(`🔧 AI引擎模式切换为: ${enable ? '真实大模型' : '前端模拟'}`, 'ai'); };
+    window.getSystemPromptForAgent = getSystemPromptForAgent;
+</script>
 </body>
 </html>

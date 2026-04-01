@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>称号查询系统 | 软软的小窝</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦝%3C/text%3E%3C/svg%3E">
+    <link href="http://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="http://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #020202;
+            background-image: radial-gradient(circle at 20% 20%, rgba(255, 127, 80, 0.08) 0%, transparent 40%),
+                              radial-gradient(circle at 80% 80%, rgba(205, 132, 63, 0.05) 0%, transparent 40%),
+                              url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: #f1f1f1;
+            font-smooth: antialiased;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .glass-card {
+            background: rgba(20, 20, 28, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 32px;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 127, 80, 0.4);
+            background: rgba(25, 25, 35, 0.8);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 127, 80, 0.2);
+        }
+        .input-modern {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.875rem 1.25rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+            width: 100%;
+            outline: none;
+        }
+        .input-modern:focus {
+            border-color: #FF7F50;
+            box-shadow: 0 0 0 2px rgba(255, 127, 80, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #FF7F50 0%, #E8642E 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 20px;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            box-shadow: 0 8px 20px rgba(255, 127, 80, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(255, 127, 80, 0.3);
+        }
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 0.75rem 1.5rem;
+            color: #f1f1f1;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FF7F50;
+            color: #FF9F6E;
+        }
+        .badge-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 28px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px dashed rgba(255, 127, 80, 0.3);
+        }
+        @media (max-width: 640px) {
+            body { padding: 1rem; }
+            .glass-card { border-radius: 28px; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .float-icon { animation: float 4s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+<div class="w-full max-w-2xl mx-auto">
+    <div class="glass-card p-6 md:p-10 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 text-8xl opacity-10 float-icon">🦝</div>
+        <div class="absolute -bottom-10 -left-10 text-8xl opacity-10 float-icon" style="animation-delay: 2s;">🏅</div>
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500/20 to-transparent rounded-2xl text-4xl mb-4">🏷️</div>
+            <h1 class="text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">称号查询系统</h1>
+            <p class="text-gray-400 mt-2 text-sm">输入QQ号，解锁你的专属身份标识</p>
+        </div>
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">QQ号码</label>
+                <input type="text" id="qqInput" class="input-modern" placeholder="请输入QQ号码" autocomplete="off">
+            </div>
+            <button id="searchBtn" class="btn-primary">查询称号 →</button>
+        </div>
+        <div id="resultArea" class="mt-8 hidden">
+            <div class="badge-result">
+                <p class="text-gray-400 text-sm mb-2">查询结果</p>
+                <div id="badgeDisplay" class="text-2xl font-bold text-orange-400"></div>
+                <p id="extraMsg" class="text-xs text-gray-500 mt-3"></p>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <a href="index.html" class="btn-outline inline-flex items-center gap-2">
+                <span>🏠</span> 返回软软的小窝
+            </a>
+        </div>
+    </div>
+    <div class="text-center mt-6 text-gray-500 text-xs font-mono">Raccoon.Fit · 身份铭牌系统 | 丙午马年 荣耀上线</div>
+</div>
+<script>
+(function(){
+    function obscure(qq){
+        return qq.split('').map(ch => ('0' + ch.charCodeAt(0).toString(16)).slice(-2)).join('');
+    }
+    const titles = {
+        "3330353531373735353035": "【网站创建者】",
+        "3330373930373737383039": "【云端筑盒师】",
+        "3331353537303335333238": "【星链架构师】"
+    };
+    const input = document.getElementById('qqInput');
+    const btn = document.getElementById('searchBtn');
+    const resultDiv = document.getElementById('resultArea');
+    const badgeSpan = document.getElementById('badgeDisplay');
+    const extraSpan = document.getElementById('extraMsg');
+    function search(){
+        let val = input.value.trim();
+        if(!val){
+            resultDiv.classList.remove('hidden');
+            badgeSpan.textContent = '⚠️ 请输入QQ号';
+            extraSpan.textContent = '在输入框中填写您的QQ号码再查询吧';
+            badgeSpan.style.color = '#ffaa66';
+            return;
+        }
+        if(!/^\d+$/.test(val)){
+            resultDiv.classList.remove('hidden');
+            badgeSpan.textContent = '❌ 无效格式';
+            extraSpan.textContent = '请输入纯数字QQ号';
+            badgeSpan.style.color = '#ff8888';
+            return;
+        }
+        let key = obscure(val);
+        let title = titles[key];
+        resultDiv.classList.remove('hidden');
+        if(title){
+            badgeSpan.textContent = title;
+            extraSpan.textContent = '身份验证成功，致敬贡献者！';
+            badgeSpan.style.color = '#FF9F6E';
+        } else {
+            badgeSpan.textContent = '无称号';
+            extraSpan.textContent = '暂未获得称号，保持活跃，未来可期～';
+            badgeSpan.style.color = '#a0a0a0';
+        }
+    }
+    btn.addEventListener('click', search);
+    input.addEventListener('keypress', function(e){
+        if(e.key === 'Enter') search();
+    });
+    input.focus();
+})();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>灵熊小记 · 电视遥控版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -130,7 +130,7 @@
         }
 
         .logo-text p {
-            display: none;  /* 隐藏副标题 */
+            display: none;
         }
 
         .top-actions {
@@ -516,6 +516,142 @@
             width: 0px;
             background: transparent;
         }
+
+        /* ========= 停运公告弹窗样式 (电视遥控优化) ========= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: #ffffff;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 520px;
+            padding: 28px 24px 32px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid #eaeaea;
+            text-align: center;
+            animation: modalPop 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            outline: none;
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 56px;
+            color: #d32f2f;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: #000;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-content {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #2c3e2f;
+            background: #fef7e0;
+            padding: 18px 16px;
+            border-radius: 20px;
+            margin: 16px 0 24px;
+            border-left: 5px solid #ff9800;
+            text-align: left;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+        }
+
+        .modal-content strong {
+            color: #c62828;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 60px;
+            border: none;
+            background: #f0f0f0;
+            color: #1f1f1f;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .modal-btn-primary {
+            background: #000000;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .modal-btn-primary:focus {
+            outline: 4px solid #ffaa00;
+            background: #2c2c2c;
+            transform: scale(1.02);
+        }
+
+        .modal-btn-secondary:focus {
+            outline: 4px solid #ffaa00;
+            background: #e4e4e4;
+            transform: scale(1.02);
+        }
+
+        .modal-btn-primary:active, .modal-btn-secondary:active {
+            transform: scale(0.98);
+        }
+
+        /* 防止body滚动 */
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -529,7 +665,6 @@
                     <div class="logo-icon"><i class="fas fa-bear"></i></div>
                     <div class="logo-text">
                         <h1>灵熊小记</h1>
-                        <!-- 原副标题“电视遥控器专用 · 简洁模式”已删除 -->
                     </div>
                 </div>
                 <div class="top-actions">
@@ -612,7 +747,6 @@
                 <a class="nav-item" data-page="promo" tabindex="0"><i class="fas fa-ad"></i><span>推广</span></a>
                 <a class="nav-item" data-page="update" tabindex="0"><i class="fas fa-history"></i><span>更新</span></a>
                 <a class="nav-item" data-page="service" tabindex="0"><i class="fas fa-headset"></i><span>客服</span></a>
-                <!-- 搜索按钮 -->
                 <a class="nav-item" id="searchNavBtn" tabindex="0"><i class="fas fa-search"></i><span>搜索</span></a>
             </div>
 
@@ -621,12 +755,30 @@
         </div>
     </div>
 
+    <!-- 停运公告弹窗结构 -->
+    <div id="shutdownModal" class="modal-overlay">
+        <div class="modal-container" tabindex="-1">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="modal-title">📢 停运公告</div>
+            <div class="modal-content">
+                <p>亲爱的灵熊小记用户：</p>
+                <p>感谢您一路以来的陪伴与支持。由于业务战略调整，我们遗憾地宣布：<strong>灵熊小记将于2026年5月31日正式停止运营</strong>，届时所有线上服务将关闭。</p>
+                <p>为保障您的权益，请您点击下方“查看详情”了解具体安排及数据备份指引。</p>
+                <p style="margin-top: 8px; font-size: 13px; color:#a94442;">—— 感恩相遇，江湖再见 ——</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="modalCloseBtn"><i class="fas fa-times"></i> 稍后再说</button>
+                <button class="modal-btn modal-btn-primary" id="modalViewBtn"><i class="fas fa-external-link-alt"></i> 查看详情</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             // 强制显示APP内容
             document.getElementById('app-content').style.display = 'block';
 
-            // 公告API调用函数
+            // 获取公告API
             function fetchAnnouncement() {
                 const adminId = "2051775505";
                 const apiUrl = "http://shuixian.ltd/main/api/bulletin/bulletin.php";
@@ -653,7 +805,111 @@
 
             fetchAnnouncement();
 
-            // 电视遥控器页面管理器
+            // ---------- 停运公告弹窗逻辑 (电视遥控焦点管理) ----------
+            const modalOverlay = document.getElementById('shutdownModal');
+            const modalContainer = modalOverlay.querySelector('.modal-container');
+            const closeModalBtn = document.getElementById('modalCloseBtn');
+            const viewModalBtn = document.getElementById('modalViewBtn');
+            let previousActiveElement = null;
+            let focusTrapActive = false;
+
+            // 焦点锁定函数 (确保焦点始终在弹窗内)
+            function handleFocusTrap(e) {
+                if (!modalOverlay.classList.contains('active')) return;
+                const focusableElements = modalContainer.querySelectorAll('button, [href], [tabindex="0"]');
+                if (focusableElements.length === 0) return;
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+                if (e.target === modalContainer || !modalContainer.contains(e.target)) {
+                    e.preventDefault();
+                    firstElement.focus();
+                    return;
+                }
+                // 处理Shift+Tab 或者 Tab 循环
+                if (e.key === 'Tab') {
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            }
+
+            function enableFocusTrap() {
+                if (focusTrapActive) return;
+                focusTrapActive = true;
+                document.addEventListener('keydown', handleFocusTrap);
+                // 额外拦截焦点逃逸
+                document.addEventListener('focusin', function onFocusIn(e) {
+                    if (!modalOverlay.classList.contains('active')) return;
+                    if (!modalContainer.contains(e.target)) {
+                        const firstBtn = modalContainer.querySelector('button');
+                        if (firstBtn) firstBtn.focus();
+                    }
+                });
+            }
+
+            function disableFocusTrap() {
+                focusTrapActive = false;
+                document.removeEventListener('keydown', handleFocusTrap);
+            }
+
+            function closeModal() {
+                if (!modalOverlay.classList.contains('active')) return;
+                modalOverlay.classList.remove('active');
+                document.body.classList.remove('modal-open');
+                disableFocusTrap();
+                // 恢复页面原来焦点，默认将焦点移到首页第一个导航
+                if (previousActiveElement && previousActiveElement.focus) {
+                    previousActiveElement.focus();
+                } else {
+                    const homeNav = document.querySelector('.nav-item[data-page="home"]');
+                    if (homeNav) homeNav.focus();
+                }
+            }
+
+            function openModal() {
+                modalOverlay.classList.add('active');
+                document.body.classList.add('modal-open');
+                previousActiveElement = document.activeElement;
+                // 确保焦点落到弹窗内第一个可交互按钮 (查看详情)
+                setTimeout(() => {
+                    if (viewModalBtn) viewModalBtn.focus();
+                    enableFocusTrap();
+                }, 50);
+            }
+
+            // 查看按钮跳转到停运公告.html
+            function gotoAnnouncementPage() {
+                window.location.href = '停运公告.html';
+            }
+
+            // 绑定事件
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            if (viewModalBtn) {
+                viewModalBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    gotoAnnouncementPage();
+                });
+            }
+            // 点击遮罩层关闭
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            // 键盘 ESC 关闭弹窗
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    e.preventDefault();
+                    closeModal();
+                }
+            });
+
+            // 进入页面立即显示停运公告弹窗
+            openModal();
+
+            // 原有电视页面管理器
             class TVPageManager {
                 constructor() {
                     this.currentPage = 'home';
@@ -663,8 +919,6 @@
 
                 init() {
                     this.showPage('home');
-
-                    // 导航点击 / 回车
                     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
                         const handler = (e) => {
                             if (e.type === 'keydown' && e.key !== 'Enter') return;
@@ -678,7 +932,6 @@
                         item.addEventListener('keydown', handler);
                     });
 
-                    // 底部搜索按钮
                     const searchNav = document.getElementById('searchNavBtn');
                     if (searchNav) {
                         const searchHandler = (e) => {
@@ -690,7 +943,6 @@
                         searchNav.addEventListener('keydown', searchHandler);
                     }
 
-                    // 卡片跳转
                     document.querySelectorAll('.app-card[data-url], .service-card[data-url], .update-item[data-url]').forEach(card => {
                         const cardHandler = (e) => {
                             if (e.type === 'keydown' && e.key !== 'Enter') return;
@@ -702,7 +954,6 @@
                         card.addEventListener('keydown', cardHandler);
                     });
 
-                    // 内部按钮
                     document.querySelectorAll('.service-btn').forEach(btn => {
                         const btnHandler = (e) => {
                             if (e.type === 'keydown' && e.key !== 'Enter') return;
@@ -717,13 +968,10 @@
                         btn.addEventListener('keydown', btnHandler);
                     });
 
-                    // 返回按钮
                     document.getElementById('backBtn').addEventListener('click', () => this.goBack());
                     document.getElementById('backBtn').addEventListener('keydown', (e) => {
                         if (e.key === 'Enter') this.goBack();
                     });
-
-                    // 顶部搜索按钮
                     document.getElementById('searchBtn').addEventListener('keydown', (e) => {
                         if (e.key === 'Enter') alert('搜索功能即将上线！');
                     });

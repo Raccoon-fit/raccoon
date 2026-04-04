@@ -3,7 +3,7 @@ var CLOUD_STATUS = 1;
 // 0=无, 1=普通, 2=重要, 4=维护公告
 
 // 普通公告（状态1）
-var CLOUD_NOTICE_NORMAL = "本APP将于20:00开服";
+var CLOUD_NOTICE_NORMAL = "本APP将于20:00开服<br>bug反馈社区808417324";
 
 // 重要公告（状态2）
 var CLOUD_NOTICE_IMPORTANT = "开服公告";

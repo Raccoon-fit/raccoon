@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Ride - 站在开发之巅</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; 
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0806, #030202);
+            background-color: #050302;
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* 奢华金晕光背景 */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 50% 40%, rgba(212, 175, 55, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 主卡片 */
+        .vip-card {
+            max-width: 560px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255, 215, 0, 0.2);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* 金色装饰条纹 */
+        .vip-card::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, #ffd966, #d4af37, transparent);
+            border-radius: 100%;
+            filter: blur(1px);
+        }
+
+        .vip-card {
+            position: relative;
+        }
+
+        /* 主标题 金碧辉煌 */
+        .gold-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #e4c580 0%, #ffd966 35%, #f5e19c 70%, #c9a03d 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5), 0 0 8px rgba(212,175,55,0.6);
+            margin-bottom: 1rem;
+            word-break: keep-all;
+        }
+
+        /* 小字优雅 */
+        .sub-gold {
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            color: #e7cf8c;
+            background: rgba(0, 0, 0, 0.55);
+            display: inline-block;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+            border: 0.5px solid rgba(212, 175, 55, 0.5);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            box-shadow: 0 0 6px rgba(212,175,55,0.3);
+        }
+
+        /* 尊贵按钮 */
+        .btn-download {
+            display: inline-block;
+            background: linear-gradient(115deg, #2f2416, #1f1a0c);
+            border: 1px solid #d4af37;
+            color: #ffeaac;
+            font-size: 1.6rem;
+            font-weight: bold;
+            padding: 1rem 2.4rem;
+            border-radius: 60px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 235, 140, 0.6);
+            letter-spacing: 2px;
+            backdrop-filter: blur(4px);
+            margin-bottom: 2.8rem;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(115deg, #3f2f1c, #2c2412);
+            border-color: #f5cb5c;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 55, 0.6);
+            color: #fff2cc;
+        }
+
+        .btn-download:active {
+            transform: translateY(2px);
+        }
+
+        /* 底部的金色链接区 */
+        .footer-link {
+            margin-top: 1rem;
+            border-top: 1px dashed rgba(212, 175, 55, 0.4);
+            padding-top: 1.8rem;
+            font-size: 0.9rem;
+        }
+
+        .download-link {
+            color: #f5cf7b;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.7);
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            word-break: break-all;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .download-link:hover {
+            color: #ffeaac;
+            border-bottom-color: #ffdf8c;
+            text-shadow: 0 0 4px rgba(212,175,55,0.5);
+        }
+
+        /* 装饰小点 金粒 */
+        .glint {
+            position: absolute;
+            background: radial-gradient(circle, #f9d976, #c9a03d);
+            border-radius: 50%;
+            opacity: 0.4;
+            filter: blur(3px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 响应式 */
+        @media (max-width: 550px) {
+            .vip-card {
+                padding: 2rem 1.2rem;
+            }
+            .gold-title {
+                font-size: 2.3rem;
+            }
+            .btn-download {
+                font-size: 1.3rem;
+                padding: 0.8rem 1.8rem;
+            }
+            .sub-gold {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 额外高级感 */
+        .shine {
+            background: radial-gradient(circle at 70% 20%, rgba(255,215,0,0.12), transparent 80%);
+        }
+    </style>
+</head>
+<body>
+    <div class="vip-card shine">
+        <div class="gold-title">欢迎使用 RiDE</div
+        
+        <!-- 主要下载按钮 黑金质感 -->
+        <a href="https://raccoon.fit/APP/com.xiaohuanxiong.Ride/Ride/" class="btn-download" target="_blank" rel="noopener noreferrer">
+            立即下载
+        </a>
+        
+        <!-- 最底部的下载链接 (清晰可见的备用链接) -->
+        <div class="footer-link">
+            <a href="https://raccoon.fit/APP/com.xiaohuanxiong.Ride/Ride/" class="download-link" target="_blank" rel="noopener noreferrer">
+                专属下载链接 (备用通道)
+            </a>
+            <div style="font-size: 0.7rem; color: #b49450; margin-top: 12px; opacity: 0.7;">
+            </div>
+        </div>
+    </div>
+    <!-- 氛围光粒装饰（纯视觉） -->
+    <div class="glint" style="width: 180px; height: 180px; top: 10%; left: -5%;"></div>
+    <div class="glint" style="width: 250px; height: 250px; bottom: 5%; right: -8%; opacity: 0.2;"></div>
+</body>
+</html>

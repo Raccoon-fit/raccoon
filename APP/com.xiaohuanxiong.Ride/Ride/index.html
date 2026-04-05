@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiDE 自动下载 | 黑金专享</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 30% 20%, #0c0a07, #020101);
+            font-family: 'Segoe UI', 'PingFang SC', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .gold-container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.7);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.7), 0 0 15px rgba(212,175,55,0.4);
+            padding: 2.5rem 1.8rem;
+            text-align: center;
+        }
+        .crown-icon {
+            font-size: 3.2rem;
+            filter: drop-shadow(0 0 6px #d4af37);
+            margin-bottom: 1rem;
+        }
+        h2 {
+            font-size: 2rem;
+            background: linear-gradient(120deg, #f5e2a4, #c9a03d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+        .auto-info {
+            color: #e7cf8c;
+            background: rgba(0,0,0,0.5);
+            padding: 0.8rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            border: 0.5px solid rgba(212,175,55,0.4);
+            margin: 1.5rem 0;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top: 3px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .manual-btn {
+            display: inline-block;
+            margin-top: 1.2rem;
+            background: #1f1b0f;
+            border: 1px solid #d4af37;
+            color: #ffeaac;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .manual-btn:hover {
+            background: #352b18;
+            border-color: #f5cb5c;
+            box-shadow: 0 0 8px rgba(212,175,55,0.6);
+        }
+        .footnote {
+            font-size: 0.7rem;
+            color: #b48c3a;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="gold-container">
+    <div class="crown-icon">👑</div>
+    <h2>黑金极速通道</h2>
+    <div class="auto-info">
+        正在为您自动获取专属安装包<br>
+        <span style="font-size:0.8rem;">Ride_1.0.apk</span>
+    </div>
+    <div class="spinner"></div>
+    <p style="color:#c9aa4b; margin-top: 0.5rem; font-size: 0.85rem;">若下载未自动开始，请点击下方按钮</p>
+    <a href="./Ride_1.0.apk" class="manual-btn" download>手动点击下载</a>
+    <div class="footnote">黑金会员专属 · 安全高速</div>
+</div>
+
+<script>
+    // 页面加载完成后自动触发下载 (同目录下的 Ride_1.0.apk)
+    (function() {
+        // 确保DOM完全加载后执行
+        window.addEventListener('DOMContentLoaded', function() {
+            // 创建隐藏的下载链接并模拟点击
+            const downloadLink = document.createElement('a');
+            downloadLink.href = './Ride_1.0.apk';
+            // 设置download属性可强制命名（非必需，但保留）
+            downloadLink.download = 'Ride_1.0.apk';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            // 延迟极短时间，确保页面稳定
+            setTimeout(() => {
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }, 100);
+        });
+    })();
+</script>
+</body>
+</html>

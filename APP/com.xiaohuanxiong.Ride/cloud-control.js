@@ -1,5 +1,5 @@
 // 云控变量
-var CLOUD_STATUS = 4;
+var CLOUD_STATUS = 0;
 // 0=无, 1=普通, 2=重要, 4=维护公告
 
 // 普通公告（状态1）

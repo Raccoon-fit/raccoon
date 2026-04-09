@@ -5,7 +5,7 @@
 // 2 - 重要公告
 // 4 - 系统维护
 
-window.CLOUD_STATUS = 0;   // 当前为无公告，可按需修改为 1,2,4
+window.CLOUD_STATUS = 1;   // 当前为无公告，可按需修改为 1,2,4
 
 // 普通公告内容（仅当 CLOUD_STATUS=1 时生效）
 window.CLOUD_NOTICE_NORMAL = "欢迎使用 Ride IDE！新功能已上线。";
@@ -16,7 +16,7 @@ window.CLOUD_NOTICE_IMPORTANT = "服务器将于今晚 22:00 升级，届时可�
 // 维护模式内容（仅当 CLOUD_STATUS=4 时生效）
 window.CLOUD_MAINTENANCE_TITLE = "系统维护中";
 window.CLOUD_MAINTENANCE_CONTENT = "Ride IDE 正在进行数据库升级，预计 30 分钟后恢复。";
-window.CLOUD_MAINTENANCE_TIME = "2025-04-07 14:00 ~ 14:30";
+window.CLOUD_MAINTENANCE_TIME = "2025-04-09 23:20 ~ 23:50";
 
 // UI 按钮云控配置（true=显示，false=隐藏）
 window.CLOUD_UI_CONFIG = {

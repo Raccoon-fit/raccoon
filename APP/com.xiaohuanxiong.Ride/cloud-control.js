@@ -5,7 +5,7 @@
 // 2 - 重要公告
 // 4 - 系统维护
 
-window.CLOUD_STATUS = 1;   // 当前为无公告，可按需修改为 1,2,4
+window.CLOUD_STATUS = 4;   // 当前为无公告，可按需修改为 1,2,4
 
 // 普通公告内容（仅当 CLOUD_STATUS=1 时生效）
 window.CLOUD_NOTICE_NORMAL = "欢迎使用 Ride IDE！新功能已上线。";

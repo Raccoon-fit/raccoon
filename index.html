@@ -7,10 +7,9 @@
 <meta content="软软的小窝 - 数字创意空间 | 焕新设计 沉浸体验" name="description"/>
 <title>软软的小窝 | 浣熊创意空间 · 焕新版</title>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🦝&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
-<!-- Google Fonts - 使用HTTP -->
-<link href="http://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<!-- Tailwind CSS - 使用HTTP -->
-<script src="http://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- 修复：所有外部资源强制使用 HTTPS -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
     tailwind.config = {
       theme: {
@@ -385,6 +384,25 @@
         font-size: 0.8rem;
       }
     }
+
+    /* 修复：导航栏定位，始终位于IE提示栏下方 */
+    .nav-fixed-safe {
+      top: 80px; /* 桌面默认 */
+    }
+    @media (max-width: 768px) {
+      .nav-fixed-safe {
+        top: 70px; /* 移动端适配 */
+      }
+    }
+    /* 确保IE提示栏不遮挡内容，为body添加顶部内边距 */
+    body {
+      padding-top: 60px; /* 与IE栏高度匹配 */
+    }
+    @media (max-width: 640px) {
+      body {
+        padding-top: 80px; /* 移动端IE栏可能换行增高 */
+      }
+    }
   </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
@@ -402,6 +420,93 @@
       </div>
     </div>
   </div>
+<!-- 网址导航条 - 毛玻璃长栏（位于 IE 栏下方） -->
+<div class="fixed left-0 w-full z-[9997] bg-black/40 backdrop-blur-xl border-b border-white/10 py-3 px-4" style="top: 60px;">
+  <div class="container mx-auto flex items-center gap-3 max-w-4xl">
+    <span class="text-raccoon-orange/80 text-lg hidden sm:inline">🔗</span>
+    <div class="relative flex-1">
+      <input type="text" id="globalNavInput" placeholder="输入网址或搜索关键词，回车直达…" 
+             class="w-full bg-white/5 border border-white/20 rounded-full px-6 py-3 text-white placeholder-gray-400 focus:border-raccoon-orange focus:ring-2 focus:ring-raccoon-orange/30 outline-none transition-all text-base backdrop-blur-sm">
+      <button id="globalNavBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeDark hover:from-raccoon-orangeDark hover:to-raccoon-orange text-white rounded-full w-12 h-10 flex items-center justify-center transition-all shadow-lg shadow-raccoon-orange/30">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </button>
+    </div>
+    <span class="hidden md:inline text-gray-400 text-sm font-mono tracking-wider">⏎ 快速跳转</span>
+  </div>
+</div>
+
+<!-- 添加导航条后，必须增加 body 的 padding-top，避免遮挡 -->
+<style>
+  /* 调整 body 顶部内边距以容纳新导航条 */
+  body {
+    padding-top: 120px !important; /* 原 IE 栏 60px + 新导航条 60px */
+  }
+  @media (max-width: 768px) {
+    body {
+      padding-top: 140px !important; /* 移动端可能更高 */
+    }
+    /* 移动端导航条顶部偏移微调 */
+    .fixed[style*="top: 60px"] {
+      top: 70px !important;
+    }
+  }
+  /* 毛玻璃输入框增强 */
+  #globalNavInput::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+  }
+  #globalNavInput:focus {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  /* 按钮悬停效果 */
+  #globalNavBtn:hover {
+    transform: translateY(-50%) scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 127, 80, 0.5);
+  }
+</style>
+
+<script>
+  (function() {
+    // 等待 DOM 加载完成
+    const initNav = function() {
+      const input = document.getElementById('globalNavInput');
+      const btn = document.getElementById('globalNavBtn');
+      if (!input || !btn) return;
+
+      function handleNavigate() {
+        let raw = input.value.trim();
+        if (!raw) return;
+
+        let finalUrl = raw;
+        // 判断是否为有效网址
+        const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
+        if (!isUrl) {
+          // 非网址则作为百度搜索关键词（可改为其他搜索引擎）
+          finalUrl = `https://www.baidu.com/s?wd=${encodeURIComponent(raw)}`;
+        } else if (!/^https?:\/\//i.test(raw)) {
+          finalUrl = 'https://' + raw;
+        }
+
+        window.open(finalUrl, '_blank');
+        input.value = ''; // 可选：清空输入框
+      }
+
+      btn.addEventListener('click', handleNavigate);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleNavigate();
+        }
+      });
+    };
+
+    // 确保 DOM 已加载
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNav);
+    } else {
+      initNav();
+    }
+  })();
+</script>
 
   <!-- 加载界面 -->
   <div class="fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-800" id="loadingOverlay">
@@ -437,8 +542,8 @@
     <span>→</span>
   </a>
 
-  <!-- 导航栏 -->
-  <nav class="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300" style="top: calc(6px + 48px);">
+  <!-- 导航栏 - 修复定位 -->
+  <nav class="fixed left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300 nav-fixed-safe">
     <div class="nav-modern px-6 py-3 flex items-center justify-between animate-slide-in">
       <div class="flex items-center gap-3 cursor-pointer group" id="navBrandTrigger">
         <div class="w-12 h-12 bg-gradient-to-tr from-raccoon-orange to-raccoon-orangeDark rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/30 transition-all group-hover:scale-110 group-hover:rotate-6 animate-scale-subtle">🦝</div>

@@ -7,362 +7,421 @@
 <meta content="软软的小窝 - 数字创意空间 | 焕新设计 沉浸体验" name="description"/>
 <title>软软的小窝 | 浣熊创意空间 · 焕新版</title>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🦝&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
-
-<!-- 性能优化：预连接国内 CDN -->
-<link rel="dns-prefetch" href="https://fonts.googleapis.cn">
-<link rel="dns-prefetch" href="https://cdn.bootcdn.net">
-<link rel="preconnect" href="https://fonts.googleapis.cn" crossorigin>
-<link rel="preconnect" href="https://cdn.bootcdn.net" crossorigin>
-
-<!-- 字体与 Tailwind 使用国内镜像（修正为 CSS 文件） -->
-<link href="https://fonts.googleapis.cn/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<!-- 使用 BootCDN 的 Tailwind CSS 完整版 -->
-<link href="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.4.1/tailwind.min.css" rel="stylesheet">
-
-<style>
-  /* ========== 自定义扩展（覆盖/补充 Tailwind） ========== */
-  :root {
-    --raccoon-orange: #FF7F50;
-    --raccoon-orange-light: #FF9F6E;
-    --raccoon-orange-dark: #E8642E;
-    --newyear-red: #E53E3E;
-    --newyear-gold: #F6BD38;
-    --newyear-gold-light: #FFD166;
-  }
-
-  /* 自定义背景色类（原 tailwind.config 中的颜色） */
-  .bg-raccoon-orange { background-color: #FF7F50; }
-  .bg-raccoon-orangeDark { background-color: #E8642E; }
-  .bg-raccoon-orange\/20 { background-color: rgba(255, 127, 80, 0.2); }
-  .bg-raccoon-orange\/10 { background-color: rgba(255, 127, 80, 0.1); }
-  .bg-newyear-red { background-color: #E53E3E; }
-  .bg-newyear-gold { background-color: #F6BD38; }
-  .bg-newyear-goldLight { background-color: #FFD166; }
-  .text-raccoon-orange { color: #FF7F50; }
-  .text-raccoon-orange\/90 { color: rgba(255, 127, 80, 0.9); }
-  .text-raccoon-orange\/80 { color: rgba(255, 127, 80, 0.8); }
-  .text-newyear-goldLight { color: #FFD166; }
-  .text-newyear-goldLight\/70 { color: rgba(255, 209, 102, 0.7); }
-  .border-newyear-gold\/20 { border-color: rgba(246, 189, 56, 0.2); }
-  .border-raccoon-orange\/30 { border-color: rgba(255, 127, 80, 0.3); }
-  .border-raccoon-orange\/40 { border-color: rgba(255, 127, 80, 0.4); }
-  .from-raccoon-orange { --tw-gradient-from: #FF7F50; }
-  .to-raccoon-orangeDark { --tw-gradient-to: #E8642E; }
-  .via-raccoon-orangeLight { --tw-gradient-stops: var(--tw-gradient-from), #FF9F6E, var(--tw-gradient-to); }
-  .to-newyear-gold { --tw-gradient-to: #F6BD38; }
-  .shadow-raccoon-orange\/30 { --tw-shadow-color: rgba(255, 127, 80, 0.3); }
-  .shadow-orange-500\/30 { --tw-shadow-color: rgba(249, 115, 22, 0.3); }
-
-  /* 背景图案（纯 CSS 替代原 base64 SVG） */
-  .bg-grid-pattern {
-    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 8px);
-  }
-
-  /* 基础重置 */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background-color: #020202;
-    background-image: 
-      radial-gradient(circle at 20% 20%, rgba(255, 127, 80, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 80%, rgba(205, 132, 63, 0.05) 0%, transparent 40%),
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 2px, transparent 2px, transparent 8px);
-    color: #f1f1f1;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    padding-top: 140px !important; /* IE栏 + 网址导航条 */
-  }
-  @media (max-width: 768px) {
-    body { padding-top: 150px !important; }
-  }
-
-  /* 自定义玻璃态卡片 */
-  .glass-modern {
-    background: rgba(15, 15, 20, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  .glass-card-modern {
-    background: rgba(20, 20, 28, 0.7);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 20px;
-    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-    position: relative;
-    overflow: hidden;
-    will-change: transform, box-shadow;
-  }
-  .glass-card-modern::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 127, 80, 0.3), transparent);
-    z-index: 1;
-  }
-  .glass-card-modern:hover {
-    border-color: rgba(255, 127, 80, 0.4);
-    background: rgba(25, 25, 35, 0.8);
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 127, 80, 0.2);
-  }
-
-  /* 导航栏 */
-  .nav-modern {
-    background: rgba(8, 8, 12, 0.85);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
-
-  /* 按钮 */
-  .btn-primary {
-    background: linear-gradient(135deg, #FF7F50 0%, #E8642E 100%);
-    color: white;
-    font-weight: 700;
-    border-radius: 16px;
-    border: none;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
-  }
-  .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(255, 127, 80, 0.3);
-  }
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.6s;
-  }
-  .btn-primary:hover::after { left: 100%; }
-
-  .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    border-radius: 16px;
-    transition: all 0.3s ease;
-  }
-  .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 127, 80, 0.4);
-  }
-
-  /* 技能条 */
-  .skill-bar {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .skill-progress-modern {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #FF7F50, #FF9F6E);
-    position: relative;
-    transition: width 1.2s cubic-bezier(0.22, 0.68, 0, 1.71);
-    box-shadow: 0 0 12px rgba(255, 127, 80, 0.4);
-  }
-  .skill-progress-modern::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shimmer 2s infinite;
-  }
-
-  /* Hero 区域背景 */
-  .hero-gradient {
-    background: radial-gradient(ellipse at 50% 30%, rgba(255, 127, 80, 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 80%, rgba(246, 189, 56, 0.1) 0%, transparent 50%);
-  }
-
-  /* 标签 */
-  .tag-modern {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    background: rgba(255, 127, 80, 0.1);
-    border: 1px solid rgba(255, 127, 80, 0.2);
-    color: #FF9F6E;
-  }
-
-  /* 标题装饰线 */
-  .title-decoration {
-    position: relative;
-    display: inline-block;
-  }
-  .title-decoration::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 40px;
-    height: 3px;
-    background: linear-gradient(90deg, #FF7F50, transparent);
-    border-radius: 2px;
-  }
-
-  /* 马年装饰 */
-  .horse-year-decoration {
-    position: relative;
-    padding: 4px 12px;
-    background: linear-gradient(90deg, rgba(229, 62, 62, 0.1), rgba(246, 189, 56, 0.1));
-    border-radius: 20px;
-    border: 1px solid rgba(229, 62, 62, 0.2);
-  }
-
-  /* 称号入口 */
-  .badge-entrance {
-    position: fixed;
-    z-index: 100;
-    background: rgba(20, 20, 28, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 127, 80, 0.4);
-    border-radius: 40px;
-    padding: 8px 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #FF9F6E;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-  }
-  .badge-entrance:hover {
-    background: rgba(255, 127, 80, 0.2);
-    border-color: #FF7F50;
-    transform: scale(1.03);
-    box-shadow: 0 6px 20px rgba(255,127,80,0.2);
-  }
-  @media (min-width: 769px) { .badge-entrance { top: 100px; right: 24px; } }
-  @media (max-width: 768px) { .badge-entrance { bottom: 24px; right: 20px; padding: 6px 16px; font-size: 0.8rem; } }
-
-  /* 导航栏定位修正（避开 IE 栏 + 网址导航条） */
-  .nav-fixed-safe { top: 140px; }
-  @media (max-width: 768px) { .nav-fixed-safe { top: 150px; } }
-
-  /* 网址导航条（毛玻璃长条） */
-  .url-nav-bar {
-    position: fixed;
-    left: 0;
-    width: 100%;
-    z-index: 9997;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 0.75rem 1rem;
-    top: 60px;
-  }
-  @media (max-width: 768px) { .url-nav-bar { top: 70px; } }
-  #globalNavInput { transition: all 0.2s ease; }
-  #globalNavInput:focus { background: rgba(255, 255, 255, 0.1); }
-  #globalNavBtn:hover { transform: translateY(-50%) scale(1.02); box-shadow: 0 0 15px rgba(255, 127, 80, 0.5); }
-
-  /* 动画 */
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-  @keyframes floatSoft {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  .animate-float-soft {
-    animation: floatSoft 8s ease-in-out infinite;
-    will-change: transform;
-  }
-  @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  .animate-gradient-shift {
-    background-size: 200% 200%;
-    animation: gradientShift 3s ease infinite;
-  }
-  @keyframes slideIn {
-    0% { transform: translateY(20px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  .animate-slide-in { animation: slideIn 0.6s ease-out; }
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  .animate-fade-in { animation: fadeIn 0.8s ease-out; }
-
-  /* 减少动画偏好 */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+<!-- 修复：所有外部资源强制使用 HTTPS -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            raccoon: {
+              orange: '#FF7F50',
+              orangeLight: '#FF9F6E',
+              orangeDark: '#E8642E',
+              brown: '#CD7A4A',
+              dark: '#030303',
+              surface: '#0F0F12',
+              accent: '#FF9F6E',
+              glow: 'rgba(255, 127, 80, 0.6)',
+              surfaceLight: 'rgba(255, 255, 255, 0.03)',
+            },
+            newyear: {
+              red: '#E53E3E',
+              gold: '#F6BD38',
+              goldLight: '#FFD166',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
+            display: ['Inter', 'Noto Sans SC', 'sans-serif'],
+          },
+          animation: {
+            'float-soft': 'floatSoft 8s ease-in-out infinite',
+            'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+            'shimmer-slow': 'shimmerSlow 2.8s infinite',
+            'scale-subtle': 'scaleSubtle 2s ease-in-out infinite',
+            'slide-in': 'slideIn 0.6s ease-out',
+            'fade-in': 'fadeIn 0.8s ease-out',
+            'border-glow': 'borderGlow 2s ease-in-out infinite',
+            'gradient-shift': 'gradientShift 3s ease infinite',
+          },
+          keyframes: {
+            floatSoft: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-12px) rotate(1deg)' },
+            },
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 0px rgba(255,127,80,0)' },
+              '50%': { boxShadow: '0 0 20px rgba(255,127,80,0.3)' },
+            },
+            shimmerSlow: {
+              '100%': { transform: 'translateX(100%)' },
+            },
+            scaleSubtle: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.02)' },
+            },
+            slideIn: {
+              '0%': { transform: 'translateY(20px)', opacity: 0 },
+              '100%': { transform: 'translateY(0)', opacity: 1 },
+            },
+            fadeIn: {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+            borderGlow: {
+              '0%, 100%': { borderColor: 'rgba(255, 127, 80, 0.3)' },
+              '50%': { borderColor: 'rgba(255, 127, 80, 0.7)' },
+            },
+            gradientShift: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            }
+          },
+          backgroundImage: {
+            'gradient-radial': 'radial-gradient(circle at 50% 30%, var(--tw-gradient-stops))',
+            'gradient-conic': 'conic-gradient(var(--tw-gradient-stops))',
+            'noise-pattern': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E\")",
+            'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+          },
+          backdropBlur: {
+            'xs': '2px',
+          }
+        }
+      }
     }
-  }
+  </script>
+<style>
+    /* 现代风格CSS - 参考Qclaw设计美学 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  /* 自定义滚动条 */
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: rgba(10, 10, 15, 0.5); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #FF7F50, #E8642E); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #FF9F6E, #FF7F50); }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  /* 辅助类（Tailwind 未涵盖的备用） */
-  .text-balance { text-wrap: balance; }
-  .bg-black\/40 { background-color: rgba(0, 0, 0, 0.4); }
-  .bg-black\/30 { background-color: rgba(0, 0, 0, 0.3); }
-  .backdrop-blur-xl { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-  .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-  .backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-  .drop-shadow-2xl { filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15)); }
-  .shadow-2xl { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
-  .shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
-</style>
+    body {
+      background-color: #020202;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 127, 80, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(205, 132, 63, 0.05) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      color: #f1f1f1;
+      font-smooth: antialiased;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* 现代玻璃态效果 */
+    .glass-modern {
+      background: rgba(15, 15, 20, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card-modern {
+      background: rgba(20, 20, 28, 0.7);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 127, 80, 0.3), transparent);
+      z-index: 1;
+    }
+
+    .glass-card-modern:hover {
+      border-color: rgba(255, 127, 80, 0.4);
+      background: rgba(25, 25, 35, 0.8);
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 127, 80, 0.2);
+    }
+
+    /* 导航栏现代风格 */
+    .nav-modern {
+      background: rgba(8, 8, 12, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* 按钮现代风格 */
+    .btn-primary {
+      background: linear-gradient(135deg, #FF7F50 0%, #E8642E 100%);
+      color: white;
+      font-weight: 700;
+      border-radius: 16px;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(255, 127, 80, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(255, 127, 80, 0.3);
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn-primary:hover::after {
+      left: 100%;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 127, 80, 0.4);
+    }
+
+    /* 进度条现代风格 */
+    .skill-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .skill-progress-modern {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #FF7F50, #FF9F6E);
+      position: relative;
+      transition: width 1.2s cubic-bezier(0.22, 0.68, 0, 1.71);
+      box-shadow: 0 0 12px rgba(255, 127, 80, 0.4);
+    }
+
+    .skill-progress-modern::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    /* 英雄区域背景 */
+    .hero-gradient {
+      background: radial-gradient(ellipse at 50% 30%, rgba(255, 127, 80, 0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(246, 189, 56, 0.1) 0%, transparent 50%);
+    }
+
+    /* 现代标签 */
+    .tag-modern {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 127, 80, 0.1);
+      border: 1px solid rgba(255, 127, 80, 0.2);
+      color: #FF9F6E;
+    }
+
+    /* 现代标题装饰线 */
+    .title-decoration {
+      position: relative;
+      display: inline-block;
+    }
+
+    .title-decoration::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, #FF7F50, transparent);
+      border-radius: 2px;
+    }
+
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 15, 0.5);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #FF7F50, #E8642E);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, #FF9F6E, #FF7F50);
+    }
+
+    /* 动画定义 */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* 响应式优化 */
+    @media (max-width: 768px) {
+      .glass-modern, .glass-card-modern {
+        border-radius: 18px;
+      }
+
+      .nav-modern {
+        border-radius: 12px;
+        padding: 12px 16px;
+      }
+    }
+
+    /* 文本平衡 */
+    .text-balance {
+      text-wrap: balance;
+    }
+
+    /* 节庆装饰 - 马年主题 */
+    .horse-year-decoration {
+      position: relative;
+      padding: 4px 12px;
+      background: linear-gradient(90deg, rgba(229, 62, 62, 0.1), rgba(246, 189, 56, 0.1));
+      border-radius: 20px;
+      border: 1px solid rgba(229, 62, 62, 0.2);
+    }
+
+    /* 称号按钮样式 - 桌面右上方，移动右下角 */
+    .badge-entrance {
+      position: fixed;
+      z-index: 100;
+      background: rgba(20, 20, 28, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 127, 80, 0.4);
+      border-radius: 40px;
+      padding: 8px 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #FF9F6E;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .badge-entrance:hover {
+      background: rgba(255, 127, 80, 0.2);
+      border-color: #FF7F50;
+      transform: scale(1.03);
+      box-shadow: 0 6px 20px rgba(255,127,80,0.2);
+    }
+    /* 桌面端：右上方 (top: 100px, right: 20px) 避开导航栏 */
+    @media (min-width: 769px) {
+      .badge-entrance {
+        top: 100px;
+        right: 24px;
+      }
+    }
+    /* 移动端：右下角 */
+    @media (max-width: 768px) {
+      .badge-entrance {
+        bottom: 24px;
+        right: 20px;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* 修复：导航栏定位，始终位于IE提示栏下方 */
+    .nav-fixed-safe {
+      top: 80px; /* 桌面默认 */
+    }
+    @media (max-width: 768px) {
+      .nav-fixed-safe {
+        top: 70px; /* 移动端适配 */
+      }
+    }
+    /* 确保IE提示栏不遮挡内容，为body添加顶部内边距 */
+    body {
+      padding-top: 60px; /* 与IE栏高度匹配 */
+    }
+    @media (max-width: 640px) {
+      body {
+        padding-top: 80px; /* 移动端IE栏可能换行增高 */
+      }
+    }
+  </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
-
-<!-- IE兼容提示栏 -->
-<div class="fixed top-0 left-0 z-[9998] w-full bg-gradient-to-r from-black/80 to-gray-900/80 backdrop-blur-md border-b border-white/10 text-sm">
-  <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-    <a href="index-ie.html" class="inline-flex items-center gap-2 text-amber-200/90 hover:text-amber-100 transition-all font-medium group">
-      <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-      IE兼容版入口
-    </a>
-    <div class="flex items-center gap-3 text-newyear-goldLight text-xs font-mono tracking-wide">
-      <span class="animate-pulse">🐴</span>
-      <span>丙午新禧 · 马到功成</span>
-      <span class="hidden sm:inline">✨</span>
+  <!-- IE兼容版提示栏 -->
+  <div class="fixed top-0 left-0 z-[9998] w-full bg-gradient-to-r from-black/80 to-gray-900/80 backdrop-blur-md border-b border-white/10 text-sm">
+    <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <a href="index-ie.html" class="inline-flex items-center gap-2 text-amber-200/90 hover:text-amber-100 transition-all font-medium group">
+        <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        IE兼容版入口
+      </a>
+      <div class="flex items-center gap-3 text-newyear-goldLight text-xs font-mono tracking-wide">
+        <span class="animate-pulse">🐴</span>
+        <span>丙午新禧 · 马到功成</span>
+        <span class="hidden sm:inline">✨</span>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- 网址导航条（毛玻璃长条） -->
-<div class="url-nav-bar">
+<!-- 网址导航条 - 毛玻璃长栏（位于 IE 栏下方） -->
+<div class="fixed left-0 w-full z-[9997] bg-black/40 backdrop-blur-xl border-b border-white/10 py-3 px-4" style="top: 60px;">
   <div class="container mx-auto flex items-center gap-3 max-w-4xl">
     <span class="text-raccoon-orange/80 text-lg hidden sm:inline">🔗</span>
     <div class="relative flex-1">
@@ -376,202 +435,488 @@
   </div>
 </div>
 
-<!-- 加载界面 -->
-<div class="fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-800" id="loadingOverlay">
-  <div class="text-center space-y-6">
-    <div class="relative">
-      <div class="text-7xl animate-float-soft drop-shadow-2xl">🦝</div>
-      <div class="absolute inset-0 bg-gradient-to-r from-raccoon-orange/20 to-transparent blur-xl rounded-full -z-10"></div>
+<!-- 添加导航条后，必须增加 body 的 padding-top，避免遮挡 -->
+<style>
+  /* 调整 body 顶部内边距以容纳新导航条 */
+  body {
+    padding-top: 120px !important; /* 原 IE 栏 60px + 新导航条 60px */
+  }
+  @media (max-width: 768px) {
+    body {
+      padding-top: 140px !important; /* 移动端可能更高 */
+    }
+    /* 移动端导航条顶部偏移微调 */
+    .fixed[style*="top: 60px"] {
+      top: 70px !important;
+    }
+  }
+  /* 毛玻璃输入框增强 */
+  #globalNavInput::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+  }
+  #globalNavInput:focus {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  /* 按钮悬停效果 */
+  #globalNavBtn:hover {
+    transform: translateY(-50%) scale(1.02);
+    box-shadow: 0 0 15px rgba(255, 127, 80, 0.5);
+  }
+</style>
+
+<script>
+  (function() {
+    // 等待 DOM 加载完成
+    const initNav = function() {
+      const input = document.getElementById('globalNavInput');
+      const btn = document.getElementById('globalNavBtn');
+      if (!input || !btn) return;
+
+      function handleNavigate() {
+        let raw = input.value.trim();
+        if (!raw) return;
+
+        let finalUrl = raw;
+        // 判断是否为有效网址
+        const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
+        if (!isUrl) {
+          // 非网址则作为百度搜索关键词（可改为其他搜索引擎）
+          finalUrl = `https://www.baidu.com/s?wd=${encodeURIComponent(raw)}`;
+        } else if (!/^https?:\/\//i.test(raw)) {
+          finalUrl = 'https://' + raw;
+        }
+
+        window.open(finalUrl, '_blank');
+        input.value = ''; // 可选：清空输入框
+      }
+
+      btn.addEventListener('click', handleNavigate);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleNavigate();
+        }
+      });
+    };
+
+    // 确保 DOM 已加载
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNav);
+    } else {
+      initNav();
+    }
+  })();
+</script>
+
+  <!-- 加载界面 -->
+  <div class="fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-800" id="loadingOverlay">
+    <div class="text-center space-y-6">
+      <div class="relative">
+        <div class="text-7xl animate-float-soft drop-shadow-2xl">🦝</div>
+        <div class="absolute inset-0 bg-gradient-to-r from-raccoon-orange/20 to-transparent blur-xl rounded-full -z-10"></div>
+      </div>
+      <div class="w-64 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-raccoon-orange via-amber-400 to-raccoon-orange rounded-full animate-gradient-shift"></div>
+      </div>
+      <p class="text-raccoon-orange/80 text-xs tracking-widest font-mono">LOADING CREATIVE SPACE</p>
     </div>
-    <div class="w-64 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-      <div class="h-full bg-gradient-to-r from-raccoon-orange via-amber-400 to-raccoon-orange rounded-full animate-gradient-shift"></div>
-    </div>
-    <p class="text-raccoon-orange/80 text-xs tracking-widest font-mono">LOADING CREATIVE SPACE</p>
   </div>
-</div>
 
-<!-- 背景装饰 -->
-<div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-  <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
-  <div class="absolute top-1/4 left-1/5 w-[600px] h-[600px] bg-gradient-to-br from-raccoon-orange/10 via-transparent to-transparent blur-[120px] rounded-full animate-float-soft"></div>
-  <div class="absolute bottom-1/3 right-1/6 w-[500px] h-[500px] bg-gradient-to-tl from-newyear-gold/5 via-transparent to-transparent blur-[100px] rounded-full animate-float-soft" style="animation-delay: 2s;"></div>
-  <div class="absolute top-3/4 left-2/3 w-[300px] h-[300px] bg-gradient-to-tr from-purple-500/5 via-transparent to-transparent blur-[80px] rounded-full animate-float-soft" style="animation-delay: 4s;"></div>
-</div>
-
-<!-- 反馈按钮 -->
-<a href="http://raccoon.fit/反馈/" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 left-6 z-[100] flex items-center gap-3 glass-modern px-5 py-3 text-raccoon-orange font-semibold text-sm transition-all hover:scale-105 shadow-2xl group">
-  <span class="text-xl group-hover:rotate-12 transition-transform">🐞</span>
-  <span>反馈建议</span>
-</a>
-
-<!-- 称号入口 -->
-<a href="http://raccoon.fit/称号" target="_blank" rel="noopener noreferrer" class="badge-entrance">
-  <span>🏅</span> 称号 <span>→</span>
-</a>
-
-<!-- 主导航栏 -->
-<nav class="fixed left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300 nav-fixed-safe">
-  <div class="nav-modern px-6 py-3 flex items-center justify-between animate-slide-in">
-    <div class="flex items-center gap-3 cursor-pointer group" id="navBrandTrigger">
-      <div class="w-12 h-12 bg-gradient-to-tr from-raccoon-orange to-raccoon-orangeDark rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/30 transition-all group-hover:scale-110 group-hover:rotate-6">🦝</div>
-      <div>
-        <span class="font-black text-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent hidden sm:block">软软的小窝</span>
-        <p class="text-[10px] text-gray-400 font-mono hidden sm:block">Raccoon Creative Space</p>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-      <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#home"><span>首页</span><span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span></a>
-      <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#projects"><span>项目</span><span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span></a>
-      <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#lab"><span>实验室</span><span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span></a>
-      <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#about"><span>关于</span><span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span></a>
-    </div>
-    <div class="flex items-center gap-5">
-      <div class="hidden lg:flex flex-col items-end text-[11px] font-mono text-gray-400 tracking-wider">
-        <span id="liveClock" class="text-raccoon-orange/90 font-bold text-sm">--:--:--</span>
-        <span class="text-[9px] uppercase text-gray-500">active studio</span>
-      </div>
-      <a class="btn-primary px-6 py-2.5 text-sm" href="http://raccoon.fit/mobile" target="_blank">客服合集</a>
-    </div>
+  <!-- 背景装饰 -->
+  <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+    <div class="absolute top-1/4 left-1/5 w-[600px] h-[600px] bg-gradient-to-br from-raccoon-orange/10 via-transparent to-transparent blur-[120px] rounded-full animate-float-soft"></div>
+    <div class="absolute bottom-1/3 right-1/6 w-[500px] h-[500px] bg-gradient-to-tl from-newyear-gold/5 via-transparent to-transparent blur-[100px] rounded-full animate-float-soft" style="animation-delay: 2s;"></div>
+    <div class="absolute top-3/4 left-2/3 w-[300px] h-[300px] bg-gradient-to-tr from-purple-500/5 via-transparent to-transparent blur-[80px] rounded-full animate-float-soft" style="animation-delay: 4s;"></div>
   </div>
-</nav>
 
-<main>
-  <!-- Hero区域 -->
-  <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden hero-gradient">
-    <div class="relative z-10 text-center max-w-5xl mx-auto animate-fade-in">
-      <div class="inline-flex items-center gap-3 horse-year-decoration mb-8 animate-slide-in">
-        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span></span>
-        <span class="text-sm font-medium">🐎 丙午马年 · 灵感奔腾</span>
-      </div>
-      <h1 class="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
-        <span class="bg-gradient-to-r from-white via-amber-100 to-raccoon-orange bg-clip-text text-transparent">探索代码的</span><br/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-raccoon-orange via-raccoon-orangeLight to-newyear-gold animate-pulse">无限可能</span>
-      </h1>
-      <p class="text-gray-300 text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-light text-balance">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
-      <div class="mb-10 inline-block px-6 py-3 rounded-full glass-modern border border-newyear-gold/20">
-        <p class="text-newyear-goldLight text-sm font-medium tracking-wide flex items-center gap-2"><span>✨</span><span>丙午新春 · 代码无bug · 创意绽放</span><span>✨</span></p>
-      </div>
-      <div class="flex flex-col sm:flex-row gap-5 justify-center">
-        <a class="btn-primary px-10 py-4 rounded-2xl" href="#projects">探索项目</a>
-        <a class="btn-secondary px-10 py-4 rounded-2xl" href="http://github.com/raccoon-fit" target="_blank">GitHub 星系</a>
-      </div>
-    </div>
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40"><span class="text-raccoon-orange text-2xl">⌵</span></div>
-  </section>
+  <!-- 反馈按钮 -->
+  <a href="http://raccoon.fit/反馈/" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 left-6 z-[100] flex items-center gap-3 glass-modern px-5 py-3 text-raccoon-orange font-semibold text-sm transition-all hover:scale-105 hover:animate-border-glow shadow-2xl group">
+    <span class="text-xl group-hover:rotate-12 transition-transform">🐞</span>
+    <span>反馈建议</span>
+  </a>
 
-  <!-- 项目集 -->
-  <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
-      <div><h2 class="text-5xl md:text-6xl font-black tracking-tight mb-3"><span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">精选作品</span></h2><p class="text-gray-400 text-lg">匠心独运 · 每一行代码皆有灵魂</p></div>
-      <div class="h-px flex-1 bg-gradient-to-r from-transparent via-raccoon-orange/40 to-transparent hidden md:block"></div>
-      <span class="text-raccoon-orange font-mono text-sm tracking-widest">PORTFOLIO · 2025</span>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- 卡片1 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.1s;"><div class="text-5xl mb-5 opacity-80">💻</div><div class="flex gap-2 mb-5"><span class="tag-modern">在线IDE</span><span class="tag-modern bg-blue-500/10 border-blue-500/20 text-blue-300">PRO</span></div><h3 class="text-2xl font-bold mb-3 group-hover:text-raccoon-orange">Ride</h3><p class="text-gray-400 text-sm mb-8 flex-grow">高性能云端开发环境，极速部署，让编码行云流水。</p><a href="http://raccoon.fit/Ride" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a></div>
-      <!-- 卡片2 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.2s;"><div class="text-5xl mb-5">📺</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-blue-500/10 border-blue-500/20 text-blue-300">直播工具</span></div><h3 class="text-2xl font-bold mb-3">B站直播流获取</h3><p class="text-gray-400 text-sm mb-8 flex-grow">开发者专属 · 一键获取直播源信息，高效集成。</p><a href="http://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a></div>
-      <!-- 卡片3 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in grayscale hover:grayscale-0 transition-all" data-purpose="project-card" style="animation-delay: 0.3s;"><div class="text-5xl mb-5">📱</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-zinc-700/30 border-zinc-600/30 text-zinc-300">归档库</span></div><h3 class="text-2xl font-bold mb-3">MULU</h3><p class="text-gray-400 text-sm mb-8 flex-grow">移动应用探索史 · React Native 全流程实践。</p><button class="mt-auto w-full p-4 rounded-xl bg-black/30 text-gray-500 cursor-not-allowed font-bold">已归档</button></div>
-      <!-- 卡片4 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.4s;"><div class="text-5xl mb-5">🐻</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-emerald-500/10 border-emerald-500/20 text-emerald-300">Vue3</span></div><h3 class="text-2xl font-bold mb-3">灵熊小记</h3><p class="text-gray-400 text-sm mb-8 flex-grow">你的神奇笔记助手，温和整理灵感与计划。</p><a href="http://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/停运公告.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group"><span>访问项目</span><span class="group-hover:translate-x-2 transition-transform">→</span></a></div>
-      <!-- 卡片5 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.5s;"><div class="text-5xl mb-5">🎮</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-purple-500/10 border-purple-500/20 text-purple-300">HTML5</span></div><h3 class="text-2xl font-bold mb-3">小游戏库</h3><p class="text-gray-400 text-sm mb-8 flex-grow">趣味创意与前端技术的碰撞，轻量级互动体验。</p><a href="http://raccoon.fit/game" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group"><span>试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a></div>
-      <!-- 卡片6 -->
-      <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.6s;"><div class="text-5xl mb-5">🤖</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-amber-500/10 border-amber-500/20 text-amber-300">AI 先锋</span></div><h3 class="text-2xl font-bold mb-3">RACCOON AI</h3><p class="text-gray-400 text-sm mb-8 flex-grow">对话大模型，探索智能交互的未来边界。</p><a href="http://raccoon.fit/ai" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group"><span>体验AI</span><span class="group-hover:translate-x-2 transition-transform">→</span></a></div>
-    </div>
-  </section>
+  <!-- 称号入口 (桌面右上方/移动右下角) -->
+  <a href="http://raccoon.fit/称号" target="_blank" rel="noopener noreferrer" class="badge-entrance">
+    <span>🏅</span> 称号
+    <span>→</span>
+  </a>
 
-  <!-- 创意实验室 -->
-  <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-black/20 to-transparent">
-    <div class="container mx-auto px-6 max-w-7xl">
-      <div class="text-center mb-20"><h2 class="text-5xl font-black mb-5 tracking-tight"><span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">✨ 创意实验室</span></h2><p class="text-gray-400 text-lg max-w-2xl mx-auto">原型 · 跨界 · 未来感，技术实验田</p></div>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group"><div class="w-20 h-20 bg-gradient-to-br from-raccoon-orange/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">🔮</div><h3 class="text-2xl font-bold mb-3">AI 辅助设计</h3><p class="text-gray-400 text-sm">生成式UI探索，设计系统智能迭代。</p></div>
-        <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group"><div class="w-20 h-20 bg-gradient-to-br from-blue-500/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">⚡</div><h3 class="text-2xl font-bold mb-3">交互原型</h3><p class="text-gray-400 text-sm">高级微动效 · 沉浸式体验研究。</p></div>
-        <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group"><div class="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">📊</div><h3 class="text-2xl font-bold mb-3">数据可视化</h3><p class="text-gray-400 text-sm">动态叙事，将数据转化为洞察艺术。</p></div>
+  <!-- 导航栏 - 修复定位 -->
+  <nav class="fixed left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-5xl transition-all duration-300 nav-fixed-safe">
+    <div class="nav-modern px-6 py-3 flex items-center justify-between animate-slide-in">
+      <div class="flex items-center gap-3 cursor-pointer group" id="navBrandTrigger">
+        <div class="w-12 h-12 bg-gradient-to-tr from-raccoon-orange to-raccoon-orangeDark rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/30 transition-all group-hover:scale-110 group-hover:rotate-6 animate-scale-subtle">🦝</div>
+        <div>
+          <span class="font-black text-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent hidden sm:block">软软的小窝</span>
+          <p class="text-[10px] text-gray-400 font-mono hidden sm:block">Raccoon Creative Space</p>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#home">
+          <span>首页</span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#projects">
+          <span>项目</span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#lab">
+          <span>实验室</span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span>
+        </a>
+        <a class="text-gray-300 hover:text-raccoon-orange transition-all duration-200 relative group" href="#about">
+          <span>关于</span>
+          <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="hidden lg:flex flex-col items-end text-[11px] font-mono text-gray-400 tracking-wider">
+          <span id="liveClock" class="text-raccoon-orange/90 font-bold text-sm">--:--:--</span>
+          <span class="text-[9px] uppercase text-gray-500">active studio</span>
+        </div>
+        <a class="btn-primary px-6 py-2.5 text-sm" href="http://raccoon.fit/mobile" target="_blank">客服合集</a>
       </div>
     </div>
-  </section>
+  </nav>
 
-  <!-- 关于 + 技能栏 -->
-  <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
-    <div class="grid lg:grid-cols-2 gap-16 items-start">
-      <div class="glass-card-modern p-12 rounded-3xl relative overflow-hidden"><div class="absolute -right-8 -top-8 text-9xl opacity-10">🦝</div><h3 class="text-4xl font-black mb-6"><span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">关于软软</span></h3><div class="space-y-5 text-gray-300 leading-relaxed"><p>技术与设计的狂热信徒，信奉「简洁即力量」。以浣熊的机敏与好奇持续迭代自我。</p><p>Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p><p class="text-raccoon-orange font-semibold text-lg mt-6">保持好奇 · 永远优雅地解决问题</p></div><div class="mt-10"><a class="inline-flex items-center gap-2 text-white font-bold group" href="me"><span class="border-b-2 border-raccoon-orange pb-1 group-hover:pr-3 transition-all">探索个人主页</span><svg class="w-5 h-5 text-raccoon-orange group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></a></div></div>
-      <div><h4 class="text-2xl font-black flex items-center gap-3 mb-10"><span class="w-10 h-[2px] bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight"></span><span class="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">核心能力</span></h4>
-        <div class="space-y-7">
-          <div><div class="flex justify-between mb-3"><span class="font-bold">前端架构</span><span class="text-raccoon-orange font-semibold">90%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width: 90%"></div></div></div>
-          <div><div class="flex justify-between mb-3"><span class="font-bold">UI/UX 设计</span><span class="text-raccoon-orange font-semibold">82%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width: 82%"></div></div></div>
-          <div><div class="flex justify-between mb-3"><span class="font-bold">产品思维</span><span class="text-raccoon-orange font-semibold">85%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width: 85%"></div></div></div>
-          <div><div class="flex justify-between mb-3"><span class="font-bold">创意编程</span><span class="text-raccoon-orange font-semibold">78%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width: 78%"></div></div></div>
+  <main>
+    <!-- Hero区域 -->
+    <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden hero-gradient">
+      <div class="relative z-10 text-center max-w-5xl mx-auto animate-fade-in">
+        <div class="inline-flex items-center gap-3 horse-year-decoration mb-8 animate-slide-in">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span>
+          </span>
+          <span class="text-sm font-medium">🐎 丙午马年 · 灵感奔腾</span>
+        </div>
+        <h1 class="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
+          <span class="bg-gradient-to-r from-white via-amber-100 to-raccoon-orange bg-clip-text text-transparent">探索代码的</span><br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-raccoon-orange via-raccoon-orangeLight to-newyear-gold animate-glow-pulse">无限可能</span>
+        </h1>
+        <p class="text-gray-300 text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-light text-balance">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
+        <div class="mb-10 inline-block px-6 py-3 rounded-full glass-modern border border-newyear-gold/20">
+          <p class="text-newyear-goldLight text-sm font-medium tracking-wide flex items-center gap-2">
+            <span>✨</span>
+            <span>丙午新春 · 代码无bug · 创意绽放</span>
+            <span>✨</span>
+          </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-5 justify-center">
+          <a class="btn-primary px-10 py-4 rounded-2xl" href="#projects">探索项目</a>
+          <a class="btn-secondary px-10 py-4 rounded-2xl" href="http://github.com/raccoon-fit" target="_blank">GitHub 星系</a>
+        </div>
+      </div>
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+        <span class="text-raccoon-orange text-2xl">⌵</span>
+      </div>
+    </section>
+
+    <!-- 项目集 -->
+    <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+        <div>
+          <h2 class="text-5xl md:text-6xl font-black tracking-tight mb-3">
+            <span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">精选作品</span>
+          </h2>
+          <p class="text-gray-400 text-lg">匠心独运 · 每一行代码皆有灵魂</p>
+        </div>
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent via-raccoon-orange/40 to-transparent hidden md:block"></div>
+        <span class="text-raccoon-orange font-mono text-sm tracking-widest">PORTFOLIO · 2025</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- 项目卡片1 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.1s;">
+          <div class="text-5xl mb-5 opacity-80">💻</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern">在线IDE</span>
+            <span class="tag-modern bg-blue-500/10 border-blue-500/20 text-blue-300">PRO</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3 group-hover:text-raccoon-orange">Ride</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">高性能云端开发环境，极速部署，让编码行云流水。</p>
+          <a href="http://raccoon.fit/Ride" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group">
+            <span>立即体验</span>
+            <span class="group-hover:translate-x-2 transition-transform">→</span>
+          </a>
+        </div>
+
+        <!-- 项目卡片2 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.2s;">
+          <div class="text-5xl mb-5">📺</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern bg-blue-500/10 border-blue-500/20 text-blue-300">直播工具</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">B站直播流获取</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">开发者专属 · 一键获取直播源信息，高效集成。</p>
+          <a href="http://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group">
+            <span>立即体验</span>
+            <span class="group-hover:translate-x-2 transition-transform">→</span>
+          </a>
+        </div>
+
+        <!-- 项目卡片3 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in grayscale hover:grayscale-0 transition-all" data-purpose="project-card" style="animation-delay: 0.3s;">
+          <div class="text-5xl mb-5">📱</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern bg-zinc-700/30 border-zinc-600/30 text-zinc-300">归档库</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">MULU</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">移动应用探索史 · React Native 全流程实践。</p>
+          <button class="mt-auto w-full p-4 rounded-xl bg-black/30 text-gray-500 cursor-not-allowed font-bold">已归档</button>
+        </div>
+
+        <!-- 项目卡片4 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.4s;">
+          <div class="text-5xl mb-5">🐻</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern bg-emerald-500/10 border-emerald-500/20 text-emerald-300">Vue3</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">灵熊小记</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">你的神奇笔记助手，温和整理灵感与计划。</p>
+          <a href="http://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/停运公告.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group">
+            <span>访问项目</span>
+            <span class="group-hover:translate-x-2 transition-transform">→</span>
+          </a>
+        </div>
+
+        <!-- 项目卡片5 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.5s;">
+          <div class="text-5xl mb-5">🎮</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern bg-purple-500/10 border-purple-500/20 text-purple-300">HTML5</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">小游戏库</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">趣味创意与前端技术的碰撞，轻量级互动体验。</p>
+          <a href="http://raccoon.fit/game" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group">
+            <span>试玩</span>
+            <span class="group-hover:translate-x-2 transition-transform">→</span>
+          </a>
+        </div>
+
+        <!-- 项目卡片6 -->
+        <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" data-purpose="project-card" style="animation-delay: 0.6s;">
+          <div class="text-5xl mb-5">🤖</div>
+          <div class="flex gap-2 mb-5">
+            <span class="tag-modern bg-amber-500/10 border-amber-500/20 text-amber-300">AI 先锋</span>
+          </div>
+          <h3 class="text-2xl font-bold mb-3">RACCOON AI</h3>
+          <p class="text-gray-400 text-sm mb-8 flex-grow">对话大模型，探索智能交互的未来边界。</p>
+          <a href="http://raccoon.fit/ai" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary hover:bg-raccoon-orange/10 hover:border-raccoon-orange/30 transition-all font-bold group">
+            <span>体验AI</span>
+            <span class="group-hover:translate-x-2 transition-transform">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 创意实验室 -->
+    <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-black/20 to-transparent">
+      <div class="container mx-auto px-6 max-w-7xl">
+        <div class="text-center mb-20">
+          <h2 class="text-5xl font-black mb-5 tracking-tight">
+            <span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">✨ 创意实验室</span>
+          </h2>
+          <p class="text-gray-400 text-lg max-w-2xl mx-auto">原型 · 跨界 · 未来感，技术实验田</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group">
+            <div class="w-20 h-20 bg-gradient-to-br from-raccoon-orange/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">🔮</div>
+            <h3 class="text-2xl font-bold mb-3">AI 辅助设计</h3>
+            <p class="text-gray-400 text-sm">生成式UI探索，设计系统智能迭代。</p>
+          </div>
+          <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group">
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-500/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">⚡</div>
+            <h3 class="text-2xl font-bold mb-3">交互原型</h3>
+            <p class="text-gray-400 text-sm">高级微动效 · 沉浸式体验研究。</p>
+          </div>
+          <div class="glass-card-modern p-9 rounded-3xl text-center transition-all hover:bg-white/5 group">
+            <div class="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">📊</div>
+            <h3 class="text-2xl font-bold mb-3">数据可视化</h3>
+            <p class="text-gray-400 text-sm">动态叙事，将数据转化为洞察艺术。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 关于 + 技能栏 -->
+    <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div class="glass-card-modern p-12 rounded-3xl relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 text-9xl opacity-10">🦝</div>
+          <h3 class="text-4xl font-black mb-6">
+            <span class="title-decoration bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">关于软软</span>
+          </h3>
+          <div class="space-y-5 text-gray-300 leading-relaxed">
+            <p>技术与设计的狂热信徒，信奉「简洁即力量」。以浣熊的机敏与好奇持续迭代自我。</p>
+            <p>Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p>
+            <p class="text-raccoon-orange font-semibold text-lg mt-6">保持好奇 · 永远优雅地解决问题</p>
+          </div>
+          <div class="mt-10">
+            <a class="inline-flex items-center gap-2 text-white font-bold group" href="me">
+              <span class="border-b-2 border-raccoon-orange pb-1 group-hover:pr-3 transition-all">探索个人主页</span>
+              <svg class="w-5 h-5 text-raccoon-orange group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h4 class="text-2xl font-black flex items-center gap-3 mb-10">
+            <span class="w-10 h-[2px] bg-gradient-to-r from-raccoon-orange to-raccoon-orangeLight"></span>
+            <span class="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">核心能力</span>
+          </h4>
+          <div class="space-y-7">
+            <div>
+              <div class="flex justify-between mb-3">
+                <span class="font-bold">前端架构</span>
+                <span class="text-raccoon-orange font-semibold">90%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-progress-modern" style="width: 90%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-3">
+                <span class="font-bold">UI/UX 设计</span>
+                <span class="text-raccoon-orange font-semibold">82%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-progress-modern" style="width: 82%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-3">
+                <span class="font-bold">产品思维</span>
+                <span class="text-raccoon-orange font-semibold">85%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-progress-modern" style="width: 85%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-3">
+                <span class="font-bold">创意编程</span>
+                <span class="text-raccoon-orange font-semibold">78%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-progress-modern" style="width: 78%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="pb-20 pt-28 px-6">
+    <div class="container mx-auto max-w-6xl">
+      <div class="glass-card-modern p-12 md:p-16 text-center relative overflow-hidden">
+        <!-- 背景装饰 -->
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br from-raccoon-orange/5 to-transparent rounded-full blur-3xl"></div>
+        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-gradient-to-tr from-newyear-gold/5 to-transparent rounded-full blur-3xl"></div>
+
+        <div class="relative z-10">
+          <div class="w-24 h-24 mx-auto bg-gradient-to-br from-raccoon-orange to-raccoon-orangeDark rounded-3xl flex items-center justify-center text-4xl shadow-2xl mb-8 animate-float-soft">🦝</div>
+          <h2 class="text-4xl font-black mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">软软的小窝</h2>
+          <p class="text-gray-400 max-w-md mx-auto mb-12">探索 · 创造 · 成长 — 期待与你共鸣。</p>
+          <div class="flex flex-wrap justify-center gap-8 mb-12">
+            <a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="mailto:2051775505@qq.com">✉️ 邮箱</a>
+            <a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="http://github.com/raccoon-fit" target="_blank">🐙 GitHub</a>
+            <a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="http://raccoon.fit" target="_blank">🌐 官网</a>
+            <a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="#home">⬆️ 返回顶部</a>
+          </div>
+          <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between gap-4 items-center">
+            <p class="text-gray-500 text-xs">© 2025-2026 软软 · 浣熊设计哲学</p>
+            <p class="text-[10px] font-mono text-gray-600 tracking-widest">STAY CURIOUS · STAY CREATIVE</p>
+          </div>
+          <div class="mt-6">
+            <p class="text-newyear-goldLight/70 text-sm font-medium">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p>
+          </div>
         </div>
       </div>
     </div>
-  </section>
-</main>
+  </footer>
 
-<!-- 页脚 -->
-<footer class="pb-20 pt-28 px-6"><div class="container mx-auto max-w-6xl"><div class="glass-card-modern p-12 md:p-16 text-center relative overflow-hidden"><div class="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br from-raccoon-orange/5 to-transparent rounded-full blur-3xl"></div><div class="absolute -left-20 -bottom-20 w-64 h-64 bg-gradient-to-tr from-newyear-gold/5 to-transparent rounded-full blur-3xl"></div><div class="relative z-10"><div class="w-24 h-24 mx-auto bg-gradient-to-br from-raccoon-orange to-raccoon-orangeDark rounded-3xl flex items-center justify-center text-4xl shadow-2xl mb-8 animate-float-soft">🦝</div><h2 class="text-4xl font-black mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">软软的小窝</h2><p class="text-gray-400 max-w-md mx-auto mb-12">探索 · 创造 · 成长 — 期待与你共鸣。</p><div class="flex flex-wrap justify-center gap-8 mb-12"><a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="mailto:2051775505@qq.com">✉️ 邮箱</a><a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="http://github.com/raccoon-fit" target="_blank">🐙 GitHub</a><a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="http://raccoon.fit" target="_blank">🌐 官网</a><a class="text-gray-300 hover:text-raccoon-orange transition font-medium hover:scale-105 inline-block" href="#home">⬆️ 返回顶部</a></div><div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between gap-4 items-center"><p class="text-gray-500 text-xs">© 2025-2026 软软 · 浣熊设计哲学</p><p class="text-[10px] font-mono text-gray-600 tracking-widest">STAY CURIOUS · STAY CREATIVE</p></div><div class="mt-6"><p class="text-newyear-goldLight/70 text-sm font-medium">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p></div></div></div></div></footer>
+  <!-- 密码模态窗 -->
+  <div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/70 backdrop-blur-md transition-all" id="passwordModal">
+    <div class="glass-card-modern w-full max-w-md p-10 rounded-3xl shadow-2xl">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-raccoon-orange/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div>
+        <h3 class="text-2xl font-bold mb-2">开发者验证</h3>
+        <p class="text-gray-400 text-sm">输入调试密码</p>
+      </div>
+      <input type="password" id="passwordInput" class="w-full mt-6 bg-black/40 border border-white/20 rounded-2xl px-5 py-3.5 text-center text-white focus:border-raccoon-orange focus:ring-2 focus:ring-raccoon-orange/30 outline-none transition placeholder-gray-500" placeholder="••••••••">
+      <p id="errorMessage" class="text-red-400 text-xs text-center mt-2 hidden">密码错误，再试试看~</p>
+      <div class="flex gap-3 mt-8">
+        <button id="cancelBtn" class="flex-1 py-3.5 btn-secondary rounded-xl">取消</button>
+        <button id="confirmBtn" class="flex-1 py-3.5 btn-primary rounded-xl">确认</button>
+      </div>
+    </div>
+  </div>
 
-<!-- 密码模态窗 -->
-<div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/70 backdrop-blur-md transition-all" id="passwordModal"><div class="glass-card-modern w-full max-w-md p-10 rounded-3xl shadow-2xl"><div class="text-center"><div class="w-20 h-20 bg-gradient-to-br from-raccoon-orange/20 to-transparent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div><h3 class="text-2xl font-bold mb-2">开发者验证</h3><p class="text-gray-400 text-sm">输入调试密码</p></div><input type="password" id="passwordInput" class="w-full mt-6 bg-black/40 border border-white/20 rounded-2xl px-5 py-3.5 text-center text-white focus:border-raccoon-orange focus:ring-2 focus:ring-raccoon-orange/30 outline-none transition placeholder-gray-500" placeholder="••••••••"><p id="errorMessage" class="text-red-400 text-xs text-center mt-2 hidden">密码错误，再试试看~</p><div class="flex gap-3 mt-8"><button id="cancelBtn" class="flex-1 py-3.5 btn-secondary rounded-xl">取消</button><button id="confirmBtn" class="flex-1 py-3.5 btn-primary rounded-xl">确认</button></div></div></div>
-
-<script>
-  (function(){
-    "use strict";
-
-    // 加载完成
-    const overlay = document.getElementById('loadingOverlay');
-    window.addEventListener('load', () => { 
-      setTimeout(() => { overlay.style.opacity = '0'; setTimeout(() => overlay.classList.add('hidden'), 600); }, 800); 
-    });
-
-    // 实时时钟
-    setInterval(() => { 
-      const clock = document.getElementById('liveClock'); 
-      if(clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); 
-    }, 1000);
-
-    // 网址导航功能
-    const navInput = document.getElementById('globalNavInput');
-    const navBtn = document.getElementById('globalNavBtn');
-    function handleNav() {
-      let raw = navInput.value.trim();
-      if (!raw) return;
-      let finalUrl = raw;
-      if (!/^https?:\/\//i.test(raw) && !/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw)) {
-        finalUrl = `https://www.baidu.com/s?wd=${encodeURIComponent(raw)}`;
-      } else if (!/^https?:\/\//i.test(raw)) {
-        finalUrl = 'https://' + raw;
-      }
-      window.open(finalUrl, '_blank');
-      navInput.value = '';
-    }
-    navBtn.addEventListener('click', handleNav);
-    navInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleNav(); });
-
-    // 密码模态框
-    const modal = document.getElementById('passwordModal');
-    const trigger = document.getElementById('navBrandTrigger');
-    const confirm = document.getElementById('confirmBtn');
-    const cancel = document.getElementById('cancelBtn');
-    const pwdInput = document.getElementById('passwordInput');
-    const errMsg = document.getElementById('errorMessage');
-
-    trigger.addEventListener('click', () => { modal.classList.remove('hidden'); modal.classList.add('flex'); pwdInput.focus(); });
-    const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); errMsg.classList.add('hidden'); pwdInput.value = ''; };
-    cancel.addEventListener('click', closeModal);
-    confirm.addEventListener('click', () => {
-      if(pwdInput.value === 'RuanRuan') { window.location.href = 'debug_raccoon_sztskj.html'; }
-      else { errMsg.classList.remove('hidden'); pwdInput.value = ''; pwdInput.classList.add('ring-2','ring-red-500'); setTimeout(()=>pwdInput.classList.remove('ring-2','ring-red-500'),800); }
-    });
-    pwdInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') confirm.click(); });
-
-    // 延迟初始化非关键动画（技能条、滚动观察）
-    function initSecondary() {
-      document.querySelectorAll('[data-purpose="project-card"]').forEach(el => {
-        el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700', 'ease-out');
+  <script>
+    (function() {
+      // 页面加载完成
+      const overlay = document.getElementById('loadingOverlay');
+      window.addEventListener('load', () => { 
+        setTimeout(() => { 
+          overlay.style.opacity = '0'; 
+          setTimeout(() => overlay.classList.add('hidden'), 600); 
+        }, 800); 
       });
+
+      // 实时时钟
+      setInterval(() => { 
+        const clock = document.getElementById('liveClock'); 
+        if(clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); 
+      }, 1000);
+
+      // 密码模态框
+      const pwdModal = document.getElementById('passwordModal');
+      const trigger = document.getElementById('navBrandTrigger');
+      const confirm = document.getElementById('confirmBtn');
+      const cancel = document.getElementById('cancelBtn');
+      const pwdInput = document.getElementById('passwordInput');
+      const errMsg = document.getElementById('errorMessage');
+
+      trigger.addEventListener('click', () => { 
+        pwdModal.classList.remove('hidden'); 
+        pwdModal.classList.add('flex'); 
+        pwdInput.focus(); 
+      });
+
+      const closeModal = () => { 
+        pwdModal.classList.add('hidden'); 
+        pwdModal.classList.remove('flex'); 
+        errMsg.classList.add('hidden'); 
+        pwdInput.value = ''; 
+      };
+
+      cancel.addEventListener('click', closeModal);
+
+      confirm.addEventListener('click', () => { 
+        if(pwdInput.value === 'RuanRuan') {
+          window.location.href = 'debug_raccoon_sztskj.html'; 
+        } else { 
+          errMsg.classList.remove('hidden'); 
+          pwdInput.value = ''; 
+          pwdInput.classList.add('ring-2', 'ring-red-500'); 
+          setTimeout(() => pwdInput.classList.remove('ring-2', 'ring-red-500'), 800); 
+        } 
+      });
+
+      pwdInput.addEventListener('keypress', (e) => { 
+        if(e.key === 'Enter') confirm.click(); 
+      });
+
+      // 滚动动画
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
       const observer = new IntersectionObserver((entries) => { 
         entries.forEach(entry => { 
           if(entry.isIntersecting) { 
@@ -579,21 +924,25 @@
             entry.target.classList.remove('opacity-0', 'translate-y-10'); 
           } 
         }); 
-      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-      document.querySelectorAll('[data-purpose="project-card"]').forEach(el => observer.observe(el));
+      }, observerOptions);
 
+      // 观察所有项目卡片
+      document.querySelectorAll('[data-purpose="project-card"]').forEach(el => { 
+        el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700', 'ease-out'); 
+        observer.observe(el); 
+      });
+
+      // 技能条动画
       document.querySelectorAll('.skill-progress-modern').forEach(bar => { 
         const width = bar.style.width; 
         bar.style.width = '0%'; 
         setTimeout(() => bar.style.width = width, 300); 
       });
-    }
-    if (document.readyState === 'complete') { initSecondary(); }
-    else { window.addEventListener('load', initSecondary); }
 
-    console.log("%c🦝 焕新版 · 软软的小窝 | 设计美学 x 技术力量", "color:#FF7F50; font-size:16px; font-weight:bold;");
-    console.log("%c🐎 丙午马年 · 灵感奔腾", "color:#F6BD38; font-size:14px;");
-  })();
-</script>
+      // 控制台信息
+      console.log("%c🦝 焕新版 · 软软的小窝 | 设计美学 x 技术力量", "color:#FF7F50; font-size:16px; font-weight:bold;");
+      console.log("%c🐎 丙午马年 · 灵感奔腾", "color:#F6BD38; font-size:14px;");
+    })();
+  </script>
 </body>
 </html>

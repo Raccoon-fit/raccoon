@@ -3,23 +3,19 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
-  <meta name="description" content="软软的小窝 · 极简搜索"/>
-  <title>软软的小窝 · 搜索</title>
-  <!-- 简洁图标 -->
+  <meta name="description" content="软软的小窝 · 极简浏览器主页"/>
+  <title>软软的小窝 · 极简浏览器主页</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FF7F50'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='system-ui'%3ER%3C/text%3E%3C/svg%3E"/>
-  <!-- 字体与 Tailwind -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- 字体 · 仅保留必要，不拖累性能 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- 极简tailwind (仅用于基础排版，无复杂样式) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            raccoon: {
-              orange: '#FF7F50',
-              orangeLight: '#FF9F6E',
-              orangeDark: '#E8642E',
-            }
+            soft: { orange: '#FF7F50', light: '#FF9F6E', dark: '#E8642E' }
           },
           fontFamily: {
             sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
@@ -29,266 +25,320 @@
     }
   </script>
   <style>
-    /* ---------- 浅蓝色背景 · 无圆角框 · 文字黑色/深色 · 清晰可读 ---------- */
+    /* ---------- 极致简洁 · 低配置友好 · 无动画/无重阴影 ---------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html, body {
+      height: 100%;
+      background: #d4e6ff;  /* 柔和浅蓝底 */
+      font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+      color: #0a1f2c;
+      overflow: hidden;       /* 防止双滚动条 */
+    }
 
     body {
-      background: #d4e6ff;  /* 柔和浅蓝色，纯色无渐变 */
-      color: #1a1a1a;        /* 全局文字深色/黑色 */
-      font-smooth: antialiased;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+
+    /* ----- 顶栏：仅一行，极轻量 ----- */
+    .top-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
+      gap: 12px;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.65); /* 半透白，清爽不卡 */
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      backdrop-filter: none;   /* 关闭模糊，低配流畅 */
+      flex-shrink: 0;
     }
 
-    /* 内容容器：无背景、无边框、无圆角 */
-    .content-container {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    /* 搜索框加大版 */
-    .search-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-
-    #globalNavInput {
-      width: 100%;
-      background: white !important;
-      border: 2px solid rgba(255, 127, 80, 0.5) !important;
-      border-radius: 60px !important;
-      padding: 1.4rem 6.5rem 1.4rem 2.2rem !important;
-      font-size: 1.45rem !important;
-      font-weight: 500;
-      color: #111 !important;          /* 输入框文字黑色 */
-      box-shadow: 0 8px 18px rgba(0, 20, 40, 0.06);
-      transition: all 0.2s;
-      outline: none;
-      line-height: 1.4;
-    }
-
-    #globalNavInput:focus {
-      border-color: #FF7F50 !important;
-      box-shadow: 0 0 0 5px rgba(255, 127, 80, 0.12), 0 8px 20px rgba(0,0,0,0.03);
-      background: white !important;
-    }
-
-    #globalNavInput::placeholder {
-      color: #4a6075;
-      font-weight: 400;
-      font-size: 1.15rem;
-    }
-
-    /* 搜索按钮加大 */
-    .search-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: linear-gradient(135deg, #FF7F50 0%, #E8642E 100%);
-      color: white;
-      width: 62px;
-      height: 62px;
-      border-radius: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s;
-      box-shadow: 0 8px 18px rgba(255, 127, 80, 0.35);
-      border: none;
-      cursor: pointer;
-    }
-
-    .search-btn:hover {
-      transform: translateY(-50%) scale(1.05);
-      box-shadow: 0 14px 24px rgba(255, 127, 80, 0.5);
-    }
-
-    .search-btn svg {
-      width: 30px;
-      height: 30px;
-    }
-
-    /* 标题风格 —— 文字深色/黑色，保留渐变但清晰可见 */
-    .brand-title {
-      font-weight: 900;
-      background: linear-gradient(135deg, #1e2fee, #1e3b4f);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: -0.02em;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.03);
-    }
-
-    /* 副标题文字黑色 */
-    .subhead-text {
+    /* 品牌小标 */
+    .brand-mini {
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: -0.01em;
       color: #1e3b4f;
-    }
-
-    /* 官网按钮 —— 干净样式 */
-    .btn-outline-blue {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1.5px solid rgba(30, 90, 140, 0.5);
-      color: #0a1f2c;                /* 深色文字 */
-      font-weight: 600;
-      border-radius: 60px;
-      padding: 0.8rem 2.5rem;
-      transition: all 0.3s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-      display: inline-flex;
+      white-space: nowrap;
+      display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
+    }
+    .brand-mini span {
+      background: #FF7F50;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 30px;
+      margin-left: 6px;
     }
 
-    .btn-outline-blue:hover {
+    /* 搜索条 —— 极简、无圆角/无渐变，纯色 */
+    .search-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: white;
+      border: 1px solid #bdd3e8;
+      border-radius: 40px;      /* 略微软化，但保持清爽 */
+      padding: 2px 2px 2px 18px;
+      transition: none;          /* 移除过渡，减少重绘 */
+      box-shadow: none;
+    }
+    .search-bar:focus-within {
+      border-color: #FF7F50;
+      outline: none;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      padding: 12px 8px 12px 0;
+      color: #111;
+      font-weight: 500;
+      min-width: 0;
+    }
+    .search-bar input::placeholder {
+      color: #5f7d9c;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .search-bar button {
+      background: #FF7F50;       /* 纯色，无渐变 */
+      border: none;
+      border-radius: 40px;
+      width: 52px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      flex-shrink: 0;
+      transition: none;
+      box-shadow: none;
+      margin: 2px;
+    }
+    .search-bar button:hover {
+      background: #e06a3a;       /* 微深，无动画 */
+    }
+    .search-bar button svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      stroke-width: 2.5;
+    }
+
+    /* 右侧小工具：官网入口 (极简) */
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .home-link {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,127,80,0.5);
+      color: #1e3b4f;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      border-radius: 40px;
+      text-decoration: none;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: none;
+    }
+    .home-link:hover {
       background: white;
       border-color: #FF7F50;
-      color: #000;
-      transform: translateY(-2px);
-      box-shadow: 0 14px 22px rgba(0, 30, 60, 0.08);
     }
 
-    /* 欢迎语 —— 黑色/深色，背景浅白半透明 */
-    .welcome-text {
-      color: #0a1c28;
-      font-weight: 500;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(255,255,255,0.9);
-      backdrop-filter: none;
+    /* ----- 全屏内嵌视图 (占用剩余全部空间) ----- */
+    .browser-frame {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: white;
+      display: block;
     }
 
-    /* 提示小字与脚标 —— 深色 */
-    .hint-text, .footer-note {
-      color: #1f4059;
+    /* 底部极简脚标 (固定高度，不抢占视图) */
+    .micro-footer {
+      flex-shrink: 0;
+      text-align: center;
+      font-size: 11px;
+      padding: 6px 12px;
+      color: #2c5778;
+      background: transparent;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      opacity: 0.8;
     }
 
-    .footer-note {
-      border-top-color: rgba(0,0,0,0.08) !important;
+    /* 所有过渡/动画移除，保证低配流畅 */
+    a, button, input {
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* 调整链接/文字颜色 */
-    a, p, span {
-      color: inherit;
+    /* 手机小屏适配：顶栏略微紧凑 */
+    @media (max-width: 560px) {
+      .top-bar {
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .brand-mini {
+        font-size: 1.1rem;
+      }
+      .brand-mini span {
+        display: none;  /* 移动端隐藏小圆标，保留清爽 */
+      }
+      .home-link span:last-child {
+        display: none;  /* 隐藏“官网”文字，只留🏠 */
+      }
+      .home-link {
+        padding: 8px 12px;
+      }
+      .search-bar input {
+        font-size: 0.95rem;
+        padding: 10px 4px 10px 0;
+      }
+      .search-bar button {
+        width: 46px;
+        height: 42px;
+      }
     }
 
-    /* 移除所有不需要的背景、圆角卡片 */
+    /* 移除所有花哨效果 */
+    .no-transition {
+      transition: none !important;
+    }
   </style>
 </head>
-<body class="font-sans antialiased">
+<body>
 
-<!-- 纯浅蓝色背景，无任何装饰，直接展示内容 -->
-<div class="content-container">
-  
-  <!-- 标题沿用：软软的小窝 (无浣熊emoji) -->
-  <div class="mb-6">
-    <h1 class="brand-title text-4xl md:text-6xl font-black tracking-tight">
-      软软的小窝
-    </h1>
+<!-- 顶栏：严格一行，包含品牌+搜索框+官网入口 -->
+<div class="top-bar">
+  <div class="brand-mini">
+    🦝 软软的小窝
+    <span>lite</span>
   </div>
-  <p class="subhead-text text-sm md:text-base mb-8 font-mono tracking-wider">—— 搜索 · 直达 · 灵感 ——</p>
 
-  <!-- 搜索框 (加大版，无圆角外框) -->
-  <div class="search-wrapper">
-    <input type="text" id="globalNavInput" placeholder="🔍 输入网址或关键词，回车直达…" 
-           class="w-full" autofocus>
-    <button id="globalNavBtn" class="search-btn" aria-label="搜索跳转">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <!-- 搜索框 (一行核心) -->
+  <div class="search-bar">
+    <input type="text" id="globalNavInput" placeholder="输入网址或关键词…" autofocus spellcheck="false" autocomplete="off">
+    <button id="globalNavBtn" aria-label="前往">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
       </svg>
     </button>
   </div>
-  
-  <!-- 提示小字 -->
-  <p class="hint-text text-xs mt-3 font-mono tracking-wide">按 ↵ 回车键快速跳转 · 支持网址/Edge搜索</p>
 
-  <!-- 中字号欢迎语：欢迎使用【软软的小窝】搜索页 (完全不动，文字黑色) -->
-  <div class="mt-10 mb-6">
-    <span class="welcome-text text-xl md:text-2xl font-medium px-6 py-2 rounded-full inline-block shadow-sm">
-      ✨ 欢迎使用【软软的小窝】搜索页 ✨
-    </span>
-  </div>
-
-  <!-- 进入官网按钮 (http://raccoon.fit) -->
-  <div class="mt-2">
-    <a href="http://raccoon.fit" target="_blank" rel="noopener noreferrer" 
-       class="btn-outline-blue text-lg md:text-xl">
-      <span>🏠</span> 进入官网 <span>→</span>
+  <div class="top-actions">
+    <a href="#" id="officialSiteBtn" class="home-link" title="在页面内打开 raccoon.fit">
+      <span>🏠</span>
+      <span>官网</span>
     </a>
   </div>
+</div>
 
-  <!-- 极简脚标 -->
-  <div class="footer-note mt-12 text-[11px] font-mono opacity-70 pt-5 flex justify-center gap-4 border-t">
-    <span>🐎 丙午马年 · 奔腾向前</span>
-    <span>·</span>
-    <span>RACCOON.FIT</span>
-  </div>
+<!-- 内嵌视图：所有链接/搜索在此打开 -->
+<iframe id="contentFrame" class="browser-frame" 
+        srcdoc='
+          <html style="background:#f2f6fc; display:flex; align-items:center; justify-content:center; font-family:system-ui, sans-serif; margin:0; height:100%;">
+            <body style="margin:0; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+              <div style="text-align:center; color:#1e3b4f; max-width:500px; padding:2rem;">
+                <div style="font-size:3rem; margin-bottom:0.5rem;">🦝</div>
+                <h2 style="font-weight:500; margin:0 0 8px; color:#1e3b4f;">软软的小窝 · 浏览器主页<br>美化版</h2>
+                <p style="margin:0; opacity:0.75; font-size:1rem;">在上方输入网址或搜索词</p>
+                <p style="margin-top:24px; font-size:0.8rem; opacity:0.5;">轻量 · 低配友好 · 丙午马年</p>
+              </div>
+            </body>
+          </html>
+        ' 
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        loading="lazy">
+</iframe>
+
+<!-- 脚标：极简信息，不占视图 -->
+<div class="micro-footer">
+  <span>🐎 丙午马年 · 奔腾向前</span>
+  <span>RACCOON.FIT</span>
 </div>
 
 <script>
   (function() {
     "use strict";
-    
-    // ---------- 搜索逻辑 (关键词使用 Bing 搜索) ----------
-    const initSearch = function() {
-      const input = document.getElementById('globalNavInput');
-      const btn = document.getElementById('globalNavBtn');
-      if (!input || !btn) return;
 
-      function handleNavigate() {
-        let raw = input.value.trim();
-        if (!raw) return;
-        
-        // 判断是否为网址或关键词
-        const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
-        let finalUrl = raw;
-        
-        if (!isUrl) {
-          finalUrl = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
-        } else if (!/^https?:\/\//i.test(raw)) {
-          finalUrl = 'https://' + raw;
-        }
-        
-        window.open(finalUrl, '_blank');
-        input.value = '';
+    const input = document.getElementById('globalNavInput');
+    const searchBtn = document.getElementById('globalNavBtn');
+    const frame = document.getElementById('contentFrame');
+    const officialBtn = document.getElementById('officialSiteBtn');
+
+    // ---------- 核心：在本页面内嵌框架打开链接/搜索 ----------
+    function navigateTo(rawInput) {
+      let raw = rawInput.trim();
+      if (!raw) return;
+
+      // 简单判断是否为网址 (包含.且无空格，或以http开头)
+      const looksLikeUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/|$)/.test(raw);
+      let destination = raw;
+
+      if (!looksLikeUrl) {
+        // 关键词 → Bing搜索 (内嵌)
+        destination = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
+      } else if (!/^https?:\/\//i.test(raw)) {
+        destination = 'https://' + raw;
       }
 
-      btn.addEventListener('click', handleNavigate);
-      input.addEventListener('keypress', (e) => {
+      // 更新iframe —— 在本页面内打开 ✅
+      frame.src = destination;
+    }
+
+    // 处理跳转事件
+    function handleNavigate() {
+      if (!input) return;
+      navigateTo(input.value);
+    }
+
+    // 搜索按钮点击
+    if (searchBtn) {
+      searchBtn.addEventListener('click', handleNavigate);
+    }
+
+    // 【核心修复】输入框：使用更可靠的 keydown 事件替代 keypress
+    // 确保回车键在任何环境下都能正确触发导航
+    if (input) {
+      input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+          e.preventDefault();  // 阻止任何潜在的默认行为（如表单提交）
           handleNavigate();
-        }
-      });
-    };
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initSearch);
-    } else {
-      initSearch();
-    }
-
-    console.log("%c🦝 软软的小窝 · 浅蓝极简 | 文字黑色 · 清晰", "color: #FF7F50; font-size: 14px; font-weight: bold;");
-    
-    // 按ESC清空输入框
-    const inputEl = document.getElementById('globalNavInput');
-    if (inputEl) {
-      inputEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          inputEl.value = '';
+        } else if (e.key === 'Escape') {
+          input.value = '';    // ESC 清空输入框，保持原有体验
         }
       });
     }
+
+    // ---------- 官网按钮：也在iframe内打开 raccoon.fit ----------
+    if (officialBtn) {
+      officialBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        frame.src = 'https://raccoon.fit';
+      });
+    }
+
+    // 低配友好：静默处理控制台信息，不干扰用户
+    console.log("%c🦝 软软的小窝 · 轻量版浏览器主页 | 一行搜索·低配流畅", "color: #FF7F50; font-size: 13px; font-weight: bold;");
   })();
 </script>
 
-<!-- 背景浅蓝，文字黑色/深色，无圆角框，搜索框加大，完全符合要求 -->
 </body>
 </html>

@@ -3,269 +3,69 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
-  <meta name="description" content="软软的小窝 · 极简浏览器主页"/>
   <title>软软的小窝 · 极简浏览器主页</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FF7F50'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='system-ui'%3ER%3C/text%3E%3C/svg%3E"/>
-  <!-- 字体 · 仅保留必要，不拖累性能 -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- 极简tailwind (仅用于基础排版，无复杂样式) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            soft: { orange: '#FF7F50', light: '#FF9F6E', dark: '#E8642E' }
-          },
-          fontFamily: {
-            sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
-          }
+          colors: { soft: { orange: '#FF7F50' } },
+          fontFamily: { sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'] }
         }
       }
     }
   </script>
   <style>
-    /* ---------- 极致简洁 · 低配置友好 · 无动画/无重阴影 ---------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      background: #d4e6ff;  /* 柔和浅蓝底 */
-      font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
-      color: #0a1f2c;
-      overflow: hidden;       /* 防止双滚动条 */
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-    }
-
-    /* ----- 顶栏：仅一行，极轻量 ----- */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 18px;
-      background: rgba(255, 255, 255, 0.65); /* 半透白，清爽不卡 */
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      backdrop-filter: none;   /* 关闭模糊，低配流畅 */
-      flex-shrink: 0;
-    }
-
-    /* 品牌小标 */
-    .brand-mini {
-      font-weight: 700;
-      font-size: 1.3rem;
-      letter-spacing: -0.01em;
-      color: #1e3b4f;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .brand-mini span {
-      background: #FF7F50;
-      color: white;
-      font-size: 0.9rem;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 30px;
-      margin-left: 6px;
-    }
-
-    /* 搜索条 —— 极简、无圆角/无渐变，纯色 */
-    .search-bar {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      background: white;
-      border: 1px solid #bdd3e8;
-      border-radius: 40px;      /* 略微软化，但保持清爽 */
-      padding: 2px 2px 2px 18px;
-      transition: none;          /* 移除过渡，减少重绘 */
-      box-shadow: none;
-    }
-    .search-bar:focus-within {
-      border-color: #FF7F50;
-      outline: none;
-    }
-
-    .search-bar input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-      padding: 12px 8px 12px 0;
-      color: #111;
-      font-weight: 500;
-      min-width: 0;
-    }
-    .search-bar input::placeholder {
-      color: #5f7d9c;
-      font-weight: 400;
-      opacity: 0.8;
-    }
-
-    .search-bar button {
-      background: #FF7F50;       /* 纯色，无渐变 */
-      border: none;
-      border-radius: 40px;
-      width: 52px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: white;
-      flex-shrink: 0;
-      transition: none;
-      box-shadow: none;
-      margin: 2px;
-    }
-    .search-bar button:hover {
-      background: #e06a3a;       /* 微深，无动画 */
-    }
-    .search-bar button svg {
-      width: 24px;
-      height: 24px;
-      stroke: white;
-      stroke-width: 2.5;
-    }
-
-    /* 右侧小工具：官网入口 + 下载按钮 (极简) */
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .home-link {
-      background: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,127,80,0.5);
-      color: #1e3b4f;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 8px 16px;
-      border-radius: 40px;
-      text-decoration: none;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: none;
-    }
-    .home-link:hover {
-      background: white;
-      border-color: #FF7F50;
-    }
-
-    /* ----- 全屏内嵌视图 (占用剩余全部空间) ----- */
-    .browser-frame {
-      flex: 1;
-      width: 100%;
-      border: none;
-      background: white;
-      display: block;
-    }
-
-    /* 底部极简脚标 (固定高度，不抢占视图) */
-    .micro-footer {
-      flex-shrink: 0;
-      text-align: center;
-      font-size: 11px;
-      padding: 6px 12px;
-      color: #2c5778;
-      background: transparent;
-      border-top: 1px solid rgba(0,0,0,0.05);
-      display: flex;
-      justify-content: space-between;
-      opacity: 0.8;
-    }
-
-    /* 所有过渡/动画移除，保证低配流畅 */
-    a, button, input {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* 手机小屏适配：顶栏略微紧凑 */
+    html, body { height: 100%; background: #d4e6ff; font-family: 'Inter', 'Noto Sans SC', sans-serif; color: #0a1f2c; overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+    .top-bar { display: flex; align-items: center; gap: 12px; padding: 10px 18px; background: rgba(255,255,255,0.68); border-bottom: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; }
+    .brand-mini { font-weight: 700; font-size: 1.3rem; color: #1e3b4f; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+    .brand-mini span { background: #FF7F50; color: white; font-size: 0.9rem; font-weight: 600; padding: 2px 8px; border-radius: 30px; margin-left: 6px; }
+    .search-bar { flex: 1; display: flex; align-items: center; background: white; border: 1px solid #bdd3e8; border-radius: 40px; padding: 2px 2px 2px 18px; }
+    .search-bar:focus-within { border-color: #FF7F50; }
+    .search-bar input { flex: 1; background: transparent; border: none; outline: none; font-size: 1rem; padding: 12px 8px 12px 0; color: #111; font-weight: 500; min-width: 0; }
+    .search-bar button { background: #FF7F50; border: none; border-radius: 40px; width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; margin: 2px; }
+    .search-bar button:hover { background: #e06a3a; }
+    .top-actions { display: flex; gap: 6px; }
+    .home-link { background: rgba(255,255,255,0.7); border: 1px solid rgba(255,127,80,0.5); color: #1e3b4f; font-weight: 600; padding: 8px 16px; border-radius: 40px; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .browser-frame { flex: 1; width: 100%; border: none; background: #fef9f0; }
+    .micro-footer { flex-shrink: 0; font-size: 11px; padding: 6px 12px; color: #2c5778; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; opacity: 0.8; }
+    .info-banner { background: #fff1e0; text-align: center; font-size: 12px; padding: 4px; color: #b85c1a; border-bottom: 1px solid #ffe0c0; }
     @media (max-width: 560px) {
-      .top-bar {
-        padding: 8px 12px;
-        gap: 8px;
-      }
-      .brand-mini {
-        font-size: 1.1rem;
-      }
-      .brand-mini span {
-        display: none;  /* 移动端隐藏小圆标，保留清爽 */
-      }
-      .home-link span:last-child {
-        display: none;  /* 隐藏最后一个文字节点（官网/下载文字），只留图标 */
-      }
-      .home-link {
-        padding: 8px 12px;
-      }
-      .search-bar input {
-        font-size: 0.95rem;
-        padding: 10px 4px 10px 0;
-      }
-      .search-bar button {
-        width: 46px;
-        height: 42px;
-      }
-    }
-
-    /* 移除所有花哨效果 */
-    .no-transition {
-      transition: none !important;
+      .top-bar { padding: 8px 12px; gap: 8px; }
+      .brand-mini span { display: none; }
+      .home-link span:last-child { display: none; }
+      .home-link { padding: 8px 12px; }
+      .search-bar button { width: 46px; height: 42px; }
     }
   </style>
 </head>
 <body>
-
-<!-- 顶栏：严格一行，包含品牌+搜索框+官网入口 + 新增下载按钮 -->
 <div class="top-bar">
-  <div class="brand-mini">
-    🦝 软软的小窝
-    <span>lite</span>
-  </div>
-
-  <!-- 搜索框 (一行核心) -->
+  <div class="brand-mini">🦝 软软的小窝<span>lite</span></div>
   <div class="search-bar">
-    <input type="text" id="globalNavInput" placeholder="输入网址或关键词…" autofocus spellcheck="false" autocomplete="off">
-    <button id="globalNavBtn" aria-label="前往">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-      </svg>
-    </button>
+    <input type="text" id="globalNavInput" placeholder="输入网址或关键词…" autofocus>
+    <button id="globalNavBtn">→</button>
   </div>
-
   <div class="top-actions">
-    <!-- 新增下载按钮：解决内嵌网页下载文件不可见的问题，点击在新窗口打开当前iframe页面 -->
-    <a href="#" id="downloadPageBtn" class="home-link" title="在新窗口打开当前页面，便于下载文件（不受iframe限制）">
-      <span>⬇️</span>
-      <span>下载</span>
-    </a>
-    <a href="#" id="officialSiteBtn" class="home-link" title="在页面内打开 raccoon.fit">
-      <span>🏠</span>
-      <span>官网</span>
-    </a>
+    <a href="#" id="officialSiteBtn" class="home-link">🏠 官网</a>
   </div>
 </div>
 
 <!-- 
-  内嵌视图：动态强制显示初始页面（修复srcdoc可能不加载的问题）。
-  原srcdoc属性移除，通过JavaScript注入完全相同的欢迎内容，保证在任何低配浏览器中强制显示。
-  保留所有原始文字、样式，不改变任何视觉内容。
+  关键修复：
+  - 添加 allow-popups → 链接可点击（新标签页）
+  - 禁止 allow-top-navigation → 防止主页跳转
+  - 保留 allow-downloads 等
 -->
-<iframe id="contentFrame" class="browser-frame" 
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"
+<iframe id="contentFrame" class="browser-frame"
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        loading="lazy">
+        loading="eager">
 </iframe>
 
-<!-- 脚标：极简信息，不占视图 -->
 <div class="micro-footer">
   <span>🐎 丙午马年 · 奔腾向前</span>
   <span>RACCOON.FIT</span>
@@ -273,145 +73,29 @@
 
 <script>
   (function() {
-    "use strict";
-
     const input = document.getElementById('globalNavInput');
     const searchBtn = document.getElementById('globalNavBtn');
     const frame = document.getElementById('contentFrame');
     const officialBtn = document.getElementById('officialSiteBtn');
 
-    
-    // 强制显示初始页面（保证任何情况下嵌入页面都能正常展示）
-    function forceShowInitialPage() {
+   
+
+    function loadInitial() {
       if (!frame) return;
-      // 移除可能遗留的 srcdoc 属性，避免浏览器行为冲突
-      frame.removeAttribute('srcdoc');
-      // 使用 data URI 设置内容，绝对可靠，兼容所有现代浏览器及低配环境
       frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(INITIAL_PAGE_HTML);
     }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadInitial);
+    else loadInitial();
 
-    // 核心：在页面加载时立即执行强制显示，确保嵌入页面可见
-    // 使用 DOMContentLoaded 保证 DOM 就绪，同时兼容 load 事件作为备胎
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', forceShowInitialPage);
-    } else {
-      forceShowInitialPage();
+    function navigateTo(raw) {
+      let s = raw.trim();
+      if (!s) return;
+      let url = /^https?:\/\//i.test(s) ? s : (/^[a-z0-9.-]+\.[a-z]{2,}/i.test(s) ? 'https://' + s : 'https://www.bing.com/search?q=' + encodeURIComponent(s));
+      frame.src = url;
     }
-    // 额外安全保险：如果由于某种异步原因未成功，load时再次确保内容可见（不会影响后续用户导航）
-    window.addEventListener('load', function() {
-      // 仅当当前iframe内容为空或为about:blank时重新强制加载（防止覆盖用户已访问的页面）
-      if (frame && (!frame.src || frame.src === 'about:blank' || frame.src.startsWith('about:srcdoc'))) {
-        forceShowInitialPage();
-      }
-    });
-
-    // ---------- 核心导航：在本页面内嵌框架打开链接/搜索 ----------
-    function navigateTo(rawInput) {
-      let raw = rawInput.trim();
-      if (!raw) return;
-
-      // 简单判断是否为网址 (包含.且无空格，或以http开头)
-      const looksLikeUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/|$)/.test(raw);
-      let destination = raw;
-
-      if (!looksLikeUrl) {
-        // 关键词 → Bing搜索 (内嵌)
-        destination = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
-      } else if (!/^https?:\/\//i.test(raw)) {
-        destination = 'https://' + raw;
-      }
-
-      // 更新iframe —— 在本页面内打开 ✅
-      frame.src = destination;
-    }
-
-    // 处理跳转事件
-    function handleNavigate() {
-      if (!input) return;
-      navigateTo(input.value);
-    }
-
-    // 搜索按钮点击
-    if (searchBtn) {
-      searchBtn.addEventListener('click', handleNavigate);
-    }
-
-    // 输入框：使用可靠的 keydown 事件，确保回车键正常触发导航
-    if (input) {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();  // 阻止任何潜在的默认行为
-          handleNavigate();
-        } else if (e.key === 'Escape') {
-          input.value = '';    // ESC 清空输入框
-        }
-      });
-    }
-
-    // 官网按钮：在iframe内打开 raccoon.fit (保留原有体验)
-    if (officialBtn) {
-      officialBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        frame.src = 'https://raccoon.fit';
-      });
-    }
-
-    // 低配友好：静默输出控制台信息，不干扰用户
-    console.log("%c🦝 软软的小窝 · 轻量版浏览器主页 | 一行搜索·低配流畅 | 嵌入页面已强制显示", "color: #FF7F50; font-size: 13px; font-weight: bold;");
-  })();
-</script>
-
-<!-- ========== 新增下载按钮专用脚本：完全独立，不修改原有任何js逻辑 ========== -->
-<script>
-  (function() {
-    "use strict";
-    const downloadBtn = document.getElementById('downloadPageBtn');
-    const frame = document.getElementById('contentFrame');
-    
-    if (!downloadBtn || !frame) return;
-    
-    // 判断URL是否为有效网页（http/https协议，非data/about/空白）
-    function isValidDownloadUrl(url) {
-      if (!url || url === 'about:blank') return false;
-      // 只允许 http/https 协议的链接在新窗口下载/访问，避免打开无意义的 data 或 blob 页面
-      return url.startsWith('http://') || url.startsWith('https://');
-    }
-    
-    // 点击下载按钮：在新标签页中打开当前iframe内嵌页面的真实URL，彻底解决iframe内下载文件不可见问题
-    downloadBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      let currentUrl = frame.src;
-      
-      // 特殊处理：如果当前是初始欢迎页（data: 开头），友好提示并且直接打开官网作为替代？或者提示无下载内容
-      if (!currentUrl || currentUrl === 'about:blank' || currentUrl.startsWith('data:')) {
-        // 尝试提取当前iframe内的真实位置（有些情况经过重定向但src未变？不过绝大多数动态跳转后src会更新，这里额外给用户友好提示）
-        // 由于iframe内可能通过history或内部跳转，但跨域无法读取location，但src已经是最外层记录的实际加载地址（包括重定向最终url）
-        // 对于data uri初始页，引导用户先搜索或进入某个网站后再下载。
-        alert('💡 当前显示的是欢迎起始页，没有需要下载的文件。\n请先在搜索框中输入网址或关键词访问目标网站，再点击「下载」按钮在新窗口打开该页面进行下载。');
-        return;
-      }
-      
-      // 处理边缘情况: 如果URL是相对路径或者不完整? 但frame.src会保持绝对地址，安全
-      if (!isValidDownloadUrl(currentUrl)) {
-        alert('⚠️ 当前页面地址无法直接下载：' + currentUrl + '\n请访问常规HTTP/HTTPS网站后再使用下载功能。');
-        return;
-      }
-      
-      // 新窗口打开当前iframe的页面，用户可以在新标签页中自由下载文件，完全不受iframe限制
-      // 使用 window.open 并且确保不丢失 referrer 策略，用户主动点击触发，浏览器不会拦截
-      const newWindow = window.open(currentUrl, '_blank');
-      if (!newWindow) {
-        // 部分浏览器可能拦截弹窗，给出提示
-        alert('⚠️ 浏览器可能阻止了新窗口打开，请检查弹窗拦截设置，或手动复制链接访问：\n' + currentUrl);
-      } else {
-        // 可选：简短的控制台提示，不干扰用户
-        console.log(`📥 下载辅助：已在新标签页打开 ${currentUrl} ，请在新页面中查找下载链接或直接下载文件。`);
-      }
-    });
-    
-    // 附加小优化：当iframe内部导航导致src变更时，控制台静默，无需额外操作
-    // 确保移动端触感友好，没有冗余交互
+    searchBtn?.addEventListener('click', () => navigateTo(input.value));
+    input?.addEventListener('keydown', e => { if (e.key === 'Enter') navigateTo(input.value); });
+    officialBtn?.addEventListener('click', e => { e.preventDefault(); frame.src = 'https://raccoon.fit'; });
   })();
 </script>
 </body>

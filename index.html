@@ -386,14 +386,15 @@
     }
 
     /* 修复：导航栏定位，始终位于IE提示栏下方 */
-    .nav-fixed-safe {
-      top: 80px; /* 桌面默认 */
-    }
-    @media (max-width: 768px) {
-      .nav-fixed-safe {
-        top: 70px; /* 移动端适配 */
-      }
-    }
+    /* 导航栏定位 - 修复因新增网址导航条导致的消失问题 */
+.nav-fixed-safe {
+  top: 140px; /* 桌面端：IE栏60px + 网址导航条60px + 20px留白 */
+}
+@media (max-width: 768px) {
+  .nav-fixed-safe {
+    top: 150px; /* 移动端：考虑IE栏可能增高 */
+  }
+}
     /* 确保IE提示栏不遮挡内容，为body添加顶部内边距 */
     body {
       padding-top: 60px; /* 与IE栏高度匹配 */

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
   <title>软软的小窝 · 极简主页</title>
   <!-- 字体与样式 -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400,500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
     tailwind.config = {
@@ -21,11 +21,11 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; background: #d4e6ff; font-family: 'Inter', 'Noto Sans SC', sans-serif; color: #0a1f2c; overflow: hidden; }
     body { display: flex; flex-direction: column; }
-    .top-bar { display: flex; align-items: center; gap: 12px; padding: 10px 18px; background: rgba(255,255,255,0.68); border-bottom: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; }
+    .top-bar { display: flex; align-items: center; gap: 12px; padding: 10px 18px; background: rgba(255,255,255,0.68); backdrop-filter: blur(4px); border-bottom: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; }
     .brand-mini { font-weight: 700; font-size: 1.3rem; color: #1e3b4f; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
     .brand-mini span { background: #FF7F50; color: white; font-size: 0.9rem; font-weight: 600; padding: 2px 8px; border-radius: 30px; margin-left: 6px; }
-    .search-bar { flex: 1; display: flex; align-items: center; background: white; border: 1px solid #bdd3e8; border-radius: 40px; padding: 2px 2px 2px 18px; }
-    .search-bar:focus-within { border-color: #FF7F50; }
+    .search-bar { flex: 1; display: flex; align-items: center; background: white; border: 1px solid #bdd3e8; border-radius: 40px; padding: 2px 2px 2px 18px; transition: all 0.1s; }
+    .search-bar:focus-within { border-color: #FF7F50; box-shadow: 0 0 0 2px rgba(255,127,80,0.2); }
     .search-bar input { flex: 1; background: transparent; border: none; outline: none; font-size: 1rem; padding: 12px 8px 12px 0; color: #111; font-weight: 500; min-width: 0; }
     .search-bar button { background: #FF7F50; border: none; border-radius: 40px; width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; margin: 2px; transition: background 0.15s; }
     .search-bar button:hover { background: #e06a3a; }
@@ -50,7 +50,7 @@
     }
     .ad-modal-overlay.show { visibility: visible; opacity: 1; }
     .ad-window {
-      width: 420px; max-width: 92vw; background: #f3f3f3; border-radius: 8px;
+      width: 440px; max-width: 92vw; background: #f3f3f3; border-radius: 8px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.25), 0 6px 12px rgba(0,0,0,0.2);
       border: 1px solid rgba(200,200,200,0.5);
       overflow: hidden; animation: modalFade 0.2s;
@@ -60,12 +60,15 @@
       background: #ffffff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid #e0e0e0;
     }
-    .win-titlebar h3 { font-weight: 600; font-size: 1.05rem; color: #1e1e1e; letter-spacing: -0.01em; }
+    .win-titlebar h3 { font-weight: 600; font-size: 1rem; color: #1e1e1e; letter-spacing: -0.01em; margin: 0; }
+    .close-area { display: flex; align-items: center; gap: 6px; }
     .win-close-btn {
-      background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: #5a5a5a;
-      padding: 0 6px; transition: color 0.1s; font-weight: 400;
+      background: none; border: none; font-size: 20px; line-height: 1; cursor: pointer; color: #5a5a5a;
+      padding: 4px 8px; transition: all 0.1s; font-weight: 500; border-radius: 4px;
     }
-    .win-close-btn:hover { color: #c42b1c; background: #f0f0f0; border-radius: 4px; }
+    .win-close-btn:disabled { opacity: 0.5; cursor: not-allowed; background: transparent; }
+    .win-close-btn:enabled:hover { background: #f0f0f0; color: #c42b1c; }
+    .close-hint { font-size: 12px; color: #888; font-weight: normal; background: #f0f0f0; padding: 2px 6px; border-radius: 20px; }
     .ad-content {
       padding: 24px 22px 20px; background: #fafafa;
     }
@@ -113,7 +116,7 @@
 
 <!-- 内嵌浏览区域 (iframe) -->
 <iframe id="contentFrame" class="browser-frame"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals allow-popups-to-escape-sandbox"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         loading="eager">
 </iframe>
@@ -124,12 +127,15 @@
   <span>RACCOON.FIT</span>
 </div>
 
-<!-- ========== Win10 风格广告弹窗 (初始隐藏) ========== -->
+<!-- ========== Win10 风格广告弹窗 (初始隐藏，5秒后才能点✕关闭) ========== -->
 <div class="ad-modal-overlay" id="adModalOverlay">
   <div class="ad-window">
     <div class="win-titlebar">
       <h3>【广告】欢迎体验 [黄小仙讨封] 网页小游戏</h3>
-      <button class="win-close-btn" id="closeAdModalBtn" aria-label="关闭">✕</button>
+      <div class="close-area">
+        <span id="closeHint" class="close-hint">⏱️ 5s后可关闭</span>
+        <button class="win-close-btn" id="closeAdModalBtn" aria-label="关闭" disabled>✕</button>
+      </div>
     </div>
     <div class="ad-content">
       <div class="ad-message">
@@ -144,7 +150,7 @@
         </div>
       </div>
       <p style="font-size:0.75rem; margin-top: 16px; color:#7a7a7a; text-align:center;">
-        点击右上角 ✕ 关闭广告 · 本次会话不再弹出
+        右上角按钮 <strong>5秒后</strong> 才可关闭 · 关闭后本次会话不再打扰
       </p>
     </div>
   </div>
@@ -157,7 +163,8 @@
     // ---------- 配置常量 ----------
     const GAME_URL = 'http://raccoon.fit/game/%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81.html';
     const FEEDBACK_URL = 'http://raccoon.fit/%E5%8F%8D%E9%A6%88';
-    
+    const OFFICIAL_URL = 'https://raccoon.fit';
+
     // ---------- DOM 元素 ----------
     const input = document.getElementById('globalNavInput');
     const searchBtn = document.getElementById('globalNavBtn');
@@ -169,27 +176,131 @@
     const closeAdBtn = document.getElementById('closeAdModalBtn');
     const playGameBtn = document.getElementById('playGameBtn');
     const feedbackBtn = document.getElementById('feedbackAdBtn');
+    const closeHintSpan = document.getElementById('closeHint');
 
-    // ---------- 状态控制 (页面级，刷新重置) ----------
-    let hasAdBeenShown = false;        // 本次会话是否已展示过广告（或已关闭）
+    // ---------- 状态控制 ----------
+    let hasAdBeenShown = false;        // 本次会话是否已展示过广告（或已关闭/已跳过）
     let isAdModalOpen = false;         // 弹窗是否正在显示
-    let adTimer = null;               // 30秒定时器
+    let adTimer = null;               // 30秒弹出定时器
+    let countdownInterval = null;      // 关闭按钮倒计时定时器
+    let closeEnabled = false;          // 关闭按钮是否可用（倒计时结束）
+    let remainingSeconds = 5;          // 倒计时剩余秒数
 
-    // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
-    function navigateToUrl(url) {
+    // ---------- 辅助函数：清除关闭按钮倒计时 ----------
+    function clearCloseCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    // ---------- 重置关闭按钮状态（禁用 + 重置提示）----------
+    function resetCloseButtonState() {
+      closeEnabled = false;
+      remainingSeconds = 5;
+      if (closeAdBtn) {
+        closeAdBtn.disabled = true;
+      }
+      if (closeHintSpan) {
+        closeHintSpan.textContent = `⏱️ ${remainingSeconds}s后可关闭`;
+        closeHintSpan.style.opacity = '1';
+      }
+    }
+
+    // ---------- 开始倒计时（启用关闭按钮）----------
+    function startCloseCountdown() {
+      clearCloseCountdown(); // 清除之前的倒计时
+      remainingSeconds = 5;
+      resetCloseButtonState(); // 确保禁用状态
+
+      countdownInterval = setInterval(() => {
+        if (!isAdModalOpen) {
+          // 如果弹窗已经被外部关闭，停止倒计时
+          clearCloseCountdown();
+          return;
+        }
+        if (remainingSeconds > 1) {
+          remainingSeconds--;
+          if (closeHintSpan) {
+            closeHintSpan.textContent = `⏱️ ${remainingSeconds}s后可关闭`;
+          }
+        } else {
+          // 倒计时结束，启用关闭按钮
+          remainingSeconds = 0;
+          if (closeAdBtn) {
+            closeAdBtn.disabled = false;
+          }
+          if (closeHintSpan) {
+            closeHintSpan.textContent = '✅ 可关闭';
+            closeHintSpan.style.opacity = '0.8';
+          }
+          closeEnabled = true;
+          clearCloseCountdown(); // 倒计时结束清除定时器
+        }
+      }, 1000);
+    }
+
+    // ---------- 彻底关闭广告弹窗（清除所有相关状态，标记已展示）----------
+    function hideAdModal(keepAdFlag = true) {
+      if (!overlay) return;
+      // 关闭弹窗UI
+      overlay.classList.remove('show');
+      isAdModalOpen = false;
+      // 清除倒计时
+      clearCloseCountdown();
+      // 重置关闭按钮样式（下次弹出重新初始化）
+      if (closeAdBtn) {
+        closeAdBtn.disabled = true;
+        closeEnabled = false;
+      }
+      if (closeHintSpan) {
+        closeHintSpan.textContent = `⏱️ 5s后可关闭`;
+      }
+      // 标记广告已经展示过/关闭过，避免再次弹出（仅当参数为true时）
+      if (keepAdFlag) {
+        hasAdBeenShown = true;
+      }
+      // 清除30秒弹出定时器，避免重复弹出
+      if (adTimer) {
+        clearTimeout(adTimer);
+        adTimer = null;
+      }
+    }
+
+    // ---------- 展示广告弹窗（30秒自动调用，且确保符合5秒关闭限制）----------
+    function showAdModal() {
+      // 如果已经展示过广告 或者 弹窗已经显示，不再重复展示
+      if (hasAdBeenShown || isAdModalOpen) return;
+      
+      // 显示模态框
+      overlay.classList.add('show');
+      isAdModalOpen = true;
+      
+      // 重置关闭按钮状态（禁用，倒计时5秒）
+      resetCloseButtonState();
+      // 开始倒计时
+      startCloseCountdown();
+    }
+
+    // ---------- 导航至指定URL (iframe内部加载) 并且如果广告开着则强制关闭广告----------
+    function navigateToUrl(url, closeAdIfOpen = true) {
       if (!url) return;
       let finalUrl = url;
       if (!/^https?:\/\//i.test(finalUrl) && /^[a-z0-9.-]+\.[a-z]{2,}/i.test(finalUrl)) {
         finalUrl = 'https://' + finalUrl;
       }
+      // 如果广告弹窗开着，关闭它（并标记已展示）
+      if (closeAdIfOpen && isAdModalOpen) {
+        hideAdModal(true);
+      }
       frame.src = finalUrl;
     }
 
-    // 处理搜索/导航
+    // 处理搜索/导航（来自输入框）
     function performSearchNavigation(rawInput) {
       let s = rawInput.trim();
       if (!s) return;
-      
+
       let targetUrl;
       if (/^https?:\/\//i.test(s)) {
         targetUrl = s;
@@ -199,49 +310,44 @@
         targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
       }
       
-      // 如果弹窗正好开着，关闭它
-      if (isAdModalOpen) {
-        hideAdModal();
-      }
-      navigateToUrl(targetUrl);
+      navigateToUrl(targetUrl, true);
     }
 
-    // ---------- 广告弹窗控制 ----------
-    function showAdModal() {
-      if (!overlay || hasAdBeenShown || isAdModalOpen) return;
-      overlay.classList.add('show');
-      isAdModalOpen = true;
-      hasAdBeenShown = true;
-    }
-
-    function hideAdModal() {
-      if (!overlay) return;
-      overlay.classList.remove('show');
-      isAdModalOpen = false;
-    }
-
-    // 内嵌打开指定链接 (并关闭广告)
+    // 内嵌打开指定链接并关闭广告（用于广告内按钮）
     function openInFrameAndCloseAd(url) {
       if (!url) return;
-      hideAdModal();
-      navigateToUrl(url);
+      // 关闭广告（会清理所有状态，标记已展示）
+      if (isAdModalOpen) {
+        hideAdModal(true);
+      }
+      navigateToUrl(url, false); // 已经关闭广告，不需要再次关闭
     }
 
-    // ---------- 30秒后自动弹窗 (仅一次) ----------
+    // ---------- 30秒后自动弹窗（仅一次）----------
     function scheduleAdPopup() {
       if (adTimer) clearTimeout(adTimer);
-      adTimer = setTimeout(() => {
-        if (!hasAdBeenShown && !isAdModalOpen) {
-          showAdModal();
-        }
-        adTimer = null;
-      }, 30000); // 30000毫秒 = 30秒
+      if (!hasAdBeenShown) {
+        adTimer = setTimeout(() => {
+          if (!hasAdBeenShown && !isAdModalOpen) {
+            showAdModal();
+          }
+          adTimer = null;
+        }, 30000); // 30秒后弹出
+      }
     }
 
-    // ---------- 初始化 iframe 内容 ----------
-    function loadInitialPage() {
       if (frame) {
-        frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(INITIAL_PAGE_HTML);
+        frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(welcomeHTML);
+      }
+    }
+
+    // ---------- 全局阻止ESC关闭广告弹窗（确保只能通过关闭按钮且倒计时结束后关闭）----------
+    function preventEscClose(e) {
+      if (e.key === 'Escape' && isAdModalOpen) {
+        e.preventDefault();
+        e.stopPropagation();
+        // 不做任何关闭操作，完全忽略ESC
+        return false;
       }
     }
 
@@ -259,40 +365,64 @@
 
     officialBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      if (isAdModalOpen) hideAdModal();
-      navigateToUrl('https://raccoon.fit');
+      navigateToUrl(OFFICIAL_URL, true);
     });
 
-    // ---------- 广告弹窗交互 (只能通过 ✕ 关闭) ----------
+    // 关闭广告按钮逻辑：只有倒计时结束后才可关闭（closeEnabled = true）
     closeAdBtn.addEventListener('click', () => {
-      hideAdModal();
+      if (!isAdModalOpen) return;
+      if (closeEnabled) {
+        // 倒计时结束，允许关闭，标记已展示不再弹出
+        hideAdModal(true);
+      } else {
+        // 未到5秒，轻反馈但不报错（静默忽略）
+        if (closeHintSpan) {
+          const originalText = closeHintSpan.textContent;
+          closeHintSpan.textContent = '⏰ 请等待5秒后关闭';
+          setTimeout(() => {
+            if (closeHintSpan && isAdModalOpen) closeHintSpan.textContent = originalText;
+          }, 1200);
+        }
+      }
     });
 
-    // 移除遮罩层点击关闭、移除 ESC 关闭 —— 确保只能点 ✕
-
-    // “点我查看” → 游戏链接，内嵌打开
+    // 游戏按钮：打开游戏链接并关闭广告
     playGameBtn.addEventListener('click', () => {
       openInFrameAndCloseAd(GAME_URL);
     });
 
-    // “意见反馈”按钮 → 反馈链接，内嵌打开
+    // 意见反馈按钮：打开反馈链接并关闭广告
     feedbackBtn.addEventListener('click', () => {
       openInFrameAndCloseAd(FEEDBACK_URL);
     });
 
-    // ---------- 页面启动 ----------
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadInitialPage);
-    } else {
-      loadInitialPage();
-    }
-
-    scheduleAdPopup();
-
-    window.addEventListener('beforeunload', () => {
-      if (adTimer) clearTimeout(adTimer);
+    // 遮罩层点击不可关闭（强制只能通过关闭按钮）
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        // 遮罩点击无效，不关闭
+        e.stopPropagation();
+      }
     });
 
+    // 监听ESC全局
+    document.addEventListener('keydown', preventEscClose);
+
+    // ---------- 页面启动 ----------
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        loadInitialPage();
+        scheduleAdPopup();
+      });
+    } else {
+      loadInitialPage();
+      scheduleAdPopup();
+    }
+
+    // 页面关闭或刷新前清理定时器，避免残留
+    window.addEventListener('beforeunload', () => {
+      if (adTimer) clearTimeout(adTimer);
+      clearCloseCountdown();
+    });
   })();
 </script>
 </body>

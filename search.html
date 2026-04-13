@@ -158,7 +158,6 @@
     const GAME_URL = 'http://raccoon.fit/game/%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81.html';
     const FEEDBACK_URL = 'http://raccoon.fit/%E5%8F%8D%E9%A6%88';
     
-
     // ---------- DOM 元素 ----------
     const input = document.getElementById('globalNavInput');
     const searchBtn = document.getElementById('globalNavBtn');
@@ -174,7 +173,7 @@
     // ---------- 状态控制 (页面级，刷新重置) ----------
     let hasAdBeenShown = false;        // 本次会话是否已展示过广告（或已关闭）
     let isAdModalOpen = false;         // 弹窗是否正在显示
-    let adTimer = null;               // 15秒定时器
+    let adTimer = null;               // 30秒定时器
 
     // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
     function navigateToUrl(url) {
@@ -186,7 +185,7 @@
       frame.src = finalUrl;
     }
 
-    // 处理搜索/导航 (不再拦截，直接执行)
+    // 处理搜索/导航
     function performSearchNavigation(rawInput) {
       let s = rawInput.trim();
       if (!s) return;
@@ -200,7 +199,7 @@
         targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
       }
       
-      // 如果弹窗正好开着，关闭它（保持界面清爽）
+      // 如果弹窗正好开着，关闭它
       if (isAdModalOpen) {
         hideAdModal();
       }
@@ -212,14 +211,13 @@
       if (!overlay || hasAdBeenShown || isAdModalOpen) return;
       overlay.classList.add('show');
       isAdModalOpen = true;
-      hasAdBeenShown = true;   // 标记已展示，不再重复
+      hasAdBeenShown = true;
     }
 
     function hideAdModal() {
       if (!overlay) return;
       overlay.classList.remove('show');
       isAdModalOpen = false;
-      // 注意：hasAdBeenShown 保持为 true，表示广告流程已结束（不再弹出）
     }
 
     // 内嵌打开指定链接 (并关闭广告)
@@ -229,16 +227,15 @@
       navigateToUrl(url);
     }
 
-    // ---------- 15秒后自动弹窗 (仅一次) ----------
+    // ---------- 30秒后自动弹窗 (仅一次) ----------
     function scheduleAdPopup() {
       if (adTimer) clearTimeout(adTimer);
       adTimer = setTimeout(() => {
-        // 15秒后，若还未展示过广告且弹窗未开，则显示
         if (!hasAdBeenShown && !isAdModalOpen) {
           showAdModal();
         }
         adTimer = null;
-      }, 15000); // 15000毫秒 = 15秒
+      }, 30000); // 30000毫秒 = 30秒
     }
 
     // ---------- 初始化 iframe 内容 ----------
@@ -249,12 +246,10 @@
     }
 
     // ---------- 事件绑定 ----------
-    // 搜索按钮点击 (直接搜索)
     searchBtn.addEventListener('click', () => {
       performSearchNavigation(input.value);
     });
 
-    // 输入框回车
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -262,26 +257,18 @@
       }
     });
 
-    // 官网按钮：直接跳转 raccoon.fit
     officialBtn.addEventListener('click', (e) => {
       e.preventDefault();
       if (isAdModalOpen) hideAdModal();
       navigateToUrl('https://raccoon.fit');
     });
 
-    // ---------- 广告弹窗交互 ----------
-    // 关闭按钮 (右上角 X)
+    // ---------- 广告弹窗交互 (只能通过 ✕ 关闭) ----------
     closeAdBtn.addEventListener('click', () => {
       hideAdModal();
-      // hasAdBeenShown 已经为 true，不会再弹出
     });
 
-    // 点击遮罩层关闭
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) {
-        hideAdModal();
-      }
-    });
+    // 移除遮罩层点击关闭、移除 ESC 关闭 —— 确保只能点 ✕
 
     // “点我查看” → 游戏链接，内嵌打开
     playGameBtn.addEventListener('click', () => {
@@ -293,35 +280,19 @@
       openInFrameAndCloseAd(FEEDBACK_URL);
     });
 
-    // 按 ESC 键关闭弹窗
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isAdModalOpen) {
-        hideAdModal();
-      }
-    });
-
     // ---------- 页面启动 ----------
-    // 1. 加载初始欢迎页
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', loadInitialPage);
     } else {
       loadInitialPage();
     }
 
-    // 2. 启动15秒广告定时器 (每次页面加载都重新计时，符合“关闭页面再次打开按第0次”)
     scheduleAdPopup();
 
-    // 可选：页面卸载前清理定时器 (好习惯)
     window.addEventListener('beforeunload', () => {
       if (adTimer) clearTimeout(adTimer);
     });
 
-    // 注意：如果用户在15秒内通过某些操作（如点击官网）并不影响广告定时。
-    // 广告只会在15秒后且从未显示过的情况下出现一次。
-    // 若用户在15秒内手动关闭了广告？广告初始隐藏，用户无法提前关闭。完美。
-
-    // 额外细节：如果15秒内用户刷新页面，定时器重置，重新计时——符合预期。
-    
   })();
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
-  <title>软软的小窝 · 极简浏览器主页</title>
+  <title>软软的小窝 · 极简主页</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
@@ -26,13 +26,13 @@
     .search-bar { flex: 1; display: flex; align-items: center; background: white; border: 1px solid #bdd3e8; border-radius: 40px; padding: 2px 2px 2px 18px; }
     .search-bar:focus-within { border-color: #FF7F50; }
     .search-bar input { flex: 1; background: transparent; border: none; outline: none; font-size: 1rem; padding: 12px 8px 12px 0; color: #111; font-weight: 500; min-width: 0; }
-    .search-bar button { background: #FF7F50; border: none; border-radius: 40px; width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; margin: 2px; }
+    .search-bar button { background: #FF7F50; border: none; border-radius: 40px; width: 52px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; margin: 2px; transition: background 0.15s; }
     .search-bar button:hover { background: #e06a3a; }
     .top-actions { display: flex; gap: 6px; }
-    .home-link { background: rgba(255,255,255,0.7); border: 1px solid rgba(255,127,80,0.5); color: #1e3b4f; font-weight: 600; padding: 8px 16px; border-radius: 40px; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .home-link { background: rgba(255,255,255,0.7); border: 1px solid rgba(255,127,80,0.5); color: #1e3b4f; font-weight: 600; padding: 8px 16px; border-radius: 40px; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
+    .home-link:hover { background: rgba(255,255,255,0.9); }
     .browser-frame { flex: 1; width: 100%; border: none; background: #fef9f0; }
     .micro-footer { flex-shrink: 0; font-size: 11px; padding: 6px 12px; color: #2c5778; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; opacity: 0.8; }
-    .info-banner { background: #fff1e0; text-align: center; font-size: 12px; padding: 4px; color: #b85c1a; border-bottom: 1px solid #ffe0c0; }
     @media (max-width: 560px) {
       .top-bar { padding: 8px 12px; gap: 8px; }
       .brand-mini span { display: none; }
@@ -40,63 +40,296 @@
       .home-link { padding: 8px 12px; }
       .search-bar button { width: 46px; height: 42px; }
     }
+
+    /* ---------- Win10 风格广告弹窗 (最高层级) ---------- */
+    .ad-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s;
+    }
+    .ad-modal-overlay.show { visibility: visible; opacity: 1; }
+    .ad-window {
+      width: 420px; max-width: 92vw; background: #f3f3f3; border-radius: 8px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25), 0 6px 12px rgba(0,0,0,0.2);
+      border: 1px solid rgba(200,200,200,0.5);
+      overflow: hidden; animation: modalFade 0.2s;
+    }
+    @keyframes modalFade { from { transform: scale(0.96); opacity: 0.7; } to { transform: scale(1); opacity: 1; } }
+    .win-titlebar {
+      background: #ffffff; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .win-titlebar h3 { font-weight: 600; font-size: 1.05rem; color: #1e1e1e; letter-spacing: -0.01em; }
+    .win-close-btn {
+      background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: #5a5a5a;
+      padding: 0 6px; transition: color 0.1s; font-weight: 400;
+    }
+    .win-close-btn:hover { color: #c42b1c; background: #f0f0f0; border-radius: 4px; }
+    .ad-content {
+      padding: 24px 22px 20px; background: #fafafa;
+    }
+    .ad-message {
+      font-size: 1rem; color: #1f1f1f; margin-bottom: 22px; line-height: 1.5;
+      background: #fff3e9; padding: 14px 16px; border-radius: 10px; border-left: 5px solid #FF7F50;
+    }
+    .ad-actions {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .btn-primary-ad {
+      background: #0078d4; border: 1px solid #0060b0; color: white; font-weight: 600;
+      padding: 12px 16px; border-radius: 6px; font-size: 1rem; cursor: pointer;
+      transition: background 0.1s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: none; width: 100%;
+    }
+    .btn-primary-ad:hover { background: #106ebe; }
+    .btn-secondary-ad {
+      background: #e1e1e1; border: 1px solid #adadad; color: #1e1e1e; font-weight: 500;
+      padding: 10px 16px; border-radius: 6px; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.1s; width: 100%;
+    }
+    .btn-secondary-ad:hover { background: #d3d3d3; }
+    .feedback-note { margin-top: 12px; font-size: 0.85rem; color: #5e5e5e; text-align: center; }
+    .feedback-note button {
+      background: none; border: none; color: #0078d4; text-decoration: underline; cursor: pointer;
+      font-weight: 500; padding: 4px 6px;
+    }
+    .feedback-note button:hover { color: #004e8c; }
   </style>
 </head>
 <body>
+
+<!-- 顶部导航栏 -->
 <div class="top-bar">
   <div class="brand-mini">🦝 软软的小窝<span>lite</span></div>
   <div class="search-bar">
     <input type="text" id="globalNavInput" placeholder="输入网址或关键词…" autofocus>
-    <button id="globalNavBtn">→</button>
+    <button id="globalNavBtn" aria-label="搜索/前往">→</button>
   </div>
   <div class="top-actions">
-    <a href="#" id="officialSiteBtn" class="home-link">🏠 官网</a>
+    <a href="#" id="officialSiteBtn" class="home-link">🏠 <span>官网</span></a>
   </div>
 </div>
 
-<!-- 
-  关键修复：
-  - 添加 allow-popups → 链接可点击（新标签页）
-  - 禁止 allow-top-navigation → 防止主页跳转
-  - 保留 allow-downloads 等
--->
+<!-- 内嵌浏览区域 -->
 <iframe id="contentFrame" class="browser-frame"
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         loading="eager">
 </iframe>
 
+<!-- 底部 -->
 <div class="micro-footer">
   <span>🐎 丙午马年 · 奔腾向前</span>
   <span>RACCOON.FIT</span>
 </div>
 
+<!-- ========== Win10 风格广告弹窗 (初始隐藏) ========== -->
+<div class="ad-modal-overlay" id="adModalOverlay">
+  <div class="ad-window">
+    <div class="win-titlebar">
+      <h3>【广告】欢迎体验 [黄小仙讨封] 网页小游戏</h3>
+      <button class="win-close-btn" id="closeAdModalBtn" aria-label="关闭">✕</button>
+    </div>
+    <div class="ad-content">
+      <div class="ad-message">
+        🦊 500年修为一念之间 · 讨封奇遇<br>
+        <span style="font-size:0.9rem; opacity:0.8;">点击下方按钮即刻游玩</span>
+      </div>
+      <div class="ad-actions">
+        <button class="btn-primary-ad" id="playGameBtn">🎮 点我查看 · 黄小仙讨封</button>
+        <div class="feedback-note">
+          如有意见请点击下方按钮进行反馈<br>
+          <button id="feedbackAdBtn">📬 意见反馈 (内嵌打开)</button>
+        </div>
+      </div>
+      <p style="font-size:0.75rem; margin-top: 16px; color:#7a7a7a; text-align:center;">
+        点击右上角 ✕ 关闭广告 · 本次会话不再弹出
+      </p>
+    </div>
+  </div>
+</div>
+
 <script>
   (function() {
+    "use strict";
+
+    // ---------- 配置常量 ----------
+    const GAME_URL = 'http://raccoon.fit/game/%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81.html';
+    const FEEDBACK_URL = 'http://raccoon.fit/%E5%8F%8D%E9%A6%88';
+    
+
+    // ---------- DOM 元素 ----------
     const input = document.getElementById('globalNavInput');
     const searchBtn = document.getElementById('globalNavBtn');
     const frame = document.getElementById('contentFrame');
     const officialBtn = document.getElementById('officialSiteBtn');
 
-   
+    // 弹窗相关
+    const overlay = document.getElementById('adModalOverlay');
+    const closeAdBtn = document.getElementById('closeAdModalBtn');
+    const playGameBtn = document.getElementById('playGameBtn');
+    const feedbackBtn = document.getElementById('feedbackAdBtn');
 
-    function loadInitial() {
-      if (!frame) return;
-      frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(INITIAL_PAGE_HTML);
+    // ---------- 状态控制 (页面级，刷新/关闭后重置) ----------
+    let hasShownAdForSession = false;      // 本次会话是否已展示过广告
+    let isAdModalOpen = false;             // 弹窗是否正在显示
+
+    // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
+    function navigateToUrl(url) {
+      if (!url) return;
+      // 确保协议补全 (简单处理)
+      let finalUrl = url;
+      if (!/^https?:\/\//i.test(finalUrl) && /^[a-z0-9.-]+\.[a-z]{2,}/i.test(finalUrl)) {
+        finalUrl = 'https://' + finalUrl;
+      }
+      frame.src = finalUrl;
     }
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadInitial);
-    else loadInitial();
 
-    function navigateTo(raw) {
-      let s = raw.trim();
+    // 处理搜索/导航 (原始逻辑增强)
+    function performSearchNavigation(rawInput) {
+      let s = rawInput.trim();
       if (!s) return;
-      let url = /^https?:\/\//i.test(s) ? s : (/^[a-z0-9.-]+\.[a-z]{2,}/i.test(s) ? 'https://' + s : 'https://www.bing.com/search?q=' + encodeURIComponent(s));
-      frame.src = url;
+      
+      let targetUrl;
+      if (/^https?:\/\//i.test(s)) {
+        targetUrl = s;
+      } else if (/^[a-z0-9.-]+\.[a-z]{2,}/i.test(s)) {
+        targetUrl = 'https://' + s;
+      } else {
+        targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
+      }
+      
+      // 如果广告弹窗还开着，先关闭（保证界面整洁）
+      if (isAdModalOpen) {
+        hideAdModal();
+      }
+      navigateToUrl(targetUrl);
     }
-    searchBtn?.addEventListener('click', () => navigateTo(input.value));
-    input?.addEventListener('keydown', e => { if (e.key === 'Enter') navigateTo(input.value); });
-    officialBtn?.addEventListener('click', e => { e.preventDefault(); frame.src = 'https://raccoon.fit'; });
+
+    // ---------- 广告弹窗控制 ----------
+    function showAdModal() {
+      if (!overlay) return;
+      overlay.classList.add('show');
+      isAdModalOpen = true;
+      hasShownAdForSession = true;   // 标记已展示，本次会话不再弹出
+      // 防止背景滚动 (body已有overflow:hidden, 但再确保一下)
+    }
+
+    function hideAdModal() {
+      if (!overlay) return;
+      overlay.classList.remove('show');
+      isAdModalOpen = false;
+    }
+
+    // 内嵌打开指定链接 (并关闭广告)
+    function openInFrameAndCloseAd(url) {
+      if (!url) return;
+      // 先关闭弹窗
+      hideAdModal();
+      // 导航到目标
+      navigateToUrl(url);
+    }
+
+    // ---------- 拦截搜索：首次触发显示广告，不执行导航 ----------
+    function handleSearchAttempt() {
+      const rawValue = input.value;
+      
+      // 如果本次会话尚未展示广告，则弹出广告（不进行搜索）
+      if (!hasShownAdForSession) {
+        // 防止重复打开 (如果已经开着就不再重复触发)
+        if (isAdModalOpen) return;
+        
+        // ★ 展示广告弹窗 (不响应搜索请求)
+        showAdModal();
+        // 注意：不执行任何导航 —— 完全符合“先不响应搜索请求”
+        return;
+      }
+      
+      // 已经展示过广告 → 正常执行搜索/导航
+      performSearchNavigation(rawValue);
+    }
+
+    // ---------- 初始化 iframe 内容 ----------
+    function loadInitialPage() {
+      if (frame) {
+        frame.src = "data:text/html;charset=utf-8," + encodeURIComponent(INITIAL_PAGE_HTML);
+      }
+    }
+
+    // ---------- 事件绑定 ----------
+    // 搜索按钮点击
+    searchBtn.addEventListener('click', () => {
+      handleSearchAttempt();
+    });
+
+    // 输入框回车
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();  // 避免任何奇怪提交
+        handleSearchAttempt();
+      }
+    });
+
+    // 官网按钮：直接跳转 raccoon.fit (不受广告逻辑影响)
+    officialBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // 如果弹窗开着，关闭它（保证视觉清爽，但不影响官网跳转）
+      if (isAdModalOpen) hideAdModal();
+      navigateToUrl('https://raccoon.fit');
+    });
+
+    // ---------- 广告弹窗交互 ----------
+    // 关闭按钮 (右上角 X)
+    closeAdBtn.addEventListener('click', () => {
+      hideAdModal();
+      // hasShownAdForSession 已在show时设为true，后续搜索正常
+    });
+
+    // 点击遮罩层也可关闭 (符合win10习惯，但主要靠X；加上无妨)
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        hideAdModal();
+      }
+    });
+
+    // “点我查看” → 游戏链接，内嵌打开
+    playGameBtn.addEventListener('click', () => {
+      openInFrameAndCloseAd(GAME_URL);
+    });
+
+    // “意见反馈”按钮 → 反馈链接，内嵌打开
+    feedbackBtn.addEventListener('click', () => {
+      openInFrameAndCloseAd(FEEDBACK_URL);
+    });
+
+    // 按 ESC 键关闭弹窗 (提升体验)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isAdModalOpen) {
+        hideAdModal();
+      }
+    });
+
+    // ---------- 额外细节：如果用户点击官网时广告开着，关闭它 (已在官网处理) ----------
+    // 初始化页面
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadInitialPage);
+    } else {
+      loadInitialPage();
+    }
+
+    // 小优化: 当iframe导航后, 若用户再次聚焦搜索框, 保持体验
+    // 确保广告只弹一次，符合“关闭页面再次打开按第0次重新弹窗” —— 每次刷新重置变量，完美。
+    
+    // 边缘情况：若用户通过浏览器前进后退等，不影响。首次搜索逻辑正确。
+    // 如果用户第一次搜索前，不小心点了官网，再搜索仍然会触发广告 (符合“第一次点击搜索”)
+    
+    // 预填演示（可选）：无
+
+    // 防抖: 避免快速双击搜索按钮导致弹窗闪现两次 (已通过 isAdModalOpen 防护)
+    
   })();
 </script>
+
+<!-- 确保初始页面变量已定义 (已在上方script内定义) 无报错 -->
 </body>
 </html>

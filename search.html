@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
-  <title>软软的小窝 · 简易浏览器主页</title>
+  <title>软软的小窝 · 极简主页</title>
+  <!-- 字体与样式 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
@@ -110,7 +111,7 @@
   </div>
 </div>
 
-<!-- 内嵌浏览区域 -->
+<!-- 内嵌浏览区域 (iframe) -->
 <iframe id="contentFrame" class="browser-frame"
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -170,14 +171,14 @@
     const playGameBtn = document.getElementById('playGameBtn');
     const feedbackBtn = document.getElementById('feedbackAdBtn');
 
-    // ---------- 状态控制 (页面级，刷新/关闭后重置) ----------
-    let hasShownAdForSession = false;      // 本次会话是否已展示过广告
-    let isAdModalOpen = false;             // 弹窗是否正在显示
+    // ---------- 状态控制 (页面级，刷新重置) ----------
+    let hasAdBeenShown = false;        // 本次会话是否已展示过广告（或已关闭）
+    let isAdModalOpen = false;         // 弹窗是否正在显示
+    let adTimer = null;               // 15秒定时器
 
     // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
     function navigateToUrl(url) {
       if (!url) return;
-      // 确保协议补全 (简单处理)
       let finalUrl = url;
       if (!/^https?:\/\//i.test(finalUrl) && /^[a-z0-9.-]+\.[a-z]{2,}/i.test(finalUrl)) {
         finalUrl = 'https://' + finalUrl;
@@ -185,7 +186,7 @@
       frame.src = finalUrl;
     }
 
-    // 处理搜索/导航 (原始逻辑增强)
+    // 处理搜索/导航 (不再拦截，直接执行)
     function performSearchNavigation(rawInput) {
       let s = rawInput.trim();
       if (!s) return;
@@ -199,7 +200,7 @@
         targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
       }
       
-      // 如果广告弹窗还开着，先关闭（保证界面整洁）
+      // 如果弹窗正好开着，关闭它（保持界面清爽）
       if (isAdModalOpen) {
         hideAdModal();
       }
@@ -208,45 +209,36 @@
 
     // ---------- 广告弹窗控制 ----------
     function showAdModal() {
-      if (!overlay) return;
+      if (!overlay || hasAdBeenShown || isAdModalOpen) return;
       overlay.classList.add('show');
       isAdModalOpen = true;
-      hasShownAdForSession = true;   // 标记已展示，本次会话不再弹出
-      // 防止背景滚动 (body已有overflow:hidden, 但再确保一下)
+      hasAdBeenShown = true;   // 标记已展示，不再重复
     }
 
     function hideAdModal() {
       if (!overlay) return;
       overlay.classList.remove('show');
       isAdModalOpen = false;
+      // 注意：hasAdBeenShown 保持为 true，表示广告流程已结束（不再弹出）
     }
 
     // 内嵌打开指定链接 (并关闭广告)
     function openInFrameAndCloseAd(url) {
       if (!url) return;
-      // 先关闭弹窗
       hideAdModal();
-      // 导航到目标
       navigateToUrl(url);
     }
 
-    // ---------- 拦截搜索：首次触发显示广告，不执行导航 ----------
-    function handleSearchAttempt() {
-      const rawValue = input.value;
-      
-      // 如果本次会话尚未展示广告，则弹出广告（不进行搜索）
-      if (!hasShownAdForSession) {
-        // 防止重复打开 (如果已经开着就不再重复触发)
-        if (isAdModalOpen) return;
-        
-        // ★ 展示广告弹窗 (不响应搜索请求)
-        showAdModal();
-        // 注意：不执行任何导航 —— 完全符合“先不响应搜索请求”
-        return;
-      }
-      
-      // 已经展示过广告 → 正常执行搜索/导航
-      performSearchNavigation(rawValue);
+    // ---------- 15秒后自动弹窗 (仅一次) ----------
+    function scheduleAdPopup() {
+      if (adTimer) clearTimeout(adTimer);
+      adTimer = setTimeout(() => {
+        // 15秒后，若还未展示过广告且弹窗未开，则显示
+        if (!hasAdBeenShown && !isAdModalOpen) {
+          showAdModal();
+        }
+        adTimer = null;
+      }, 15000); // 15000毫秒 = 15秒
     }
 
     // ---------- 初始化 iframe 内容 ----------
@@ -257,23 +249,22 @@
     }
 
     // ---------- 事件绑定 ----------
-    // 搜索按钮点击
+    // 搜索按钮点击 (直接搜索)
     searchBtn.addEventListener('click', () => {
-      handleSearchAttempt();
+      performSearchNavigation(input.value);
     });
 
     // 输入框回车
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        e.preventDefault();  // 避免任何奇怪提交
-        handleSearchAttempt();
+        e.preventDefault();
+        performSearchNavigation(input.value);
       }
     });
 
-    // 官网按钮：直接跳转 raccoon.fit (不受广告逻辑影响)
+    // 官网按钮：直接跳转 raccoon.fit
     officialBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      // 如果弹窗开着，关闭它（保证视觉清爽，但不影响官网跳转）
       if (isAdModalOpen) hideAdModal();
       navigateToUrl('https://raccoon.fit');
     });
@@ -282,10 +273,10 @@
     // 关闭按钮 (右上角 X)
     closeAdBtn.addEventListener('click', () => {
       hideAdModal();
-      // hasShownAdForSession 已在show时设为true，后续搜索正常
+      // hasAdBeenShown 已经为 true，不会再弹出
     });
 
-    // 点击遮罩层也可关闭 (符合win10习惯，但主要靠X；加上无妨)
+    // 点击遮罩层关闭
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
         hideAdModal();
@@ -302,34 +293,36 @@
       openInFrameAndCloseAd(FEEDBACK_URL);
     });
 
-    // 按 ESC 键关闭弹窗 (提升体验)
+    // 按 ESC 键关闭弹窗
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isAdModalOpen) {
         hideAdModal();
       }
     });
 
-    // ---------- 额外细节：如果用户点击官网时广告开着，关闭它 (已在官网处理) ----------
-    // 初始化页面
+    // ---------- 页面启动 ----------
+    // 1. 加载初始欢迎页
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', loadInitialPage);
     } else {
       loadInitialPage();
     }
 
-    // 小优化: 当iframe导航后, 若用户再次聚焦搜索框, 保持体验
-    // 确保广告只弹一次，符合“关闭页面再次打开按第0次重新弹窗” —— 每次刷新重置变量，完美。
-    
-    // 边缘情况：若用户通过浏览器前进后退等，不影响。首次搜索逻辑正确。
-    // 如果用户第一次搜索前，不小心点了官网，再搜索仍然会触发广告 (符合“第一次点击搜索”)
-    
-    // 预填演示（可选）：无
+    // 2. 启动15秒广告定时器 (每次页面加载都重新计时，符合“关闭页面再次打开按第0次”)
+    scheduleAdPopup();
 
-    // 防抖: 避免快速双击搜索按钮导致弹窗闪现两次 (已通过 isAdModalOpen 防护)
+    // 可选：页面卸载前清理定时器 (好习惯)
+    window.addEventListener('beforeunload', () => {
+      if (adTimer) clearTimeout(adTimer);
+    });
+
+    // 注意：如果用户在15秒内通过某些操作（如点击官网）并不影响广告定时。
+    // 广告只会在15秒后且从未显示过的情况下出现一次。
+    // 若用户在15秒内手动关闭了广告？广告初始隐藏，用户无法提前关闭。完美。
+
+    // 额外细节：如果15秒内用户刷新页面，定时器重置，重新计时——符合预期。
     
   })();
 </script>
-
-<!-- 确保初始页面变量已定义 (已在上方script内定义) 无报错 -->
 </body>
 </html>

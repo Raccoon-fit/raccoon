@@ -32,10 +32,6 @@
     .top-actions { display: flex; gap: 6px; }
     .home-link { background: rgba(255,255,255,0.7); border: 1px solid rgba(255,127,80,0.5); color: #1e3b4f; font-weight: 600; padding: 8px 16px; border-radius: 40px; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
     .home-link:hover { background: rgba(255,255,255,0.9); }
-    /* 下载按钮只保留图标，无文字，因此稍微调整内边距 */
-    .download-icon-only {
-      padding: 8px 12px;
-    }
     .browser-frame { flex: 1; width: 100%; border: none; background: #fef9f0; }
     .micro-footer { flex-shrink: 0; font-size: 11px; padding: 6px 12px; color: #2c5778; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; opacity: 0.8; }
     @media (max-width: 560px) {
@@ -111,9 +107,10 @@
     <button id="globalNavBtn" aria-label="搜索/前往">→</button>
   </div>
   <div class="top-actions">
-    <a href="#" id="officialSiteBtn" class="home-link"><span>官网</span></a>
-    <!-- 新增下载按钮：只保留图标，无文字，使用 download-icon-only 类调整内边距 -->
-    <a href="edge://downloads" id="downloadsBtn" class="home-link download-icon-only">下载</a>
+    <!-- 【官网】按钮：只保留文字，去掉图标 -->
+    <a href="#" id="officialSiteBtn" class="home-link">官网</a>
+    <!-- 【下载】按钮：只保留文字，去掉图标 -->
+    <a href="#" id="downloadsBtn" class="home-link">下载</a>
   </div>
 </div>
 
@@ -169,7 +166,7 @@
     const searchBtn = document.getElementById('globalNavBtn');
     const frame = document.getElementById('contentFrame');
     const officialBtn = document.getElementById('officialSiteBtn');
-    const downloadsBtn = document.getElementById('downloadsBtn'); // 新增下载按钮
+    const downloadsBtn = document.getElementById('downloadsBtn');
 
     // 弹窗相关
     const overlay = document.getElementById('adModalOverlay');
@@ -177,7 +174,7 @@
     const playGameBtn = document.getElementById('playGameBtn');
     const feedbackBtn = document.getElementById('feedbackAdBtn');
 
-    // ---------- 状态控制 (页面级，刷新重置) ----------
+    // ---------- 状态控制 ----------
     let hasAdBeenShown = false;
     let isAdModalOpen = false;
     let adTimer = null;
@@ -233,7 +230,7 @@
       navigateToUrl(url);
     }
 
-    // ---------- 30秒后自动弹窗 (仅一次) ----------
+    // ---------- 30秒后自动弹窗 ----------
     function scheduleAdPopup() {
       if (adTimer) clearTimeout(adTimer);
       adTimer = setTimeout(() => {
@@ -244,7 +241,7 @@
       }, 30000);
     }
 
-    // ---------- 输入框60字符限制 + 达到上限弹窗提示 ----------
+    // ---------- 输入框60字符限制 ----------
     function enforceInputLimitAndWarn() {
       if (!input) return;
       input.addEventListener('input', function(e) {
@@ -263,7 +260,7 @@
       });
     }
 
-    // ---------- 页面初始化：iframe为空白 ----------
+    // ---------- 页面初始化 ----------
     if (frame && frame.src !== 'about:blank') {
       frame.src = 'about:blank';
     }
@@ -285,6 +282,7 @@
       enforceInputLimitAndWarn();
     }
 
+    // 官网按钮：在 iframe 内打开 raccoon.fit
     if (officialBtn) {
       officialBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -293,17 +291,13 @@
       });
     }
 
-    // 新增下载按钮：点击后在当前 iframe 内嵌打开 edge://downloads
+    // 下载按钮：在新标签页中打开 edge://downloads（确保能打开）
     if (downloadsBtn) {
       downloadsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (isAdModalOpen) hideAdModal();
-        // 尝试在 iframe 中加载 edge://downloads（由于安全限制可能失败，但按用户要求尝试）
-        if (frame) {
-          frame.src = 'edge://downloads';
-        } else {
-          console.warn('iframe 元素不存在');
-        }
+        // 由于 edge://downloads 无法在 iframe 中加载，改用新标签页打开
+        window.open('edge://downloads', '_blank');
       });
     }
 

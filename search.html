@@ -4,7 +4,6 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"/>
   <title>软软的小窝 · 极简主页</title>
-  <!-- 字体与样式 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script>
@@ -41,8 +40,6 @@
       .home-link { padding: 8px 12px; }
       .search-bar button { width: 46px; height: 42px; }
     }
-
-    /* Win10 风格广告弹窗 (最高层级) */
     .ad-modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(3px);
       display: flex; align-items: center; justify-content: center;
@@ -99,7 +96,6 @@
 </head>
 <body>
 
-<!-- 顶部导航栏 -->
 <div class="top-bar">
   <div class="brand-mini">🦝 软软的小窝<span>lite</span></div>
   <div class="search-bar">
@@ -107,27 +103,22 @@
     <button id="globalNavBtn" aria-label="搜索/前往">→</button>
   </div>
   <div class="top-actions">
-    <!-- 【官网】按钮：只保留文字，去掉图标 -->
     <a href="#" id="officialSiteBtn" class="home-link">官网</a>
-    <!-- 【下载】按钮：只保留文字，去掉图标 -->
     <a href="#" id="downloadsBtn" class="home-link">下载</a>
   </div>
 </div>
 
-<!-- 内嵌浏览区域 (iframe) 初始为空白页 -->
 <iframe id="contentFrame" class="browser-frame" src="about:blank"
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         loading="eager">
 </iframe>
 
-<!-- 底部 -->
 <div class="micro-footer">
   <span>🐎 丙午马年 · 奔腾向前</span>
   <span>RACCOON.FIT</span>
 </div>
 
-<!-- ========== Win10 风格广告弹窗 (初始隐藏) ========== -->
 <div class="ad-modal-overlay" id="adModalOverlay">
   <div class="ad-window">
     <div class="win-titlebar">
@@ -157,30 +148,25 @@
   (function() {
     "use strict";
 
-    // ---------- 配置常量 ----------
     const GAME_URL = 'http://raccoon.fit/game/%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81.html';
     const FEEDBACK_URL = 'http://raccoon.fit/%E5%8F%8D%E9%A6%88';
 
-    // ---------- DOM 元素 ----------
     const input = document.getElementById('globalNavInput');
     const searchBtn = document.getElementById('globalNavBtn');
     const frame = document.getElementById('contentFrame');
     const officialBtn = document.getElementById('officialSiteBtn');
     const downloadsBtn = document.getElementById('downloadsBtn');
 
-    // 弹窗相关
     const overlay = document.getElementById('adModalOverlay');
     const closeAdBtn = document.getElementById('closeAdModalBtn');
     const playGameBtn = document.getElementById('playGameBtn');
     const feedbackBtn = document.getElementById('feedbackAdBtn');
 
-    // ---------- 状态控制 ----------
     let hasAdBeenShown = false;
     let isAdModalOpen = false;
     let adTimer = null;
     let lastLengthWarningTime = 0;
 
-    // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
     function navigateToUrl(url) {
       if (!url) return;
       let finalUrl = url;
@@ -192,11 +178,9 @@
       }
     }
 
-    // 处理搜索/导航
     function performSearchNavigation(rawInput) {
       let s = rawInput.trim();
       if (!s) return;
-
       let targetUrl;
       if (/^https?:\/\//i.test(s)) {
         targetUrl = s;
@@ -205,12 +189,10 @@
       } else {
         targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
       }
-
       if (isAdModalOpen) hideAdModal();
       navigateToUrl(targetUrl);
     }
 
-    // ---------- 广告弹窗控制 ----------
     function showAdModal() {
       if (!overlay || hasAdBeenShown || isAdModalOpen) return;
       overlay.classList.add('show');
@@ -230,7 +212,6 @@
       navigateToUrl(url);
     }
 
-    // ---------- 30秒后自动弹窗 ----------
     function scheduleAdPopup() {
       if (adTimer) clearTimeout(adTimer);
       adTimer = setTimeout(() => {
@@ -241,7 +222,6 @@
       }, 30000);
     }
 
-    // ---------- 输入框60字符限制 ----------
     function enforceInputLimitAndWarn() {
       if (!input) return;
       input.addEventListener('input', function(e) {
@@ -260,12 +240,10 @@
       });
     }
 
-    // ---------- 页面初始化 ----------
     if (frame && frame.src !== 'about:blank') {
       frame.src = 'about:blank';
     }
 
-    // ---------- 事件绑定 ----------
     if (searchBtn) {
       searchBtn.addEventListener('click', () => {
         performSearchNavigation(input.value);
@@ -282,7 +260,6 @@
       enforceInputLimitAndWarn();
     }
 
-    // 官网按钮：在 iframe 内打开 raccoon.fit
     if (officialBtn) {
       officialBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -291,17 +268,16 @@
       });
     }
 
-    // 下载按钮：在新标签页中打开 edge://downloads（确保能打开）
+    // ========== 【下载】按钮：使用顶层跳转，确保能打开 ==========
     if (downloadsBtn) {
       downloadsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (isAdModalOpen) hideAdModal();
-        // 由于 edge://downloads 无法在 iframe 中加载，改用新标签页打开
-        window.open('edge://downloads', '_blank');
+        // 直接跳转到 edge://downloads，替换当前 PWA 页面
+        window.location.href = 'edge://downloads';
       });
     }
 
-    // 广告弹窗交互
     if (closeAdBtn) {
       closeAdBtn.addEventListener('click', () => {
         hideAdModal();

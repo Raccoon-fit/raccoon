@@ -32,6 +32,10 @@
     .top-actions { display: flex; gap: 6px; }
     .home-link { background: rgba(255,255,255,0.7); border: 1px solid rgba(255,127,80,0.5); color: #1e3b4f; font-weight: 600; padding: 8px 16px; border-radius: 40px; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
     .home-link:hover { background: rgba(255,255,255,0.9); }
+    /* 下载按钮只保留图标，无文字，因此稍微调整内边距 */
+    .download-icon-only {
+      padding: 8px 12px;
+    }
     .browser-frame { flex: 1; width: 100%; border: none; background: #fef9f0; }
     .micro-footer { flex-shrink: 0; font-size: 11px; padding: 6px 12px; color: #2c5778; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; opacity: 0.8; }
     @media (max-width: 560px) {
@@ -103,16 +107,17 @@
 <div class="top-bar">
   <div class="brand-mini">🦝 软软的小窝<span>lite</span></div>
   <div class="search-bar">
-    <!-- 限制输入长度为60字符，超出部分不计入输入框 -->
     <input type="text" id="globalNavInput" placeholder="在此键入要搜索或浏览的内容..." autofocus maxlength="60">
     <button id="globalNavBtn" aria-label="搜索/前往">→</button>
   </div>
   <div class="top-actions">
     <a href="#" id="officialSiteBtn" class="home-link">🏠 <span>官网</span></a>
+    <!-- 新增下载按钮：只保留图标，无文字，使用 download-icon-only 类调整内边距 -->
+    <a href="#" id="downloadsBtn" class="home-link download-icon-only">⬇️</a>
   </div>
 </div>
 
-<!-- 内嵌浏览区域 (iframe) 初始为空白页，无任何欢迎内容 -->
+<!-- 内嵌浏览区域 (iframe) 初始为空白页 -->
 <iframe id="contentFrame" class="browser-frame" src="about:blank"
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -164,6 +169,7 @@
     const searchBtn = document.getElementById('globalNavBtn');
     const frame = document.getElementById('contentFrame');
     const officialBtn = document.getElementById('officialSiteBtn');
+    const downloadsBtn = document.getElementById('downloadsBtn'); // 新增下载按钮
 
     // 弹窗相关
     const overlay = document.getElementById('adModalOverlay');
@@ -172,11 +178,9 @@
     const feedbackBtn = document.getElementById('feedbackAdBtn');
 
     // ---------- 状态控制 (页面级，刷新重置) ----------
-    let hasAdBeenShown = false;        // 本次会话是否已展示过广告（或已关闭）
-    let isAdModalOpen = false;         // 弹窗是否正在显示
-    let adTimer = null;               // 30秒定时器
-
-    // 字符限制提示防抖标记（避免短时间内多次弹窗）
+    let hasAdBeenShown = false;
+    let isAdModalOpen = false;
+    let adTimer = null;
     let lastLengthWarningTime = 0;
 
     // ---------- 辅助函数：导航至目标URL (内嵌iframe) ----------
@@ -191,7 +195,7 @@
       }
     }
 
-    // 处理搜索/导航 (输入框已限制60字符)
+    // 处理搜索/导航
     function performSearchNavigation(rawInput) {
       let s = rawInput.trim();
       if (!s) return;
@@ -205,10 +209,7 @@
         targetUrl = 'https://www.bing.com/search?q=' + encodeURIComponent(s);
       }
 
-      // 如果弹窗正好开着，关闭它
-      if (isAdModalOpen) {
-        hideAdModal();
-      }
+      if (isAdModalOpen) hideAdModal();
       navigateToUrl(targetUrl);
     }
 
@@ -226,7 +227,6 @@
       isAdModalOpen = false;
     }
 
-    // 内嵌打开指定链接 (并关闭广告)
     function openInFrameAndCloseAd(url) {
       if (!url) return;
       hideAdModal();
@@ -247,33 +247,23 @@
     // ---------- 输入框60字符限制 + 达到上限弹窗提示 ----------
     function enforceInputLimitAndWarn() {
       if (!input) return;
-
-      // 监听 input 事件: 实时检测长度达到60时弹窗（且仅当长度恰好为60时提醒，避免重复提示）
       input.addEventListener('input', function(e) {
         let currentLen = this.value.length;
-        // 由于 maxlength=60 浏览器会自动阻止超出，但通过 JS 做二次保险
         if (currentLen > 60) {
           this.value = this.value.slice(0, 60);
           currentLen = 60;
         }
-        // 当长度达到60时弹出提示（并且避免短时间内反复弹窗，使用时间戳限制）
         if (currentLen === 60) {
           const now = Date.now();
-          if (now - lastLengthWarningTime > 1500) { // 1.5秒内只弹一次
+          if (now - lastLengthWarningTime > 1500) {
             lastLengthWarningTime = now;
             alert('⚠️ 已达到60字符上限，无法继续输入');
           }
         }
       });
-
-      // 额外处理粘贴等可能导致超限的情况，maxlength 已保证最终长度 ≤60，但为了体验，再明确拦截
-      input.addEventListener('keydown', function(e) {
-        // 不需要额外拦截，maxlength 会自动处理，但为了及时反馈，不重复处理
-      });
     }
 
-    // ---------- 页面初始化：iframe为空白，无欢迎页 ----------
-    // 确保 iframe 完全空白（about:blank）
+    // ---------- 页面初始化：iframe为空白 ----------
     if (frame && frame.src !== 'about:blank') {
       frame.src = 'about:blank';
     }
@@ -292,7 +282,6 @@
           performSearchNavigation(input.value);
         }
       });
-      // 启动字符限制与提示功能
       enforceInputLimitAndWarn();
     }
 
@@ -304,28 +293,39 @@
       });
     }
 
-    // 广告弹窗交互 (只能通过 ✕ 关闭)
+    // 新增下载按钮：点击后在当前 iframe 内嵌打开 edge://downloads
+    if (downloadsBtn) {
+      downloadsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (isAdModalOpen) hideAdModal();
+        // 尝试在 iframe 中加载 edge://downloads（由于安全限制可能失败，但按用户要求尝试）
+        if (frame) {
+          frame.src = 'edge://downloads';
+        } else {
+          console.warn('iframe 元素不存在');
+        }
+      });
+    }
+
+    // 广告弹窗交互
     if (closeAdBtn) {
       closeAdBtn.addEventListener('click', () => {
         hideAdModal();
       });
     }
 
-    // “点我查看” → 游戏链接，内嵌打开
     if (playGameBtn) {
       playGameBtn.addEventListener('click', () => {
         openInFrameAndCloseAd(GAME_URL);
       });
     }
 
-    // “意见反馈”按钮 → 反馈链接，内嵌打开
     if (feedbackBtn) {
       feedbackBtn.addEventListener('click', () => {
         openInFrameAndCloseAd(FEEDBACK_URL);
       });
     }
 
-    // 禁止点击遮罩层关闭广告，确保只有 ✕ 能关闭
     if (overlay) {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) {
@@ -334,7 +334,6 @@
       });
     }
 
-    // 禁止ESC键关闭弹窗（遵循只能点X关闭）
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isAdModalOpen) {
         e.preventDefault();
@@ -342,10 +341,8 @@
       }
     });
 
-    // 启动30秒广告定时器
     scheduleAdPopup();
 
-    // 清理定时器
     window.addEventListener('beforeunload', () => {
       if (adTimer) clearTimeout(adTimer);
     });

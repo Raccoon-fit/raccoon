@@ -92,16 +92,20 @@
       font-weight: 500; padding: 4px 6px;
     }
     .feedback-note button:hover { color: #004e8c; }
-    /* 手动打开提示框样式 */
-    .manual-download-tip {
+    /* 下载提示框 */
+    .download-tip {
       position: fixed; bottom: 80px; right: 20px; background: #ffffff; border-left: 4px solid #FF7F50;
       padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       z-index: 10000; font-size: 14px; display: flex; align-items: center; gap: 12px;
       backdrop-filter: blur(8px); background: rgba(255,255,255,0.95);
     }
-    .manual-download-tip a { color: #FF7F50; font-weight: bold; text-decoration: none; margin-left: 8px; }
-    .manual-download-tip a:hover { text-decoration: underline; }
-    .manual-download-tip button { background: none; border: none; font-size: 18px; cursor: pointer; color: #888; margin-left: 12px; }
+    .download-tip kbd {
+      background: #f1f1f1; border-radius: 4px; padding: 2px 6px; font-family: monospace;
+      border: 1px solid #ccc; margin: 0 2px;
+    }
+    .download-tip a { color: #FF7F50; font-weight: bold; text-decoration: none; margin-left: 4px; }
+    .download-tip a:hover { text-decoration: underline; }
+    .download-tip button { background: none; border: none; font-size: 18px; cursor: pointer; color: #888; margin-left: 12px; }
   </style>
 </head>
 <body>
@@ -278,13 +282,31 @@
       });
     }
 
-    // ========== 下载按钮：尝试自动打开，失败则显示手动链接 ==========
+    // ========== 【下载】按钮：显示操作指引（因为 PWA 无法直接打开 edge://downloads） ==========
     if (downloadsBtn) {
       downloadsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (isAdModalOpen) hideAdModal();
 
-        // 尝试方法1：动态创建 a 标签模拟点击（新标签页）
+        // 移除已存在的提示框
+        const existingTip = document.getElementById('downloadTip');
+        if (existingTip) existingTip.remove();
+
+        // 创建提示框
+        const tipDiv = document.createElement('div');
+        tipDiv.id = 'downloadTip';
+        tipDiv.className = 'download-tip';
+        tipDiv.innerHTML = `
+          <span>📥 打开下载管理：</span>
+          <kbd>Ctrl</kbd> + <kbd>J</kbd>
+          <span>或</span>
+          <a href="edge://downloads" target="_blank" rel="noopener noreferrer">点击此处尝试打开</a>
+          <button id="closeDownloadTip">✕</button>
+        `;
+        document.body.appendChild(tipDiv);
+        document.getElementById('closeDownloadTip').onclick = () => tipDiv.remove();
+
+        // 自动尝试打开 edge://downloads（可能无效，但保留尝试）
         const a = document.createElement('a');
         a.href = 'edge://downloads';
         a.target = '_blank';
@@ -293,25 +315,10 @@
         a.click();
         document.body.removeChild(a);
 
-        // 由于无法检测是否成功，延迟1秒后显示一个手动打开提示（防止用户以为没反应）
+        // 8秒后自动移除提示框
         setTimeout(() => {
-          // 检查是否已经有一个提示框，避免重复
-          if (document.getElementById('manualDownloadTip')) return;
-          const tipDiv = document.createElement('div');
-          tipDiv.id = 'manualDownloadTip';
-          tipDiv.className = 'manual-download-tip';
-          tipDiv.innerHTML = `
-            <span>🔽 如果页面未自动打开，请点击</span>
-            <a href="edge://downloads" target="_blank" rel="noopener noreferrer">此处手动打开下载页面</a>
-            <button id="closeTipBtn">✕</button>
-          `;
-          document.body.appendChild(tipDiv);
-          document.getElementById('closeTipBtn').onclick = () => tipDiv.remove();
-          // 10秒后自动消失
-          setTimeout(() => {
-            if (tipDiv && tipDiv.parentNode) tipDiv.remove();
-          }, 10000);
-        }, 1000);
+          if (tipDiv && tipDiv.parentNode) tipDiv.remove();
+        }, 8000);
       });
     }
 

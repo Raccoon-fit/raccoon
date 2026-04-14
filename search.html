@@ -92,6 +92,16 @@
       font-weight: 500; padding: 4px 6px;
     }
     .feedback-note button:hover { color: #004e8c; }
+    /* 手动打开提示框样式 */
+    .manual-download-tip {
+      position: fixed; bottom: 80px; right: 20px; background: #ffffff; border-left: 4px solid #FF7F50;
+      padding: 12px 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10000; font-size: 14px; display: flex; align-items: center; gap: 12px;
+      backdrop-filter: blur(8px); background: rgba(255,255,255,0.95);
+    }
+    .manual-download-tip a { color: #FF7F50; font-weight: bold; text-decoration: none; margin-left: 8px; }
+    .manual-download-tip a:hover { text-decoration: underline; }
+    .manual-download-tip button { background: none; border: none; font-size: 18px; cursor: pointer; color: #888; margin-left: 12px; }
   </style>
 </head>
 <body>
@@ -268,13 +278,40 @@
       });
     }
 
-    // ========== 【下载】按钮：使用顶层跳转，确保能打开 ==========
+    // ========== 下载按钮：尝试自动打开，失败则显示手动链接 ==========
     if (downloadsBtn) {
       downloadsBtn.addEventListener('click', (e) => {
         e.preventDefault();
         if (isAdModalOpen) hideAdModal();
-        // 直接跳转到 edge://downloads，替换当前 PWA 页面
-        window.location.href = 'edge://downloads';
+
+        // 尝试方法1：动态创建 a 标签模拟点击（新标签页）
+        const a = document.createElement('a');
+        a.href = 'edge://downloads';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // 由于无法检测是否成功，延迟1秒后显示一个手动打开提示（防止用户以为没反应）
+        setTimeout(() => {
+          // 检查是否已经有一个提示框，避免重复
+          if (document.getElementById('manualDownloadTip')) return;
+          const tipDiv = document.createElement('div');
+          tipDiv.id = 'manualDownloadTip';
+          tipDiv.className = 'manual-download-tip';
+          tipDiv.innerHTML = `
+            <span>🔽 如果页面未自动打开，请点击</span>
+            <a href="edge://downloads" target="_blank" rel="noopener noreferrer">此处手动打开下载页面</a>
+            <button id="closeTipBtn">✕</button>
+          `;
+          document.body.appendChild(tipDiv);
+          document.getElementById('closeTipBtn').onclick = () => tipDiv.remove();
+          // 10秒后自动消失
+          setTimeout(() => {
+            if (tipDiv && tipDiv.parentNode) tipDiv.remove();
+          }, 10000);
+        }, 1000);
       });
     }
 

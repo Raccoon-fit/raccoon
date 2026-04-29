@@ -121,19 +121,42 @@
 
         body {
             background: #FDF7F0;
-            /* 温暖奶油底 */
             background-image:
                 radial-gradient(ellipse at 25% 20%, rgba(212, 160, 84, 0.12) 0%, transparent 40%),
                 radial-gradient(ellipse at 75% 65%, rgba(193, 127, 89, 0.10) 0%, transparent 45%),
                 radial-gradient(ellipse at 50% 85%, rgba(232, 213, 192, 0.18) 0%, transparent 35%),
                 url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.014'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             color: #3C2415;
-            /* 深咖啡文字 */
             font-smooth: antialiased;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
             transition: background 0.3s;
             font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+        }
+
+        /* ---------- body 内边距修复：按浏览器兼容能力分层 ---------- */
+        /* 默认 (不支持 backdrop-filter 的旧浏览器) : IE栏大，需要更多顶部空间 */
+        body {
+            padding-top: 160px !important;
+        }
+
+        /* 现代浏览器 (支持 backdrop-filter) : IE栏缩小，使用更紧凑的顶部空间 */
+        @supports (backdrop-filter: blur(1px)) {
+            body {
+                padding-top: 120px !important;
+            }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 150px !important;
+            }
+            @supports (backdrop-filter: blur(1px)) {
+                body {
+                    padding-top: 130px !important;
+                }
+            }
         }
 
         /* 玻璃卡片 — 温暖奶油半透明 */
@@ -192,7 +215,7 @@
             opacity: 1;
         }
 
-        /* 导航栏 — 温暖白 */
+        /* 导航栏 */
         .nav-modern {
             background: rgba(255, 252, 247, 0.78);
             backdrop-filter: blur(26px);
@@ -301,6 +324,8 @@
             border-radius: 20px;
             padding: 8px 16px;
             transition: all 0.3s;
+            /* 防止桌面端同时存在 top 和 bottom 导致拉伸 */
+            white-space: nowrap;
         }
         .badge-entrance:hover {
             background: rgba(255, 252, 247, 0.95);
@@ -432,28 +457,29 @@
             }
         }
 
-        /* 导航条 */
+        /* 导航条位置 */
         .nav-search-bar {
+            top: 70px;                    /* 旧浏览器默认 */
             background: rgba(255, 248, 240, 0.65);
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
             border-bottom: 1px solid rgba(232, 213, 192, 0.5);
         }
 
+        @supports (backdrop-filter: blur(1px)) {
+            .nav-search-bar {
+                top: 52px !important;     /* 现代浏览器中紧贴缩小后的IE栏 */
+            }
+        }
+
         /* 文字颜色 */
-        h1,
-        h2,
-        h3,
-        h4 {
+        h1, h2, h3, h4 {
             color: #2C1808;
         }
-        .text-gray-300,
-        .text-gray-400,
-        .text-gray-500 {
+        .text-gray-300, .text-gray-400, .text-gray-500 {
             color: #5C3D2E !important;
         }
-        p,
-        .text-gray-400 {
+        p, .text-gray-400 {
             color: #4A3022;
         }
 
@@ -461,8 +487,7 @@
         footer .glass-card-modern {
             background: rgba(255, 248, 240, 0.6);
         }
-        footer p,
-        footer a {
+        footer p, footer a {
             color: #3C2415;
         }
 
@@ -496,8 +521,7 @@
         }
 
         /* 导航文字 */
-        .nav-modern a,
-        .nav-modern span:not(.btn-primary) {
+        .nav-modern a, .nav-modern span:not(.btn-primary) {
             color: #3C2415;
         }
 
@@ -505,36 +529,6 @@
         .horse-year-decoration {
             background: rgba(255, 248, 240, 0.6);
             border: 1px solid rgba(212, 160, 84, 0.4);
-        }
-
-        /* 响应式body padding */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 150px !important;
-            }
-            @supports (backdrop-filter: blur(1px)) {
-                body {
-                    padding-top: 130px !important;
-                }
-            }
-        }
-        @supports (backdrop-filter: blur(1px)) {
-            body {
-                padding-top: 115px !important;
-            }
-        }
-        body {
-            padding-top: 160px !important;
-        }
-
-        /* 导航条位置 */
-        .nav-search-bar {
-            top: 70px;
-        }
-        @supports (backdrop-filter: blur(1px)) {
-            .nav-search-bar {
-                top: 52px;
-            }
         }
     </style>
 </head>
@@ -562,7 +556,7 @@
     </div>
 
     <!-- 网址导航条 -->
-    <div class="nav-search-bar fixed left-0 w-full z-[9997] py-3 px-4 shadow-sm" style="top:70px;">
+    <div class="nav-search-bar fixed left-0 w-full z-[9997] py-3 px-4 shadow-sm">
         <div class="container mx-auto flex items-center gap-3 max-w-4xl">
             <span class="text-brand-copper text-lg hidden sm:inline">🦝</span>
             <div class="relative flex-1">
@@ -576,28 +570,18 @@
         </div>
     </div>
 
-    <!-- 使用supports修正导航条位置 -->
-    <style>
-        @supports (backdrop-filter: blur(1px)) {
-            .nav-search-bar {
-                top: 52px !important;
-            }
-        }
-    </style>
-
     <script>
         (function() {
             const initNav = function() {
                 const input = document.getElementById('globalNavInput');
                 const btn = document.getElementById('globalNavBtn');
                 if (!input || !btn) return;
-
                 function handleNavigate() {
                     let raw = input.value.trim();
                     if (!raw) return;
                     const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
                     let finalUrl = raw;
-                    if (!isUrl) finalUrl = `https://www.baidu.com/s?wd=${encodeURIComponent(raw)}`;
+                    if (!isUrl) finalUrl = `https://www.bing.com/s?wd=${encodeURIComponent(raw)}`;
                     else if (!/^https?:\/\//i.test(raw)) finalUrl = 'https://' + raw;
                     window.open(finalUrl, '_blank');
                     input.value = '';
@@ -624,8 +608,8 @@
         <span>反馈建议</span>
     </a>
 
-    <!-- 称号入口 -->
-    <a href="http://raccoon.fit/称号" target="_blank" rel="noopener noreferrer" class="badge-entrance fixed md:top-[100px] md:right-6 bottom-6 right-5 z-[100]">
+    <!-- 称号入口（修复拉伸问题：桌面端添加 md:bottom-auto 取消 bottom 约束） -->
+    <a href="http://raccoon.fit/称号" target="_blank" rel="noopener noreferrer" class="badge-entrance fixed md:top-[100px] md:right-6 md:bottom-auto bottom-6 right-5 z-[100]">
         <span>🏅</span> 称号 <span>→</span>
     </a>
 
@@ -762,12 +746,11 @@
         </div>
     </div>
 
-    <!-- 实时时钟 (隐藏，供JS更新) -->
+    <!-- 实时时钟 (隐藏) -->
     <span id="liveClock" class="hidden"></span>
 
     <script>
         (function() {
-            // 加载遮罩
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 window.addEventListener('load', () => {
@@ -778,13 +761,11 @@
                 });
             }
 
-            // 实时时钟
             setInterval(() => {
                 const clock = document.getElementById('liveClock');
                 if (clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
             }, 1000);
 
-            // 密码模态窗
             const pwdModal = document.getElementById('passwordModal');
             const trigger = document.getElementById('navBrandTrigger');
             const confirm = document.getElementById('confirmBtn');
@@ -829,7 +810,6 @@
                 });
             }
 
-            // 技能条动画
             document.querySelectorAll('.skill-progress-modern').forEach(bar => {
                 const w = bar.style.width;
                 bar.style.width = '0%';

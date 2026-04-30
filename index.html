@@ -7,7 +7,6 @@
     <meta content="软软的小窝" name="description" />
     <title>软软的小窝 - 首页</title>
     <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🦝&lt;/text&gt;&lt;/svg&gt;" rel="icon" />
-    <!-- 字体与 Tailwind -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
     </script>
@@ -53,6 +52,7 @@
                         'gradient-shift': 'gradientShift 4s ease infinite',
                         'drift': 'drift 12s ease-in-out infinite',
                         'warm-pulse': 'warmPulse 3s ease-in-out infinite',
+                        'menu-pop': 'menuPop 0.3s ease-out',
                     },
                     keyframes: {
                         floatSoft: {
@@ -95,6 +95,10 @@
                             '0%, 100%': { boxShadow: '0 0 18px rgba(193,127,89,0.15)' },
                             '50%': { boxShadow: '0 0 36px rgba(193,127,89,0.35)' },
                         },
+                        menuPop: {
+                            '0%': { transform: 'translateY(12px) scale(0.95)', opacity: 0 },
+                            '100%': { transform: 'translateY(0) scale(1)', opacity: 1 },
+                        },
                     },
                     backgroundImage: {
                         'gradient-radial': 'radial-gradient(circle at 50% 30%, var(--tw-gradient-stops))',
@@ -119,6 +123,20 @@
             scroll-behavior: smooth;
         }
 
+        /* 彻底移除所有浏览器默认蓝色外框和蓝色下划线 */
+        *, *:focus, *:active, *:hover {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+        a, a:hover, a:focus, a:active, a:visited {
+            text-decoration: none !important;
+            color: inherit;
+        }
+        button:focus, input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            box-shadow: none !important; /* 全局清除任何默认box-shadow，若有自定义会覆盖 */
+        }
+
         body {
             background: #FDF7F0;
             background-image:
@@ -134,41 +152,27 @@
             font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
         }
 
-        /* ---------- body 内边距修复：按浏览器兼容能力分层 ---------- */
-        /* 默认 (不支持 backdrop-filter 的旧浏览器) : IE栏大，需要更多顶部空间 */
-        body {
-            padding-top: 160px !important;
-        }
-
-        /* 现代浏览器 (支持 backdrop-filter) : IE栏缩小，使用更紧凑的顶部空间 */
+        /* body 内边距：按浏览器兼容分层 */
+        body { padding-top: 160px !important; }
         @supports (backdrop-filter: blur(1px)) {
-            body {
-                padding-top: 120px !important;
-            }
+            body { padding-top: 120px !important; }
         }
-
-        /* 移动端适配 */
         @media (max-width: 768px) {
-            body {
-                padding-top: 150px !important;
-            }
+            body { padding-top: 150px !important; }
             @supports (backdrop-filter: blur(1px)) {
-                body {
-                    padding-top: 130px !important;
-                }
+                body { padding-top: 130px !important; }
             }
         }
 
-        /* 玻璃卡片 — 温暖奶油半透明 */
+        /* 玻璃卡片 */
         .glass-modern {
             background: rgba(255, 248, 240, 0.72);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(232, 213, 192, 0.55);
             border-radius: 22px;
-            box-shadow: 0 12px 32px rgba(60, 36, 21, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 32px rgba(60, 36, 21, 0.06), inset 0 1px 2px rgba(255,255,255,0.7);
         }
-
         .glass-card-modern {
             background: rgba(255, 248, 240, 0.75);
             backdrop-filter: blur(18px);
@@ -180,378 +184,180 @@
             overflow: hidden;
             box-shadow: 0 6px 24px rgba(60, 36, 21, 0.05);
         }
-
         .glass-card-modern::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(193, 127, 89, 0.45), rgba(212, 160, 84, 0.35), transparent);
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(193,127,89,0.45), rgba(212,160,84,0.35), transparent);
             z-index: 1;
         }
-
         .glass-card-modern::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(232, 213, 192, 0.4), transparent);
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.4s;
+            content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(232,213,192,0.4), transparent);
+            z-index: 1; opacity: 0; transition: opacity 0.4s;
         }
-
         .glass-card-modern:hover {
-            border-color: rgba(193, 127, 89, 0.5);
-            background: rgba(255, 252, 247, 0.9);
+            border-color: rgba(193,127,89,0.5);
+            background: rgba(255,252,247,0.9);
             transform: translateY(-7px) scale(1.012);
-            box-shadow: 0 22px 40px -10px rgba(60, 36, 21, 0.13), 0 0 0 1px rgba(193, 127, 89, 0.2);
+            box-shadow: 0 22px 40px -10px rgba(60,36,21,0.13), 0 0 0 1px rgba(193,127,89,0.2);
         }
-        .glass-card-modern:hover::after {
-            opacity: 1;
-        }
-
-        /* 导航栏 */
-        .nav-modern {
-            background: rgba(255, 252, 247, 0.78);
-            backdrop-filter: blur(26px);
-            -webkit-backdrop-filter: blur(26px);
-            border: 1px solid rgba(232, 213, 192, 0.65);
-            border-radius: 18px;
-            box-shadow: 0 8px 28px rgba(60, 36, 21, 0.06), 0 1px 0 rgba(255, 255, 255, 0.8);
-        }
+        .glass-card-modern:hover::after { opacity: 1; }
 
         /* 按钮 */
         .btn-primary {
             background: linear-gradient(135deg, #C17F59 0%, #A05A35 100%);
-            color: #FFFBF7;
-            font-weight: 700;
-            border-radius: 16px;
-            border: none;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.35s ease;
-            box-shadow: 0 8px 20px rgba(160, 90, 53, 0.3);
-            letter-spacing: 0.01em;
+            color: #FFFBF7; font-weight: 700; border-radius: 16px; border: none;
+            position: relative; overflow: hidden; transition: all 0.35s ease;
+            box-shadow: 0 8px 20px rgba(160,90,53,0.3); letter-spacing: 0.01em;
         }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 30px rgba(160, 90, 53, 0.4);
-        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(160,90,53,0.4); }
         .btn-primary::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 248, 240, 0.28), transparent);
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,248,240,0.28), transparent);
             transition: left 0.65s;
         }
-        .btn-primary:hover::after {
-            left: 100%;
-        }
+        .btn-primary:hover::after { left: 100%; }
 
         .btn-secondary {
-            background: rgba(255, 248, 240, 0.7);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(193, 127, 89, 0.18);
-            color: #3C2415;
-            border-radius: 16px;
-            transition: all 0.35s;
-            font-weight: 600;
+            background: rgba(255,248,240,0.7); backdrop-filter: blur(8px);
+            border: 1px solid rgba(193,127,89,0.18); color: #3C2415; border-radius: 16px;
+            transition: all 0.35s; font-weight: 600;
         }
         .btn-secondary:hover {
-            background: rgba(255, 252, 247, 0.95);
-            border-color: rgba(193, 127, 89, 0.5);
-            color: #1a0d06;
-            box-shadow: 0 4px 16px rgba(160, 90, 53, 0.12);
+            background: rgba(255,252,247,0.95); border-color: rgba(193,127,89,0.5);
+            color: #1a0d06; box-shadow: 0 4px 16px rgba(160,90,53,0.12);
         }
 
-        /* 技能条 */
-        .skill-bar {
-            height: 7px;
-            background: rgba(193, 127, 89, 0.08);
-            border-radius: 10px;
-            overflow: hidden;
-        }
+        .skill-bar { height: 7px; background: rgba(193,127,89,0.08); border-radius: 10px; overflow: hidden; }
         .skill-progress-modern {
-            height: 100%;
-            border-radius: 10px;
+            height: 100%; border-radius: 10px;
             background: linear-gradient(90deg, #C17F59, #D4A37A, #D4A054);
-            box-shadow: 0 0 12px rgba(193, 127, 89, 0.3);
-            transition: width 1.3s cubic-bezier(0.22, 0.68, 0, 1.71);
+            box-shadow: 0 0 12px rgba(193,127,89,0.3);
+            transition: width 1.3s cubic-bezier(0.22,0.68,0,1.71);
         }
 
-        /* 装饰线 */
         .title-decoration::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: linear-gradient(90deg, #C17F59, #D4A054, transparent);
-            border-radius: 2px;
+            content: ''; position: absolute; bottom: -10px; left: 0; width: 50px; height: 3px;
+            background: linear-gradient(90deg, #C17F59, #D4A054, transparent); border-radius: 2px;
         }
 
-        /* 标签 */
         .tag-modern {
-            display: inline-flex;
-            align-items: center;
-            padding: 5px 14px;
-            border-radius: 22px;
-            font-size: 11px;
-            font-weight: 600;
-            background: rgba(193, 127, 89, 0.1);
-            border: 1px solid rgba(193, 127, 89, 0.22);
-            color: #8B4A2A;
-            letter-spacing: 0.02em;
-        }
-
-        /* 称号入口 & 反馈 */
-        .badge-entrance {
-            background: rgba(255, 248, 240, 0.78);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(193, 127, 89, 0.45);
-            color: #8B4A2A;
-            font-weight: 600;
-            box-shadow: 0 6px 16px rgba(60, 36, 21, 0.08);
-            border-radius: 20px;
-            padding: 8px 16px;
-            transition: all 0.3s;
-            /* 防止桌面端同时存在 top 和 bottom 导致拉伸 */
-            white-space: nowrap;
-        }
-        .badge-entrance:hover {
-            background: rgba(255, 252, 247, 0.95);
-            border-color: #C17F59;
-            box-shadow: 0 10px 24px rgba(160, 90, 53, 0.18);
-        }
-
-        /* 反馈按钮 */
-        a[href*="反馈"] {
-            background: rgba(255, 248, 240, 0.72) !important;
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(193, 127, 89, 0.2) !important;
-            color: #3C2415 !important;
-            border-radius: 20px !important;
-            transition: all 0.3s;
-        }
-        a[href*="反馈"]:hover {
-            background: rgba(255, 252, 247, 0.92) !important;
-            border-color: #C17F59 !important;
-            box-shadow: 0 8px 20px rgba(160, 90, 53, 0.15);
+            display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 22px;
+            font-size: 11px; font-weight: 600; background: rgba(193,127,89,0.1);
+            border: 1px solid rgba(193,127,89,0.22); color: #8B4A2A; letter-spacing: 0.02em;
         }
 
         /* 滚动条 */
-        ::-webkit-scrollbar {
-            width: 7px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(232, 213, 192, 0.5);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #C17F59;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #A05A35;
-        }
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: rgba(232,213,192,0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #C17F59; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #A05A35; }
 
         /* 搜索框 */
         #globalNavInput {
-            background: rgba(255, 252, 247, 0.9) !important;
-            border: 1.5px solid rgba(193, 127, 89, 0.35) !important;
-            color: #3C2415 !important;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(60, 36, 21, 0.04);
-            transition: all 0.25s;
+            background: rgba(255,252,247,0.9) !important;
+            border: 1.5px solid rgba(193,127,89,0.35) !important;
+            color: #3C2415 !important; font-weight: 500;
+            box-shadow: 0 4px 12px rgba(60,36,21,0.04); transition: all 0.25s;
         }
         #globalNavInput:focus {
             border-color: #C17F59 !important;
-            box-shadow: 0 0 0 5px rgba(193, 127, 89, 0.12), 0 6px 14px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 0 0 5px rgba(193,127,89,0.12), 0 6px 14px rgba(0,0,0,0.03) !important;
             background: #FFFBF7 !important;
         }
-        #globalNavInput::placeholder {
-            color: #B89580;
-            font-weight: 400;
-        }
+        #globalNavInput::placeholder { color: #B89580; font-weight: 400; }
 
-        /* 顶部IE栏 — 默认放大(旧浏览器可见) */
+        /* IE栏 */
         .ie-banner {
-            background: #FFF3E6 !important;
-            border-bottom: 3px solid #C17F59 !important;
-            padding: 16px 20px !important;
-            font-size: 18px !important;
-            font-weight: 700 !important;
-            text-align: center !important;
-            display: block !important;
-            width: 100% !important;
-            z-index: 9999 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            color: #5C1A00 !important;
-            box-shadow: 0 4px 20px rgba(160, 90, 53, 0.35) !important;
+            background: #FFF3E6 !important; border-bottom: 3px solid #C17F59 !important;
+            padding: 16px 20px !important; font-size: 18px !important; font-weight: 700 !important;
+            text-align: center !important; display: block !important; width: 100% !important;
+            z-index: 9999 !important; position: fixed !important; top: 0 !important; left: 0 !important;
+            color: #5C1A00 !important; box-shadow: 0 4px 20px rgba(160,90,53,0.35) !important;
             letter-spacing: 0.03em !important;
         }
         .ie-banner a {
-            color: #8B3A1A !important;
-            font-size: 18px !important;
-            font-weight: 700 !important;
-            text-decoration: underline !important;
-            text-underline-offset: 4px !important;
-            text-decoration-thickness: 2px !important;
+            color: #8B3A1A !important; font-size: 18px !important; font-weight: 700 !important;
+            text-decoration: underline !important; text-underline-offset: 4px; text-decoration-thickness: 2px;
         }
-        .ie-banner .ie-subtitle {
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            color: #6B3A20 !important;
-            display: block !important;
-            margin-top: 4px !important;
-        }
+        .ie-banner .ie-subtitle { font-size: 14px !important; font-weight: 500; color: #6B3A20; display: block; margin-top: 4px; }
 
-        /* 现代浏览器中缩小IE栏 */
         @supports (backdrop-filter: blur(1px)) {
             .ie-banner {
-                background: rgba(255, 248, 240, 0.7) !important;
-                backdrop-filter: blur(12px) !important;
-                -webkit-backdrop-filter: blur(12px) !important;
-                border-bottom: 1px solid rgba(193, 127, 89, 0.2) !important;
-                padding: 10px 16px !important;
-                font-size: 13px !important;
-                font-weight: 500 !important;
-                text-align: left !important;
-                box-shadow: 0 1px 8px rgba(60, 36, 21, 0.04) !important;
-                letter-spacing: 0.01em !important;
-                display: flex !important;
-                flex-wrap: wrap !important;
-                align-items: center !important;
-                justify-content: space-between !important;
+                background: rgba(255,248,240,0.7) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+                border-bottom: 1px solid rgba(193,127,89,0.2) !important; padding: 10px 16px !important;
+                font-size: 13px !important; font-weight: 500 !important; text-align: left !important;
+                box-shadow: 0 1px 8px rgba(60,36,21,0.04) !important; letter-spacing: 0.01em !important;
+                display: flex !important; flex-wrap: wrap; align-items: center; justify-content: space-between;
                 color: #3C2415 !important;
             }
-            .ie-banner a {
-                color: #5C3D2E !important;
-                font-size: 13px !important;
-                font-weight: 500 !important;
-                text-decoration: none !important;
-                text-underline-offset: auto !important;
-                text-decoration-thickness: auto !important;
-            }
-            .ie-banner a:hover {
-                color: #A05A35 !important;
-                text-decoration: underline !important;
-            }
-            .ie-banner .ie-subtitle {
-                font-size: 11px !important;
-                font-weight: 400 !important;
-                color: #8B6B55 !important;
-                display: inline !important;
-                margin-top: 0 !important;
-            }
+            .ie-banner a { color: #5C3D2E !important; font-size: 13px !important; font-weight: 500; text-decoration: none !important; }
+            .ie-banner a:hover { color: #A05A35 !important; text-decoration: underline !important; }
+            .ie-banner .ie-subtitle { font-size: 11px; color: #8B6B55; display: inline; margin-top: 0; }
         }
 
-        /* 导航条位置 */
         .nav-search-bar {
-            top: 70px;                    /* 旧浏览器默认 */
-            background: rgba(255, 248, 240, 0.65);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border-bottom: 1px solid rgba(232, 213, 192, 0.5);
+            top: 70px; background: rgba(255,248,240,0.65);
+            backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+            border-bottom: 1px solid rgba(232,213,192,0.5);
         }
+        @supports (backdrop-filter: blur(1px)) { .nav-search-bar { top: 52px !important; } }
 
-        @supports (backdrop-filter: blur(1px)) {
-            .nav-search-bar {
-                top: 52px !important;     /* 现代浏览器中紧贴缩小后的IE栏 */
-            }
-        }
-
-        /* 文字颜色 */
-        h1, h2, h3, h4 {
-            color: #2C1808;
-        }
-        .text-gray-300, .text-gray-400, .text-gray-500 {
-            color: #5C3D2E !important;
-        }
-        p, .text-gray-400 {
-            color: #4A3022;
-        }
-
-        /* 页脚 */
-        footer .glass-card-modern {
-            background: rgba(255, 248, 240, 0.6);
-        }
-        footer p, footer a {
-            color: #3C2415;
-        }
-
-        /* Hero区域背景 */
+        h1,h2,h3,h4 { color: #2C1808; }
+        .text-gray-300,.text-gray-400,.text-gray-500 { color: #5C3D2E !important; }
+        p,.text-gray-400 { color: #4A3022; }
+        footer .glass-card-modern { background: rgba(255,248,240,0.6); }
+        footer p, footer a { color: #3C2415; }
         .hero-warm-bg {
-            background:
-                radial-gradient(ellipse at 30% 25%, rgba(212, 160, 84, 0.13) 0%, transparent 55%),
-                radial-gradient(ellipse at 70% 60%, rgba(193, 127, 89, 0.10) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(232, 213, 192, 0.16) 0%, transparent 40%);
+            background: radial-gradient(ellipse at 30% 25%, rgba(212,160,84,0.13) 0%, transparent 55%),
+                        radial-gradient(ellipse at 70% 60%, rgba(193,127,89,0.10) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(232,213,192,0.16) 0%, transparent 40%);
         }
+        #liveClock { color: #A05A35 !important; font-variant-numeric: tabular-nums; }
+        #loadingOverlay { background: #FDF7F0; z-index: 99999; }
+        #passwordModal .glass-card-modern { background: rgba(255,248,240,0.9); }
+        .nav-modern a, .nav-modern span:not(.btn-primary) { color: #3C2415; }
+        .horse-year-decoration { background: rgba(255,248,240,0.6); border: 1px solid rgba(212,160,84,0.4); }
 
-        /* 时钟 */
-        #liveClock {
-            color: #A05A35 !important;
-            font-variant-numeric: tabular-nums;
-            font-family: 'Inter', 'SF Mono', 'Noto Sans SC', monospace;
+        /* 左下角菜单 */
+        .quick-menu-btn {
+            background: rgba(255,248,240,0.75); backdrop-filter: blur(16px);
+            border: 1px solid rgba(193,127,89,0.35); border-radius: 50%;
+            width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 22px rgba(60,36,21,0.1); transition: all 0.3s;
+            font-size: 24px; cursor: pointer; z-index: 101;
         }
-
-        /* 加载遮罩 */
-        #loadingOverlay {
-            background: #FDF7F0;
-            z-index: 99999;
+        .quick-menu-btn:hover { background: rgba(255,252,247,0.95); border-color: #C17F59; transform: scale(1.08); }
+        .quick-menu-panel {
+            background: rgba(255,248,240,0.85); backdrop-filter: blur(24px);
+            border: 1px solid rgba(193,127,89,0.4); border-radius: 24px;
+            box-shadow: 0 16px 40px rgba(60,36,21,0.15); padding: 12px;
+            display: flex; flex-direction: column; gap: 4px; animation: menuPop 0.3s ease-out;
         }
-        #loadingOverlay p {
-            color: #5C3D2E !important;
+        .quick-menu-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+            border-radius: 16px; color: #3C2415; font-weight: 600; transition: all 0.2s;
+            background: transparent; white-space: nowrap;
         }
-
-        /* 密码模态窗 */
-        #passwordModal .glass-card-modern {
-            background: rgba(255, 248, 240, 0.9);
-        }
-
-        /* 导航文字 */
-        .nav-modern a, .nav-modern span:not(.btn-primary) {
-            color: #3C2415;
-        }
-
-        /* 新年装饰 */
-        .horse-year-decoration {
-            background: rgba(255, 248, 240, 0.6);
-            border: 1px solid rgba(212, 160, 84, 0.4);
-        }
+        .quick-menu-item:hover { background: rgba(193,127,89,0.1); color: #A05A35; }
     </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
 
-    <!-- 加载遮罩 -->
-    <div id="loadingOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center transition-opacity duration-500" style="background:#FDF7F0;">
+    <div id="loadingOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center transition-opacity duration-500">
         <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-brand-copper border-t-transparent animate-spin" style="border-top-color:transparent;"></div>
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-brand-copper border-t-transparent animate-spin"></div>
             <p class="text-brand-espresso font-medium tracking-wide">🦝 软软的小窝 · 加载中...</p>
         </div>
     </div>
 
-    <!-- IE兼容版提示栏 — 默认放大，现代浏览器缩小 -->
+    <!-- IE兼容版提示栏 -->
     <div class="ie-banner fixed top-0 left-0 w-full text-sm" style="z-index:9998;">
         <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;max-width:1200px;margin:0 auto;gap:8px;">
-            <a href="index-ie.html" class="inline-flex items-center gap-2 transition-all group" style="white-space:nowrap;">
+            <a href="index-ie.html" class="inline-flex items-center gap-2 transition-all group">
                 <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                <span class="ie-link-text">IE兼容版入口</span>
+                <span>IE兼容版入口</span>
             </a>
-            <span class="ie-subtitle" style="white-space:nowrap;">
-                <span class="animate-pulse">🐴</span> 丙午新禧 · 马到功成 <span class="hidden sm:inline">✨</span>
-            </span>
+            <span class="ie-subtitle"><span class="animate-pulse">🐴</span> 丙午新禧 · 马到功成 <span class="hidden sm:inline">✨</span></span>
         </div>
     </div>
 
@@ -560,8 +366,7 @@
         <div class="container mx-auto flex items-center gap-3 max-w-4xl">
             <span class="text-brand-copper text-lg hidden sm:inline">🦝</span>
             <div class="relative flex-1">
-                <input type="text" id="globalNavInput" placeholder="🔍 输入网址或搜索关键词，回车直达…"
-                class="w-full bg-white/80 border border-white/60 rounded-full px-6 py-3.5 text-gray-800 placeholder-gray-500 focus:border-brand-copper focus:ring-4 focus:ring-brand-copper/20 outline-none transition-all text-base font-medium shadow-md">
+                <input type="text" id="globalNavInput" placeholder="🔍 输入网址或搜索关键词，回车直达…" class="w-full bg-white/80 border border-white/60 rounded-full px-6 py-3.5 text-gray-800 placeholder-gray-500 focus:border-brand-copper focus:ring-0 outline-none transition-all text-base font-medium shadow-md">
                 <button id="globalNavBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-brand-copper to-brand-copperDark hover:from-brand-copperDark hover:to-brand-copper text-white rounded-full w-12 h-10 flex items-center justify-center transition-all shadow-lg shadow-brand-copper/40">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </button>
@@ -581,7 +386,7 @@
                     if (!raw) return;
                     const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
                     let finalUrl = raw;
-                    if (!isUrl) finalUrl = `https://www.bing.com/s?wd=${encodeURIComponent(raw)}`;
+                    if (!isUrl) finalUrl = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
                     else if (!/^https?:\/\//i.test(raw)) finalUrl = 'https://' + raw;
                     window.open(finalUrl, '_blank');
                     input.value = '';
@@ -602,22 +407,22 @@
         <div class="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-gradient-to-br from-yellow-100/18 via-transparent to-transparent blur-[100px] rounded-full animate-drift" style="animation-delay: 1s;"></div>
     </div>
 
-    <!-- 反馈按钮 -->
-    <a href="http://raccoon.fit/反馈/" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 left-6 z-[100] flex items-center gap-3 glass-modern px-5 py-3 text-brand-espresso font-semibold text-sm transition-all hover:scale-105 shadow-xl group" style="background: rgba(255,248,240,0.75);">
-        <span class="text-xl group-hover:rotate-12 transition-transform">🐞</span>
-        <span>反馈建议</span>
-    </a>
+    <!-- 左下角快速入口菜单 -->
+    <div class="fixed bottom-6 left-6 z-[100] flex flex-col items-start gap-2">
+        <button id="quickMenuToggle" class="quick-menu-btn" aria-label="快速入口" title="反馈 / 称号 / 客服中心">
+            <span class="transition-transform duration-300" id="menuIcon">☰</span>
+        </button>
+        <div id="quickMenuPanel" class="quick-menu-panel hidden">
+            <a href="http://raccoon.fit/反馈/" target="_blank" class="quick-menu-item">🐞 反馈建议</a>
+            <a href="http://raccoon.fit/称号" target="_blank" class="quick-menu-item">🏅 称号</a>
+            <a href="http://raccoon.fit/客服中心" target="_blank" class="quick-menu-item">💬 客服中心</a>
+        </div>
+    </div>
 
-    <!-- 称号入口（修复拉伸问题：桌面端添加 md:bottom-auto 取消 bottom 约束） -->
-    <a href="http://raccoon.fit/称号" target="_blank" rel="noopener noreferrer" class="badge-entrance fixed md:top-[100px] md:right-6 md:bottom-auto bottom-6 right-5 z-[100]">
-        <span>🏅</span> 称号 <span>→</span>
-    </a>
-
-    <!-- 隐藏的密码触发器 (开发者入口) -->
+    <!-- 隐藏密码触发器 -->
     <span id="navBrandTrigger" class="fixed top-1/2 right-0 z-[99] w-8 h-20 cursor-pointer opacity-0 hover:opacity-10 transition-opacity" title="开发者入口"></span>
 
     <main>
-        <!-- Hero区域 -->
         <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden hero-warm-bg">
             <div class="relative z-10 text-center max-w-5xl mx-auto animate-fade-in">
                 <div class="inline-flex items-center gap-3 horse-year-decoration mb-8 animate-slide-in px-5 py-2 rounded-full">
@@ -639,7 +444,6 @@
             </div>
         </section>
 
-        <!-- 项目集 -->
         <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
             <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
                 <div><h2 class="text-5xl font-black tracking-tight mb-3 title-decoration text-brand-espresso font-display">精选作品</h2><p class="text-brand-mocha text-lg">匠心独运 · 每一行代码皆有灵魂</p></div>
@@ -680,7 +484,6 @@
             </div>
         </section>
 
-        <!-- 创意实验室 -->
         <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-brand-warm/25 to-transparent">
             <div class="container mx-auto px-6 max-w-7xl">
                 <div class="text-center mb-20"><h2 class="text-5xl font-black mb-5 title-decoration inline-block relative font-display text-brand-espresso">✨ 创意实验室</h2><p class="text-brand-mocha mt-4">原型 · 跨界 · 未来感</p></div>
@@ -692,7 +495,6 @@
             </div>
         </section>
 
-        <!-- 关于 -->
         <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
             <div class="grid lg:grid-cols-2 gap-16">
                 <div class="glass-card-modern p-12 rounded-3xl">
@@ -731,12 +533,15 @@
                     <div class="mt-6">
                         <p class="text-brand-copperDark text-sm font-medium">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p>
                     </div>
+                    <!-- 新增更新日期 -->
+                    <div class="mt-4 pt-4 border-t border-brand-sand/40">
+                        <p class="text-xs text-brand-mocha/70 tracking-wider">本站最后更新于 2026年4月30日</p>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- 密码模态窗 -->
     <div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/25 backdrop-blur-sm" id="passwordModal">
         <div class="glass-card-modern w-full max-w-md p-10 rounded-3xl bg-white/80">
             <div class="text-center"><div class="w-20 h-20 bg-brand-copper/15 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div><h3 class="text-2xl font-bold text-brand-espresso">开发者验证</h3><p class="text-brand-mocha">输入调试密码</p></div>
@@ -746,11 +551,11 @@
         </div>
     </div>
 
-    <!-- 实时时钟 (隐藏) -->
     <span id="liveClock" class="hidden"></span>
 
     <script>
         (function() {
+            // 加载遮罩
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 window.addEventListener('load', () => {
@@ -761,18 +566,19 @@
                 });
             }
 
+            // 实时时钟
             setInterval(() => {
                 const clock = document.getElementById('liveClock');
                 if (clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
             }, 1000);
 
+            // 密码模态窗
             const pwdModal = document.getElementById('passwordModal');
             const trigger = document.getElementById('navBrandTrigger');
             const confirm = document.getElementById('confirmBtn');
             const cancel = document.getElementById('cancelBtn');
             const pwdInput = document.getElementById('passwordInput');
             const errMsg = document.getElementById('errorMessage');
-
             if (trigger && pwdModal) {
                 trigger.addEventListener('click', () => {
                     pwdModal.classList.remove('hidden');
@@ -780,16 +586,11 @@
                     if (pwdInput) pwdInput.focus();
                 });
             }
-
             const closeModal = () => {
-                if (pwdModal) {
-                    pwdModal.classList.add('hidden');
-                    pwdModal.classList.remove('flex');
-                }
+                if (pwdModal) { pwdModal.classList.add('hidden'); pwdModal.classList.remove('flex'); }
                 if (errMsg) errMsg.classList.add('hidden');
                 if (pwdInput) pwdInput.value = '';
             };
-
             if (cancel) cancel.addEventListener('click', closeModal);
             if (confirm) {
                 confirm.addEventListener('click', () => {
@@ -804,17 +605,38 @@
                     }
                 });
             }
-            if (pwdInput) {
-                pwdInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && confirm) confirm.click();
-                });
-            }
+            if (pwdInput) pwdInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && confirm) confirm.click(); });
 
+            // 技能条动画
             document.querySelectorAll('.skill-progress-modern').forEach(bar => {
                 const w = bar.style.width;
                 bar.style.width = '0%';
                 setTimeout(() => { bar.style.width = w; }, 200);
             });
+
+            // 左下角菜单交互
+            const menuToggle = document.getElementById('quickMenuToggle');
+            const menuPanel = document.getElementById('quickMenuPanel');
+            const menuIcon = document.getElementById('menuIcon');
+            if (menuToggle && menuPanel && menuIcon) {
+                menuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isHidden = menuPanel.classList.contains('hidden');
+                    if (isHidden) {
+                        menuPanel.classList.remove('hidden');
+                        menuIcon.textContent = '✕';
+                    } else {
+                        menuPanel.classList.add('hidden');
+                        menuIcon.textContent = '☰';
+                    }
+                });
+                document.addEventListener('click', (e) => {
+                    if (!menuToggle.contains(e.target) && !menuPanel.contains(e.target)) {
+                        menuPanel.classList.add('hidden');
+                        menuIcon.textContent = '☰';
+                    }
+                });
+            }
 
             console.log("%c🦝 温暖大地 · 软软的小窝", "color:#C17F59; font-size:16px; font-weight:bold;");
             console.log("%cRaccoon.Fit — Stay Curious, Stay Creative", "color:#5C3D2E; font-size:12px;");

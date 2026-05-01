@@ -55,592 +55,479 @@
                         'menu-pop': 'menuPop 0.3s ease-out',
                     },
                     keyframes: {
-                        floatSoft: {
-                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-                            '50%': { transform: 'translateY(-14px) rotate(1.5deg)' },
-                        },
-                        glowPulse: {
-                            '0%, 100%': { boxShadow: '0 0 0px rgba(193,127,89,0)' },
-                            '50%': { boxShadow: '0 0 28px rgba(193,127,89,0.25)' },
-                        },
-                        shimmerSlow: {
-                            '100%': { transform: 'translateX(100%)' },
-                        },
-                        scaleSubtle: {
-                            '0%, 100%': { transform: 'scale(1)' },
-                            '50%': { transform: 'scale(1.015)' },
-                        },
-                        slideIn: {
-                            '0%': { transform: 'translateY(24px)', opacity: 0 },
-                            '100%': { transform: 'translateY(0)', opacity: 1 },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: 0 },
-                            '100%': { opacity: 1 },
-                        },
-                        borderGlow: {
-                            '0%, 100%': { borderColor: 'rgba(193,127,89,0.15)' },
-                            '50%': { borderColor: 'rgba(193,127,89,0.55)' },
-                        },
-                        gradientShift: {
-                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' },
-                        },
-                        drift: {
-                            '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-                            '33%': { transform: 'translate(18px, -10px) scale(1.03)' },
-                            '66%': { transform: 'translate(-12px, 8px) scale(0.97)' },
-                        },
-                        warmPulse: {
-                            '0%, 100%': { boxShadow: '0 0 18px rgba(193,127,89,0.15)' },
-                            '50%': { boxShadow: '0 0 36px rgba(193,127,89,0.35)' },
-                        },
-                        menuPop: {
-                            '0%': { transform: 'translateY(12px) scale(0.95)', opacity: 0 },
-                            '100%': { transform: 'translateY(0) scale(1)', opacity: 1 },
-                        },
+                        floatSoft: { '0%,100%':{transform:'translateY(0px) rotate(0deg)'}, '50%':{transform:'translateY(-14px) rotate(1.5deg)'} },
+                        glowPulse: { '0%,100%':{boxShadow:'0 0 0px rgba(193,127,89,0)'}, '50%':{boxShadow:'0 0 28px rgba(193,127,89,0.25)'} },
+                        shimmerSlow: { '100%':{transform:'translateX(100%)'} },
+                        scaleSubtle: { '0%,100%':{transform:'scale(1)'}, '50%':{transform:'scale(1.015)'} },
+                        slideIn: { '0%':{transform:'translateY(24px)',opacity:0}, '100%':{transform:'translateY(0)',opacity:1} },
+                        fadeIn: { '0%':{opacity:0}, '100%':{opacity:1} },
+                        borderGlow: { '0%,100%':{borderColor:'rgba(193,127,89,0.15)'}, '50%':{borderColor:'rgba(193,127,89,0.55)'} },
+                        gradientShift: { '0%,100%':{backgroundPosition:'0% 50%'}, '50%':{backgroundPosition:'100% 50%'} },
+                        drift: { '0%,100%':{transform:'translate(0,0) scale(1)'}, '33%':{transform:'translate(18px,-10px) scale(1.03)'}, '66%':{transform:'translate(-12px,8px) scale(0.97)'} },
+                        warmPulse: { '0%,100%':{boxShadow:'0 0 18px rgba(193,127,89,0.15)'}, '50%':{boxShadow:'0 0 36px rgba(193,127,89,0.35)'} },
+                        menuPop: { '0%':{transform:'translateY(12px) scale(0.95)',opacity:0}, '100%':{transform:'translateY(0) scale(1)',opacity:1} },
                     },
                     backgroundImage: {
                         'gradient-radial': 'radial-gradient(circle at 50% 30%, var(--tw-gradient-stops))',
                         'noise-pattern': "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E\")",
                         'grain-pattern': "url(\"data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
                     },
-                    backdropBlur: {
-                        'xs': '2px',
-                    }
+                    backdropBlur: { 'xs': '2px' }
                 }
             }
         }
     </script>
     <style>
-        /* ========== 温暖大地色主题 · 完全重构 ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* 彻底移除所有浏览器默认蓝色外框和蓝色下划线 */
-        *, *:focus, *:active, *:hover {
-            outline: none !important;
-            -webkit-tap-highlight-color: transparent !important;
-        }
-        a, a:hover, a:focus, a:active, a:visited {
-            text-decoration: none !important;
-            color: inherit;
-        }
-        button:focus, input:focus, textarea:focus, select:focus {
-            outline: none !important;
-            box-shadow: none !important; /* 全局清除任何默认box-shadow，若有自定义会覆盖 */
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        *, *:focus, *:active, *:hover { outline:none !important; -webkit-tap-highlight-color:transparent !important; }
+        a, a:hover, a:focus, a:active, a:visited { text-decoration:none !important; color:inherit; }
+        button:focus, input:focus, textarea:focus, select:focus { outline:none !important; box-shadow:none !important; }
 
         body {
-            background: #FDF7F0;
-            background-image:
-                radial-gradient(ellipse at 25% 20%, rgba(212, 160, 84, 0.12) 0%, transparent 40%),
-                radial-gradient(ellipse at 75% 65%, rgba(193, 127, 89, 0.10) 0%, transparent 45%),
-                radial-gradient(ellipse at 50% 85%, rgba(232, 213, 192, 0.18) 0%, transparent 35%),
-                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.014'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            color: #3C2415;
-            font-smooth: antialiased;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-            transition: background 0.3s;
-            font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+            background:#FDF7F0;
+            background-image: radial-gradient(ellipse at 25% 20%, rgba(212,160,84,0.12) 0%, transparent 40%), radial-gradient(ellipse at 75% 65%, rgba(193,127,89,0.10) 0%, transparent 45%), radial-gradient(ellipse at 50% 85%, rgba(232,213,192,0.18) 0%, transparent 35%), url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.014'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color:#3C2415; font-smooth:antialiased; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+            font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
         }
 
-        /* body 内边距：按浏览器兼容分层 */
-        body { padding-top: 160px !important; }
-        @supports (backdrop-filter: blur(1px)) {
-            body { padding-top: 120px !important; }
-        }
-        @media (max-width: 768px) {
-            body { padding-top: 150px !important; }
-            @supports (backdrop-filter: blur(1px)) {
-                body { padding-top: 130px !important; }
-            }
+        body { padding-top:160px !important; }
+        @supports (backdrop-filter: blur(1px)) { body { padding-top:120px !important; } }
+        @media (max-width:768px) {
+            body { padding-top:150px !important; }
+            @supports (backdrop-filter: blur(1px)) { body { padding-top:130px !important; } }
         }
 
-        /* 玻璃卡片 */
         .glass-modern {
-            background: rgba(255, 248, 240, 0.72);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(232, 213, 192, 0.55);
-            border-radius: 22px;
-            box-shadow: 0 12px 32px rgba(60, 36, 21, 0.06), inset 0 1px 2px rgba(255,255,255,0.7);
+            background:rgba(255,248,240,0.72); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(232,213,192,0.55); border-radius:22px;
+            box-shadow:0 12px 32px rgba(60,36,21,0.06),inset 0 1px 2px rgba(255,255,255,0.7);
         }
         .glass-card-modern {
-            background: rgba(255, 248, 240, 0.75);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(232, 213, 192, 0.6);
-            border-radius: 22px;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 6px 24px rgba(60, 36, 21, 0.05);
+            background:rgba(255,248,240,0.75); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+            border:1px solid rgba(232,213,192,0.6); border-radius:22px;
+            transition:all 0.4s cubic-bezier(0.23,1,0.32,1); position:relative; overflow:hidden;
+            box-shadow:0 6px 24px rgba(60,36,21,0.05);
         }
         .glass-card-modern::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(193,127,89,0.45), rgba(212,160,84,0.35), transparent);
-            z-index: 1;
+            content:''; position:absolute; top:0; left:0; right:0; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(193,127,89,0.45),rgba(212,160,84,0.35),transparent); z-index:1;
         }
         .glass-card-modern::after {
-            content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(232,213,192,0.4), transparent);
-            z-index: 1; opacity: 0; transition: opacity 0.4s;
+            content:''; position:absolute; bottom:0; left:20%; right:20%; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(232,213,192,0.4),transparent); z-index:1; opacity:0; transition:opacity 0.4s;
         }
         .glass-card-modern:hover {
-            border-color: rgba(193,127,89,0.5);
-            background: rgba(255,252,247,0.9);
-            transform: translateY(-7px) scale(1.012);
-            box-shadow: 0 22px 40px -10px rgba(60,36,21,0.13), 0 0 0 1px rgba(193,127,89,0.2);
+            border-color:rgba(193,127,89,0.5); background:rgba(255,252,247,0.9); transform:translateY(-7px) scale(1.012);
+            box-shadow:0 22px 40px -10px rgba(60,36,21,0.13),0 0 0 1px rgba(193,127,89,0.2);
         }
-        .glass-card-modern:hover::after { opacity: 1; }
+        .glass-card-modern:hover::after { opacity:1; }
 
-        /* 按钮 */
         .btn-primary {
-            background: linear-gradient(135deg, #C17F59 0%, #A05A35 100%);
-            color: #FFFBF7; font-weight: 700; border-radius: 16px; border: none;
-            position: relative; overflow: hidden; transition: all 0.35s ease;
-            box-shadow: 0 8px 20px rgba(160,90,53,0.3); letter-spacing: 0.01em;
+            background:linear-gradient(135deg,#C17F59 0%,#A05A35 100%); color:#FFFBF7; font-weight:700; border-radius:16px; border:none;
+            position:relative; overflow:hidden; transition:all 0.35s ease; box-shadow:0 8px 20px rgba(160,90,53,0.3);
         }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(160,90,53,0.4); }
+        .btn-primary:hover { transform:translateY(-3px); box-shadow:0 14px 30px rgba(160,90,53,0.4); }
         .btn-primary::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,248,240,0.28), transparent);
-            transition: left 0.65s;
+            content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+            background:linear-gradient(90deg,transparent,rgba(255,248,240,0.28),transparent); transition:left 0.65s;
         }
-        .btn-primary:hover::after { left: 100%; }
+        .btn-primary:hover::after { left:100%; }
 
         .btn-secondary {
-            background: rgba(255,248,240,0.7); backdrop-filter: blur(8px);
-            border: 1px solid rgba(193,127,89,0.18); color: #3C2415; border-radius: 16px;
-            transition: all 0.35s; font-weight: 600;
+            background:rgba(255,248,240,0.7); backdrop-filter:blur(8px); border:1px solid rgba(193,127,89,0.18);
+            color:#3C2415; border-radius:16px; transition:all 0.35s; font-weight:600;
         }
-        .btn-secondary:hover {
-            background: rgba(255,252,247,0.95); border-color: rgba(193,127,89,0.5);
-            color: #1a0d06; box-shadow: 0 4px 16px rgba(160,90,53,0.12);
-        }
+        .btn-secondary:hover { background:rgba(255,252,247,0.95); border-color:rgba(193,127,89,0.5); color:#1a0d06; }
 
-        .skill-bar { height: 7px; background: rgba(193,127,89,0.08); border-radius: 10px; overflow: hidden; }
+        .skill-bar { height:7px; background:rgba(193,127,89,0.08); border-radius:10px; overflow:hidden; }
         .skill-progress-modern {
-            height: 100%; border-radius: 10px;
-            background: linear-gradient(90deg, #C17F59, #D4A37A, #D4A054);
-            box-shadow: 0 0 12px rgba(193,127,89,0.3);
-            transition: width 1.3s cubic-bezier(0.22,0.68,0,1.71);
+            height:100%; border-radius:10px; background:linear-gradient(90deg,#C17F59,#D4A37A,#D4A054);
+            box-shadow:0 0 12px rgba(193,127,89,0.3); transition:width 1.3s cubic-bezier(0.22,0.68,0,1.71);
         }
 
         .title-decoration::after {
-            content: ''; position: absolute; bottom: -10px; left: 0; width: 50px; height: 3px;
-            background: linear-gradient(90deg, #C17F59, #D4A054, transparent); border-radius: 2px;
+            content:''; position:absolute; bottom:-10px; left:0; width:50px; height:3px;
+            background:linear-gradient(90deg,#C17F59,#D4A054,transparent); border-radius:2px;
         }
 
         .tag-modern {
-            display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 22px;
-            font-size: 11px; font-weight: 600; background: rgba(193,127,89,0.1);
-            border: 1px solid rgba(193,127,89,0.22); color: #8B4A2A; letter-spacing: 0.02em;
+            display:inline-flex; align-items:center; padding:5px 14px; border-radius:22px; font-size:11px; font-weight:600;
+            background:rgba(193,127,89,0.1); border:1px solid rgba(193,127,89,0.22); color:#8B4A2A;
         }
 
-        /* 滚动条 */
-        ::-webkit-scrollbar { width: 7px; }
-        ::-webkit-scrollbar-track { background: rgba(232,213,192,0.5); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #C17F59; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #A05A35; }
+        ::-webkit-scrollbar { width:7px; }
+        ::-webkit-scrollbar-track { background:rgba(232,213,192,0.5); border-radius:4px; }
+        ::-webkit-scrollbar-thumb { background:#C17F59; border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background:#A05A35; }
 
-        /* 搜索框 */
         #globalNavInput {
-            background: rgba(255,252,247,0.9) !important;
-            border: 1.5px solid rgba(193,127,89,0.35) !important;
-            color: #3C2415 !important; font-weight: 500;
-            box-shadow: 0 4px 12px rgba(60,36,21,0.04); transition: all 0.25s;
+            background:rgba(255,252,247,0.9)!important; border:1.5px solid rgba(193,127,89,0.35)!important;
+            color:#3C2415!important; font-weight:500; box-shadow:0 4px 12px rgba(60,36,21,0.04); transition:all 0.25s;
         }
         #globalNavInput:focus {
-            border-color: #C17F59 !important;
-            box-shadow: 0 0 0 5px rgba(193,127,89,0.12), 0 6px 14px rgba(0,0,0,0.03) !important;
-            background: #FFFBF7 !important;
+            border-color:#C17F59!important; box-shadow:0 0 0 5px rgba(193,127,89,0.12),0 6px 14px rgba(0,0,0,0.03)!important;
+            background:#FFFBF7!important;
         }
-        #globalNavInput::placeholder { color: #B89580; font-weight: 400; }
+        #globalNavInput::placeholder { color:#B89580; }
 
-        /* IE栏 */
         .ie-banner {
-            background: #FFF3E6 !important; border-bottom: 3px solid #C17F59 !important;
-            padding: 16px 20px !important; font-size: 18px !important; font-weight: 700 !important;
-            text-align: center !important; display: block !important; width: 100% !important;
-            z-index: 9999 !important; position: fixed !important; top: 0 !important; left: 0 !important;
-            color: #5C1A00 !important; box-shadow: 0 4px 20px rgba(160,90,53,0.35) !important;
-            letter-spacing: 0.03em !important;
+            background:#FFF3E6!important; border-bottom:3px solid #C17F59!important; padding:16px 20px!important;
+            font-size:18px!important; font-weight:700!important; text-align:center!important; display:block!important;
+            width:100%!important; z-index:9999!important; position:fixed!important; top:0!important; left:0!important;
+            color:#5C1A00!important; box-shadow:0 4px 20px rgba(160,90,53,0.35)!important;
         }
-        .ie-banner a {
-            color: #8B3A1A !important; font-size: 18px !important; font-weight: 700 !important;
-            text-decoration: underline !important; text-underline-offset: 4px; text-decoration-thickness: 2px;
-        }
-        .ie-banner .ie-subtitle { font-size: 14px !important; font-weight: 500; color: #6B3A20; display: block; margin-top: 4px; }
+        .ie-banner a { color:#8B3A1A!important; font-size:18px!important; font-weight:700!important; text-decoration:underline!important; }
+        .ie-banner .ie-subtitle { font-size:14px; color:#6B3A20; display:block; margin-top:4px; }
 
         @supports (backdrop-filter: blur(1px)) {
             .ie-banner {
-                background: rgba(255,248,240,0.7) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(193,127,89,0.2) !important; padding: 10px 16px !important;
-                font-size: 13px !important; font-weight: 500 !important; text-align: left !important;
-                box-shadow: 0 1px 8px rgba(60,36,21,0.04) !important; letter-spacing: 0.01em !important;
-                display: flex !important; flex-wrap: wrap; align-items: center; justify-content: space-between;
-                color: #3C2415 !important;
+                background:rgba(255,248,240,0.7)!important; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+                border-bottom:1px solid rgba(193,127,89,0.2)!important; padding:10px 16px!important; font-size:13px!important;
+                font-weight:500!important; text-align:left!important; box-shadow:0 1px 8px rgba(60,36,21,0.04)!important;
+                display:flex!important; flex-wrap:wrap; align-items:center; justify-content:space-between; color:#3C2415!important;
             }
-            .ie-banner a { color: #5C3D2E !important; font-size: 13px !important; font-weight: 500; text-decoration: none !important; }
-            .ie-banner a:hover { color: #A05A35 !important; text-decoration: underline !important; }
-            .ie-banner .ie-subtitle { font-size: 11px; color: #8B6B55; display: inline; margin-top: 0; }
+            .ie-banner a { color:#5C3D2E!important; font-size:13px!important; font-weight:500; text-decoration:none!important; }
+            .ie-banner a:hover { color:#A05A35!important; text-decoration:underline!important; }
+            .ie-banner .ie-subtitle { font-size:11px; color:#8B6B55; display:inline; margin-top:0; }
         }
 
-        .nav-search-bar {
-            top: 70px; background: rgba(255,248,240,0.65);
-            backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-            border-bottom: 1px solid rgba(232,213,192,0.5);
-        }
-        @supports (backdrop-filter: blur(1px)) { .nav-search-bar { top: 52px !important; } }
+        .nav-search-bar { top:70px; background:rgba(255,248,240,0.65); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border-bottom:1px solid rgba(232,213,192,0.5); }
+        @supports (backdrop-filter: blur(1px)) { .nav-search-bar { top:52px!important; } }
 
-        h1,h2,h3,h4 { color: #2C1808; }
-        .text-gray-300,.text-gray-400,.text-gray-500 { color: #5C3D2E !important; }
-        p,.text-gray-400 { color: #4A3022; }
-        footer .glass-card-modern { background: rgba(255,248,240,0.6); }
-        footer p, footer a { color: #3C2415; }
+        footer .glass-card-modern { background:rgba(255,248,240,0.6); }
         .hero-warm-bg {
             background: radial-gradient(ellipse at 30% 25%, rgba(212,160,84,0.13) 0%, transparent 55%),
                         radial-gradient(ellipse at 70% 60%, rgba(193,127,89,0.10) 0%, transparent 50%),
                         radial-gradient(ellipse at 50% 80%, rgba(232,213,192,0.16) 0%, transparent 40%);
         }
-        #liveClock { color: #A05A35 !important; font-variant-numeric: tabular-nums; }
-        #loadingOverlay { background: #FDF7F0; z-index: 99999; }
-        #passwordModal .glass-card-modern { background: rgba(255,248,240,0.9); }
-        .nav-modern a, .nav-modern span:not(.btn-primary) { color: #3C2415; }
-        .horse-year-decoration { background: rgba(255,248,240,0.6); border: 1px solid rgba(212,160,84,0.4); }
 
-        /* 左下角菜单 */
         .quick-menu-btn {
-            background: rgba(255,248,240,0.75); backdrop-filter: blur(16px);
-            border: 1px solid rgba(193,127,89,0.35); border-radius: 50%;
-            width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 8px 22px rgba(60,36,21,0.1); transition: all 0.3s;
-            font-size: 24px; cursor: pointer; z-index: 101;
+            background:rgba(255,248,240,0.75); backdrop-filter:blur(16px); border:1px solid rgba(193,127,89,0.35);
+            border-radius:50%; width:52px; height:52px; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 8px 22px rgba(60,36,21,0.1); transition:all 0.3s; font-size:24px; cursor:pointer; z-index:101;
         }
-        .quick-menu-btn:hover { background: rgba(255,252,247,0.95); border-color: #C17F59; transform: scale(1.08); }
+        .quick-menu-btn:hover { background:rgba(255,252,247,0.95); border-color:#C17F59; transform:scale(1.08); }
         .quick-menu-panel {
-            background: rgba(255,248,240,0.85); backdrop-filter: blur(24px);
-            border: 1px solid rgba(193,127,89,0.4); border-radius: 24px;
-            box-shadow: 0 16px 40px rgba(60,36,21,0.15); padding: 12px;
-            display: flex; flex-direction: column; gap: 4px; animation: menuPop 0.3s ease-out;
+            background:rgba(255,248,240,0.85); backdrop-filter:blur(24px); border:1px solid rgba(193,127,89,0.4);
+            border-radius:24px; box-shadow:0 16px 40px rgba(60,36,21,0.15); padding:12px;
+            display:flex; flex-direction:column; gap:4px; animation:menuPop 0.3s ease-out;
         }
         .quick-menu-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-            border-radius: 16px; color: #3C2415; font-weight: 600; transition: all 0.2s;
-            background: transparent; white-space: nowrap;
+            display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:16px;
+            color:#3C2415; font-weight:600; transition:all 0.2s; background:transparent;
         }
-        .quick-menu-item:hover { background: rgba(193,127,89,0.1); color: #A05A35; }
+        .quick-menu-item:hover { background:rgba(193,127,89,0.1); color:#A05A35; }
+
+        .card-discontinued {
+            filter: grayscale(0.4); opacity:0.85;
+        }
+        .card-discontinued:hover {
+            filter: grayscale(0.1); opacity:1;
+        }
     </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
 
-    <div id="loadingOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center transition-opacity duration-500">
-        <div class="text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-brand-copper border-t-transparent animate-spin"></div>
-            <p class="text-brand-espresso font-medium tracking-wide">🦝 软软的小窝 · 加载中...</p>
-        </div>
+<div id="loadingOverlay" class="fixed inset-0 z-[99999] flex items-center justify-center transition-opacity duration-500">
+    <div class="text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-brand-copper border-t-transparent animate-spin"></div>
+        <p class="text-brand-espresso font-medium tracking-wide">🦝 软软的小窝 · 加载中...</p>
     </div>
+</div>
 
-    <!-- IE兼容版提示栏 -->
-    <div class="ie-banner fixed top-0 left-0 w-full text-sm" style="z-index:9998;">
-        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;max-width:1200px;margin:0 auto;gap:8px;">
-            <a href="index-ie.html" class="inline-flex items-center gap-2 transition-all group">
-                <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                <span>IE兼容版入口</span>
-            </a>
-            <span class="ie-subtitle"><span class="animate-pulse">🐴</span> 丙午新禧 · 马到功成 <span class="hidden sm:inline">✨</span></span>
-        </div>
+<div class="ie-banner fixed top-0 left-0 w-full text-sm" style="z-index:9998;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;max-width:1200px;margin:0 auto;gap:8px;">
+        <a href="index-ie.html" class="inline-flex items-center gap-2 transition-all group">
+            <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span>IE兼容版入口</span>
+        </a>
+        <span class="ie-subtitle"><span class="animate-pulse">🐴</span> 丙午新禧 · 马到功成 <span class="hidden sm:inline">✨</span></span>
     </div>
+</div>
 
-    <!-- 网址导航条 -->
-    <div class="nav-search-bar fixed left-0 w-full z-[9997] py-3 px-4 shadow-sm">
-        <div class="container mx-auto flex items-center gap-3 max-w-4xl">
-            <span class="text-brand-copper text-lg hidden sm:inline">🦝</span>
-            <div class="relative flex-1">
-                <input type="text" id="globalNavInput" placeholder="🔍 输入网址或搜索关键词，回车直达…" class="w-full bg-white/80 border border-white/60 rounded-full px-6 py-3.5 text-gray-800 placeholder-gray-500 focus:border-brand-copper focus:ring-0 outline-none transition-all text-base font-medium shadow-md">
-                <button id="globalNavBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-brand-copper to-brand-copperDark hover:from-brand-copperDark hover:to-brand-copper text-white rounded-full w-12 h-10 flex items-center justify-center transition-all shadow-lg shadow-brand-copper/40">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </button>
-            </div>
-            <span class="hidden md:inline text-brand-mocha text-sm font-mono tracking-wider">按"回车键"快速跳转</span>
+<div class="nav-search-bar fixed left-0 w-full z-[9997] py-3 px-4 shadow-sm">
+    <div class="container mx-auto flex items-center gap-3 max-w-4xl">
+        <span class="text-brand-copper text-lg hidden sm:inline">🦝</span>
+        <div class="relative flex-1">
+            <input type="text" id="globalNavInput" placeholder="🔍 输入网址或搜索关键词，回车直达…" class="w-full bg-white/80 border border-white/60 rounded-full px-6 py-3.5 text-gray-800 placeholder-gray-500 focus:border-brand-copper focus:ring-0 outline-none transition-all text-base font-medium shadow-md">
+            <button id="globalNavBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-brand-copper to-brand-copperDark hover:from-brand-copperDark hover:to-brand-copper text-white rounded-full w-12 h-10 flex items-center justify-center transition-all shadow-lg shadow-brand-copper/40">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
         </div>
+        <span class="hidden md:inline text-brand-mocha text-sm font-mono tracking-wider">按"回车键"快速跳转</span>
     </div>
+</div>
 
-    <script>
-        (function() {
-            const initNav = function() {
-                const input = document.getElementById('globalNavInput');
-                const btn = document.getElementById('globalNavBtn');
-                if (!input || !btn) return;
-                function handleNavigate() {
-                    let raw = input.value.trim();
-                    if (!raw) return;
-                    const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
-                    let finalUrl = raw;
-                    if (!isUrl) finalUrl = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
-                    else if (!/^https?:\/\//i.test(raw)) finalUrl = 'https://' + raw;
-                    window.open(finalUrl, '_blank');
-                    input.value = '';
-                }
-                btn.addEventListener('click', handleNavigate);
-                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleNavigate(); });
-            };
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNav);
-            else initNav();
-        })();
-    </script>
-
-    <!-- 背景装饰 -->
-    <div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div class="absolute inset-0 bg-grain-pattern opacity-35"></div>
-        <div class="absolute top-1/5 left-1/6 w-[550px] h-[550px] bg-gradient-to-br from-amber-100/25 via-transparent to-transparent blur-[140px] rounded-full animate-float-soft"></div>
-        <div class="absolute bottom-1/4 right-1/5 w-[480px] h-[480px] bg-gradient-to-tl from-orange-100/20 via-transparent to-transparent blur-[110px] rounded-full animate-float-soft" style="animation-delay: 2.5s;"></div>
-        <div class="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-gradient-to-br from-yellow-100/18 via-transparent to-transparent blur-[100px] rounded-full animate-drift" style="animation-delay: 1s;"></div>
-    </div>
-
-    <!-- 左下角快速入口菜单 -->
-    <div class="fixed bottom-6 left-6 z-[100] flex flex-col items-start gap-2">
-        <button id="quickMenuToggle" class="quick-menu-btn" aria-label="快速入口" title="反馈 / 称号 / 客服中心">
-            <span class="transition-transform duration-300" id="menuIcon">☰</span>
-        </button>
-        <div id="quickMenuPanel" class="quick-menu-panel hidden">
-            <a href="http://raccoon.fit/反馈/" target="_blank" class="quick-menu-item">🐞 反馈建议</a>
-            <a href="http://raccoon.fit/称号" target="_blank" class="quick-menu-item">🏅 称号</a>
-            <a href="http://raccoon.fit/客服中心" target="_blank" class="quick-menu-item">💬 客服中心</a>
-        </div>
-    </div>
-
-    <!-- 隐藏密码触发器 -->
-    <span id="navBrandTrigger" class="fixed top-1/2 right-0 z-[99] w-8 h-20 cursor-pointer opacity-0 hover:opacity-10 transition-opacity" title="开发者入口"></span>
-
-    <main>
-        <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden hero-warm-bg">
-            <div class="relative z-10 text-center max-w-5xl mx-auto animate-fade-in">
-                <div class="inline-flex items-center gap-3 horse-year-decoration mb-8 animate-slide-in px-5 py-2 rounded-full">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span></span>
-                    <span class="text-sm font-medium text-brand-espresso">🐎 丙午马年 · 灵感奔腾</span>
-                </div>
-                <h1 class="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter font-display">
-                    <span class="bg-gradient-to-r from-brand-espresso to-brand-mocha bg-clip-text text-transparent">探索代码的</span><br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-copper via-brand-caramel to-brand-gold animate-glow-pulse">无限可能</span>
-                </h1>
-                <p class="text-brand-mocha text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-light text-balance">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
-                <div class="mb-10 inline-block px-6 py-3 rounded-full glass-modern border border-brand-sand/60 bg-white/60">
-                    <p class="text-brand-copperDark text-sm font-medium tracking-wide flex items-center gap-2"><span>✨</span><span>丙午新春 · 代码无bug · 创意绽放</span><span>✨</span></p>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-5 justify-center">
-                    <a class="btn-primary px-10 py-4 rounded-2xl" href="#projects">探索项目</a>
-                    <a class="btn-secondary px-10 py-4 rounded-2xl" href="http://github.com/raccoon-fit" target="_blank">GitHub 星系</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
-                <div><h2 class="text-5xl font-black tracking-tight mb-3 title-decoration text-brand-espresso font-display">精选作品</h2><p class="text-brand-mocha text-lg">匠心独运 · 每一行代码皆有灵魂</p></div>
-                <div class="h-px flex-1 bg-gradient-to-r from-transparent via-brand-copper/50 to-transparent hidden md:block"></div>
-                <span class="text-brand-copper font-mono text-sm tracking-widest">PORTFOLIO · 2025</span>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.1s;">
-                    <div class="text-5xl mb-5 opacity-80">💻</div><div class="flex gap-2 mb-5"><span class="tag-modern">在线IDE</span><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">PRO</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">Ride</h3><p class="text-brand-mocha text-sm mb-8">高性能云端开发环境，极速部署。</p>
-                    <a href="http://raccoon.fit/Ride" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-                </div>
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.2s;">
-                    <div class="text-5xl mb-5">📺</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">直播工具</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">B站直播流获取</h3><p class="text-brand-mocha text-sm mb-8">开发者专属 · 一键获取直播源。</p>
-                    <a href="http://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-                </div>
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in grayscale hover:grayscale-0 transition-all" style="animation-delay: 0.3s;">
-                    <div class="text-5xl mb-5">📱</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-600">归档库</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">MULU</h3><p class="text-brand-mocha text-sm mb-8">移动应用探索史 · React Native实践。</p>
-                    <button class="mt-auto w-full p-4 rounded-xl bg-gray-200/70 text-gray-500 cursor-not-allowed font-bold">已归档</button>
-                </div>
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.4s;">
-                    <div class="text-5xl mb-5">🐻</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-emerald-100 text-emerald-700">Vue3</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">灵熊小记</h3><p class="text-brand-mocha text-sm mb-8">你的神奇笔记助手。</p>
-                    <a href="http://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/停运公告.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>访问项目</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-                </div>
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.5s;">
-                    <div class="text-5xl mb-5">🎮</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-purple-100 text-purple-700">HTML5</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">小游戏库</h3><p class="text-brand-mocha text-sm mb-8">趣味创意轻量互动。</p>
-                    <a href="http://raccoon.fit/game" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-                </div>
-                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.6s;">
-                    <div class="text-5xl mb-5">🤖</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-amber-100 text-amber-700">AI 先锋</span></div>
-                    <h3 class="text-2xl font-bold mb-3 text-brand-espresso">RACCOON AI</h3><p class="text-brand-mocha text-sm mb-8">对话大模型探索。</p>
-                    <a href="http://raccoon.fit/ai" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>体验AI</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-                </div>
-            </div>
-        </section>
-
-        <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-brand-warm/25 to-transparent">
-            <div class="container mx-auto px-6 max-w-7xl">
-                <div class="text-center mb-20"><h2 class="text-5xl font-black mb-5 title-decoration inline-block relative font-display text-brand-espresso">✨ 创意实验室</h2><p class="text-brand-mocha mt-4">原型 · 跨界 · 未来感</p></div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">🔮</div><h3 class="text-2xl font-bold text-brand-espresso">AI 辅助设计</h3><p class="text-brand-mocha">生成式UI探索。</p></div>
-                    <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">⚡</div><h3 class="text-2xl font-bold text-brand-espresso">交互原型</h3><p class="text-brand-mocha">高级微动效。</p></div>
-                    <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">📊</div><h3 class="text-2xl font-bold text-brand-espresso">数据可视化</h3><p class="text-brand-mocha">动态叙事。</p></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
-            <div class="grid lg:grid-cols-2 gap-16">
-                <div class="glass-card-modern p-12 rounded-3xl">
-                    <h3 class="text-4xl font-black mb-6 title-decoration relative font-display text-brand-espresso">关于软软</h3>
-                    <div class="space-y-5 text-brand-mocha"><p>技术与设计的狂热信徒，信奉「简洁即力量」。</p><p>Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p><p class="text-brand-copper font-semibold text-lg">保持好奇 · 永远优雅地解决问题</p></div>
-                    <div class="mt-10"><a class="inline-flex items-center gap-2 text-brand-espresso font-bold group" href="me"><span class="border-b-2 border-brand-copper pb-1">探索个人主页</span><svg class="w-5 h-5 text-brand-copper group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a></div>
-                </div>
-                <div>
-                    <h4 class="text-2xl font-black flex items-center gap-3 mb-10 text-brand-espresso"><span class="w-10 h-[2px] bg-brand-copper"></span><span>核心能力</span></h4>
-                    <div class="space-y-7">
-                        <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">前端架构</span><span class="text-brand-copper font-bold">90%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:90%"></div></div></div>
-                        <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">UI/UX设计</span><span class="text-brand-copper font-bold">82%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:82%"></div></div></div>
-                        <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">产品思维</span><span class="text-brand-copper font-bold">85%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:85%"></div></div></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="pb-20 pt-28 px-6">
-        <div class="container mx-auto max-w-6xl">
-            <div class="glass-card-modern p-12 md:p-16 text-center relative overflow-hidden">
-                <div class="relative z-10">
-                    <div class="w-24 h-24 mx-auto bg-gradient-to-br from-brand-copper to-brand-copperDark rounded-3xl flex items-center justify-center text-4xl shadow-xl mb-8 animate-warm-pulse">🦝</div>
-                    <h2 class="text-4xl font-black mb-4 font-display text-brand-espresso">软软的小窝</h2>
-                    <p class="text-brand-mocha max-w-md mx-auto mb-12">探索 · 创造 · 成长 — 期待与你共鸣。</p>
-                    <div class="flex flex-wrap justify-center gap-8 mb-12">
-                        <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="mailto:2051775505@qq.com">✉️ 邮箱</a>
-                        <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="http://github.com/raccoon-fit" target="_blank">🐙 GitHub</a>
-                        <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="http://raccoon.fit">🌐 官网</a>
-                    </div>
-                    <div class="pt-8 border-t border-brand-sand/50">
-                        <p class="text-brand-mocha text-xs">© 2025-2026 软软 · 浣熊设计哲学</p>
-                        <p class="text-[10px] font-mono text-brand-copper/70 mt-1">STAY CURIOUS · STAY CREATIVE</p>
-                    </div>
-                    <div class="mt-6">
-                        <p class="text-brand-copperDark text-sm font-medium">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p>
-                    </div>
-                    <!-- 新增更新日期 -->
-                    <div class="mt-4 pt-4 border-t border-brand-sand/40">
-                        <p class="text-xs text-brand-mocha/70 tracking-wider">本站最后更新于 2026年4月30日</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/25 backdrop-blur-sm" id="passwordModal">
-        <div class="glass-card-modern w-full max-w-md p-10 rounded-3xl bg-white/80">
-            <div class="text-center"><div class="w-20 h-20 bg-brand-copper/15 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div><h3 class="text-2xl font-bold text-brand-espresso">开发者验证</h3><p class="text-brand-mocha">输入调试密码</p></div>
-            <input type="password" id="passwordInput" class="w-full mt-6 bg-white/90 border border-brand-sand/60 rounded-2xl px-5 py-3.5 text-center text-brand-espresso focus:border-brand-copper outline-none transition-all" placeholder="••••••••">
-            <p id="errorMessage" class="text-red-500 text-xs text-center mt-2 hidden">密码错误，再试试看~</p>
-            <div class="flex gap-3 mt-8"><button id="cancelBtn" class="flex-1 py-3.5 btn-secondary">取消</button><button id="confirmBtn" class="flex-1 py-3.5 btn-primary">确认</button></div>
-        </div>
-    </div>
-
-    <span id="liveClock" class="hidden"></span>
-
-    <script>
-        (function() {
-            // 加载遮罩
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                window.addEventListener('load', () => {
-                    setTimeout(() => {
-                        overlay.style.opacity = '0';
-                        setTimeout(() => overlay.classList.add('hidden'), 600);
-                    }, 500);
-                });
+<script>
+    (function() {
+        const initNav = function() {
+            const input = document.getElementById('globalNavInput');
+            const btn = document.getElementById('globalNavBtn');
+            if (!input || !btn) return;
+            function handleNavigate() {
+                let raw = input.value.trim();
+                if (!raw) return;
+                const isUrl = /^https?:\/\//i.test(raw) || /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(raw);
+                let finalUrl = raw;
+                if (!isUrl) finalUrl = `https://www.bing.com/search?q=${encodeURIComponent(raw)}`;
+                else if (!/^https?:\/\//i.test(raw)) finalUrl = 'https://' + raw;
+                window.open(finalUrl, '_blank');
+                input.value = '';
             }
+            btn.addEventListener('click', handleNavigate);
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleNavigate(); });
+        };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initNav);
+        else initNav();
+    })();
+</script>
 
-            // 实时时钟
-            setInterval(() => {
-                const clock = document.getElementById('liveClock');
-                if (clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
-            }, 1000);
+<div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 bg-grain-pattern opacity-35"></div>
+    <div class="absolute top-1/5 left-1/6 w-[550px] h-[550px] bg-gradient-to-br from-amber-100/25 via-transparent to-transparent blur-[140px] rounded-full animate-float-soft"></div>
+    <div class="absolute bottom-1/4 right-1/5 w-[480px] h-[480px] bg-gradient-to-tl from-orange-100/20 via-transparent to-transparent blur-[110px] rounded-full animate-float-soft" style="animation-delay: 2.5s;"></div>
+    <div class="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-gradient-to-br from-yellow-100/18 via-transparent to-transparent blur-[100px] rounded-full animate-drift" style="animation-delay: 1s;"></div>
+</div>
 
-            // 密码模态窗
-            const pwdModal = document.getElementById('passwordModal');
-            const trigger = document.getElementById('navBrandTrigger');
-            const confirm = document.getElementById('confirmBtn');
-            const cancel = document.getElementById('cancelBtn');
-            const pwdInput = document.getElementById('passwordInput');
-            const errMsg = document.getElementById('errorMessage');
-            if (trigger && pwdModal) {
-                trigger.addEventListener('click', () => {
-                    pwdModal.classList.remove('hidden');
-                    pwdModal.classList.add('flex');
-                    if (pwdInput) pwdInput.focus();
-                });
-            }
-            const closeModal = () => {
-                if (pwdModal) { pwdModal.classList.add('hidden'); pwdModal.classList.remove('flex'); }
-                if (errMsg) errMsg.classList.add('hidden');
-                if (pwdInput) pwdInput.value = '';
-            };
-            if (cancel) cancel.addEventListener('click', closeModal);
-            if (confirm) {
-                confirm.addEventListener('click', () => {
-                    if (pwdInput && pwdInput.value === 'RuanRuan') {
-                        window.location.href = 'debug_raccoon_sztskj.html';
-                    } else {
-                        if (errMsg) errMsg.classList.remove('hidden');
-                        if (pwdInput) {
-                            pwdInput.classList.add('ring-2', 'ring-red-400');
-                            setTimeout(() => pwdInput.classList.remove('ring-2', 'ring-red-400'), 800);
-                        }
-                    }
-                });
-            }
-            if (pwdInput) pwdInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && confirm) confirm.click(); });
+<!-- 左下角快速入口 -->
+<div class="fixed bottom-6 left-6 z-[100] flex flex-col items-start gap-2">
+    <button id="quickMenuToggle" class="quick-menu-btn" aria-label="快速入口" title="反馈 / 称号 / 客服中心">
+        <span class="transition-transform duration-300" id="menuIcon">☰</span>
+    </button>
+    <div id="quickMenuPanel" class="quick-menu-panel hidden">
+        <a href="http://raccoon.fit/反馈/" target="_blank" class="quick-menu-item">🐞 反馈建议</a>
+        <a href="http://raccoon.fit/称号" target="_blank" class="quick-menu-item">🏅 称号</a>
+        <a href="http://raccoon.fit/客服中心" target="_blank" class="quick-menu-item">💬 客服中心</a>
+    </div>
+</div>
 
-            // 技能条动画
-            document.querySelectorAll('.skill-progress-modern').forEach(bar => {
-                const w = bar.style.width;
-                bar.style.width = '0%';
-                setTimeout(() => { bar.style.width = w; }, 200);
+<span id="navBrandTrigger" class="fixed top-1/2 right-0 z-[99] w-8 h-20 cursor-pointer opacity-0 hover:opacity-10 transition-opacity" title="开发者入口"></span>
+
+<main>
+    <section id="home" class="min-h-screen flex items-center justify-center pt-28 px-6 relative overflow-hidden hero-warm-bg">
+        <div class="relative z-10 text-center max-w-5xl mx-auto animate-fade-in">
+            <div class="inline-flex items-center gap-3 horse-year-decoration mb-8 animate-slide-in px-5 py-2 rounded-full">
+                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span></span>
+                <span class="text-sm font-medium text-brand-espresso">🐎 丙午马年 · 灵感奔腾</span>
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter font-display">
+                <span class="bg-gradient-to-r from-brand-espresso to-brand-mocha bg-clip-text text-transparent">探索代码的</span><br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-copper via-brand-caramel to-brand-gold animate-glow-pulse">无限可能</span>
+            </h1>
+            <p class="text-brand-mocha text-lg md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed font-light text-balance">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
+            <div class="mb-10 inline-block px-6 py-3 rounded-full glass-modern border border-brand-sand/60 bg-white/60">
+                <p class="text-brand-copperDark text-sm font-medium tracking-wide flex items-center gap-2"><span>✨</span><span>丙午新春 · 代码无bug · 创意绽放</span><span>✨</span></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-5 justify-center">
+                <a class="btn-primary px-10 py-4 rounded-2xl" href="#projects">探索项目</a>
+                <a class="btn-secondary px-10 py-4 rounded-2xl" href="http://github.com/raccoon-fit" target="_blank">GitHub 星系</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-32 px-6 container mx-auto max-w-7xl">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+            <div><h2 class="text-5xl font-black tracking-tight mb-3 title-decoration text-brand-espresso font-display">精选作品</h2><p class="text-brand-mocha text-lg">匠心独运 · 每一行代码皆有灵魂</p></div>
+            <div class="h-px flex-1 bg-gradient-to-r from-transparent via-brand-copper/50 to-transparent hidden md:block"></div>
+            <span class="text-brand-copper font-mono text-sm tracking-widest">PORTFOLIO · 2025</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.1s;">
+                <div class="text-5xl mb-5 opacity-80">💻</div><div class="flex gap-2 mb-5"><span class="tag-modern">在线IDE</span><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">PRO</span></div>
+                <h3 class="text-2xl font-bold mb-3 text-brand-espresso">Ride</h3><p class="text-brand-mocha text-sm mb-8">高性能云端开发环境，极速部署。</p>
+                <a href="http://raccoon.fit/Ride" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+            </div>
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.2s;">
+                <div class="text-5xl mb-5">📺</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">直播工具</span></div>
+                <h3 class="text-2xl font-bold mb-3 text-brand-espresso">B站直播流获取</h3><p class="text-brand-mocha text-sm mb-8">开发者专属 · 一键获取直播源。</p>
+                <a href="http://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+            </div>
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in grayscale hover:grayscale-0 transition-all" style="animation-delay: 0.3s;">
+                <div class="text-5xl mb-5">📱</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-600">归档库</span></div>
+                <h3 class="text-2xl font-bold mb-3 text-brand-espresso">MULU</h3><p class="text-brand-mocha text-sm mb-8">移动应用探索史 · React Native实践。</p>
+                <button class="mt-auto w-full p-4 rounded-xl bg-gray-200/70 text-gray-500 cursor-not-allowed font-bold">已归档</button>
+            </div>
+
+            <!-- 灵熊小记：已停运，灰阶降低，链接指向停运公告 -->
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in card-discontinued" style="animation-delay: 0.4s;">
+                <div class="text-5xl mb-5 opacity-70">🐻</div>
+                <div class="flex gap-2 mb-5">
+                    <span class="tag-modern bg-gray-200/70 text-gray-500">已停运</span>
+                    <span class="tag-modern bg-gray-100 text-gray-500">Vue3</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-3 text-gray-600">灵熊小记</h3>
+                <p class="text-gray-500 text-sm mb-8">你的神奇笔记助手（服务已停止）。</p>
+                <a href="http://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/%E5%81%9C%E8%BF%90%E5%85%AC%E5%91%8A.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl bg-gray-100/80 border border-gray-200 text-gray-600 font-bold group hover:bg-gray-200/80 transition-all">
+                    <span>查看停运公告</span>
+                    <span class="group-hover:translate-x-2 transition-transform">→</span>
+                </a>
+            </div>
+
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.5s;">
+                <div class="text-5xl mb-5">🎮</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-purple-100 text-purple-700">HTML5</span></div>
+                <h3 class="text-2xl font-bold mb-3 text-brand-espresso">小游戏库</h3><p class="text-brand-mocha text-sm mb-8">趣味创意轻量互动。</p>
+                <a href="http://raccoon.fit/game" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+            </div>
+            <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay: 0.6s;">
+                <div class="text-5xl mb-5">🤖</div><div class="flex gap-2 mb-5"><span class="tag-modern bg-amber-100 text-amber-700">AI 先锋</span></div>
+                <h3 class="text-2xl font-bold mb-3 text-brand-espresso">RACCOON AI</h3><p class="text-brand-mocha text-sm mb-8">对话大模型探索。</p>
+                <a href="http://raccoon.fit/ai" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span>体验AI</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-brand-warm/25 to-transparent">
+        <div class="container mx-auto px-6 max-w-7xl">
+            <div class="text-center mb-20"><h2 class="text-5xl font-black mb-5 title-decoration inline-block relative font-display text-brand-espresso">✨ 创意实验室</h2><p class="text-brand-mocha mt-4">原型 · 跨界 · 未来感</p></div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">🔮</div><h3 class="text-2xl font-bold text-brand-espresso">AI 辅助设计</h3><p class="text-brand-mocha">生成式UI探索。</p></div>
+                <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">⚡</div><h3 class="text-2xl font-bold text-brand-espresso">交互原型</h3><p class="text-brand-mocha">高级微动效。</p></div>
+                <div class="glass-card-modern p-9 rounded-3xl text-center"><div class="text-3xl mb-4">📊</div><h3 class="text-2xl font-bold text-brand-espresso">数据可视化</h3><p class="text-brand-mocha">动态叙事。</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-32 px-6 container mx-auto max-w-7xl">
+        <div class="grid lg:grid-cols-2 gap-16">
+            <div class="glass-card-modern p-12 rounded-3xl">
+                <h3 class="text-4xl font-black mb-6 title-decoration relative font-display text-brand-espresso">关于软软</h3>
+                <div class="space-y-5 text-brand-mocha"><p>技术与设计的狂热信徒，信奉「简洁即力量」。</p><p>Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p><p class="text-brand-copper font-semibold text-lg">保持好奇 · 永远优雅地解决问题</p></div>
+                <div class="mt-10"><a class="inline-flex items-center gap-2 text-brand-espresso font-bold group" href="me"><span class="border-b-2 border-brand-copper pb-1">探索个人主页</span><svg class="w-5 h-5 text-brand-copper group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a></div>
+            </div>
+            <div>
+                <h4 class="text-2xl font-black flex items-center gap-3 mb-10 text-brand-espresso"><span class="w-10 h-[2px] bg-brand-copper"></span><span>核心能力</span></h4>
+                <div class="space-y-7">
+                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">前端架构</span><span class="text-brand-copper font-bold">90%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:90%"></div></div></div>
+                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">UI/UX设计</span><span class="text-brand-copper font-bold">82%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:82%"></div></div></div>
+                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium">产品思维</span><span class="text-brand-copper font-bold">85%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:85%"></div></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="pb-20 pt-28 px-6">
+    <div class="container mx-auto max-w-6xl">
+        <div class="glass-card-modern p-12 md:p-16 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <div class="w-24 h-24 mx-auto bg-gradient-to-br from-brand-copper to-brand-copperDark rounded-3xl flex items-center justify-center text-4xl shadow-xl mb-8 animate-warm-pulse">🦝</div>
+                <h2 class="text-4xl font-black mb-4 font-display text-brand-espresso">软软的小窝</h2>
+                <p class="text-brand-mocha max-w-md mx-auto mb-12">探索 · 创造 · 成长 — 期待与你共鸣。</p>
+                <div class="flex flex-wrap justify-center gap-8 mb-12">
+                    <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="mailto:2051775505@qq.com">✉️ 邮箱</a>
+                    <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="http://github.com/raccoon-fit" target="_blank">🐙 GitHub</a>
+                    <a class="text-brand-mocha hover:text-brand-copper transition-colors font-medium" href="http://raccoon.fit">🌐 官网</a>
+                </div>
+                <div class="pt-8 border-t border-brand-sand/50">
+                    <p class="text-brand-mocha text-xs">© 2025-2026 软软 · 浣熊设计哲学</p>
+                    <p class="text-[10px] font-mono text-brand-copper/70 mt-1">STAY CURIOUS · STAY CREATIVE</p>
+                </div>
+                <div class="mt-6">
+                    <p class="text-brand-copperDark text-sm font-medium">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-brand-sand/40">
+                    <p class="text-xs text-brand-mocha/70 tracking-wider">本站最后更新于 2026年4月30日</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="fixed inset-0 z-[1000] hidden items-center justify-center p-6 bg-black/25 backdrop-blur-sm" id="passwordModal">
+    <div class="glass-card-modern w-full max-w-md p-10 rounded-3xl bg-white/80">
+        <div class="text-center"><div class="w-20 h-20 bg-brand-copper/15 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔑</div><h3 class="text-2xl font-bold text-brand-espresso">开发者验证</h3><p class="text-brand-mocha">输入调试密码</p></div>
+        <input type="password" id="passwordInput" class="w-full mt-6 bg-white/90 border border-brand-sand/60 rounded-2xl px-5 py-3.5 text-center text-brand-espresso focus:border-brand-copper outline-none transition-all" placeholder="••••••••">
+        <p id="errorMessage" class="text-red-500 text-xs text-center mt-2 hidden">密码错误，再试试看~</p>
+        <div class="flex gap-3 mt-8"><button id="cancelBtn" class="flex-1 py-3.5 btn-secondary">取消</button><button id="confirmBtn" class="flex-1 py-3.5 btn-primary">确认</button></div>
+    </div>
+</div>
+
+<span id="liveClock" class="hidden"></span>
+
+<script>
+    (function() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.classList.add('hidden'), 600);
+                }, 500);
             });
+        }
 
-            // 左下角菜单交互
-            const menuToggle = document.getElementById('quickMenuToggle');
-            const menuPanel = document.getElementById('quickMenuPanel');
-            const menuIcon = document.getElementById('menuIcon');
-            if (menuToggle && menuPanel && menuIcon) {
-                menuToggle.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isHidden = menuPanel.classList.contains('hidden');
-                    if (isHidden) {
-                        menuPanel.classList.remove('hidden');
-                        menuIcon.textContent = '✕';
-                    } else {
-                        menuPanel.classList.add('hidden');
-                        menuIcon.textContent = '☰';
-                    }
-                });
-                document.addEventListener('click', (e) => {
-                    if (!menuToggle.contains(e.target) && !menuPanel.contains(e.target)) {
-                        menuPanel.classList.add('hidden');
-                        menuIcon.textContent = '☰';
-                    }
-                });
-            }
+        setInterval(() => {
+            const clock = document.getElementById('liveClock');
+            if (clock) clock.innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        }, 1000);
 
-            console.log("%c🦝 温暖大地 · 软软的小窝", "color:#C17F59; font-size:16px; font-weight:bold;");
-            console.log("%cRaccoon.Fit — Stay Curious, Stay Creative", "color:#5C3D2E; font-size:12px;");
-        })();
-    </script>
+        const pwdModal = document.getElementById('passwordModal');
+        const trigger = document.getElementById('navBrandTrigger');
+        const confirm = document.getElementById('confirmBtn');
+        const cancel = document.getElementById('cancelBtn');
+        const pwdInput = document.getElementById('passwordInput');
+        const errMsg = document.getElementById('errorMessage');
+        if (trigger && pwdModal) {
+            trigger.addEventListener('click', () => {
+                pwdModal.classList.remove('hidden');
+                pwdModal.classList.add('flex');
+                if (pwdInput) pwdInput.focus();
+            });
+        }
+        const closeModal = () => {
+            if (pwdModal) { pwdModal.classList.add('hidden'); pwdModal.classList.remove('flex'); }
+            if (errMsg) errMsg.classList.add('hidden');
+            if (pwdInput) pwdInput.value = '';
+        };
+        if (cancel) cancel.addEventListener('click', closeModal);
+        if (confirm) {
+            confirm.addEventListener('click', () => {
+                if (pwdInput && pwdInput.value === 'RuanRuan') {
+                    window.location.href = 'debug_raccoon_sztskj.html';
+                } else {
+                    if (errMsg) errMsg.classList.remove('hidden');
+                    if (pwdInput) {
+                        pwdInput.classList.add('ring-2', 'ring-red-400');
+                        setTimeout(() => pwdInput.classList.remove('ring-2', 'ring-red-400'), 800);
+                    }
+                }
+            });
+        }
+        if (pwdInput) pwdInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && confirm) confirm.click(); });
+
+        document.querySelectorAll('.skill-progress-modern').forEach(bar => {
+            const w = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = w; }, 200);
+        });
+
+        const menuToggle = document.getElementById('quickMenuToggle');
+        const menuPanel = document.getElementById('quickMenuPanel');
+        const menuIcon = document.getElementById('menuIcon');
+        if (menuToggle && menuPanel && menuIcon) {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = menuPanel.classList.contains('hidden');
+                if (isHidden) {
+                    menuPanel.classList.remove('hidden');
+                    menuIcon.textContent = '✕';
+                } else {
+                    menuPanel.classList.add('hidden');
+                    menuIcon.textContent = '☰';
+                }
+            });
+            document.addEventListener('click', (e) => {
+                if (!menuToggle.contains(e.target) && !menuPanel.contains(e.target)) {
+                    menuPanel.classList.add('hidden');
+                    menuIcon.textContent = '☰';
+                }
+            });
+        }
+
+        console.log("%c🦝 温暖大地 · 软软的小窝", "color:#C17F59; font-size:16px; font-weight:bold;");
+        console.log("%cRaccoon.Fit — Stay Curious, Stay Creative", "color:#5C3D2E; font-size:12px;");
+    })();
+</script>
 </body>
 </html>

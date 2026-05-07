@@ -1,29 +1,34 @@
 <html lang="" style="font-size: 38.4px;" class="hairlines"><head><!--222940--><script>window._GreyResult = {method:"direct",versionId:"222940"}</script><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover"><meta name="spm_prefix" content="444.267"><!--[if IE]><link rel="icon" href="//www.bilibili.com/favicon.ico"><![endif]--><link rel="preload" href="https://s1.hdslb.com/bfs/seed/jinkela/short/b-mirror/biliMirror.umd.mini.js" as="script"><title>哔哩哔哩直播</title>
-<!-- ========== 跨域登录修复补丁（最先执行） ========== -->
+<!-- ========== 增强跨域修复补丁（最先执行） ========== -->
 <script>
 (function() {
     const API_BASE = 'https://api.bilibili.com';
     const PASSPORT_BASE = 'https://passport.bilibili.com';
     const MAIN_BASE = 'https://www.bilibili.com';
 
+    // 补全相对路径为绝对域名
     function fixUrl(url) {
         if (!url || typeof url !== 'string') return url;
+        // 已是绝对路径或数据/Blob，直接返回
         if (url.startsWith('http') || url.startsWith('//') || url.startsWith('data:') || url.startsWith('blob:')) return url;
+        // API 类请求
         if (url.startsWith('/x/') || url.startsWith('/api/')) {
             return API_BASE + url;
-        } else if (url.startsWith('/login') || url.startsWith('/register') || url.startsWith('/passport')) {
+        // 登录/注册/安全验证
+        } else if (url.startsWith('/login') || url.startsWith('/register') || url.startsWith('/passport') || url.startsWith('/account')) {
             return PASSPORT_BASE + url;
+        // 其他一般页面
         } else if (url.startsWith('/')) {
             return MAIN_BASE + url;
         }
         return url;
     }
 
-    // 修补 XMLHttpRequest
+    // ---------- 1. 修复 XMLHttpRequest ----------
     const OrigXHROpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
         const fixed = fixUrl(url);
-        this.__fixedUrl = fixed;   // 保存修复后的 URL，供 send 使用
+        this.__fixedUrl = fixed;
         return OrigXHROpen.call(this, method, fixed, async, user, password);
     };
 
@@ -36,7 +41,7 @@
         return OrigXHRSend.call(this, body);
     };
 
-    // 修补 fetch
+    // ---------- 2. 修复 fetch (增强版) ----------
     const origFetch = window.fetch;
     window.fetch = function(input, init) {
         init = init || {};
@@ -46,24 +51,51 @@
             url = fixUrl(input);
             input = url;
         } else if (input instanceof Request) {
-            url = fixUrl(input.url);
-            if (url !== input.url) {
-                input = new Request(url, input);
+            // 处理 Request 对象（保留原有配置，仅补全 URL）
+            const origUrl = input.url;
+            const newUrl = fixUrl(origUrl);
+            if (newUrl !== origUrl) {
+                // 拷贝原有属性并创建新 Request
+                const initCopy = {
+                    method: input.method,
+                    headers: input.headers,
+                    body: input.body,
+                    mode: input.mode,
+                    credentials: input.credentials,
+                    cache: input.cache,
+                    redirect: input.redirect,
+                    referrer: input.referrer,
+                    integrity: input.integrity,
+                    keepalive: input.keepalive,
+                    signal: input.signal
+                };
+                input = new Request(newUrl, initCopy);
             }
+            url = newUrl;
         } else {
             url = '';
         }
 
+        // 对哔哩哔哩域名的请求强制携带凭证
         if (/^https?:\/\/(api|passport|www)\.bilibili\.com/.test(url)) {
             init.credentials = 'include';
         }
         return origFetch.call(this, input, init);
     };
 
-    // 修复已存在的登录/跳转链接
+    // ---------- 3. 修复 window.open / a标签 导致的安全验证跳转 ----------
+    const origOpen = window.open;
+    window.open = function(url, target, features) {
+        if (typeof url === 'string' && !url.startsWith('http') && !url.startsWith('//')) {
+            url = fixUrl(url);
+        }
+        return origOpen.call(this, url, target, features);
+    };
+
+    // 页面内的超链接修正（包括动态添加的）
     function fixLinks() {
         const map = [
-            { selector: 'a[href^="/login"], a[href^="/register"], a[href^="/passport"]', base: PASSPORT_BASE },
+            { selector: 'a[href^="/login"], a[href^="/register"], a[href^="/passport"], a[href^="/account"]', base: PASSPORT_BASE },
             { selector: 'a[href^="/x/"], a[href^="/api/"]', base: API_BASE },
             { selector: 'a[href^="/"]:not([href^="//"]):not([href^="http"])', base: MAIN_BASE }
         ];
@@ -82,6 +114,8 @@
     } else {
         fixLinks();
     }
+    // 监听动态插入的节点（简单轮询，可改用 MutationObserver，但尽量保持轻量）
+    setInterval(fixLinks, 1500);
 })();
 </script>
 <!-- ========== 修复补丁结束 ========== -->

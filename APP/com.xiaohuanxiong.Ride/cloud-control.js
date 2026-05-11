@@ -11,8 +11,7 @@ window.CLOUD_STATUS = 2;   // 当前为无公告，可按需修改为 1,2,4
 window.CLOUD_NOTICE_NORMAL = "欢迎使用 Ride IDE！新功能已上线。";
 
 // 重要公告内容（仅当 CLOUD_STATUS=2 时生效）
-window.CLOUD_NOTICE_IMPORTANT = "请查看用户协议<a href="raccoon.fit/Ride/用户协议.html">点击查看</a>";
-
+window.CLOUD_NOTICE_IMPORTANT = '请查看用户协议 <a href="https://raccoon.fit/Ride/用户协议.html">点击查看</a>';
 // 维护模式内容（仅当 CLOUD_STATUS=4 时生效）
 window.CLOUD_MAINTENANCE_TITLE = "系统维护中";
 window.CLOUD_MAINTENANCE_CONTENT = "Ride IDE 正在进行数据库升级，预计 30 分钟后恢复。";

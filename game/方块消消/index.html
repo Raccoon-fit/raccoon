@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方块消除游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 1408px;
+            height: 704px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 48px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 10;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #4ecca3;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 20;
+            display: none;
+        }
+        
+        .restart-btn {
+            background: #4ecca3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background: #3db592;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1408" height="704"></canvas>
+        
+        <div class="score">0</div>
+        
+        <div class="instructions">
+            <h3>游戏说明</h3>
+            <ul>
+                <li>🎯 点击左侧区域发射方块</li>
+                <li>A键：向左移动方块</li>
+                <li>D键：向右移动方块</li>
+                <li>相同等级方块碰撞会合成</li>
+                <li>3个最高级方块可消除</li>
+                <li>目标：获得尽可能高的分数！</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            点击发射方块 | A键左移 | D键右移
+        </div>
+        
+        <div class="game-over" id="gameOver">
+            <h2>游戏结束！</h2>
+            <p>最终得分: <span id="finalScore">0</span></p>
+            <button class="restart-btn" onclick="restartGame()">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏常量
+        const CANVAS_WIDTH = 1408;
+        const CANVAS_HEIGHT = 704;
+        const BLOCK_SIZE = 64;
+        const GRID_COLS = 11;  // 右侧网格列数 (1408/2 / 64 = 11)
+        const GRID_ROWS = 11;  // 网格行数 (704 / 64 = 11)
+        const MAX_LEVEL = 5;
+        
+        // 方块颜色，对应不同等级
+        const BLOCK_COLORS = [
+            '#FF6B6B',  // 等级0
+            '#4ECDC4',  // 等级1
+            '#45B7D1',  // 等级2
+            '#96CEB4',  // 等级3
+            '#FFEAA7',  // 等级4
+            '#DDA0DD'   // 等级5
+        ];
+        
+        // 状态枚举
+        const MoveState = {
+            FREE: 0,   // 自由落体
+            MOVE: 1,   // 移动到目标位置
+            STAY: 2,   // 静止
+            FALL: 3,   // 下落状态
+            TRIP: 4    // 三消逻辑
+        };
+        
+        // 方块类
+        class Block {
+            constructor(pos, targetPos, level, speed) {
+                this.level = level;
+                this.speed = speed || {x: 0, y: 0};
+                this.acc = {x: 0, y: 0.0002};
+                this.pos = {x: pos.x, y: pos.y};
+                this.moveState = MoveState.FREE;
+                this.locked = false;
+                
+                // 如果是发射的方块，计算初始速度
+                if (targetPos) {
+                    const dx = targetPos.x - pos.x;
+                    const dy = targetPos.y - pos.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    this.speed.x += 0.3 * (dx / distance);
+                    this.speed.y += 0.3 * (dy / distance);
+                }
+                
+                this.width = BLOCK_SIZE;
+                this.height = BLOCK_SIZE;
+            }
+            
+            update(deltaTime) {
+                switch (this.moveState) {
+                    case MoveState.FREE:
+                        this.speed.x += this.acc.x * deltaTime;
+                        this.speed.y += this.acc.y * deltaTime;
+                        this.pos.x += this.speed.x * deltaTime;
+                        this.pos.y += this.speed.y * deltaTime;
+                        break;
+                        
+                    case MoveState.MOVE:
+                        this.pos.x += (this.targetPos.x - this.pos.x) / 5;
+                        this.pos.y += (this.targetPos.y - this.pos.y) / 5;
+                        
+                        if (Math.abs(this.targetPos.x - this.pos.x) < 1 && 
+                            Math.abs(this.targetPos.y - this.pos.y) < 1) {
+                            this.pos.x = this.targetPos.x;
+                            this.pos.y = this.targetPos.y;
+                            this.moveState = MoveState.STAY;
+                            this.locked = false;
+                        }
+                        break;
+                        
+                    case MoveState.FALL:
+                        this.pos.x += (this.targetPos.x - this.pos.x) / 5;
+                        this.speed.y += this.acc.y * deltaTime;
+                        this.pos.y += this.speed.y * deltaTime;
+                        
+                        if (this.pos.y > this.targetPos.y) {
+                            this.pos.x = this.targetPos.x;
+                            this.pos.y = this.targetPos.y;
+                            this.moveState = MoveState.STAY;
+                            this.locked = false;
+                        }
+                        break;
+                        
+                    case MoveState.TRIP:
+                        this.pos.x -= deltaTime / 10;
+                        this.pos.y += 5 * (2.5 - this.runTime);
+                        this.runTime -= deltaTime / 1000.0;
+                        
+                        if (this.runTime < 0) {
+                            this.moveState = MoveState.STAY;
+                            this.locked = false;
+                        }
+                        break;
+                }
+            }
+            
+            setMoveState(state, gridPos = null, runTime = null) {
+                this.moveState = state;
+                this.gridPos = gridPos;
+                this.runTime = runTime;
+                
+                if (gridPos) {
+                    this.targetPos = {
+                        x: gridPos.col * BLOCK_SIZE + BLOCK_SIZE / 2 + CANVAS_WIDTH / 2,
+                        y: gridPos.row * BLOCK_SIZE + BLOCK_SIZE / 2
+                    };
+                }
+            }
+            
+            get rect() {
+                return {
+                    x: this.pos.x - this.width / 2,
+                    y: this.pos.y - this.height / 2,
+                    width: this.width,
+                    height: this.height
+                };
+            }
+            
+            levelUp() {
+                if (this.locked) return false;
+                if (this.level < MAX_LEVEL) {
+                    this.level++;
+                    return true;
+                }
+                return false;
+            }
+            
+            setLock(locked) {
+                this.locked = locked;
+            }
+            
+            draw(ctx) {
+                const rect = this.rect;
+                
+                // 绘制方块背景
+                ctx.fillStyle = BLOCK_COLORS[this.level];
+                ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+                
+                // 绘制方块边框
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                
+                // 绘制等级数字
+                ctx.fillStyle = this.level >= 4 ? '#000' : '#fff';
+                ctx.font = 'bold 20px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(
+                    Math.pow(2, this.level + 1).toString(),
+                    this.pos.x,
+                    this.pos.y
+                );
+                
+                // 如果是特殊状态，添加效果
+                if (this.moveState === MoveState.TRIP) {
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                }
+            }
+        }
+        
+        // 游戏主类
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.score = 0;
+                this.showScore = 0;
+                
+                this.activeBlocks = [];      // 发射中的方块
+                this.receivedBlocks = [];    // 已接收的方块
+                this.removeBlocks = [];      // 待移除的方块
+                
+                // 初始化接收方块网格
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    this.receivedBlocks[i] = [];
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        this.receivedBlocks[i][j] = null;
+                    }
+                }
+                
+                this.isRunning = true;
+                this.lastTime = 0;
+                
+                this.setupEventListeners();
+                this.init();
+                this.animate(0);
+            }
+            
+            init() {
+                // 初始化背景
+                this.drawBackground();
+            }
+            
+            setupEventListeners() {
+                // 鼠标点击事件
+                this.canvas.addEventListener('click', (e) => {
+                    if (!this.isRunning) return;
+                    
+                    const rect = this.canvas.getBoundingClientRect();
+                    const mousePos = {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                    
+                    // 只在左侧区域发射
+                    if (mousePos.x < CANVAS_WIDTH / 2) {
+                        this.shootBlocks(mousePos);
+                    }
+                });
+                
+                // 键盘事件
+                document.addEventListener('keydown', (e) => {
+                    if (!this.isRunning) return;
+                    
+                    switch (e.key.toLowerCase()) {
+                        case 'a':
+                            this.shiftLeft();
+                            break;
+                        case 'd':
+                            this.shiftRight();
+                            break;
+                        case 'r':
+                        case 'R':
+                            this.restart();
+                            break;
+                    }
+                });
+            }
+            
+            shootBlocks(targetPos) {
+                const startPos = {x: 0, y: CANVAS_HEIGHT};
+                const level = Math.floor(Math.random() * 3);
+                
+                // 发射多个方块
+                for (let i = 0; i < 3; i++) {
+                    const speed = {
+                        x: 0.1 + i * 0.1,
+                        y: -0.3 - i * 0.1
+                    };
+                    const block = new Block(startPos, targetPos, level, speed);
+                    this.activeBlocks.push(block);
+                }
+            }
+            
+            shiftLeft() {
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    let lastCol = 0;
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block) continue;
+                        
+                        if (j === lastCol) {
+                            lastCol++;
+                            continue;
+                        }
+                        
+                        block.setMoveState(MoveState.MOVE, {row: i, col: lastCol});
+                        this.receivedBlocks[i][lastCol] = block;
+                        this.receivedBlocks[i][j] = null;
+                        lastCol++;
+                    }
+                }
+            }
+            
+            shiftRight() {
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    let lastCol = GRID_COLS - 1;
+                    for (let j = GRID_COLS - 1; j >= 0; j--) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block) continue;
+                        
+                        if (j === lastCol) {
+                            lastCol--;
+                            continue;
+                        }
+                        
+                        block.setMoveState(MoveState.MOVE, {row: i, col: lastCol});
+                        this.receivedBlocks[i][lastCol] = block;
+                        this.receivedBlocks[i][j] = null;
+                        lastCol--;
+                    }
+                }
+            }
+            
+            update(deltaTime) {
+                // 更新活动方块
+                for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
+                    const block = this.activeBlocks[i];
+                    block.update(deltaTime);
+                    
+                    // 边界碰撞
+                    if (block.rect.x + block.rect.width > CANVAS_WIDTH) {
+                        block.speed.x = -Math.abs(block.speed.x);
+                    }
+                    if (block.rect.x < 0) {
+                        block.speed.x = Math.abs(block.speed.x);
+                    }
+                    if (block.rect.y < 0) {
+                        block.speed.y = Math.abs(block.speed.y);
+                    }
+                    
+                    // 计算网格位置
+                    const gridX = block.pos.x - CANVAS_WIDTH / 2;
+                    const gridCol = Math.floor(gridX / BLOCK_SIZE);
+                    const gridRow = Math.floor(block.pos.y / BLOCK_SIZE);
+                    
+                    // 检查是否应该接收方块
+                    if (block.rect.y + block.rect.height > CANVAS_HEIGHT && 
+                        block.pos.x > CANVAS_WIDTH / 2) {
+                        if (gridCol >= 0 && gridCol < GRID_COLS && 
+                            gridRow >= 0 && gridRow < GRID_ROWS) {
+                            block.setMoveState(MoveState.MOVE, {row: gridRow, col: gridCol});
+                            this.receivedBlocks[gridRow][gridCol] = block;
+                            this.activeBlocks.splice(i, 1);
+                        }
+                    }
+                    
+                    // 检查与已接收方块的碰撞
+                    for (let r = Math.max(0, gridRow - 1); r <= Math.min(GRID_ROWS - 1, gridRow + 1); r++) {
+                        for (let c = Math.max(0, gridCol - 1); c <= Math.min(GRID_COLS - 1, gridCol + 1); c++) {
+                            const otherBlock = this.receivedBlocks[r][c];
+                            if (otherBlock && this.checkCollision(block, otherBlock)) {
+                                if (gridCol >= 0) {
+                                    block.setMoveState(MoveState.MOVE, {row: gridRow, col: gridCol});
+                                    this.receivedBlocks[gridRow][gridCol] = block;
+                                    this.activeBlocks.splice(i, 1);
+                                } else {
+                                    block.speed.x = 0;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // 处理下落逻辑
+                for (let j = 0; j < GRID_COLS; j++) {
+                    let lastRow = GRID_ROWS - 1;
+                    for (let i = GRID_ROWS - 1; i >= 0; i--) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block) continue;
+                        
+                        if (i === lastRow) {
+                            lastRow--;
+                            continue;
+                        }
+                        
+                        if (block.moveState !== MoveState.FALL) {
+                            block.setMoveState(MoveState.FALL, {row: lastRow, col: j});
+                            this.receivedBlocks[lastRow][j] = block;
+                            this.receivedBlocks[i][j] = null;
+                            lastRow--;
+                        }
+                    }
+                }
+                
+                // 处理合成逻辑
+                for (let j = 0; j < GRID_COLS; j++) {
+                    for (let i = GRID_ROWS - 1; i >= 0; i--) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block || block.moveState !== MoveState.STAY || block.locked || block.level === MAX_LEVEL) {
+                            continue;
+                        }
+                        
+                        // 检查左侧和上方
+                        const neighbors = [
+                            {row: i - 1, col: j},
+                            {row: i, col: j - 1}
+                        ];
+                        
+                        for (const neighbor of neighbors) {
+                            const otherBlock = this.receivedBlocks[neighbor.row]?.[neighbor.col];
+                            if (otherBlock && 
+                                otherBlock.moveState === MoveState.STAY && 
+                                otherBlock.level === block.level && 
+                                !otherBlock.locked) {
+                                
+                                this.score += (block.level + 1);
+                                
+                                otherBlock.setLock(true);
+                                block.setLock(true);
+                                otherBlock.setMoveState(MoveState.MOVE, {row: i, col: j});
+                                
+                                this.removeBlocks.push({
+                                    block: otherBlock,
+                                    target: {row: i, col: j}
+                                });
+                                
+                                this.receivedBlocks[neighbor.row][neighbor.col] = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // 处理水平三消
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block || block.level !== MAX_LEVEL || block.moveState !== MoveState.STAY) {
+                            continue;
+                        }
+                        
+                        let count = 1;
+                        for (let k = 1; j + k < GRID_COLS; k++) {
+                            const otherBlock = this.receivedBlocks[i][j + k];
+                            if (!otherBlock || 
+                                otherBlock.level !== MAX_LEVEL || 
+                                otherBlock.moveState !== MoveState.STAY) {
+                                break;
+                            }
+                            count++;
+                        }
+                        
+                        if (count >= 3) {
+                            this.score += MAX_LEVEL * count * count * count;
+                            
+                            for (let k = 0; k < count; k++) {
+                                const blockToRemove = this.receivedBlocks[i][j + k];
+                                blockToRemove.setMoveState(MoveState.TRIP, null, 3);
+                                this.removeBlocks.push({
+                                    block: blockToRemove,
+                                    target: {row: i, col: j + k}
+                                });
+                                this.receivedBlocks[i][j + k] = null;
+                            }
+                        }
+                    }
+                }
+                
+                // 处理垂直三消
+                for (let j = 0; j < GRID_COLS; j++) {
+                    for (let i = 0; i < GRID_ROWS; i++) {
+                        const block = this.receivedBlocks[i][j];
+                        if (!block || block.level !== MAX_LEVEL || block.moveState !== MoveState.STAY) {
+                            continue;
+                        }
+                        
+                        let count = 1;
+                        for (let k = 1; i + k < GRID_ROWS; k++) {
+                            const otherBlock = this.receivedBlocks[i + k][j];
+                            if (!otherBlock || 
+                                otherBlock.level !== MAX_LEVEL || 
+                                otherBlock.moveState !== MoveState.STAY) {
+                                break;
+                            }
+                            count++;
+                        }
+                        
+                        if (count >= 3) {
+                            this.score += MAX_LEVEL * count * count * count;
+                            
+                            for (let k = 0; k < count; k++) {
+                                const blockToRemove = this.receivedBlocks[i + k][j];
+                                blockToRemove.setMoveState(MoveState.TRIP, null, 3);
+                                this.removeBlocks.push({
+                                    block: blockToRemove,
+                                    target: {row: i + k, col: j}
+                                });
+                                this.receivedBlocks[i + k][j] = null;
+                            }
+                        }
+                    }
+                }
+                
+                // 更新所有方块
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        const block = this.receivedBlocks[i][j];
+                        if (block) {
+                            block.update(deltaTime);
+                        }
+                    }
+                }
+                
+                // 处理移除的方块
+                for (let i = this.removeBlocks.length - 1; i >= 0; i--) {
+                    const item = this.removeBlocks[i];
+                    item.block.update(deltaTime);
+                    
+                    if (item.block.moveState === MoveState.STAY) {
+                        const targetBlock = this.receivedBlocks[item.target.row][item.target.col];
+                        if (targetBlock) {
+                            targetBlock.setLock(false);
+                            targetBlock.levelUp();
+                        }
+                        this.removeBlocks.splice(i, 1);
+                    }
+                }
+                
+                // 平滑更新显示分数
+                this.showScore += (this.score - this.showScore) / 5;
+            }
+            
+            checkCollision(block1, block2) {
+                const rect1 = block1.rect;
+                const rect2 = block2.rect;
+                
+                return rect1.x < rect2.x + rect2.width &&
+                       rect1.x + rect1.width > rect2.x &&
+                       rect1.y < rect2.y + rect2.height &&
+                       rect1.y + rect1.height > rect2.y;
+            }
+            
+            drawBackground() {
+                // 清空画布
+                this.ctx.fillStyle = '#0f3460';
+                this.ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                
+                // 绘制左侧背景
+                this.ctx.fillStyle = '#16213e';
+                this.ctx.fillRect(0, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+                
+                // 绘制右侧网格背景
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        const x = CANVAS_WIDTH / 2 + j * BLOCK_SIZE;
+                        const y = i * BLOCK_SIZE;
+                        
+                        this.ctx.fillStyle = (i + j) % 2 === 0 ? '#1a1a2e' : '#16213e';
+                        this.ctx.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                        
+                        this.ctx.strokeStyle = '#4ecca3';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                    }
+                }
+                
+                // 绘制中间分隔线
+                this.ctx.strokeStyle = '#4ecca3';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.moveTo(CANVAS_WIDTH / 2, 0);
+                this.ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+                this.ctx.stroke();
+            }
+            
+            draw() {
+                // 绘制背景
+                this.drawBackground();
+                
+                // 绘制活动方块
+                this.activeBlocks.forEach(block => block.draw(this.ctx));
+                
+                // 绘制接收的方块
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        const block = this.receivedBlocks[i][j];
+                        if (block) {
+                            block.draw(this.ctx);
+                        }
+                    }
+                }
+                
+                // 绘制待移除的方块
+                this.removeBlocks.forEach(item => item.block.draw(this.ctx));
+                
+                // 绘制分数
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = 'bold 48px Arial';
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText(`分数: ${Math.floor(this.showScore)}`, 20, 60);
+                
+                // 绘制游戏标题
+                this.ctx.fillStyle = '#4ecca3';
+                this.ctx.font = 'bold 24px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('发射区', CANVAS_WIDTH / 4, 30);
+                this.ctx.fillText('接收区', CANVAS_WIDTH * 3 / 4, 30);
+            }
+            
+            animate(time) {
+                if (!this.lastTime) this.lastTime = time;
+                const deltaTime = time - this.lastTime;
+                this.lastTime = time;
+                
+                this.update(deltaTime);
+                this.draw();
+                
+                if (this.isRunning) {
+                    requestAnimationFrame((t) => this.animate(t));
+                }
+            }
+            
+            restart() {
+                this.score = 0;
+                this.showScore = 0;
+                this.activeBlocks = [];
+                this.removeBlocks = [];
+                
+                for (let i = 0; i < GRID_ROWS; i++) {
+                    for (let j = 0; j < GRID_COLS; j++) {
+                        this.receivedBlocks[i][j] = null;
+                    }
+                }
+                
+                this.isRunning = true;
+                document.getElementById('gameOver').style.display = 'none';
+                this.animate(0);
+            }
+            
+            gameOver() {
+                this.isRunning = false;
+                document.getElementById('finalScore').textContent = Math.floor(this.score);
+                document.getElementById('gameOver').style.display = 'block';
+            }
+        }
+        
+        // 启动游戏
+        let game = new Game();
+        
+        // 全局重新开始函数
+        function restartGame() {
+            game.restart();
+        }
+        
+        // 确保游戏在窗口失去焦点时不会太快
+        window.addEventListener('blur', () => {
+            if (game) {
+                game.lastTime = performance.now();
+            }
+        });
+    </script>
+</body>
+</html>

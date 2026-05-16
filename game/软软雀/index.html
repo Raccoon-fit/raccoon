@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二人麻将 · 简化版</title>
+    <style>
+        :root {
+            --bg: #1a3a1a;
+            --table: #1a5c2a;
+            --felt: #1e6b35;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0d1a0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', 'SimHei', 'STHeiti', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .game-container {
+            position: relative;
+            background: var(--table);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 8px #3d1c02, 0 0 0 14px #5c2d08, 0 0 0 18px #3d1c02;
+            overflow: hidden;
+            max-width: 100%;
+        }
+        canvas {
+            display: block;
+            cursor: pointer;
+            max-width: 100%;
+            height: auto;
+        }
+        @media (max-width: 768px) {
+            .game-container {
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 0 4px #3d1c02, 0 0 0 7px #5c2d08, 0 0 0 10px #3d1c02;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameContainer">
+    <canvas id="mahjongCanvas"></canvas>
+</div>
+
+<script>
+    (function() {
+        // ==================== 常量与枚举 ====================
+        const Action = Object.freeze({
+            PASS: 0,
+            CHI: 1,
+            PONG: 2,
+            MING_KONG: 3,
+            HU: 4,
+            DISCARD: 5,
+            DRAW: 6,
+        });
+        const ActionLabels = { [Action.HU]:'胡', [Action.PONG]:'碰', [Action.MING_KONG]:'杠', [Action.CHI]:'吃', [Action.PASS]:'过' };
+
+        // ==================== 麻将核心逻辑 (修复版) ====================
+        class MahjongGame {
+            constructor() {
+                // 34种牌
+                this.tiles = [];
+                for (let i = 1; i <= 9; i++) this.tiles.push(i+'万');
+                for (let i = 1; i <= 9; i++) this.tiles.push(i+'筒');
+                for (let i = 1; i <= 9; i++) this.tiles.push(i+'条');
+                this.tiles.push('东','南','西','北','白','发','中');
+                this._tileIndexMap = {};
+                this.tiles.forEach((t,i) => { this._tileIndexMap[t] = i; });
+                this.reset();
+            }
+
+            reset() {
+                this.deck = [];
+                for (const t of this.tiles) {
+                    for (let i = 0; i < 4; i++) this.deck.push(t);
+                }
+                this._shuffle(this.deck);
+
+                this.playerHand = [];
+                this.aiHand = [];
+                this.playerRiver = [];
+                this.aiRiver = [];
+                this.isPlayerTurn = Math.random() < 0.5;
+                this.lastDiscard = null;
+                this.lastDiscardBy = null;
+                this.waitingForAction = false;
+                this.gameOver = false;
+                this.winner = null;
+                this.message = '';
+
+                // 发牌13张
+                for (let i = 0; i < 13; i++) {
+                    this.playerHand.push(this._draw());
+                    this.aiHand.push(this._draw());
+                }
+                this._sortHand(this.playerHand);
+                this._sortHand(this.aiHand);
+
+                // 庄家摸第14张
+                if (this.isPlayerTurn) {
+                    this.playerHand.push(this._draw());
+                    this._sortHand(this.playerHand);
+                    this.message = '你的回合，请选择一张牌打出';
+                } else {
+                    this.aiHand.push(this._draw());
+                    this._sortHand(this.aiHand);
+                    this.message = '电脑回合';
+                }
+                this.waitingForAction = false;
+            }
+
+            _shuffle(arr) {
+                for (let i = arr.length-1; i > 0; i--) {
+                    const j = Math.floor(Math.random()*(i+1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+
+            _draw() {
+                if (this.deck.length === 0) return null;
+                return this.deck.pop();
+            }
+
+            _tileIndex(t) {
+                return this._tileIndexMap[t] !== undefined ? this._tileIndexMap[t] : 999;
+            }
+
+            _sortHand(hand) {
+                hand.sort((a,b) => this._tileIndex(a) - this._tileIndex(b));
+            }
+
+            // ---------- 胡牌检测 (修复排序) ----------
+            _canHu(hand14) {
+                if (hand14.length !== 14) return false;
+                return this._isWin(hand14);
+            }
+
+            _isWin(tiles) {
+                if (tiles.length !== 14) return false;
+                const counts = {};
+                for (const t of tiles) {
+                    counts[t] = (counts[t]||0)+1;
+                }
+                const sortedUnique = Object.keys(counts).sort((a,b) => this._tileIndex(a)-this._tileIndex(b));
+                for (const tile of sortedUnique) {
+                    if (counts[tile] >= 2) {
+                        const remaining = [];
+                        let removed = 0;
+                        for (const t of tiles) {
+                            if (t === tile && removed < 2) {
+                                removed++;
+                            } else {
+                                remaining.push(t);
+                            }
+                        }
+                        remaining.sort((a,b) => this._tileIndex(a)-this._tileIndex(b));
+                        if (this._findMelds(remaining)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            _findMelds(tiles) {
+                if (tiles.length === 0) return true;
+                if (tiles.length % 3 !== 0) return false;
+                // ★ 关键修复：每次递归必须重新排序，确保按牌序处理
+                tiles.sort((a,b) => this._tileIndex(a)-this._tileIndex(b));
+                const first = tiles[0];
+                const count = tiles.filter(t => t === first).length;
+
+                // 尝试刻子
+                if (count >= 3) {
+                    const remaining = [];
+                    let removed = 0;
+                    for (const t of tiles) {
+                        if (t === first && removed < 3) {
+                            removed++;
+                        } else {
+                            remaining.push(t);
+                        }
+                    }
+                    if (this._findMelds(remaining)) return true;
+                }
+
+                // 尝试顺子（仅数牌）
+                if (first.length > 1 && ['万','筒','条'].includes(first[first.length-1])) {
+                    const suit = first[first.length-1];
+                    const n = parseInt(first);
+                    if (n <= 7) {
+                        const t2 = (n+1)+suit;
+                        const t3 = (n+2)+suit;
+                        if (tiles.includes(t2) && tiles.includes(t3)) {
+                            const remaining = [];
+                            let rFirst = false, rT2 = false, rT3 = false;
+                            for (const t of tiles) {
+                                if (!rFirst && t === first) { rFirst = true; }
+                                else if (!rT2 && t === t2) { rT2 = true; }
+                                else if (!rT3 && t === t3) { rT3 = true; }
+                                else { remaining.push(t); }
+                            }
+                            if (this._findMelds(remaining)) return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            // ---------- 可执行动作判断 ----------
+            getValidActions(hand, discard) {
+                const actions = [];
+                // 胡
+                const testHand = [...hand, discard];
+                testHand.sort((a,b) => this._tileIndex(a)-this._tileIndex(b));
+                if (this._canHu(testHand)) {
+                    actions.push(Action.HU);
+                }
+                // 杠
+                if (hand.filter(t => t === discard).length >= 3) {
+                    actions.push(Action.MING_KONG);
+                }
+                // 碰
+                if (hand.filter(t => t === discard).length >= 2) {
+                    actions.push(Action.PONG);
+                }
+                // 吃
+                if (discard.length > 1 && ['万','筒','条'].includes(discard[discard.length-1])) {
+                    const suit = discard[discard.length-1];
+                    const n = parseInt(discard);
+                    const combos = this._getChiCombos(hand, n, suit);
+                    if (combos.length > 0) {
+                        actions.push(Action.CHI);
+                    }
+                }
+                if (actions.length === 0) {
+                    actions.push(Action.PASS);
+                }
+                return actions;
+            }
+
+            _getChiCombos(hand, n, suit) {
+                const combos = [];
+                if (n >= 3 && hand.includes((n-2)+suit) && hand.includes((n-1)+suit))
+                    combos.push([(n-2)+suit, (n-1)+suit]);
+                if (n >= 2 && n <= 8 && hand.includes((n-1)+suit) && hand.includes((n+1)+suit))
+                    combos.push([(n-1)+suit, (n+1)+suit]);
+                if (n <= 7 && hand.includes((n+1)+suit) && hand.includes((n+2)+suit))
+                    combos.push([(n+1)+suit, (n+2)+suit]);
+                return combos;
+            }
+
+            _getFirstChiCombo(hand, discard) {
+                if (discard.length > 1 && ['万','筒','条'].includes(discard[discard.length-1])) {
+                    const suit = discard[discard.length-1];
+                    const n = parseInt(discard);
+                    const combos = this._getChiCombos(hand, n, suit);
+                    if (combos.length > 0) return combos[0];
+                }
+                return null;
+            }
+
+            // ---------- 执行动作 (修复AI后续出牌) ----------
+            applyAction(actor, action, extra = null) {
+                if (action === Action.HU) {
+                    this.gameOver = true;
+                    this.winner = actor;
+                    this.waitingForAction = false;
+                    this.message = (actor==='player' ? '🎉 你胡了！' : '😞 电脑胡了！') + ' 点击任意位置重新开始';
+                    return;
+                }
+
+                if (action === Action.PONG) {
+                    const hand = actor==='player' ? this.playerHand : this.aiHand;
+                    hand.push(this.lastDiscard);
+                    this._sortHand(hand);
+                    for (let i=0; i<2; i++) {
+                        const idx = hand.indexOf(this.lastDiscard);
+                        if (idx >= 0) hand.splice(idx,1);
+                    }
+                    this._setTurn(actor);
+                    if (actor === 'player') {
+                        this.waitingForAction = true;
+                        this.message = '碰！请选择一张牌打出';
+                    } else {
+                        this.message = '电脑碰牌';
+                        // ★ AI碰后立即出牌
+                        this._aiDiscard();
+                    }
+                    return;
+                }
+
+                if (action === Action.MING_KONG) {
+                    const hand = actor==='player' ? this.playerHand : this.aiHand;
+                    hand.push(this.lastDiscard);
+                    this._sortHand(hand);
+                    for (let i=0; i<3; i++) {
+                        const idx = hand.indexOf(this.lastDiscard);
+                        if (idx >= 0) hand.splice(idx,1);
+                    }
+                    this._drawAndSetTurn(actor);
+                    return;
+                }
+
+                if (action === Action.CHI) {
+                    const hand = actor==='player' ? this.playerHand : this.aiHand;
+                    hand.push(this.lastDiscard);
+                    for (const t of extra) {
+                        const idx = hand.indexOf(t);
+                        if (idx >= 0) hand.splice(idx,1);
+                    }
+                    this._sortHand(hand);
+                    this._setTurn(actor);
+                    if (actor === 'player') {
+                        this.waitingForAction = true;
+                        this.message = '吃！请选择一张牌打出';
+                    } else {
+                        this.message = '电脑吃牌';
+                        // ★ AI吃后立即出牌
+                        this._aiDiscard();
+                    }
+                    return;
+                }
+
+                if (action === Action.DISCARD) {
+                    const hand = actor==='player' ? this.playerHand : this.aiHand;
+                    const idx = hand.indexOf(extra);
+                    if (idx >= 0) hand.splice(idx,1);
+                    if (actor === 'player') {
+                        this.playerRiver.push(extra);
+                    } else {
+                        this.aiRiver.push(extra);
+                    }
+                    this.lastDiscard = extra;
+                    this.lastDiscardBy = actor;
+                    this.isPlayerTurn = !(actor==='player');
+                    this.waitingForAction = false;
+
+                    const opponent = actor==='player' ? 'ai' : 'player';
+                    this._checkOpponentResponse(opponent, extra);
+                    return;
+                }
+            }
+
+            _setTurn(who) {
+                this.isPlayerTurn = (who==='player');
+                this.lastDiscard = null;
+                this.lastDiscardBy = null;
+            }
+
+            _drawAndSetTurn(who) {
+                const hand = who==='player' ? this.playerHand : this.aiHand;
+                const drawn = this._draw();
+                if (drawn) {
+                    hand.push(drawn);
+                    this._sortHand(hand);
+                }
+                if (this._canHu(hand)) {
+                    this.gameOver = true;
+                    this.winner = who;
+                    this.waitingForAction = false;
+                    this.message = (who==='player' ? '🎉 自摸！你胡了！' : '😞 电脑自摸胡了！') + ' 点击任意位置重新开始';
+                    return;
+                }
+                this._setTurn(who);
+                if (who === 'player') {
+                    this.waitingForAction = true;
+                    this.message = '你的回合，请选择一张牌打出';
+                } else {
+                    this.waitingForAction = false;
+                    this.message = '电脑回合';
+                    // ★ AI杠后补牌，立即出牌
+                    this._aiDiscard();
+                }
+            }
+
+            _checkOpponentResponse(opponent, discard) {
+                const hand = opponent==='player' ? this.playerHand : this.aiHand;
+                const actions = this.getValidActions(hand, discard);
+                if (opponent === 'ai') {
+                    if (actions.includes(Action.HU)) {
+                        this.applyAction('ai', Action.HU);
+                    } else if (actions.includes(Action.MING_KONG)) {
+                        this.applyAction('ai', Action.MING_KONG);
+                    } else if (actions.includes(Action.PONG)) {
+                        this.applyAction('ai', Action.PONG);
+                    } else if (actions.includes(Action.CHI)) {
+                        const extra = this._getFirstChiCombo(hand, discard);
+                        if (extra) {
+                            this.applyAction('ai', Action.CHI, extra);
+                        } else {
+                            this._normalDraw(opponent);
+                        }
+                    } else {
+                        this._normalDraw(opponent);
+                    }
+                } else {
+                    if (actions.length > 0 && !(actions.length===1 && actions[0]===Action.PASS)) {
+                        this.waitingForAction = true;
+                        this.message = '你可以选择：胡/碰/杠/吃，或点“过”摸牌';
+                    } else {
+                        this._normalDraw('player');
+                    }
+                }
+            }
+
+            _normalDraw(who) {
+                const hand = who==='player' ? this.playerHand : this.aiHand;
+                const drawn = this._draw();
+                if (drawn) {
+                    hand.push(drawn);
+                    this._sortHand(hand);
+                }
+                if (this._canHu(hand)) {
+                    this.gameOver = true;
+                    this.winner = who;
+                    this.waitingForAction = false;
+                    this.message = (who==='player' ? '🎉 自摸！你胡了！' : '😞 电脑自摸胡了！') + ' 点击任意位置重新开始';
+                    return;
+                }
+                this._setTurn(who);
+                if (who === 'player') {
+                    this.waitingForAction = true;
+                    this.message = '你的回合，请选择一张牌打出';
+                } else {
+                    this.waitingForAction = false;
+                    this.message = '电脑回合';
+                    // ★ 正常摸牌后AI需要出牌，但通过外部调度延迟，保持节奏
+                    // 不在此直接调用，交给scheduleAIAction
+                }
+            }
+
+            // AI出牌 (简单价值评估)
+            _aiDiscard() {
+                if (this.gameOver || this.isPlayerTurn) return;
+                const hand = this.aiHand;
+                if (hand.length === 0) return;
+                const value = (t) => {
+                    const cnt = hand.filter(x => x===t).length;
+                    if (cnt >= 3) return 10;
+                    if (cnt === 2) return 8;
+                    if (t.length===1 || ['东','南','西','北','白','发','中'].includes(t)) return 2;
+                    return 0;
+                };
+                let discard = hand[0];
+                let minVal = value(hand[0]);
+                for (const t of hand) {
+                    const v = value(t);
+                    if (v < minVal) { minVal = v; discard = t; }
+                }
+                this.applyAction('ai', Action.DISCARD, discard);
+            }
+
+            // 玩家跳过响应
+            playerPass() {
+                if (!this.waitingForAction || this.lastDiscardBy !== 'ai' || !this.lastDiscard) return;
+                this.waitingForAction = false;
+                this._normalDraw('player');
+            }
+
+            // 获取玩家当前可响应动作
+            getPlayerResponseActions() {
+                if (!this.waitingForAction || this.lastDiscardBy !== 'ai' || !this.lastDiscard) return [];
+                return this.getValidActions(this.playerHand, this.lastDiscard);
+            }
+
+            // 玩家是否需要出牌 (手牌>13 或 碰/吃/杠后)
+            needsPlayerDiscard() {
+                if (this.gameOver) return false;
+                if (!this.isPlayerTurn) return false;
+                if (this.waitingForAction && this.lastDiscardBy==='ai' && this.lastDiscard) return false;
+                return this.playerHand.length > 13 ||
+                       (this.waitingForAction && this.playerHand.length >= 2);
+            }
+        }
+
+        // ==================== Canvas 绘制引擎 ====================
+        const canvas = document.getElementById('mahjongCanvas');
+        const ctx = canvas.getContext('2d');
+        const DESIGN_W = 1100, DESIGN_H = 720;
+        const CARD_W = 54, CARD_H = 76, CARD_GAP = 6, CARD_RADIUS = 6;
+
+        let game = new MahjongGame();
+        let selectedTileIndex = -1;
+        let actionButtons = [];
+        let hoveredButton = null;
+        let aiPending = false;
+        let aiTimeoutId = null;
+
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const maxWidth = Math.min(window.innerWidth-20, DESIGN_W);
+            const maxHeight = Math.min(window.innerHeight-20, DESIGN_H);
+            const scale = Math.min(maxWidth/DESIGN_W, maxHeight/DESIGN_H);
+            canvas.width = DESIGN_W;
+            canvas.height = DESIGN_H;
+            canvas.style.width = (DESIGN_W*scale)+'px';
+            canvas.style.height = (DESIGN_H*scale)+'px';
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // ==================== 绘图函数 ====================
+        function drawRoundRect(x,y,w,h,r, fill, stroke, lw=1.5) {
+            ctx.beginPath();
+            ctx.moveTo(x+r, y);
+            ctx.lineTo(x+w-r, y);
+            ctx.arcTo(x+w, y, x+w, y+r, r);
+            ctx.lineTo(x+w, y+h-r);
+            ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+            ctx.lineTo(x+r, y+h);
+            ctx.arcTo(x, y+h, x, y+h-r, r);
+            ctx.lineTo(x, y+r);
+            ctx.arcTo(x, y, x+r, y, r);
+            ctx.closePath();
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+        }
+
+        function drawTileFace(x,y,tile, highlight=false, scale=1) {
+            const w = CARD_W*scale, h = CARD_H*scale, r = CARD_RADIUS*scale;
+            if (highlight) { ctx.shadowColor='#ffd700'; ctx.shadowBlur=12*scale; }
+            drawRoundRect(x,y,w,h,r, '#fdf5e6', '#8b7355', 1.5*scale);
+            ctx.shadowColor='transparent'; ctx.shadowBlur=0;
+            drawRoundRect(x+3*scale, y+3*scale, w-6*scale, h-6*scale, r-1*scale, null, '#c4a882', 1*scale);
+            ctx.fillStyle = getTileColor(tile);
+            ctx.font = `bold ${18*scale}px "PingFang SC","Microsoft YaHei","SimHei","STHeiti",sans-serif`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(tile, x+w/2, y+h/2);
+            if (tile.length>1 && ['万','筒','条'].includes(tile[tile.length-1])) {
+                const dot = 3*scale;
+                ctx.fillStyle = getTileColor(tile);
+                ctx.beginPath(); ctx.arc(x+w*0.22, y+h*0.22, dot, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(x+w*0.78, y+h*0.78, dot, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        function drawTileBack(x,y, scale=1) {
+            const w = CARD_W*scale, h = CARD_H*scale, r = CARD_RADIUS*scale;
+            drawRoundRect(x,y,w,h,r, '#1e3a5f', '#0d1f33', 1.5*scale);
+            drawRoundRect(x+4*scale, y+4*scale, w-8*scale, h-8*scale, r-1*scale, '#264a73', '#1a3352', 1*scale);
+            ctx.fillStyle = '#3a6fa0';
+            ctx.beginPath();
+            const cx = x+w/2, cy = y+h/2, ds = 10*scale;
+            ctx.moveTo(cx, cy-ds); ctx.lineTo(cx+ds*0.7, cy);
+            ctx.lineTo(cx, cy+ds); ctx.lineTo(cx-ds*0.7, cy);
+            ctx.closePath(); ctx.fill();
+        }
+
+        function getTileColor(tile) {
+            if (tile.includes('万')) return '#c41e3a';
+            if (tile.includes('筒')) return '#1a5276';
+            if (tile.includes('条')) return '#1e7a3a';
+            if (tile==='发') return '#1e7a3a';
+            if (tile==='中') return '#c41e3a';
+            if (tile==='白') return '#555';
+            return '#2c2c2c';
+        }
+
+        function getHandStartX(len, totalW) {
+            const cardsW = len*CARD_W + (len-1)*CARD_GAP;
+            return (totalW - cardsW)/2;
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,DESIGN_W,DESIGN_H);
+            const grad = ctx.createRadialGradient(DESIGN_W/2, DESIGN_H/2, 100, DESIGN_W/2, DESIGN_H/2, DESIGN_W);
+            grad.addColorStop(0,'#2d7d46'); grad.addColorStop(1,'#1a4d28');
+            ctx.fillStyle = grad; ctx.fillRect(0,0,DESIGN_W,DESIGN_H);
+            ctx.fillStyle = 'rgba(0,0,0,0.03)';
+            for (let i=0;i<DESIGN_W;i+=30) for (let j=0;j<DESIGN_H;j+=30) if ((i+j)%60===0) ctx.fillRect(i,j,1,1);
+            drawRoundRect(15,15,DESIGN_W-30,DESIGN_H-30,14, null, '#8b6914',4);
+            drawRoundRect(22,22,DESIGN_W-44,DESIGN_H-44,10, null, 'rgba(139,105,20,0.4)',1.5);
+
+            // 牌河
+            drawRiver(game.aiRiver, 60, 'ai');
+            drawRiver(game.playerRiver, DESIGN_H-160, 'player');
+
+            // AI手牌
+            const aiY = 120;
+            const aiStartX = getHandStartX(game.aiHand.length, DESIGN_W);
+            for (let i=0; i<game.aiHand.length; i++) {
+                drawTileBack(aiStartX + i*(CARD_W+CARD_GAP), aiY, 0.85);
+            }
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.font = '13px "PingFang SC","Microsoft YaHei","SimHei",sans-serif';
+            ctx.textAlign='center';
+            ctx.fillText(`电脑手牌: ${game.aiHand.length}张`, DESIGN_W/2, aiY+CARD_H*0.85+18);
+
+            // 最近弃牌
+            if (game.lastDiscard && !game.gameOver) {
+                const ldx = DESIGN_W/2 - CARD_W/2, ldy = DESIGN_H/2 - CARD_H/2 - 10;
+                drawRoundRect(ldx-30, ldy-35, CARD_W+60, CARD_H+70, 10, 'rgba(255,255,200,0.15)', null);
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.font = 'bold 14px "PingFang SC","Microsoft YaHei","SimHei",sans-serif';
+                ctx.fillText(`${game.lastDiscardBy==='player'?'你':'电脑'}打出:`, DESIGN_W/2, ldy-10);
+                drawTileFace(ldx, ldy, game.lastDiscard, true, 1.05);
+            }
+
+            // 动作按钮
+            drawActionButtons();
+
+            // 玩家手牌
+            const pY = DESIGN_H - CARD_H - 40;
+            const pStartX = getHandStartX(game.playerHand.length, DESIGN_W);
+            for (let i=0; i<game.playerHand.length; i++) {
+                const x = pStartX + i*(CARD_W+CARD_GAP);
+                const yOff = (i===selectedTileIndex) ? -18 : 0;
+                drawTileFace(x, pY+yOff, game.playerHand[i], i===selectedTileIndex, 0.95);
+                if (i===selectedTileIndex) {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 11px "PingFang SC","Microsoft YaHei","SimHei",sans-serif';
+                    ctx.textAlign='center';
+                    ctx.fillText('▼ 确认打出', x+CARD_W*0.95/2, pY+yOff+CARD_H*0.95+16);
+                }
+            }
+
+            // 信息栏
+            const infoY = DESIGN_H-20;
+            ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0, infoY-28, DESIGN_W, 50);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 17px "PingFang SC","Microsoft YaHei","SimHei",sans-serif';
+            ctx.textAlign='center';
+            ctx.fillText(game.message || '...', DESIGN_W/2, infoY);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '13px sans-serif'; ctx.textAlign='right';
+            ctx.fillText(`剩余牌: ${game.deck.length}张`, DESIGN_W-30, 40);
+
+            // 游戏结束遮罩
+            if (game.gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0,0,DESIGN_W,DESIGN_H);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 36px "PingFang SC","Microsoft YaHei","SimHei",sans-serif';
+                ctx.textAlign='center';
+                ctx.fillText(game.winner==='player'?'🎉 恭喜获胜！':'😞 电脑获胜', DESIGN_W/2, DESIGN_H/2-20);
+                ctx.fillStyle = '#ffd700'; ctx.font = 'bold 20px sans-serif';
+                ctx.fillText('点击任意位置重新开始', DESIGN_W/2, DESIGN_H/2+35);
+            }
+
+            // 回合指示器
+            if (!game.gameOver) {
+                const dotY = game.isPlayerTurn ? DESIGN_H-CARD_H-55 : aiY-22;
+                ctx.fillStyle = game.isPlayerTurn ? '#ffd700' : '#aaa';
+                ctx.beginPath(); ctx.arc(DESIGN_W/2, dotY, 7, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = '12px sans-serif'; ctx.textAlign='center';
+                ctx.fillText(game.isPlayerTurn?'▼ 你的回合':'▲ 电脑回合', DESIGN_W/2, dotY+18);
+            }
+        }
+
+        function drawRiver(river, baseY, who) {
+            const maxShow = 12;
+            const recent = river.slice(-maxShow);
+            const tileW = CARD_W*0.7, tileH = CARD_H*0.7, gap = 3;
+            const totalW = recent.length*tileW + (Math.max(0,recent.length-1))*gap;
+            const startX = (DESIGN_W-totalW)/2;
+            const bgY = baseY-8, bgH = tileH+16, bgW = Math.max(totalW+40,200), bgX = (DESIGN_W-bgW)/2;
+            drawRoundRect(bgX, bgY, bgW, bgH, 8, 'rgba(0,0,0,0.2)', 'rgba(255,255,255,0.1)',1);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '11px sans-serif'; ctx.textAlign='center';
+            ctx.fillText(`${who==='ai'?'电脑':'玩家'}牌河 (${river.length}张)`, DESIGN_W/2, bgY-4);
+            for (let i=0; i<recent.length; i++) {
+                const x = startX + i*(tileW+gap);
+                drawTileFace(x, baseY, recent[i], i===recent.length-1, 0.7);
+            }
+        }
+
+        function drawActionButtons() {
+            actionButtons = [];
+            if (game.gameOver) return;
+            if (!game.waitingForAction || game.lastDiscardBy!=='ai' || !game.lastDiscard) return;
+            const actions = game.getPlayerResponseActions();
+            if (actions.length===0 || (actions.length===1 && actions[0]===Action.PASS)) return;
+
+            const btnW = 68, btnH = 36, btnGap = 10;
+            const totalW = actions.length*btnW + (actions.length-1)*btnGap;
+            const startX = DESIGN_W/2 - totalW/2;
+            const baseY = DESIGN_H/2 + CARD_H/2 + 20;
+
+            drawRoundRect(startX-15, baseY-8, totalW+30, btnH+16, 8, 'rgba(0,0,0,0.5)', 'rgba(255,255,255,0.2)',1.5);
+            for (let i=0; i<actions.length; i++) {
+                const act = actions[i];
+                if (act === Action.PASS) continue;
+                const x = startX + i*(btnW+btnGap), y = baseY;
+                let bg = '#5c3a1e', label = ActionLabels[act]||'?';
+                if (act===Action.HU) { bg='#8b1a1a'; label='胡'; }
+                if (act===Action.PONG) { bg='#6b4c1e'; label='碰'; }
+                if (act===Action.MING_KONG) { bg='#4a2a6b'; label='杠'; }
+                if (act===Action.CHI) { bg='#1e5c3a'; label='吃'; }
+                const isHov = hoveredButton && hoveredButton.x===x && hoveredButton.y===y;
+                if (isHov) bg = lightenColor(bg, 0.25);
+                drawRoundRect(x,y,btnW,btnH,6, bg, '#d4a860',2);
+                ctx.fillStyle='#fff'; ctx.font='bold 17px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText(label, x+btnW/2, y+btnH/2);
+                let extra = null;
+                if (act===Action.CHI) extra = game._getFirstChiCombo(game.playerHand, game.lastDiscard);
+                actionButtons.push({rect:{x,y,w:btnW,h:btnH}, action:act, extra, label});
+            }
+            // 过按钮
+            const passX = startX + actions.length*(btnW+btnGap) - btnGap;
+            if (passX+btnW <= DESIGN_W-20) {
+                const isHov = hoveredButton && hoveredButton.x===passX && hoveredButton.y===baseY;
+                drawRoundRect(passX, baseY, btnW, btnH, 6, isHov?'#666':'#444', '#999',1.5);
+                ctx.fillStyle='#ddd'; ctx.fillText('过', passX+btnW/2, baseY+btnH/2);
+                actionButtons.push({rect:{x:passX,y:baseY,w:btnW,h:btnH}, action:Action.PASS, extra:null, label:'过'});
+            }
+        }
+
+        function lightenColor(hex, f) {
+            const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+            const lr=Math.min(255,Math.round(r+(255-r)*f)), lg=Math.min(255,Math.round(g+(255-g)*f)), lb=Math.min(255,Math.round(b+(255-b)*f));
+            return '#'+[lr,lg,lb].map(c=>c.toString(16).padStart(2,'0')).join('');
+        }
+
+        // ==================== 交互逻辑 ====================
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX-rect.left)*(DESIGN_W/rect.width),
+                y: (e.clientY-rect.top)*(DESIGN_H/rect.height)
+            };
+        }
+
+        function findTile(mx, my) {
+            const hand = game.playerHand;
+            if (!hand.length) return -1;
+            const pY = DESIGN_H - CARD_H - 40;
+            const startX = getHandStartX(hand.length, DESIGN_W);
+            for (let i=0; i<hand.length; i++) {
+                const x = startX + i*(CARD_W+CARD_GAP);
+                const yOff = (i===selectedTileIndex)?-18:0;
+                if (mx>=x-4 && mx<=x+CARD_W*0.95+4 && my>=pY+yOff-4 && my<=pY+yOff+CARD_H*0.95+4)
+                    return i;
+            }
+            return -1;
+        }
+
+        function findButton(mx, my) {
+            for (const btn of actionButtons) {
+                const {x,y,w,h} = btn.rect;
+                if (mx>=x-4 && mx<=x+w+4 && my>=y-4 && my<=y+h+4) return btn;
+            }
+            return null;
+        }
+
+        function handleClick(e) {
+            const pos = getCanvasPos(e);
+            if (game.gameOver) { restartGame(); return; }
+            if (aiTimeoutId) { clearTimeout(aiTimeoutId); aiTimeoutId=null; }
+
+            const btn = findButton(pos.x, pos.y);
+            if (btn) { handleButton(btn); return; }
+
+            if (game.needsPlayerDiscard() || (game.isPlayerTurn && !game.waitingForAction && game.playerHand.length>13)) {
+                const idx = findTile(pos.x, pos.y);
+                if (idx>=0 && idx<game.playerHand.length) {
+                    if (selectedTileIndex === idx) {
+                        const tile = game.playerHand[idx];
+                        game.applyAction('player', Action.DISCARD, tile);
+                        selectedTileIndex = -1; actionButtons = [];
+                        afterPlayerAction();
+                    } else {
+                        selectedTileIndex = idx;
+                    }
+                    draw(); return;
+                }
+                if (idx<0 && selectedTileIndex>=0) { selectedTileIndex=-1; draw(); }
+                return;
+            }
+            if (selectedTileIndex>=0) { selectedTileIndex=-1; draw(); }
+        }
+
+        function handleButton(btn) {
+            if (btn.action === Action.PASS) {
+                game.playerPass();
+            } else if (btn.action === Action.HU) {
+                game.applyAction('player', Action.HU);
+            } else if (btn.action === Action.PONG) {
+                game.applyAction('player', Action.PONG);
+            } else if (btn.action === Action.MING_KONG) {
+                game.applyAction('player', Action.MING_KONG);
+            } else if (btn.action === Action.CHI) {
+                game.applyAction('player', Action.CHI, btn.extra);
+            }
+            selectedTileIndex = -1; actionButtons = [];
+            afterPlayerAction();
+        }
+
+        function afterPlayerAction() {
+            draw();
+            if (!game.gameOver && !game.isPlayerTurn && !game.waitingForAction) {
+                scheduleAIAction();
+            }
+            if (!game.gameOver && game.isPlayerTurn && game.waitingForAction &&
+                game.lastDiscardBy==='ai' && game.lastDiscard) {
+                draw();
+            }
+            if (!game.gameOver && game.isPlayerTurn && game.waitingForAction &&
+                !(game.lastDiscardBy==='ai' && game.lastDiscard)) {
+                game.message = '请选择一张牌打出';
+                draw();
+            }
+        }
+
+        function scheduleAIAction() {
+            if (game.gameOver || game.isPlayerTurn || aiPending) return;
+            aiPending = true;
+            aiTimeoutId = setTimeout(() => {
+                aiTimeoutId = null;
+                if (game.gameOver || game.isPlayerTurn) { aiPending=false; draw(); return; }
+                if (!game.waitingForAction && !game.isPlayerTurn) {
+                    game._aiDiscard();
+                }
+                aiPending = false;
+                draw();
+                if (!game.gameOver && game.isPlayerTurn && game.waitingForAction && game.lastDiscardBy==='ai') {
+                    draw();
+                } else if (!game.gameOver && !game.isPlayerTurn && !game.waitingForAction) {
+                    scheduleAIAction();
+                }
+            }, 700+Math.random()*500);
+        }
+
+        function restartGame() {
+            if (aiTimeoutId) { clearTimeout(aiTimeoutId); aiTimeoutId=null; }
+            game.reset();
+            selectedTileIndex=-1; actionButtons=[]; hoveredButton=null; aiPending=false;
+            draw();
+            if (!game.isPlayerTurn && !game.gameOver) scheduleAIAction();
+        }
+
+        function handleMouseMove(e) {
+            const pos = getCanvasPos(e);
+            const btn = findButton(pos.x, pos.y);
+            const prev = hoveredButton;
+            hoveredButton = btn ? {x:btn.rect.x, y:btn.rect.y} : null;
+            if (prev !== hoveredButton) draw();
+            canvas.style.cursor = (btn || findTile(pos.x,pos.y)>=0) ? 'pointer' : 'default';
+        }
+
+        function handleTouchStart(e) {
+            if (e.touches.length===1) {
+                handleClick({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY});
+                e.preventDefault();
+            }
+        }
+        function handleTouchMove(e) {
+            if (e.touches.length===1) {
+                handleMouseMove({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY});
+            }
+        }
+
+        canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('touchstart', handleTouchStart, {passive:false});
+        canvas.addEventListener('touchmove', handleTouchMove, {passive:false});
+        canvas.addEventListener('touchend', ()=>{ hoveredButton=null; draw(); });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key==='Escape') restartGame();
+            if (e.key==='Enter' && selectedTileIndex>=0 && game.needsPlayerDiscard()) {
+                game.applyAction('player', Action.DISCARD, game.playerHand[selectedTileIndex]);
+                selectedTileIndex=-1; actionButtons=[]; afterPlayerAction();
+            }
+            if (actionButtons.length>0 && e.key>='1' && e.key<='9') {
+                const idx = parseInt(e.key)-1;
+                if (idx < actionButtons.length) handleButton(actionButtons[idx]);
+            }
+        });
+
+        // 启动
+        if (game.isPlayerTurn && game.playerHand.length===14) {
+            game.message = '你的回合，请选择一张牌打出';
+        }
+        draw();
+        if (!game.isPlayerTurn && !game.gameOver) scheduleAIAction();
+    })();
+</script>
+</body>
+</html>

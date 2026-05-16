@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>软软的游戏库</title>
+    <title>软软的游戏库 - 在线畅玩</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -389,6 +389,10 @@
             width: 100%;
             overflow: hidden;
             position: relative;
+            background: linear-gradient(135deg, #2d3436, #1a1a2e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .game-image img {
@@ -398,8 +402,28 @@
             transition: transform 0.5s;
         }
         
-        .game-card:hover .game-image img {
-            transform: scale(1.05);
+        /* 当图片为空时显示占位图标 */
+        .game-image img[src=""], .game-image img:not([src]) {
+            opacity: 0;
+        }
+        
+        .game-image::after {
+            content: "\f11b";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 400;
+            font-size: 48px;
+            color: rgba(255,255,255,0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+        }
+        
+        .game-card .game-image img[src=""] + .game-overlay ~ .game-image::after,
+        .game-card .game-image img:not([src]) + .game-overlay ~ .game-image::after {
+            display: block;
         }
         
         .game-overlay {
@@ -625,7 +649,7 @@
                 <a href="#" class="nav-item">
                     <div class="nav-icon"><i class="fas fa-gamepad"></i></div>
                     <div class="nav-text">所有游戏</div>
-                    <div class="nav-badge" id="gameCount">6</div>
+                    <div class="nav-badge" id="gameCount">8</div>
                 </a>
                 <a href="#" class="nav-item">
                     <div class="nav-icon"><i class="fas fa-star"></i></div>
@@ -683,13 +707,72 @@
                 </div>
             </div>
             
-            <!-- 热门游戏 -->
+            <!-- 热门游戏（所有游戏卡片集合） -->
             <div class="section-header">
-                <h2>热门游戏</h2>
+                <h2>🎮 热门推荐</h2>
                 <a href="#" class="view-all" id="viewAllGames">查看全部 <i class="fas fa-chevron-right"></i></a>
             </div>
             
             <div class="games-grid" id="gamesGrid">
+                <!-- 【置顶1】软软雀 - 新添加卡片，暂时去掉图片 -->
+                <div class="game-card" data-game="ruanque">
+                    <div class="game-badge">火爆</div>
+                    <div class="game-image">
+                        <img src="" alt="软软雀">
+                        <div class="game-overlay">
+                            <a href="https://raccoon.fit/game/软软雀/" class="play-btn" target="_blank">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-title">
+                            <span>软软雀</span>
+                            <div class="game-rating">
+                                <i class="fas fa-star"></i> 4.9
+                            </div>
+                        </div>
+                        <p class="game-desc">软萌雀神降临！趣味麻将消除，轻松合成赢高分，治愈画风停不下来。</p>
+                        <div class="game-meta">
+                            <div class="game-tags">
+                                <span class="game-tag">消除</span>
+                                <span class="game-tag">休闲</span>
+                                <span class="game-tag">卡牌</span>
+                            </div>
+                            <div class="game-version">v1.0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 【置顶2】黄小仙讨封 - 移动至最前，暂时去掉图片（原图本就是空） -->
+                <div class="game-card" data-game="taofeng">
+                    <div class="game-badge">讨封</div>
+                    <div class="game-image">
+                        <img src="" alt="黄小仙讨封">
+                        <div class="game-overlay">
+                            <a href="黄小仙讨封.html" class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="game-info">
+                        <div class="game-title">
+                            <span>黄小仙讨封</span>
+                            <div class="game-rating">
+                                <i class="fas fa-star"></i> 5.0
+                            </div>
+                        </div>
+                        <p class="game-desc">五百年道行，一夜讨封。成仙或成仁，在你一念之间。</p>
+                        <div class="game-meta">
+                            <div class="game-tags">
+                                <span class="game-tag">传统</span>
+                                <span class="game-tag">讨封</span>
+                                <span class="game-tag">黄仙</span>
+                            </div>
+                            <div class="game-version">v1.5</div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- 飞翔的浣熊 -->
                 <div class="game-card" data-game="space_game">
@@ -784,7 +867,7 @@
                 <!-- 修仙问道 -->
                 <div class="game-card" data-game="space_racer">
                     <div class="game-image">
-                        <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="修仙问到">
+                        <img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="修仙问道">
                         <div class="game-overlay">
                             <a href="3D_Xiuxian_Complete.html" class="play-btn" id="racerPlayBtn">
                                 <i class="fas fa-play"></i>
@@ -811,50 +894,20 @@
                 </div>
             </div>
             
-            <!-- 新上架游戏 -->
+            <!-- 新上架游戏区域（移除了原黄小仙讨封，避免重复，保留打蚊子、方块消消） -->
             <div class="section-header" style="margin-top: 40px;">
-                <h2>新上架游戏</h2>
+                <h2>✨ 新上架游戏</h2>
                 <a href="#" class="view-all">浏览更多 <i class="fas fa-chevron-right"></i></a>
             </div>
             
             <div class="games-grid">
-                <!-- 黄小仙讨封 -->
-                <div class="game-card" data-game="galaxy_td">
-                    <div class="game-badge">讨封</div>
-                    <div class="game-image">
-                        <img src="" alt="黄小仙讨封">
-                        <div class="game-overlay">
-                            <a href="黄小仙讨封.html" class="play-btn" id="tdPlayBtn">
-                                <i class="fas fa-play"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="game-info">
-                        <div class="game-title">
-                            <span>黄小仙讨封</span>
-                            <div class="game-rating">
-                                <i class="fas fa-star"></i> 5.0
-                            </div>
-                        </div>
-                        <p class="game-desc">五百年道行，一夜讨封。成仙或成仁，在你一念之间。</p>
-                        <div class="game-meta">
-                            <div class="game-tags">
-                                <span class="game-tag">传统</span>
-                                <span class="game-tag">讨封</span>
-                                <span class="game-tag">黄仙</span>
-                            </div>
-                            <div class="game-version">v1.5</div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- 打蚊子小游戏 -->
                 <div class="game-card" data-game="alien_invasion">
                     <div class="game-badge">免费</div>
                     <div class="game-image">
-                        <img src="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="打蚊子小游戏">
+                        <img src="https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="打蚊子">
                         <div class="game-overlay">
-                            <a href="打蚊子/index.html" class="play-btn" id="alienPlayBtn">
+                            <a href="打蚊子/index.html" class="play-btn">
                                 <i class="fas fa-play"></i>
                             </a>
                         </div>
@@ -871,7 +924,6 @@
                             <div class="game-tags">
                                 <span class="game-tag">策略</span>
                                 <span class="game-tag">攻击</span>
-                        
                             </div>
                             <div class="game-version">v1.0</div>
                         </div>
@@ -883,7 +935,7 @@
                     <div class="game-image">
                         <img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="方块消消">
                         <div class="game-overlay">
-                            <a href="https://raccoon.fit/game/%E6%96%B9%E5%9D%97%E6%B6%88%E6%B6%88/" class="play-btn" id="builderPlayBtn">
+                            <a href="https://raccoon.fit/game/%E6%96%B9%E5%9D%97%E6%B6%88%E6%B6%88/" class="play-btn" target="_blank">
                                 <i class="fas fa-play"></i>
                             </a>
                         </div>
@@ -950,27 +1002,18 @@
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 
-                // 随机大小
                 const size = Math.random() * 4 + 1;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
-                
-                // 随机位置
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
-                
-                // 随机透明度
                 particle.style.opacity = Math.random() * 0.5 + 0.1;
-                
-                // 随机动画
                 const duration = Math.random() * 20 + 10;
                 const delay = Math.random() * 5;
                 particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
-                
                 container.appendChild(particle);
             }
             
-            // 添加CSS动画
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes float {
@@ -1007,198 +1050,95 @@
         }
         
         // 移动端菜单切换
-        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('active');
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        mobileBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
         });
         
-        // 点击侧边栏外区域关闭菜单
         document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            
             if (window.innerWidth <= 992 && 
                 !sidebar.contains(event.target) && 
-                !mobileMenuBtn.contains(event.target) && 
+                !mobileBtn.contains(event.target) && 
                 sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }
         });
         
-        // 游戏卡片悬停效果增强
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.zIndex = '10';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.zIndex = '';
-            });
-        });
-        
-        // 搜索框功能
-        const searchInput = document.querySelector('.search-box input');
-        searchInput.addEventListener('focus', function() {
-            this.parentElement.style.zIndex = '20';
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            this.parentElement.style.zIndex = '';
-        });
-        
         // 页面加载动画
         function addPageLoadAnimations() {
-            document.querySelectorAll('.game-card, .welcome-banner').forEach((el, index) => {
+            const elements = document.querySelectorAll('.game-card, .welcome-banner');
+            elements.forEach((el, index) => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(20px)';
-                
                 setTimeout(() => {
                     el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                     el.style.opacity = '1';
                     el.style.transform = 'translateY(0)';
-                }, 100 + index * 100);
-            });
-        }
-        
-        // 设置游戏点击事件
-           
-
-            // 查看全部游戏
-            document.getElementById('viewAllGames').addEventListener('click', function(e) {
-                e.preventDefault();
-                // 滚动到新上架游戏区域
-                document.querySelector('.section-header:last-of-type').scrollIntoView({ behavior: 'smooth' });
+                }, 100 + index * 80);
             });
         }
         
         // 设置页脚按钮事件
         function setupFooterButtons() {
-            // 关于
-            document.getElementById('aboutBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('aboutModal').style.display = 'flex';
-            });
-            
-            // 联系我们
-            document.getElementById('contactBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('联系我们: contact@gamelibrary.com\n欢迎提出宝贵意见和建议！');
-            });
-            
-            // 隐私政策
-            document.getElementById('privacyBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('隐私政策\n我们尊重您的隐私，本网站不收集任何个人数据，所有游戏数据都保存在您的本地浏览器中。');
-            });
-            
-            // 使用条款
-            document.getElementById('termsBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('使用条款\n1. 本网站所有游戏免费游玩\n2. 禁止将本站内容用于商业用途\n3. 如有问题请联系我们');
-            });
-            
-            // 关闭关于
-            document.getElementById('closeAboutBtn').addEventListener('click', function() {
-                document.getElementById('aboutModal').style.display = 'none';
-            });
-            
-            // 点击模态背景关闭
-            document.getElementById('aboutModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.style.display = 'none';
-                }
-            });
+            document.getElementById('aboutBtn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('aboutModal').style.display = 'flex'; });
+            document.getElementById('contactBtn').addEventListener('click', (e) => { e.preventDefault(); alert('联系我们: contact@gamelibrary.com\n欢迎提出宝贵意见和建议！'); });
+            document.getElementById('privacyBtn').addEventListener('click', (e) => { e.preventDefault(); alert('隐私政策\n我们尊重您的隐私，本网站不收集任何个人数据，所有游戏数据都保存在您的本地浏览器中。'); });
+            document.getElementById('termsBtn').addEventListener('click', (e) => { e.preventDefault(); alert('使用条款\n1. 本网站所有游戏免费游玩\n2. 禁止将本站内容用于商业用途\n3. 如有问题请联系我们'); });
+            document.getElementById('closeAboutBtn').addEventListener('click', () => document.getElementById('aboutModal').style.display = 'none');
+            document.getElementById('aboutModal').addEventListener('click', (e) => { if (e.target === document.getElementById('aboutModal')) document.getElementById('aboutModal').style.display = 'none'; });
         }
         
-        // 更新欢迎横幅日期
-        function updateWelcomeDate() {
-            const today = new Date();
-            const dateElement = document.querySelector('.date-number');
-            const dateTextElement = document.querySelector('.date-text');
-            
-            // 如果是1月1日，显示新年快乐
-            if (today.getMonth() === 0 && today.getDate() === 1) {
-                dateElement.textContent = '2026';
-                dateTextElement.textContent = '新年快乐！';
-            } else {
-                dateElement.textContent = '2026';
-                dateTextElement.textContent = '在线游戏库';
-            }
+        // 更新游戏总数显示
+        function updateGameCount() {
+            const totalGames = document.querySelectorAll('.game-card').length;
+            document.getElementById('gameCount').innerText = totalGames;
         }
         
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 创建背景粒子
-            createParticles();
-            
-            // 设置搜索功能
-            setupSearch();
-            
-            // 设置游戏点击事件
-            setupGameClickEvents();
-            
-            // 设置页脚按钮
-            setupFooterButtons();
-            
-            // 更新欢迎横幅日期
-            updateWelcomeDate();
-            
-            // 添加页面加载动画
-            addPageLoadAnimations();
-            
-            // 设置导航菜单点击事件
+        // 导航菜单点击平滑滚动与提示
+        function setupNavEvents() {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
-                    
-                    // 移除所有active类
-                    document.querySelectorAll('.nav-item').forEach(nav => {
-                        nav.classList.remove('active');
-                    });
-                    
-                    // 添加当前active类
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                     this.classList.add('active');
+                    if (window.innerWidth <= 992) sidebar.classList.remove('active');
                     
-                    // 如果是移动端，点击后关闭侧边栏
-                    if (window.innerWidth <= 992) {
-                        document.getElementById('sidebar').classList.remove('active');
-                    }
-                    
-                    // 根据点击的菜单项执行操作
-                    const navText = this.querySelector('.nav-text').textContent;
-                    switch(navText) {
-                        case '精选游戏':
-                            // 滚动到热门游戏区域
-                            document.querySelector('.section-header:first-of-type').scrollIntoView({ behavior: 'smooth' });
-                            break;
-                        case '游戏新闻':
-                            alert('游戏新闻功能即将上线，敬请期待！');
-                            break;
-                        case '最新上架':
-                            // 滚动到新上架游戏区域
-                            document.querySelector('.section-header:last-of-type').scrollIntoView({ behavior: 'smooth' });
-                            break;
-                        case '网站设置':
-                            alert('网站设置功能开发中');
-                            break;
-                    }
+                    const text = this.querySelector('.nav-text').textContent;
+                    if (text === '精选游戏') document.querySelector('.section-header:first-of-type').scrollIntoView({ behavior: 'smooth' });
+                    else if (text === '游戏新闻') alert('游戏新闻功能即将上线，敬请期待！');
+                    else if (text === '最新上架') document.querySelectorAll('.section-header')[1].scrollIntoView({ behavior: 'smooth' });
+                    else if (text === '网站设置') alert('网站设置功能开发中');
+                    else if (text === '所有游戏') window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
             });
-            
-            // 设置玩家名称
-            const playerName = '网站玩家';
-            document.getElementById('playerName').textContent = playerName;
-            
-            // 可以添加修改玩家名称的功能
-            document.querySelector('.user-profile').addEventListener('dblclick', function() {
-                const newName = prompt('请输入你的玩家名称:', playerName);
-                if (newName && newName.trim() !== '') {
-                    document.getElementById('playerName').textContent = newName.trim();
-                }
+            document.getElementById('viewAllGames').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.section-header')[1].scrollIntoView({ behavior: 'smooth' });
             });
-            
-            console.log('软软的游戏库已加载完成！');
+        }
+        
+        // 双击修改昵称
+        function setupUserProfile() {
+            const profile = document.querySelector('.user-profile');
+            const playerNameSpan = document.getElementById('playerName');
+            profile.addEventListener('dblclick', () => {
+                const newName = prompt('请输入你的玩家名称:', playerNameSpan.textContent);
+                if (newName && newName.trim()) playerNameSpan.textContent = newName.trim();
+            });
+        }
+        
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setupSearch();
+            setupFooterButtons();
+            addPageLoadAnimations();
+            updateGameCount();
+            setupNavEvents();
+            setupUserProfile();
+            console.log('软软的游戏库已加载完成！软软雀 & 黄小仙讨封已置顶，图片已隐藏');
         });
     </script>
 </body>
 </html>
-

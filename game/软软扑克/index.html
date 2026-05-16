@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>软软扑克 - 斗地主</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --panel-bg: #1e2a3a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0d1117;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'SimHei', 'Arial', sans-serif;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            aspect-ratio: 1100/720;
+            max-height: 95vh;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+        }
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 12px;
+        }
+        .overlay.active { display: flex; }
+        .settings-panel {
+            background: #1e2a3a;
+            border: 3px solid #5a7aac;
+            border-radius: 16px;
+            padding: 28px 32px 24px;
+            width: 85%;
+            max-width: 420px;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+        }
+        .settings-panel h3 {
+            text-align: center;
+            margin-bottom: 18px;
+            font-size: 1.4em;
+            letter-spacing: 2px;
+            color: #ffd740;
+        }
+        .settings-panel .close-btn {
+            position: absolute;
+            top: 10px; right: 16px;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: #c0392b;
+            color: #fff;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .settings-panel .close-btn:hover { background: #e74c3c; }
+        .settings-panel .row {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .settings-panel .row label { font-weight: bold; min-width: 50px; font-size: 1em; letter-spacing: 1px; }
+        .settings-panel .row button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #5a7aac;
+            background: #2a3a50;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .settings-panel .row button:hover { background: #3a5070; color: #fff; border-color: #8ab4f0; }
+        .settings-panel .row button.active { background: #2980b9; color: #fff; border-color: #ffd740; font-weight: bold; }
+        .settings-panel .row button.danger { border-color: #c0392b; background: #3a1a1a; }
+        .settings-panel .row button.danger:hover { background: #5a2020; border-color: #e74c3c; }
+        @media (max-width: 768px) {
+            .game-container { max-height: 98vh; aspect-ratio: auto; height: auto; min-height: 520px; }
+            canvas { border-radius: 0; box-shadow: none; }
+            .settings-panel { width: 92%; padding: 20px 16px 16px; max-width: 360px; }
+            .settings-panel h3 { font-size: 1.2em; margin-bottom: 12px; }
+            .settings-panel .row button { padding: 7px 12px; font-size: 0.8em; }
+            .settings-panel .row { gap: 6px; margin: 8px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div class="overlay" id="settingsOverlay">
+            <div class="settings-panel">
+                <button class="close-btn" id="settingsClose">✕</button>
+                <h3 id="settingsTitle">设置</h3>
+                <div class="row">
+                    <label id="diffLabel">难度：</label>
+                    <button data-diff="easy" id="diffEasy">简单</button>
+                    <button data-diff="normal" id="diffNormal">普通</button>
+                    <button data-diff="hard" id="diffHard">困难</button>
+                </div>
+                <div class="row">
+                    <label id="langLabel">语言：</label>
+                    <button data-lang="zh" id="langZh">中文</button>
+                    <button data-lang="en" id="langEn">English</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const CANVAS_WIDTH = 1100;
+            const CANVAS_HEIGHT = 720;
+            const CARD_WIDTH = 72;
+            const CARD_HEIGHT = 100;
+            const CARD_RADIUS = 8;
+            const CARD_SELECTED_OFFSET = 22;
+
+            const SUIT_SPADE = 0;
+            const SUIT_HEART = 1;
+            const SUIT_CLUB = 2;
+            const SUIT_DIAMOND = 3;
+            const SUIT_JOKER = 4;
+
+            const SUIT_SYMBOLS = { [SUIT_SPADE]: '♠', [SUIT_HEART]: '♥', [SUIT_CLUB]: '♣', [SUIT_DIAMOND]: '♦', [SUIT_JOKER]: '🃏' };
+            const RANK_NAMES_ZH = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'小',17:'大' };
+            const RANK_NAMES_EN = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'Jo',17:'JO' };
+
+            const TEXTS = {
+                zh: { title:'软软扑克', start:'开始游戏', restart:'重新开始', settings:'设置', difficulty:'难度', easy:'简单', normal:'普通', hard:'困难', language:'语言', chinese:'中文', english:'English', call_landlord:'叫地主', no_call:'不叫', grab_landlord:'抢地主', no_grab:'不抢', play:'出牌', pass:'过', hint:'提示', landlord:'地主', farmer:'农民', you_win:'你赢了！', you_lose:'你输了！', waiting:'等待中...', thinking:'思考中...', close:'关闭', you:'你', ai1:'AI 1', ai2:'AI 2', cards_count:'张', bottom_cards:'底牌', new_round:'新一轮，请出牌', invalid_play:'无效牌型！', cant_beat:'打不过上家的牌！', must_play:'新一轮必须出牌！', select_cards:'请选择要出的牌', no_one_call:'没人叫地主，重新发牌...', no_one_grab:'没人抢地主，重新发牌...', ai_pass:'过', ai_play:'出牌' },
+                en: { title:'RuanRuan Poker', start:'Start', restart:'Restart', settings:'Settings', difficulty:'Difficulty', easy:'Easy', normal:'Normal', hard:'Hard', language:'Language', chinese:'中文', english:'English', call_landlord:'Call', no_call:'Pass', grab_landlord:'Grab', no_grab:'Pass', play:'Play', pass:'Pass', hint:'Hint', landlord:'Landlord', farmer:'Farmer', you_win:'You Win!', you_lose:'You Lose!', waiting:'Waiting...', thinking:'Thinking...', close:'Close', you:'You', ai1:'AI 1', ai2:'AI 2', cards_count:' cards', bottom_cards:'Bottom Cards', new_round:'New round, play!', invalid_play:'Invalid play!', cant_beat:"Can't beat that!", must_play:'Must play a card!', select_cards:'Select cards to play', no_one_call:'No one called, redealing...', no_one_grab:'No one grabbed, redealing...', ai_pass:'Pass', ai_play:'Play' }
+            };
+
+            const canvas = document.getElementById('gameCanvas');
+            canvas.width = CANVAS_WIDTH;
+            canvas.height = CANVAS_HEIGHT;
+            const ctx = canvas.getContext('2d');
+
+            const gameContainer = document.getElementById('gameContainer');
+            const settingsOverlay = document.getElementById('settingsOverlay');
+            const settingsClose = document.getElementById('settingsClose');
+            const diffEasy = document.getElementById('diffEasy');
+            const diffNormal = document.getElementById('diffNormal');
+            const diffHard = document.getElementById('diffHard');
+            const langZh = document.getElementById('langZh');
+            const langEn = document.getElementById('langEn');
+            const settingsTitle = document.getElementById('settingsTitle');
+            const diffLabel = document.getElementById('diffLabel');
+            const langLabel = document.getElementById('langLabel');
+
+            function getCanvasPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = CANVAS_WIDTH / rect.width;
+                const scaleY = CANVAS_HEIGHT / rect.height;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+            }
+
+            function lerp(a, b, t) { return a + (b - a) * t; }
+
+            class Card {
+                constructor(suit, rank) {
+                    this.suit = suit;
+                    this.rank = rank;
+                    this.selected = false;
+                    this.faceUp = true;
+                    this.x = 0; this.y = 0;
+                    this.targetX = 0; this.targetY = 0;
+                    this.animSpeed = 0.15;
+                }
+                get isRed() { return this.suit === SUIT_HEART || this.suit === SUIT_DIAMOND || (this.suit === SUIT_JOKER && this.rank === 17); }
+                get displayRank() { return (window._lang === 'en' ? RANK_NAMES_EN : RANK_NAMES_ZH)[this.rank] || String(this.rank); }
+                get displaySuit() { return SUIT_SYMBOLS[this.suit] || ''; }
+                updatePosition() {
+                    this.x = lerp(this.x, this.targetX, this.animSpeed);
+                    this.y = lerp(this.y, this.targetY, this.animSpeed);
+                    if (Math.abs(this.x - this.targetX) < 0.3) this.x = this.targetX;
+                    if (Math.abs(this.y - this.targetY) < 0.3) this.y = this.targetY;
+                }
+                setTarget(x, y) { this.targetX = x; this.targetY = y; }
+                snapToTarget() { this.x = this.targetX; this.y = this.targetY; }
+                containsPoint(px, py) {
+                    const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
+                    return px >= this.x && px <= this.x + CARD_WIDTH && py >= cy && py <= cy + CARD_HEIGHT;
+                }
+                draw(ctx, lang) {
+                    const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    this._roundRect(ctx, this.x+3, cy+3, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                    ctx.fill();
+                    if (this.faceUp) {
+                        ctx.fillStyle = '#faf8f0';
+                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                        ctx.fill();
+                        ctx.strokeStyle = '#bbb';
+                        ctx.lineWidth = 1;
+                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                        ctx.stroke();
+                        const color = this.isRed ? '#d63031' : '#1a1a1a';
+                        if (this.suit === SUIT_JOKER) {
+                            const jcolor = this.rank === 17 ? '#d63031' : '#555';
+                            const text = this.rank === 17 ? (lang==='en'?'JO':'大') : (lang==='en'?'Jo':'小');
+                            ctx.fillStyle = jcolor;
+                            ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(text, this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 6);
+                            if (this.rank === 16) {
+                                ctx.font = '11px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                                ctx.fillText('JOKER', this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 26);
+                            }
+                        } else {
+                            ctx.fillStyle = color;
+                            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                            ctx.textAlign = 'left';
+                            ctx.fillText(this.displayRank, this.x+6, cy+20);
+                            ctx.font = '13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                            ctx.fillText(this.displaySuit, this.x+6, cy+37);
+                            ctx.font = '32px serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(this.displaySuit, this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 10);
+                            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                            ctx.textAlign = 'right';
+                            ctx.fillText(this.displayRank, this.x + CARD_WIDTH-6, cy + CARD_HEIGHT-10);
+                            ctx.font = '13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                            ctx.fillText(this.displaySuit, this.x + CARD_WIDTH-6, cy + CARD_HEIGHT-26);
+                        }
+                    } else {
+                        ctx.fillStyle = '#2850a0';
+                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                        ctx.fill();
+                        ctx.strokeStyle = '#1a3870';
+                        ctx.lineWidth = 2;
+                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                        ctx.stroke();
+                        ctx.fillStyle = '#3868c0';
+                        this._roundRect(ctx, this.x+8, cy+8, CARD_WIDTH-16, CARD_HEIGHT-16, 4);
+                        ctx.fill();
+                        const cx = this.x + CARD_WIDTH/2;
+                        const mcy = cy + CARD_HEIGHT/2;
+                        ctx.fillStyle = '#6090d8';
+                        ctx.beginPath();
+                        ctx.moveTo(cx, mcy-14);
+                        ctx.lineTo(cx+10, mcy);
+                        ctx.lineTo(cx, mcy+14);
+                        ctx.lineTo(cx-10, mcy);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    ctx.textAlign = 'start';
+                }
+                _roundRect(ctx, x, y, w, h, r) {
+                    ctx.beginPath();
+                    ctx.moveTo(x+r, y);
+                    ctx.lineTo(x+w-r, y);
+                    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+                    ctx.lineTo(x+w, y+h-r);
+                    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+                    ctx.lineTo(x+r, y+h);
+                    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+                    ctx.lineTo(x, y+r);
+                    ctx.quadraticCurveTo(x, y, x+r, y);
+                    ctx.closePath();
+                }
+            }
+
+            function getRankCounts(cards) { const cts={}; for(const c of cards) cts[c.rank]=(cts[c.rank]||0)+1; return cts; }
+
+            function analyzeHand(cards) {
+                if (!cards || !cards.length) return null;
+                const n = cards.length;
+                const ranks = cards.map(c=>c.rank).sort((a,b)=>a-b);
+                const counts = getRankCounts(cards);
+                const uniqueRanks = Object.keys(counts).map(Number).sort((a,b)=>a-b);
+                const vals = Object.values(counts).sort((a,b)=>a-b);
+                if (n===2 && counts[16]===1 && counts[17]===1) return {type:'rocket',weight:1000,mainRank:17,length:1};
+                if (n===4 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===4) return {type:'bomb',weight:500+uniqueRanks[0],mainRank:uniqueRanks[0],length:1};
+                if (n===4 && vals.join(',')==='1,3') { const mr = uniqueRanks.find(r=>counts[r]===3); return {type:'triple_one',weight:mr,mainRank:mr,length:1}; }
+                if (n===5 && vals.join(',')==='2,3') { const mr = uniqueRanks.find(r=>counts[r]===3); return {type:'triple_two',weight:mr,mainRank:mr,length:1}; }
+                if (n===6 && (vals.join(',')==='1,1,4'||vals.join(',')==='2,4')) { const mr = uniqueRanks.find(r=>counts[r]===4); return {type:'quad_two',weight:400+mr,mainRank:mr,length:1}; }
+                if (n===8 && vals.join(',')==='2,2,4') { const mr = uniqueRanks.find(r=>counts[r]===4); return {type:'quad_two_pair',weight:400+mr,mainRank:mr,length:1}; }
+                if (n===1) return {type:'single',weight:ranks[0],mainRank:ranks[0],length:1};
+                if (n===2 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===2) return {type:'pair',weight:ranks[0],mainRank:ranks[0],length:1};
+                if (n===3 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===3) return {type:'triple',weight:ranks[0],mainRank:ranks[0],length:1};
+                if (n>=5 && uniqueRanks.length===n && uniqueRanks.every(r=>counts[r]===1) && uniqueRanks[n-1]<=14 && uniqueRanks[n-1]-uniqueRanks[0]===n-1 && uniqueRanks.every(r=>r<=14))
+                    return {type:'straight',weight:uniqueRanks[n-1],mainRank:uniqueRanks[n-1],length:n};
+                if (n>=6 && n%2===0 && uniqueRanks.every(r=>counts[r]===2) && uniqueRanks.length>=3 && uniqueRanks[uniqueRanks.length-1]<=14 && uniqueRanks[uniqueRanks.length-1]-uniqueRanks[0]===uniqueRanks.length-1 && uniqueRanks.every(r=>r<=14))
+                    return {type:'straight_pair',weight:uniqueRanks[uniqueRanks.length-1],mainRank:uniqueRanks[uniqueRanks.length-1],length:uniqueRanks.length};
+                const triples = uniqueRanks.filter(r=>counts[r]>=3&&r<=14).sort((a,b)=>a-b);
+                for(let si=0; si<triples.length; si++) {
+                    for(let ei=si+1; ei<triples.length; ei++) {
+                        const seq = triples.slice(si,ei+1);
+                        if(seq[ei]-seq[0]===seq.length-1 && seq.length>=2) {
+                            const tripCnt = seq.reduce((s,r)=>s+counts[r],0);
+                            const rem = n - tripCnt;
+                            if(rem===0 && seq.every(r=>counts[r]===3)) return {type:'plane',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
+                            if(rem===seq.length && rem>0) return {type:'plane_single',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
+                            if(rem===seq.length*2) {
+                                const wingRanks = uniqueRanks.filter(r=>!seq.includes(r));
+                                if(wingRanks.length===seq.length && wingRanks.every(r=>counts[r]===2))
+                                    return {type:'plane_pair',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
+                            }
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function canBeat(newT, lastT) {
+                if(!lastT) return true;
+                if(newT.type==='rocket') return true;
+                if(lastT.type==='rocket') return false;
+                if(newT.type==='bomb') { if(lastT.type!=='bomb') return true; return newT.mainRank > lastT.mainRank; }
+                if(lastT.type==='bomb') return false;
+                if(newT.type===lastT.type && newT.length===lastT.length) return newT.mainRank > lastT.mainRank;
+                return false;
+            }
+
+            class AIPlayer {
+                constructor(playerId, difficulty='normal') {
+                    this.playerId = playerId;
+                    this.difficulty = difficulty;
+                    this.hand = [];
+                    this.isLandlord = false;
+                }
+                findSmallestPlayable(lastInfo) {
+                    if(!lastInfo) return this._findOpening();
+                    const same = this._findBeatingSame(lastInfo);
+                    if(same) return same;
+                    if(this.difficulty!=='easy') { const b = this._findSmallestBomb(); if(b && (this.difficulty==='hard'||Math.random()<0.5)) return b; }
+                    if(this.difficulty==='hard') { const r = this._findRocket(); if(r) return r; }
+                    if(this.difficulty==='easy') { const b = this._findSmallestBomb(); if(b && Math.random()<0.3) return b; }
+                    return null;
+                }
+                _findOpening() {
+                    if(!this.hand.length) return null;
+                    const counts = getRankCounts(this.hand);
+                    const sorted = [...this.hand].sort((a,b)=>a.rank-b.rank);
+                    if(this.difficulty==='easy') return [sorted[0]];
+                    if(this.difficulty==='normal') {
+                        const st = this._findLongestStraight();
+                        if(st && st.length>=5) return st;
+                        return [sorted[0]];
+                    }
+                    const st = this._findLongestStraight();
+                    if(st && st.length>=5 && Math.random()<0.5) return st;
+                    const pairs = Object.keys(counts).map(Number).filter(r=>counts[r]>=2&&r<=14);
+                    if(pairs.length && Math.random()<0.4) {
+                        const mp = Math.min(...pairs);
+                        return this.hand.filter(c=>c.rank===mp).slice(0,2);
+                    }
+                    return [sorted[0]];
+                }
+                _findBeatingSame(info) {
+                    const counts = getRankCounts(this.hand);
+                    const byRank = {};
+                    for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    const sRanks = Object.keys(byRank).map(Number).sort((a,b)=>a-b);
+                    const lt = info.type, lr = info.mainRank, ll = info.length;
+                    if(lt==='single') { for(const r of sRanks) if(r>lr) return [byRank[r][0]]; return null; }
+                    if(lt==='pair') { for(const r of sRanks) if(r>lr && byRank[r].length>=2) return byRank[r].slice(0,2); return null; }
+                    if(lt==='triple') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) return byRank[r].slice(0,3); return null; }
+                    if(lt==='triple_one') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) { const tr=byRank[r].slice(0,3); const rem=this.hand.filter(c=>!tr.includes(c)); if(rem.length) return [...tr, rem[0]]; } return null; }
+                    if(lt==='triple_two') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) { const tr=byRank[r].slice(0,3); const rem=this.hand.filter(c=>!tr.includes(c)); const rc=getRankCounts(rem); const pr=Object.keys(rc).map(Number).find(rr=>rc[rr]>=2); if(pr!==undefined) { const pc=rem.filter(c=>c.rank===pr).slice(0,2); return [...tr,...pc]; } } return null; }
+                    if(lt==='straight') return this._findBeatingStraight(lr,ll);
+                    if(lt==='straight_pair') return this._findBeatingStraightPair(lr,ll);
+                    if(['plane','plane_single','plane_pair'].includes(lt)) return this._findBeatingPlane(lt,lr,ll);
+                    if(lt==='quad_two'||lt==='quad_two_pair') { for(const r of sRanks) if(r>lr && byRank[r].length>=4) { const qd=byRank[r].slice(0,4); const rem=this.hand.filter(c=>!qd.includes(c)); if(rem.length>=2) return [...qd,...rem.slice(0,2)]; } return null; }
+                    return null;
+                }
+                _findBeatingStraight(lr,ll) {
+                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    for(let sr=3; sr<=14-ll+1; sr++) { const er=sr+ll-1; if(er>lr && er<=14) { let ok=true; for(let r=sr; r<=er; r++) if(!byRank[r]||byRank[r].length<1) { ok=false; break; } if(ok) { const res=[]; for(let r=sr; r<=er; r++) res.push(byRank[r][0]); return res; } } }
+                    return null;
+                }
+                _findBeatingStraightPair(lr,ll) {
+                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    for(let sr=3; sr<=14-ll+1; sr++) { const er=sr+ll-1; if(er>lr && er<=14) { let ok=true; for(let r=sr; r<=er; r++) if(!byRank[r]||byRank[r].length<2) { ok=false; break; } if(ok) { const res=[]; for(let r=sr; r<=er; r++) res.push(...byRank[r].slice(0,2)); return res; } } }
+                    return null;
+                }
+                _findBeatingPlane(lt,lr,ll) {
+                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    const trs = Object.keys(byRank).map(Number).filter(r=>byRank[r].length>=3&&r<=14).sort((a,b)=>a-b);
+                    for(let si=0; si<trs.length; si++) {
+                        for(let ei=si+ll-1; ei<trs.length; ei++) {
+                            const seq = trs.slice(si,ei+1);
+                            if(seq.length===ll && seq[ei]-seq[0]===ll-1 && seq[ei]>lr) {
+                                const tripCards = []; for(const r of seq) tripCards.push(...byRank[r].slice(0,3));
+                                const rem = this.hand.filter(c=>!tripCards.includes(c));
+                                if(lt==='plane') return tripCards;
+                                if(lt==='plane_single' && rem.length>=ll) return [...tripCards,...rem.slice(0,ll)];
+                                if(lt==='plane_pair') {
+                                    const rc = getRankCounts(rem);
+                                    const prs = Object.keys(rc).map(Number).filter(r=>rc[r]>=2);
+                                    if(prs.length>=ll) { const wing=[]; for(const r of prs.slice(0,ll)) wing.push(...rem.filter(c=>c.rank===r).slice(0,2)); return [...tripCards,...wing]; }
+                                }
+                            }
+                        }
+                    }
+                    return null;
+                }
+                _findSmallestBomb() {
+                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    const bombs = Object.entries(byRank).filter(([,cs])=>cs.length>=4).map(([r,cs])=>[Number(r),cs]).sort((a,b)=>a[0]-b[0]);
+                    return bombs.length ? bombs[0][1].slice(0,4) : null;
+                }
+                _findRocket() { const hs=this.hand.some(c=>c.rank===16), hb=this.hand.some(c=>c.rank===17); if(hs&&hb) return this.hand.filter(c=>c.rank===16||c.rank===17); return null; }
+                _findLongestStraight() {
+                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
+                    let best=null;
+                    for(let sr=3; sr<=10; sr++) { const cur=[]; for(let r=sr; r<=14; r++) { if(byRank[r]&&byRank[r].length>=1) cur.push(r); else break; } if(cur.length>=5 && (!best || cur.length>best.length)) best=cur; }
+                    if(best) { const res=[]; for(const r of best) res.push(byRank[r][0]); return res; }
+                    return null;
+                }
+            }
+
+            class Game {
+                constructor() {
+                    this.lang = 'zh';
+                    window._lang = 'zh';
+                    this.difficulty = 'normal';
+                    this.settingsOpen = false;
+                    this.state = 'idle';
+                    this.playersHand = [[],[],[]];
+                    this.landlordCards = [];
+                    this.landlordId = -1;
+                    this.currentPlayer = 0;
+                    this.lastPlayedCards = [];
+                    this.lastPlayedBy = -1;
+                    this.lastPlayInfo = null;
+                    this.passCount = 0;
+                    this.callScores = [0,0,0];
+                    this.callStartPlayer = 0;
+                    this.callCurrent = 0;
+                    this.grabPhase = false;
+                    this.grabScores = [0,0,0];
+                    this.grabCurrent = 0;
+                    this.grabStart = 0;
+                    this.winner = -1;
+                    this.message = '';
+                    this.messageTimer = 0;
+                    this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+                    this.aiTimer = null;
+                    this._mouseX = -100; this._mouseY = -100;
+                    this._playBtnRect = null; this._passBtnRect = null;
+                    this._callBtnRect = null; this._noCallBtnRect = null;
+                    this._grabBtnRect = null; this._noGrabBtnRect = null;
+                    this._startBtnRect = null;
+                    this.initNewGame();
+                }
+                t(key) { return (TEXTS[this.lang]||TEXTS['zh'])[key]||key; }
+
+                initNewGame() {
+                    if(this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+                    const deck = [];
+                    for(const s of [SUIT_SPADE,SUIT_HEART,SUIT_CLUB,SUIT_DIAMOND]) for(let r=3; r<=15; r++) deck.push(new Card(s,r));
+                    deck.push(new Card(SUIT_JOKER,16), new Card(SUIT_JOKER,17));
+                    for(let i=deck.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+                    this.playersHand = [deck.slice(0,17), deck.slice(17,34), deck.slice(34,51)];
+                    this.landlordCards = deck.slice(51,54);
+                    this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+                    this.aiPlayers[1].hand = [...this.playersHand[1]];
+                    this.aiPlayers[2].hand = [...this.playersHand[2]];
+                    for(const c of this.playersHand[0]) c.faceUp = true;
+                    for(const c of this.playersHand[1]) c.faceUp = false;
+                    for(const c of this.playersHand[2]) c.faceUp = false;
+                    for(const c of this.landlordCards) c.faceUp = false;
+                    this.state = 'idle'; this.landlordId = -1; this.currentPlayer = -1;
+                    this.lastPlayedCards = []; this.lastPlayedBy = -1; this.lastPlayInfo = null; this.passCount = 0;
+                    this.callScores = [0,0,0]; this.callStartPlayer = Math.floor(Math.random()*3); this.callCurrent = this.callStartPlayer;
+                    this.grabPhase = false; this.grabScores = [0,0,0]; this.grabCurrent = 0; this.grabStart = 0;
+                    this.winner = -1; this.message = ''; this.messageTimer = 0;
+                    for(let i=0;i<3;i++) this.playersHand[i].sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
+                    this.landlordCards.sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
+                    this._layoutAllCards();
+                }
+
+                _layoutAllCards() {
+                    const hand0 = this.playersHand[0];
+                    const totalW0 = hand0.length * CARD_WIDTH + (hand0.length-1)*8;
+                    let spacing0 = 8;
+                    if(totalW0 > CANVAS_WIDTH-100) spacing0 = -(totalW0 - (CANVAS_WIDTH-100)) / Math.max(hand0.length-1,1);
+                    const startX0 = (CANVAS_WIDTH - (hand0.length*(CARD_WIDTH+spacing0)-spacing0)) / 2;
+                    const baseY0 = CANVAS_HEIGHT - CARD_HEIGHT - 50;  // 上移手牌，避免按钮遮挡
+                    for(let i=0; i<hand0.length; i++) {
+                        hand0[i].setTarget(startX0 + i*(CARD_WIDTH+spacing0), baseY0);
+                        hand0[i].snapToTarget();
+                    }
+                    const hand1 = this.playersHand[1];
+                    for(let i=0; i<hand1.length; i++) { hand1[i].setTarget(25 + i*21, 45); hand1[i].snapToTarget(); }
+                    const hand2 = this.playersHand[2];
+                    const totalW2 = hand2.length*21;
+                    const ai2StartX = CANVAS_WIDTH - 25 - totalW2;
+                    for(let i=0; i<hand2.length; i++) { hand2[i].setTarget(ai2StartX + i*21, 45); hand2[i].snapToTarget(); }
+                    for(let i=0; i<this.landlordCards.length; i++) {
+                        this.landlordCards[i].setTarget(CANVAS_WIDTH/2 - 55 + i*50, CANVAS_HEIGHT/2 - 55);
+                        this.landlordCards[i].snapToTarget();
+                    }
+                }
+
+                startCallingPhase() {
+                    this.state='calling'; this.callScores=[0,0,0]; this.callStartPlayer=Math.floor(Math.random()*3); this.callCurrent=this.callStartPlayer; this.grabPhase=false; this.message=''; this.messageTimer=0;
+                    this._processCurrentCaller();
+                }
+                _processCurrentCaller() { if(this.state!=='calling') return; this.currentPlayer=this.callCurrent; if(this.callCurrent===0) this.message=''; else this._aiCallLandlord(this.callCurrent); }
+                _aiCallLandlord(pid) {
+                    const ai=this.aiPlayers[pid]; const score=this._evaluateHandStrength(ai.hand);
+                    const th=this.difficulty==='easy'?40:(this.difficulty==='normal'?30:20);
+                    if(score>th || (this.callScores.every(s=>s===0) && score>15)) {
+                        let cs=1; if(this.difficulty==='hard'&&score>60) cs=Math.min(3,1+Math.floor(score/30)); else if(this.difficulty==='normal'&&score>50) cs=2;
+                        this.callScores[pid]=cs; this.message=`AI${pid} ${this.t('call_landlord')} (${cs}分)`;
+                    } else { this.callScores[pid]=0; this.message=`AI${pid} ${this.t('no_call')}`; }
+                    this.messageTimer=55; this.aiTimer=setTimeout(()=>this._advanceCalling(),700);
+                }
+                _evaluateHandStrength(hand) {
+                    if(!hand.length) return 0; const counts=getRankCounts(hand); let score=0;
+                    const bombs=Object.values(counts).filter(c=>c>=4).length; score+=bombs*15;
+                    if(counts[16]&&counts[17]) score+=25;
+                    for(const r of [15,14,13,12]) if(counts[r]) score+=counts[r]*3;
+                    const ranks=[...new Set(hand.map(c=>c.rank).filter(r=>r<=14))].sort((a,b)=>a-b);
+                    let consec=0,maxC=0; for(let i=0;i<ranks.length-1;i++) { if(ranks[i+1]-ranks[i]===1) { consec++; maxC=Math.max(maxC,consec); } else consec=0; }
+                    score+=maxC*5;
+                    score+=Object.values(counts).filter(c=>c>=3).length*8;
+                    score+=Object.values(counts).filter(c=>c>=2).length*2;
+                    return Math.min(100,score);
+                }
+                _advanceCalling() { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.callCurrent=(this.callCurrent+1)%3; if(this.callCurrent===this.callStartPlayer) this._resolveCalling(); else this._processCurrentCaller(); }
+                _resolveCalling() {
+                    const maxS=Math.max(...this.callScores); if(maxS===0) { this.message=this.t('no_one_call'); this.messageTimer=80; this.aiTimer=setTimeout(()=>{this.initNewGame();this.startCallingPhase();},1400); return; }
+                    const cands=[]; for(let i=0;i<3;i++) if(this.callScores[i]===maxS) cands.push(i);
+                    if(cands.length===1) this._setLandlord(cands[0]); else this._startGrabPhase(cands);
+                }
+                _startGrabPhase(cands) { this.state='grabbing'; this.grabPhase=true; this.grabScores=[0,0,0]; this.grabStart=(cands[0]+1)%3; this.grabCurrent=this.grabStart; this._processGrabber(); }
+                _processGrabber() { if(this.grabCurrent===0) { this.currentPlayer=0; this.message=''; } else this._aiGrabLandlord(this.grabCurrent); }
+                _aiGrabLandlord(pid) {
+                    const ai=this.aiPlayers[pid]; const score=this._evaluateHandStrength(ai.hand);
+                    const th=this.difficulty==='easy'?50:(this.difficulty==='normal'?40:30);
+                    if(score>th) { this.grabScores[pid]=(this.callScores[pid]||1)+1; this.message=`AI${pid} ${this.t('grab_landlord')}!`; }
+                    else { this.grabScores[pid]=0; this.message=`AI${pid} ${this.t('no_grab')}`; }
+                    this.messageTimer=55; this.aiTimer=setTimeout(()=>this._advanceGrabbing(),700);
+                }
+                _advanceGrabbing() { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.grabCurrent=(this.grabCurrent+1)%3; if(this.grabCurrent===this.grabStart) this._resolveGrabbing(); else this._processGrabber(); }
+                _resolveGrabbing() {
+                    const all=[]; for(let i=0;i<3;i++) { if(this.grabScores[i]>0) all.push([i,this.grabScores[i]]); else if(this.callScores[i]>0) all.push([i,this.callScores[i]]); }
+                    if(!all.length) { this.message=this.t('no_one_grab'); this.messageTimer=80; this.aiTimer=setTimeout(()=>{this.initNewGame();this.startCallingPhase();},1400); return; }
+                    all.sort((a,b)=>b[1]-a[1]); this._setLandlord(all[0][0]);
+                }
+                _setLandlord(pid) {
+                    this.landlordId=pid; this.aiPlayers[1].isLandlord=(pid===1); this.aiPlayers[2].isLandlord=(pid===2);
+                    for(const c of this.landlordCards) { c.faceUp=true; this.playersHand[pid].push(c); }
+                    if(pid!==0) this.aiPlayers[pid].hand=[...this.playersHand[pid]];
+                    this.playersHand[pid].sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
+                    if(pid!==0) this.aiPlayers[pid].hand.sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
+                    this._layoutAllCards(); this.state='playing'; this.currentPlayer=pid;
+                    this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
+                    this.message=`${this.t('landlord')}: ${pid===0?this.t('you'):'AI'+pid}`; this.messageTimer=55;
+                    if(pid!==0) this._aiTurn(pid);
+                }
+                _aiTurn(pid) {
+                    if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;}
+                    this.currentPlayer=pid; const ai=this.aiPlayers[pid]; const cards=ai.findSmallestPlayable(this.lastPlayInfo);
+                    if(cards && cards.length) {
+                        const info=analyzeHand(cards);
+                        if(info && canBeat(info, this.lastPlayInfo)) {
+                            for(const c of cards) { const idx=ai.hand.indexOf(c); if(idx>=0) ai.hand.splice(idx,1); const idx2=this.playersHand[pid].indexOf(c); if(idx2>=0) this.playersHand[pid].splice(idx2,1); }
+                            this.lastPlayedCards=cards; this.lastPlayedBy=pid; this.lastPlayInfo=info; this.passCount=0;
+                            for(const c of cards) c.faceUp=true;
+                            this._layoutAllCards(); this.message=`AI${pid} ${this.t('ai_play')}`; this.messageTimer=35;
+                            if(this.playersHand[pid].length===0) { this._gameOver(pid); return; }
+                            this.currentPlayer=this._getNextPlayer(pid);
+                            this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); return;
+                        }
+                    }
+                    this._aiPass(pid);
+                }
+                _aiTurnIfNeeded() { if(this.state==='playing' && this.currentPlayer!==0) this._aiTurn(this.currentPlayer); }
+                _aiPass(pid) {
+                    if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;}
+                    if(!this.lastPlayInfo) {
+                        const ai=this.aiPlayers[pid]; if(ai.hand.length) {
+                            const sorted=[...ai.hand].sort((a,b)=>a.rank-b.rank); const card=sorted[0]; const info=analyzeHand([card]);
+                            if(info) {
+                                const idx=ai.hand.indexOf(card); if(idx>=0) ai.hand.splice(idx,1);
+                                const idx2=this.playersHand[pid].indexOf(card); if(idx2>=0) this.playersHand[pid].splice(idx2,1);
+                                this.lastPlayedCards=[card]; this.lastPlayedBy=pid; this.lastPlayInfo=info; this.passCount=0;
+                                card.faceUp=true; this._layoutAllCards(); this.message=`AI${pid} ${this.t('ai_play')}`; this.messageTimer=35;
+                                if(this.playersHand[pid].length===0) { this._gameOver(pid); return; }
+                                this.currentPlayer=this._getNextPlayer(pid);
+                                this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); return;
+                            }
+                        }
+                    }
+                    this.passCount++; this.message=`AI${pid} ${this.t('ai_pass')}`; this.messageTimer=35;
+                    if(this.passCount>=2) {
+                        this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
+                        this.currentPlayer=this._getNextPlayer(this.currentPlayer);
+                        if(this.currentPlayer===0) { this.message=this.t('new_round'); this.messageTimer=50; }
+                        else this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500);
+                    } else { this.currentPlayer=this._getNextPlayer(pid); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); }
+                }
+                _getNextPlayer(pid) { return (pid+1)%3; }
+
+                playerPlayCards(selected) {
+                    if(this.currentPlayer!==0||this.state!=='playing') return false;
+                    const info=analyzeHand(selected); if(!info) { this.message=this.t('invalid_play'); this.messageTimer=45; return false; }
+                    if(!canBeat(info,this.lastPlayInfo)) { this.message=this.t('cant_beat'); this.messageTimer=45; return false; }
+                    for(const c of selected) { const idx=this.playersHand[0].indexOf(c); if(idx>=0) this.playersHand[0].splice(idx,1); }
+                    this.lastPlayedCards=selected; this.lastPlayedBy=0; this.lastPlayInfo=info; this.passCount=0;
+                    for(const c of this.playersHand[0]) c.selected=false;
+                    this._layoutAllCards(); this.message='';
+                    if(this.playersHand[0].length===0) { this._gameOver(0); return true; }
+                    this.currentPlayer=this._getNextPlayer(0); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),450); return true;
+                }
+                playerPass() {
+                    if(this.currentPlayer!==0||this.state!=='playing') return;
+                    if(!this.lastPlayInfo) { this.message=this.t('must_play'); this.messageTimer=45; return; }
+                    this.passCount++; this.message=this.t('pass'); this.messageTimer=30;
+                    if(this.passCount>=2) {
+                        this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
+                        this.currentPlayer=this._getNextPlayer(this.currentPlayer);
+                        if(this.currentPlayer!==0) this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500);
+                        else { this.message=this.t('new_round'); this.messageTimer=50; }
+                    } else { this.currentPlayer=this._getNextPlayer(0); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),450); }
+                }
+                _gameOver(wid) { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.state='ended'; this.winner=wid; this.message=wid===0?this.t('you_win'):this.t('you_lose'); this.messageTimer=180; for(const h of this.playersHand) for(const c of h) c.faceUp=true; for(const c of this.landlordCards) c.faceUp=true; }
+
+                update() {
+                    const all=[]; for(const h of this.playersHand) all.push(...h); all.push(...this.landlordCards);
+                    for(const c of this.lastPlayedCards) if(!all.includes(c)) all.push(c);
+                    for(const c of all) c.updatePosition();
+                    if(this.messageTimer>0) this.messageTimer--;
+                }
+
+                draw(ctx) {
+                    ctx.fillStyle='#19283d'; ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+                    const tr={x:70,y:125,w:CANVAS_WIDTH-140,h:CANVAS_HEIGHT-270};
+                    ctx.fillStyle='#1a5c30'; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+tr.h/2,tr.w/2,tr.h/2,0,0,Math.PI*2); ctx.fill();
+                    ctx.strokeStyle='#154a26'; ctx.lineWidth=4; ctx.stroke();
+                    for(let i=0;i<3;i++){ ctx.strokeStyle='#1e7038'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+tr.h/2,tr.w/2-25-i*30,tr.h/2-25-i*30,0,0,Math.PI*2); ctx.stroke(); }
+                    ctx.fillStyle='rgba(80,180,100,0.12)'; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+50,tr.w/2-70,tr.h/4,0,0,Math.PI*2); ctx.fill();
+
+                    const positions = [
+                        { x: CANVAS_WIDTH/2, y: CANVAS_HEIGHT-175 },
+                        { x: 140, y: 25 },
+                        { x: CANVAS_WIDTH-140, y: 25 }
+                    ];
+                    const names = [this.t('you'), 'AI 1', 'AI 2'];
+                    for(let i=0;i<3;i++) {
+                        const {x,y}=positions[i]; const color=i===this.landlordId?'#ffd740':'#fff';
+                        let label=names[i]; if(i===this.landlordId) label+=` [${this.t('landlord')}]`;
+                        ctx.fillStyle=color; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(label,x,y);
+                        const cnt=this.playersHand[i].length; ctx.fillStyle='#ccc'; ctx.font='13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
+                        ctx.fillText(`${cnt}${this.t('cards_count')}`,x,y+22);
+                    }
+                    ctx.textAlign='start';
+
+                    for(const c of this.landlordCards) {
+                        if(c.faceUp) c.draw(ctx,this.lang);
+                        else { const dx=c.targetX,dy=c.targetY; ctx.fillStyle='#5a2020'; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill(); ctx.strokeStyle='#3a1010'; ctx.lineWidth=2; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.stroke(); ctx.fillStyle='#ffd740'; ctx.font='bold 16px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText('?',dx+CARD_WIDTH/2,dy+CARD_HEIGHT/2+5); ctx.textAlign='start'; }
+                    }
+                    if(this.landlordCards.length) { ctx.fillStyle='#ffd740'; ctx.font='13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText(this.t('bottom_cards'),CANVAS_WIDTH/2,CANVAS_HEIGHT/2-78); ctx.textAlign='start'; }
+
+                    if(this.lastPlayedCards.length) {
+                        const lc=this.lastPlayedCards; const tw=lc.length*CARD_WIDTH+(lc.length-1)*6; const sx=CANVAS_WIDTH/2-tw/2; const by=CANVAS_HEIGHT/2-160;
+                        for(let i=0;i<lc.length;i++) {
+                            const c=lc[i]; c.faceUp=true; const dx=sx+i*(CARD_WIDTH+6),dy=by;
+                            ctx.fillStyle='rgba(0,0,0,0.25)'; c._roundRect(ctx,dx+3,dy+3,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill();
+                            ctx.fillStyle='#faf8f0'; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill();
+                            ctx.strokeStyle='#bbb'; ctx.lineWidth=1; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.stroke();
+                            const color=c.isRed?'#d63031':'#1a1a1a';
+                            if(c.suit===SUIT_JOKER) {
+                                const jc=c.rank===17?'#d63031':'#555'; const jt=c.rank===17?(this.lang==='en'?'JO':'大'):(this.lang==='en'?'Jo':'小');
+                                ctx.fillStyle=jc; ctx.font='bold 18px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText(jt,dx+CARD_WIDTH/2,dy+CARD_HEIGHT/2+6);
+                            } else {
+                                ctx.fillStyle=color; ctx.font='bold 15px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.fillText(c.displayRank,dx+5,dy+18);
+                                ctx.font='12px serif'; ctx.fillText(c.displaySuit,dx+5,dy+33);
+                            }
+                        }
+                        ctx.fillStyle='#ffd740'; ctx.font='12px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='right';
+                        const byLabel=`← ${this.lastPlayedBy===0?this.t('you'):'AI'+this.lastPlayedBy}`; ctx.fillText(byLabel,sx-10,by+CARD_HEIGHT/2+4); ctx.textAlign='start';
+                    }
+
+                    for(let i=0;i<3;i++) for(const c of this.playersHand[i]) c.draw(ctx,this.lang);
+
+                    if(this.message && this.messageTimer>0) {
+                        const alpha=Math.min(1,this.messageTimer/50); ctx.fillStyle=`rgba(255,215,64,${alpha})`; ctx.font='bold 22px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.message,CANVAS_WIDTH/2,CANVAS_HEIGHT/2+100); ctx.textAlign='start';
+                    }
+
+                    ctx.fillStyle='rgba(180,130,20,0.7)'; ctx.font='bold 36px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                    ctx.fillText(this.t('title'),CANVAS_WIDTH/2+2,38); ctx.fillStyle='#ffd740'; ctx.fillText(this.t('title'),CANVAS_WIDTH/2,36); ctx.textAlign='start';
+
+                    const gx=CANVAS_WIDTH-60, gy=42;
+                    ctx.fillStyle='#3a3a3a'; ctx.beginPath(); ctx.arc(gx,gy,24,0,Math.PI*2); ctx.fill();
+                    ctx.strokeStyle='#aaa'; ctx.lineWidth=2; ctx.stroke();
+                    ctx.strokeStyle='#aaa'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(gx,gy,12,0,Math.PI*2); ctx.stroke();
+                    for(let a=0;a<360;a+=45){ const rad=a*Math.PI/180; ctx.fillStyle='#aaa'; ctx.beginPath(); ctx.arc(gx+Math.cos(rad)*17,gy+Math.sin(rad)*17,4,0,Math.PI*2); ctx.fill(); }
+
+                    this._drawButtons(ctx);
+                }
+
+                _drawButtons(ctx) {
+                    const mx=this._mouseX, my=this._mouseY;
+                    if(this.state==='playing' && this.currentPlayer===0) {
+                        const pw=120, ph=42, px=CANVAS_WIDTH/2 - pw - 18, py=CANVAS_HEIGHT - 68;
+                        const hover=mx>=px&&mx<=px+pw&&my>=py&&my<=py+ph;
+                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,px,py,pw,ph,10); ctx.fill();
+                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,px,py,pw,ph,10); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.t('play'),px+pw/2,py+ph/2+6); ctx.textAlign='start';
+                        this._playBtnRect={x:px,y:py,w:pw,h:ph};
+
+                        if(this.lastPlayInfo) {
+                            const pw2=85, ph2=42, px2=CANVAS_WIDTH/2+18, py2=CANVAS_HEIGHT-68;
+                            const hover2=mx>=px2&&mx<=px2+pw2&&my>=py2&&my<=py2+ph2;
+                            ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,px2,py2,pw2,ph2,10); ctx.fill();
+                            ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,px2,py2,pw2,ph2,10); ctx.stroke();
+                            ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                            ctx.fillText(this.t('pass'),px2+pw2/2,py2+ph2/2+6); ctx.textAlign='start';
+                            this._passBtnRect={x:px2,y:py2,w:pw2,h:ph2};
+                        } else this._passBtnRect=null;
+                    } else { this._playBtnRect=null; this._passBtnRect=null; }
+
+                    if(this.state==='calling' && this.callCurrent===0) {
+                        const cw=130, ch=46, cx=CANVAS_WIDTH/2-cw-25, cy=CANVAS_HEIGHT/2+55;
+                        const hover=mx>=cx&&mx<=cx+cw&&my>=cy&&my<=cy+ch;
+                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,cx,cy,cw,ch,10); ctx.fill();
+                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,cx,cy,cw,ch,10); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.t('call_landlord'),cx+cw/2,cy+ch/2+6); ctx.textAlign='start';
+                        this._callBtnRect={x:cx,y:cy,w:cw,h:ch};
+
+                        const ncw=100, nch=46, ncx=CANVAS_WIDTH/2+25, ncy=CANVAS_HEIGHT/2+55;
+                        const hover2=mx>=ncx&&mx<=ncx+ncw&&my>=ncy&&my<=ncy+nch;
+                        ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,ncx,ncy,ncw,nch,10); ctx.fill();
+                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,ncx,ncy,ncw,nch,10); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.t('no_call'),ncx+ncw/2,ncy+nch/2+6); ctx.textAlign='start';
+                        this._noCallBtnRect={x:ncx,y:ncy,w:ncw,h:nch};
+                    } else { this._callBtnRect=null; this._noCallBtnRect=null; }
+
+                    if(this.state==='grabbing' && this.grabCurrent===0) {
+                        const gw=130, gh=46, gx=CANVAS_WIDTH/2-gw-25, gy=CANVAS_HEIGHT/2+55;
+                        const hover=mx>=gx&&mx<=gx+gw&&my>=gy&&my<=gy+gh;
+                        ctx.fillStyle=hover?'#e05040':'#c03020'; this._roundRect(ctx,gx,gy,gw,gh,10); ctx.fill();
+                        ctx.strokeStyle='#ffd740'; ctx.lineWidth=2; this._roundRect(ctx,gx,gy,gw,gh,10); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.t('grab_landlord'),gx+gw/2,gy+gh/2+6); ctx.textAlign='start';
+                        this._grabBtnRect={x:gx,y:gy,w:gw,h:gh};
+
+                        const ngw=100, ngh=46, ngx=CANVAS_WIDTH/2+25, ngy=CANVAS_HEIGHT/2+55;
+                        const hover2=mx>=ngx&&mx<=ngx+ngw&&my>=ngy&&my<=ngy+ngh;
+                        ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,ngx,ngy,ngw,ngh,10); ctx.fill();
+                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,ngx,ngy,ngw,ngh,10); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        ctx.fillText(this.t('no_grab'),ngx+ngw/2,ngy+ngh/2+6); ctx.textAlign='start';
+                        this._noGrabBtnRect={x:ngx,y:ngy,w:ngw,h:ngh};
+                    } else { this._grabBtnRect=null; this._noGrabBtnRect=null; }
+
+                    if(this.state==='idle'||this.state==='ended') {
+                        const sw=160, sh=50, sx=CANVAS_WIDTH/2-sw/2, sy=CANVAS_HEIGHT/2+15;
+                        const hover=mx>=sx&&mx<=sx+sw&&my>=sy&&my<=sy+sh;
+                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,sx,sy,sw,sh,12); ctx.fill();
+                        ctx.strokeStyle='#ffd740'; ctx.lineWidth=2; this._roundRect(ctx,sx,sy,sw,sh,12); ctx.stroke();
+                        ctx.fillStyle='#fff'; ctx.font='bold 20px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
+                        const txtKey=this.state==='ended'?'restart':'start'; ctx.fillText(this.t(txtKey),sx+sw/2,sy+sh/2+7); ctx.textAlign='start';
+                        this._startBtnRect={x:sx,y:sy,w:sw,h:sh};
+                    } else this._startBtnRect=null;
+                }
+
+                _roundRect(ctx,x,y,w,h,r) {
+                    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+                    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+                    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+                }
+
+                handleClick(pos) {
+                    const {x,y}=pos;
+                    if(Math.hypot(x-(CANVAS_WIDTH-60), y-42) < 26) { this.settingsOpen=true; settingsOverlay.classList.add('active'); return; }
+                    if(this._startBtnRect && x>=this._startBtnRect.x && x<=this._startBtnRect.x+this._startBtnRect.w && y>=this._startBtnRect.y && y<=this._startBtnRect.y+this._startBtnRect.h) { this.initNewGame(); this.startCallingPhase(); return; }
+                    if(this._callBtnRect && x>=this._callBtnRect.x && x<=this._callBtnRect.x+this._callBtnRect.w && y>=this._callBtnRect.y && y<=this._callBtnRect.y+this._callBtnRect.h) { this.callScores[0]=1; this.message='你叫地主！'; this.messageTimer=50; this._advanceCalling(); return; }
+                    if(this._noCallBtnRect && x>=this._noCallBtnRect.x && x<=this._noCallBtnRect.x+this._noCallBtnRect.w && y>=this._noCallBtnRect.y && y<=this._noCallBtnRect.y+this._noCallBtnRect.h) { this.callScores[0]=0; this.message='你不叫'; this.messageTimer=50; this._advanceCalling(); return; }
+                    if(this._grabBtnRect && x>=this._grabBtnRect.x && x<=this._grabBtnRect.x+this._grabBtnRect.w && y>=this._grabBtnRect.y && y<=this._grabBtnRect.y+this._grabBtnRect.h) { this.grabScores[0]=Math.max(this.callScores[0],...this.grabScores)+1; this.message='你抢地主！'; this.messageTimer=50; this._advanceGrabbing(); return; }
+                    if(this._noGrabBtnRect && x>=this._noGrabBtnRect.x && x<=this._noGrabBtnRect.x+this._noGrabBtnRect.w && y>=this._noGrabBtnRect.y && y<=this._noGrabBtnRect.y+this._noGrabBtnRect.h) { this.grabScores[0]=0; this.message='你不抢'; this.messageTimer=50; this._advanceGrabbing(); return; }
+                    if(this._playBtnRect && x>=this._playBtnRect.x && x<=this._playBtnRect.x+this._playBtnRect.w && y>=this._playBtnRect.y && y<=this._playBtnRect.y+this._playBtnRect.h) { const sel=this.playersHand[0].filter(c=>c.selected); if(sel.length) this.playerPlayCards(sel); else { this.message=this.t('select_cards'); this.messageTimer=45; } return; }
+                    if(this._passBtnRect && x>=this._passBtnRect.x && x<=this._passBtnRect.x+this._passBtnRect.w && y>=this._passBtnRect.y && y<=this._passBtnRect.y+this._passBtnRect.h) { this.playerPass(); return; }
+                    if(this.state==='playing' && this.currentPlayer===0) {
+                        const h0=this.playersHand[0];
+                        for(let i=h0.length-1; i>=0; i--) { if(h0[i].containsPoint(x,y)) { h0[i].selected=!h0[i].selected; return; } }
+                    }
+                }
+            }
+
+            const game = new Game();
+
+            function updateSettingsUI() {
+                diffEasy.classList.toggle('active', game.difficulty==='easy');
+                diffNormal.classList.toggle('active', game.difficulty==='normal');
+                diffHard.classList.toggle('active', game.difficulty==='hard');
+                langZh.classList.toggle('active', game.lang==='zh');
+                langEn.classList.toggle('active', game.lang==='en');
+                settingsTitle.textContent = game.t('settings');
+                diffLabel.textContent = game.t('difficulty')+'：';
+                langLabel.textContent = game.t('language')+'：';
+                diffEasy.textContent = game.t('easy');
+                diffNormal.textContent = game.t('normal');
+                diffHard.textContent = game.t('hard');
+                langZh.textContent = game.t('chinese');
+                langEn.textContent = game.t('english');
+            }
+
+            settingsClose.addEventListener('click', ()=>{ game.settingsOpen=false; settingsOverlay.classList.remove('active'); });
+            settingsOverlay.addEventListener('click', (e)=>{ if(e.target===settingsOverlay) { game.settingsOpen=false; settingsOverlay.classList.remove('active'); } });
+            diffEasy.addEventListener('click', ()=>{ game.difficulty='easy'; game._updateAIDifficulty(); updateSettingsUI(); });
+            diffNormal.addEventListener('click', ()=>{ game.difficulty='normal'; game._updateAIDifficulty(); updateSettingsUI(); });
+            diffHard.addEventListener('click', ()=>{ game.difficulty='hard'; game._updateAIDifficulty(); updateSettingsUI(); });
+            langZh.addEventListener('click', ()=>{ game.lang='zh'; window._lang='zh'; updateSettingsUI(); });
+            langEn.addEventListener('click', ()=>{ game.lang='en'; window._lang='en'; updateSettingsUI(); });
+
+            game._updateAIDifficulty = function() {
+                if(this.aiPlayers[1]) this.aiPlayers[1].difficulty = this.difficulty;
+                if(this.aiPlayers[2]) this.aiPlayers[2].difficulty = this.difficulty;
+            };
+
+            canvas.addEventListener('mousedown', (e)=>{ if(e.button===0) { const pos=getCanvasPos(e); game.handleClick(pos); } });
+            canvas.addEventListener('mousemove', (e)=>{ const pos=getCanvasPos(e); game._mouseX=pos.x; game._mouseY=pos.y; });
+            canvas.addEventListener('mouseleave', ()=>{ game._mouseX=-100; game._mouseY=-100; });
+            canvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); const pos=getCanvasPos(e); game.handleClick(pos); }, {passive:false});
+            canvas.addEventListener('touchmove', (e)=>{ e.preventDefault(); const pos=getCanvasPos(e); game._mouseX=pos.x; game._mouseY=pos.y; }, {passive:false});
+            canvas.addEventListener('touchend', ()=>{ game._mouseX=-100; game._mouseY=-100; });
+            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && game.settingsOpen) { game.settingsOpen=false; settingsOverlay.classList.remove('active'); } });
+
+            function gameLoop() {
+                game.update();
+                ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+                game.draw(ctx);
+                updateSettingsUI();
+                requestAnimationFrame(gameLoop);
+            }
+            game.state='idle'; game.message='';
+            updateSettingsUI();
+            gameLoop();
+        })();
+    </script>
+</body>
+</html>

@@ -540,20 +540,37 @@
     })();
 </script>
 <script>
-// ==================== 统计上报 ====================
-        function submitStatistics() {
-            var USER = "2051775505";
-            var APPID = "676";
-            var url = "https://yuju.99kpk.top:81/api/statistics_add.php?user=" + encodeURIComponent(USER) + "&appid=" + encodeURIComponent(APPID);
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.timeout = 5000;
-            xhr.onload = function() { if (xhr.status === 200) { try { var data = JSON.parse(xhr.responseText); if (data.code === 1) console.log("[统计] 上报成功"); } catch(e) {} } };
-            xhr.ontimeout = function() {};
-            xhr.onerror = function() {};
-            xhr.send();
+// ==================== 统计上报（修复：自动触发 + 错误处理） ====================
+function submitStatistics() {
+    var USER = "2051775505";
+    var APPID = "676";
+    var url = "https://yuju.99kpk.top:81/api/statistics_add.php?user=" + encodeURIComponent(USER) + "&appid=" + encodeURIComponent(APPID);
+    
+    // 使用 fetch 更现代，同时保留超时控制
+    fetch(url, {
+        method: 'GET',
+        mode: 'cors',           // 允许跨域
+        cache: 'no-cache',
+        signal: AbortSignal.timeout(5000)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.code === 1) {
+            console.log("[统计] 上报成功");
+        } else {
+            console.warn("[统计] 上报响应异常", data);
         }
+    })
+    .catch(err => {
+        // 静默失败，不影响用户体验
+        console.log("[统计] 上报失败（已忽略）", err.message);
+    });
+}
 
+// 确保页面完全加载后执行统计上报
+window.addEventListener('load', function() {
+    submitStatistics();
+});
 </script>
 </body>
 </html>

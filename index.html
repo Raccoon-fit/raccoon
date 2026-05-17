@@ -539,5 +539,21 @@
         console.log("%cRaccoon.Fit — Stay Curious, Stay Creative", "color:#5C3D2E; font-size:12px;");
     })();
 </script>
+<script>
+// ==================== 统计上报 ====================
+        function submitStatistics() {
+            var USER = "2051775505";
+            var APPID = "627";
+            var url = "https://yuju.99kpk.top:81/api/statistics_add.php?user=" + encodeURIComponent(USER) + "&appid=" + encodeURIComponent(APPID);
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.timeout = 5000;
+            xhr.onload = function() { if (xhr.status === 200) { try { var data = JSON.parse(xhr.responseText); if (data.code === 1) console.log("[统计] 上报成功"); } catch(e) {} } };
+            xhr.ontimeout = function() {};
+            xhr.onerror = function() {};
+            xhr.send();
+        }
+
+</script>
 </body>
 </html>

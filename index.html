@@ -458,6 +458,45 @@
 <span id="liveClock" class="hidden"></span>
 
 <script>
+
+// 检测微信浏览器
+        function isWeChatBrowser() {
+            const ua = navigator.userAgent;
+            return ua.indexOf('MicroMessenger') > -1;
+        }
+        
+        // 检测QQ浏览器
+        function isQQBrowser() {
+            const ua = navigator.userAgent;
+            return ua.indexOf('QQ/') > -1 || ua.indexOf('MQQBrowser') > -1;
+        }
+        
+        // 显示微信弹窗
+        function showWeChatTip() {
+            const tip = document.getElementById('wechatTip');
+            
+            setTimeout(() => {
+                tip.classList.add('show');
+            }, 1000);
+            
+            setTimeout(() => {
+                tip.classList.remove('show');
+            }, 8000);
+        }
+        
+        // 显示QQ弹窗
+        function showQQTip() {
+            const tip = document.getElementById('qqTip');
+            
+            setTimeout(() => {
+                tip.classList.add('show');
+            }, 1000);
+            
+            setTimeout(() => {
+                tip.classList.remove('show');
+            }, 8000);
+        }
+
     (function() {
         const overlay = document.getElementById('loadingOverlay');
         if (overlay) {
@@ -540,6 +579,54 @@
         console.log("%c🦝 温暖大地 · 软软的小窝", "color:#C17F59; font-size:16px; font-weight:bold;");
         console.log("%cRaccoon.Fit — Stay Curious, Stay Creative", "color:#5C3D2E; font-size:12px;");
     })();
+
+
+
+
+// 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检测浏览器类型并显示对应的提示
+            if (isWeChatBrowser()) {
+                showWeChatTip();
+            } else if (isQQBrowser()) {
+                showQQTip();
+            }
+            
+            // 绑定简易模式切换按钮
+            document.getElementById('modeToggle').addEventListener('click', toggleSimpleMode);
+            
+            // 检查保存的模式设置
+            checkSavedMode();
+            
+            initParticles();
+            animateParticles();
+            animateFireworks();
+            animateSkills();
+            initScrollAnimations();
+            
+            // 启动时钟
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // 控制台欢迎信息
+            console.log('%cRaccoon.Fit', 'font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #2DD4BF, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;');
+            console.log('%c高级数字创意空间已加载', 'color: #A1A1AA;');
+            console.log('%c当前浏览器UA:', 'color: #A1A1AA;', navigator.userAgent);
+            console.log('%c微信浏览器检测:', 'color: #A1A1AA;', isWeChatBrowser() ? '检测到微信浏览器' : '非微信浏览器');
+            console.log('%cQQ浏览器检测:', 'color: #A1A1AA;', isQQBrowser() ? '检测到QQ浏览器' : '非QQ浏览器');
+            console.log('%c简易模式功能已启用', 'color: #A1A1AA;', '点击右上角按钮切换模式');
+            
+            // 导航栏滚动效果
+            window.addEventListener('scroll', () => {
+                const nav = document.querySelector('.main-nav');
+                if (window.scrollY > 100) {
+                    nav.style.background = 'rgba(20, 20, 30, 0.8)';
+                    nav.style.backdropFilter = 'blur(20px) saturate(180%)';
+                } else {
+                    nav.style.background = 'var(--glass-bg)';
+                }
+            });
+        });
 </script>
 <script>
 // ==================== 统计上报（修复：自动触发 + 错误处理） ====================

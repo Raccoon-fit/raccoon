@@ -5,13 +5,17 @@
 // 2 - 重要公告
 // 4 - 系统维护
 
-window.CLOUD_STATUS = 0;   // 当前为无公告，可按需修改为 1,2,4
+window.CLOUD_STATUS = 2;   // 当前为无公告，可按需修改为 1,2,4
 
 // 普通公告内容（仅当 CLOUD_STATUS=1 时生效）
 window.CLOUD_NOTICE_NORMAL = "欢迎使用 Ride IDE！新功能已上线。";
 
 // 重要公告内容（仅当 CLOUD_STATUS=2 时生效）
-window.CLOUD_NOTICE_IMPORTANT = '由于更换编辑器后bug有点多，目前正在修bug，近期将不再进行更新，望悉知';
+window.CLOUD_NOTICE_IMPORTANT = '版本更新调整<br>
+各位用户：<br>
+大版本延期至5月25日（下周一）。今晚19:00先行发布小版本（需重新下载安装包），修复部分已知bug。<br>
+感谢理解。<br>
+——Ride开发团队';
 // 维护模式内容（仅当 CLOUD_STATUS=4 时生效）
 window.CLOUD_MAINTENANCE_TITLE = "系统维护中";
 window.CLOUD_MAINTENANCE_CONTENT = "Ride IDE 正在进行维护升级，预计需要 100 分钟。";

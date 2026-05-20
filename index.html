@@ -661,244 +661,226 @@ window.addEventListener('load', function() {
     submitStatistics();
 });
 </script>
-<style>
-/* 灵动岛提示容器 */
-.dynamic-island-toast {
-  position: fixed;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-  /* 初始小球样式 */
-  width: 24px;
-  height: 24px;
-  background-color: #07C160; /* 默认微信绿，后续动态覆盖 */
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(4px);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-/* 下落 + 放大动画 */
-.dynamic-island-toast.fall-animation {
-  animation: fallAndGrow 0.55s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
-}
-
-@keyframes fallAndGrow {
-  0% {
-    top: -60px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-  }
-  60% {
-    top: 68px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-  }
-  100% {
-    top: 68px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-  }
-}
-
-/* 展开为灵动岛胶囊 */
-.dynamic-island-toast.expand-state {
-  width: 260px;
-  max-width: 86vw;
-  border-radius: 40px;
-  padding: 0 16px;
-  justify-content: flex-start;
-  gap: 8px;
-  backdrop-filter: blur(12px);
-  background-color: var(--island-color);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(255, 255, 255, 0.3) inset;
-  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-}
-
-/* 内部文字样式 */
-.island-toast-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-  letter-spacing: 0.3px;
-  opacity: 0;
-  transition: opacity 0.2s ease 0.05s;
-  white-space: nowrap;
-}
-
-.dynamic-island-toast.expand-state .island-toast-text {
-  opacity: 1;
-}
-
-/* 可选的左侧 icon（微信/QQ 小标） */
-.island-icon {
-  width: 20px;
-  height: 20px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.dynamic-island-toast.expand-state .island-icon {
-  opacity: 1;
-}
-
-/* 微信 icon 模拟 */
-.wechat-icon {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8.5 8.5C7.67 8.5 7 7.83 7 7s.67-1.5 1.5-1.5S10 6.17 10 7s-.67 1.5-1.5 1.5zm7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5S17 6.17 17 7s-.67 1.5-1.5 1.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-1.66 0-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1H8.5c.28-.59.5-1.21.5-1.87 0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5c0 .66.22 1.28.5 1.87H14c-.55 0-1 .45-1 1s.45 1 1 1h-1c0 1.66-1.34 3-3 3z'/%3E%3C/svg%3E");
-}
-.qq-icon {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z'/%3E%3C/svg%3E");
-}
-
-/* 淡出移除动画 */
-.dynamic-island-toast.fade-out {
-  animation: toastFadeOut 0.4s ease forwards;
-}
-
-@keyframes toastFadeOut {
-  to {
-    opacity: 0;
-    transform: translateX(-50%) scale(0.92);
-    visibility: hidden;
-  }
-}
-
-/* 自适应安全区偏移（避免刘海/状态栏过近） */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .dynamic-island-toast.fall-animation,
-  .dynamic-island-toast.expand-state {
-    top: calc(48px + env(safe-area-inset-top));
-  }
-  @keyframes fallAndGrow {
-    0% { top: -60px; width: 16px; height: 16px; }
-    60% { top: calc(44px + env(safe-area-inset-top)); width: 44px; height: 44px; }
-    100% { top: calc(44px + env(safe-area-inset-top)); width: 44px; height: 44px; }
-  }
-}
-</style>
-
 <script>
-// 灵动岛提示管理器 (全局单例)
-let activeIslandToast = null;
-let toastTimer = null;
+(function() {
+    // ========== 1. 动态注入灵动岛样式（确保动画流畅、GPU加速） ==========
+    const styleId = 'dynamic-island-style';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            /* 灵动岛容器 - 基础样式 + 高性能渲染 */
+            .dynamic-island-toast {
+                position: fixed;
+                left: 50%;
+                top: -80px;
+                transform: translateX(-50%);
+                z-index: 10001;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                will-change: transform, width, height, top, border-radius;
+                /* 过渡用于展开阶段 */
+                transition: width 0.32s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+                            height 0.32s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+                            border-radius 0.32s cubic-bezier(0.2, 0.9, 0.4, 1.1),
+                            background-color 0.2s ease;
+                /* 初始小球参数 */
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                background-color: #07C160;  /* 动态覆盖 */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                backdrop-filter: blur(8px);
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            /* 下落阶段：使用 transform 实现物理回落 (不会卡顿) */
+            .dynamic-island-toast.falling {
+                animation: smoothFall 0.55s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+            }
+            @keyframes smoothFall {
+                0% {
+                    top: -80px;
+                    transform: translateX(-50%) scale(0.7);
+                    opacity: 0.8;
+                }
+                40% {
+                    top: 30px;
+                    transform: translateX(-50%) scale(1.1);
+                }
+                100% {
+                    top: 60px;
+                    transform: translateX(-50%) scale(1);
+                }
+            }
+            /* 展开为灵动岛 (长胶囊) */
+            .dynamic-island-toast.expanded {
+                width: 260px !important;
+                max-width: 86vw;
+                height: 44px !important;
+                border-radius: 40px !important;
+                justify-content: flex-start;
+                gap: 10px;
+                padding: 0 18px;
+                background-color: var(--island-color);
+                box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12), inset 0 0.5px 0 rgba(255,255,255,0.3);
+            }
+            /* 内部图标 + 文字 默认透明，展开后渐显 */
+            .island-icon, .island-toast-text {
+                opacity: 0;
+                transition: opacity 0.2s ease 0.08s;
+            }
+            .dynamic-island-toast.expanded .island-icon,
+            .dynamic-island-toast.expanded .island-toast-text {
+                opacity: 1;
+            }
+            .island-icon {
+                width: 22px;
+                height: 22px;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                flex-shrink: 0;
+            }
+            .wechat-icon {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8.5 8.5C7.67 8.5 7 7.83 7 7s.67-1.5 1.5-1.5S10 6.17 10 7s-.67 1.5-1.5 1.5zm7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5S17 6.17 17 7s-.67 1.5-1.5 1.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 17c-1.66 0-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1-.45-1-1-1H8.5c.28-.59.5-1.21.5-1.87 0-1.93 1.57-3.5 3.5-3.5s3.5 1.57 3.5 3.5c0 .66.22 1.28.5 1.87H14c-.55 0-1 .45-1 1s.45 1 1 1h-1c0 1.66-1.34 3-3 3z'/%3E%3C/svg%3E");
+            }
+            .qq-icon {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z'/%3E%3C/svg%3E");
+            }
+            .island-toast-text {
+                font-size: 15px;
+                font-weight: 600;
+                color: white;
+                letter-spacing: 0.3px;
+                white-space: nowrap;
+            }
+            /* 淡出消失动画 */
+            .dynamic-island-toast.fade-out {
+                animation: fadeOutAnim 0.35s ease forwards;
+            }
+            @keyframes fadeOutAnim {
+                to {
+                    opacity: 0;
+                    transform: translateX(-50%) scale(0.92);
+                    visibility: hidden;
+                }
+            }
+            /* 安全区域适配 */
+            @supports (padding-top: env(safe-area-inset-top)) {
+                @keyframes smoothFall {
+                    0% { top: -80px; transform: translateX(-50%) scale(0.7); }
+                    40% { top: calc(30px + env(safe-area-inset-top)); transform: translateX(-50%) scale(1.1); }
+                    100% { top: calc(60px + env(safe-area-inset-top)); transform: translateX(-50%) scale(1); }
+                }
+                .dynamic-island-toast.expanded {
+                    top: calc(60px + env(safe-area-inset-top)) !important;
+                }
+                .dynamic-island-toast.falling {
+                    top: calc(60px + env(safe-area-inset-top)) !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-function destroyIslandToast() {
-  if (activeIslandToast) {
-    if (toastTimer) clearTimeout(toastTimer);
-    const toast = activeIslandToast;
-    toast.classList.add('fade-out');
-    toast.addEventListener('animationend', () => {
-      if (toast.parentNode) toast.remove();
-    }, { once: true });
-    activeIslandToast = null;
-  }
-}
+    // ========== 2. 灵动岛管理器（无卡顿版） ==========
+    let activeToast = null;
+    let autoHideTimer = null;
 
-function showDynamicIslandTip(browserType) {
-  // 避免重复弹出
-  if (activeIslandToast) {
-    destroyIslandToast();
-  }
+    function destroyToast() {
+        if (autoHideTimer) clearTimeout(autoHideTimer);
+        if (activeToast) {
+            const toast = activeToast;
+            toast.classList.add('fade-out');
+            toast.addEventListener('animationend', () => {
+                if (toast.parentNode) toast.remove();
+            }, { once: true });
+            activeToast = null;
+        }
+    }
 
-  // 确定配色和文案
-  let bgColor = '#07C160';      // 微信绿
-  let iconClass = 'wechat-icon';
-  let tipText = '您正在使用微信浏览';
-  if (browserType === 'qq') {
-    bgColor = '#12B7F5';        // QQ蓝
-    iconClass = 'qq-icon';
-    tipText = '您正在使用QQ浏览';
-  }
+    function showDynamicIslandTip(browserType) {
+        if (activeToast) destroyToast();
 
-  // 创建 DOM 结构
-  const toast = document.createElement('div');
-  toast.className = 'dynamic-island-toast';
-  toast.style.setProperty('--island-color', bgColor);
-  toast.style.backgroundColor = bgColor;
-  
-  // 内部结构：图标 + 文字
-  const iconSpan = document.createElement('div');
-  iconSpan.className = `island-icon ${iconClass}`;
-  const textSpan = document.createElement('span');
-  textSpan.className = 'island-toast-text';
-  textSpan.innerText = tipText;
-  
-  toast.appendChild(iconSpan);
-  toast.appendChild(textSpan);
-  document.body.appendChild(toast);
-  
-  activeIslandToast = toast;
+        // 确定配色和文案
+        const isWechat = browserType === 'wechat';
+        const bgColor = isWechat ? '#07C160' : '#12B7F5';
+        const iconClass = isWechat ? 'wechat-icon' : 'qq-icon';
+        const tipText = isWechat ? '您正在使用微信浏览' : '您正在使用QQ浏览';
 
-  // 强制回流确保动画
-  toast.offsetHeight;
-  
-  // 1. 执行下落放大动画
-  toast.classList.add('fall-animation');
-  
-  // 监听动画结束，进行左右展开
-  const onFallEnd = () => {
-    toast.classList.remove('fall-animation');
-    // 展开为灵动岛胶囊
-    toast.classList.add('expand-state');
-    
-    // 设置自动消失 (4.5秒后移除)
-    toastTimer = setTimeout(() => {
-      if (activeIslandToast === toast) {
-        destroyIslandToast();
-      }
-    }, 4500);
-    
-    toast.removeEventListener('animationend', onFallEnd);
-  };
-  
-  toast.addEventListener('animationend', onFallEnd, { once: true });
-  
-  // 可选：点击灵动岛立即关闭
-  toast.addEventListener('click', () => {
-    destroyIslandToast();
-  });
-}
+        // 创建 DOM
+        const toast = document.createElement('div');
+        toast.className = 'dynamic-island-toast';
+        toast.style.setProperty('--island-color', bgColor);
+        toast.style.backgroundColor = bgColor;
 
-// 覆盖原有微信/QQ浏览器提示函数，启用灵动岛效果
-window.showWeChatTip = function() {
-  showDynamicIslandTip('wechat');
-};
-window.showQQTip = function() {
-  showDynamicIslandTip('qq');
-};
+        const iconSpan = document.createElement('div');
+        iconSpan.className = `island-icon ${iconClass}`;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'island-toast-text';
+        textSpan.innerText = tipText;
 
-// 检测浏览器类型 (保留原有稳健逻辑)
-function isWeChatBrowser() {
-  return navigator.userAgent.indexOf('MicroMessenger') > -1;
-}
-function isQQBrowser() {
-  const ua = navigator.userAgent;
-  return ua.indexOf('QQ/') > -1 || ua.indexOf('MQQBrowser') > -1;
-}
+        toast.appendChild(iconSpan);
+        toast.appendChild(textSpan);
+        document.body.appendChild(toast);
+        activeToast = toast;
 
-// 页面初始化时调用
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (isWeChatBrowser()) window.showWeChatTip();
-    else if (isQQBrowser()) window.showQQTip();
-  });
-} else {
-  if (isWeChatBrowser()) window.showWeChatTip();
-  else if (isQQBrowser()) window.showQQTip();
-}
+        // 强制重绘
+        toast.offsetHeight;
+
+        // 开始下落动画
+        toast.classList.add('falling');
+
+        // 下落结束后展开为灵动岛
+        const onFallEnd = () => {
+            toast.classList.remove('falling');
+            toast.classList.add('expanded');
+
+            // 自动消失（4.5秒）
+            autoHideTimer = setTimeout(() => {
+                destroyToast();
+            }, 4500);
+            toast.removeEventListener('animationend', onFallEnd);
+        };
+        toast.addEventListener('animationend', onFallEnd, { once: true });
+
+        // 点击立即关闭
+        toast.addEventListener('click', () => {
+            destroyToast();
+        });
+    }
+
+    // ========== 3. 浏览器检测 ==========
+    function isWeChatBrowser() {
+        return /MicroMessenger/i.test(navigator.userAgent);
+    }
+    function isQQBrowser() {
+        const ua = navigator.userAgent;
+        return /QQ\//i.test(ua) || /MQQBrowser/i.test(ua);
+    }
+
+    // ========== 4. 自动触发 ==========
+    function init() {
+        if (isWeChatBrowser()) {
+            showDynamicIslandTip('wechat');
+        } else if (isQQBrowser()) {
+            showDynamicIslandTip('qq');
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    // 暴露全局方法（便于手动调用）
+    window.showWeChatTip = () => showDynamicIslandTip('wechat');
+    window.showQQTip = () => showDynamicIslandTip('qq');
+})();
 </script>
 </body>
 </html>

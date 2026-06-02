@@ -1613,7 +1613,7 @@
         k === 'Info' || k === 'F1' || k === 'Keyboard' || k === 'ShowSettings' ||
         k === 'ColorF0Red' || k === 'MediaContextMenu') return true;
     // keyCode
-    if (c === 93 /* Menu */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
+    if (c === 82 /* KEYCODE_MENU */ || c === 93 /* Menu */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
     // Tizen / webOS 电视：调用了历史菜单
     if (k && k.startsWith('ColorF') && k.includes('Red')) return true;
     return false;
@@ -1626,7 +1626,7 @@
     const startOverlay = document.getElementById('startOverlay');
     const inStart = startOverlay && startOverlay.style.display !== 'none';
 
-    // 【最高优先级】菜单键：任何界面都能打开/关闭设置
+    // 【最高优先级】菜单键（KEYCODE_MENU=82）：任何界面都能打开/关闭设置
     if (isMenuKey(e)) {
       e.preventDefault();
       e.stopPropagation();

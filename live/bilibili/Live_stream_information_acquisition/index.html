@@ -5,7 +5,6 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="referrer" content="no-referrer">
     <title>Bilibili 直播流提取工具</title>
-    
     <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
@@ -26,7 +25,6 @@
             }
         }
     </script>
-    
     <!-- Custom Styles -->
     <style>
         body {
@@ -79,8 +77,14 @@
             background: transparent;
         }
 
-        .win-btn:hover { background: #e5e5e5; }
-        .win-btn.close:hover { background: #e81123; color: white; }
+        .win-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .win-btn.close:hover {
+            background: #e81123;
+            color: white;
+        }
 
         .sidebar {
             background: rgba(243, 243, 243, 0.8);
@@ -91,12 +95,15 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cdcdcd;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #a6a6a6;
         }
@@ -112,8 +119,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Toast Notification */
@@ -468,9 +480,15 @@
         }
     </style>
 </head>
+
 <body class="font-sans">
     <!-- Windows 10 Application Window -->
     <div class="window-frame rounded-sm">
+        <!-- 顶部声明条 -->
+        <div style="background: #fff3cd; color: #856404; padding: 4px 10px; font-size: 12px; text-align: center; border-bottom: 1px solid #ffeaa7; flex-shrink: 0;">
+            如有侵权，可联系2051775505@qq.com
+        </div>
+
         <!-- Title Bar -->
         <header class="title-bar">
             <div class="flex items-center gap-2">
@@ -620,9 +638,9 @@
                             <i class="fa-solid fa-link mr-2"></i>可用直播流地址
                         </h3>
                         <p class="text-sm text-gray-500 mb-4">提示：点击"复制"复制链接，点击"播放"在线观看，或使用PotPlayer/VLC播放</p>
-                        
+
                         <div class="quality-tabs" id="qualityTabs"></div>
-                        
+
                         <div class="stream-items" id="streamUrls"></div>
                     </section>
                 </div>
@@ -682,18 +700,18 @@
         // Parse room ID from input
         function parseRoomId(input) {
             input = input.trim();
-            
+
             // Pure number
             if (/^\d+$/.test(input)) {
                 return input;
             }
-            
+
             // URL patterns
             var urlMatch = input.match(/live\.bilibili\.com\/(\d+)/);
             if (urlMatch) {
                 return urlMatch[1];
             }
-            
+
             return null;
         }
 
@@ -711,7 +729,7 @@
             document.getElementById('errorText').textContent = message;
             errorDiv.className = 'error-msg show';
 
-            setTimeout(function() {
+            setTimeout(function () {
                 errorDiv.className = 'error-msg';
             }, 5000);
         }
@@ -723,7 +741,7 @@
             toastText.textContent = message;
             toast.className = 'toast show';
 
-            setTimeout(function() {
+            setTimeout(function () {
                 toast.className = 'toast';
             }, 3000);
         }
@@ -748,9 +766,9 @@
         // Copy to clipboard
         function copyToClipboard(text, callback) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(function() {
+                navigator.clipboard.writeText(text).then(function () {
                     if (callback) callback();
-                })['catch'](function() {
+                })['catch'](function () {
                     fallbackCopyToClipboard(text, callback);
                 });
             } else {
@@ -796,7 +814,7 @@
                 xhr.timeout = 15000;
                 xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             try {
@@ -815,11 +833,11 @@
                     }
                 };
 
-                xhr.onerror = function() {
+                xhr.onerror = function () {
                     tryRequest(proxyIndex + 1);
                 };
 
-                xhr.ontimeout = function() {
+                xhr.ontimeout = function () {
                     tryRequest(proxyIndex + 1);
                 };
 
@@ -833,7 +851,7 @@
         function getRoomInfo(roomId, callback) {
             var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + roomId;
 
-            proxyRequest(apiUrl, function(data, error) {
+            proxyRequest(apiUrl, function (data, error) {
                 if (error) {
                     callback(null, error);
                     return;
@@ -865,10 +883,10 @@
                 }
             }
 
-            qualities.forEach(function(qn) {
+            qualities.forEach(function (qn) {
                 var apiUrl = 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=' + roomId + '&quality=' + qn + '&platform=web';
 
-                proxyRequest(apiUrl, function(data, error) {
+                proxyRequest(apiUrl, function (data, error) {
                     if (error) {
                         checkComplete();
                         return;
@@ -923,7 +941,7 @@
             setLoading(true);
 
             // Get room info
-            getRoomInfo(roomId, function(roomInfo, error) {
+            getRoomInfo(roomId, function (roomInfo, error) {
                 if (error) {
                     showError(error.message || '获取房间信息失败');
                     setLoading(false);
@@ -944,7 +962,7 @@
                 }
 
                 // Get stream URL
-                getStreamUrl(roomId, function(streamData, error2) {
+                getStreamUrl(roomId, function (streamData, error2) {
                     if (error2) {
                         showError(error2.message || '获取直播流地址失败');
                         setLoading(false);
@@ -961,10 +979,10 @@
 
                     // Display stream list
                     displayStreamList();
-                    
+
                     // Save to history
                     saveToHistory(roomId, roomInfo);
-                    
+
                     setLoading(false);
                 });
             });
@@ -982,7 +1000,7 @@
             // Cover image
             var coverImg = document.getElementById('roomCover');
             coverImg.src = data.keyframe || data.user_cover || 'https://via.placeholder.com/400x300?text=No+Cover';
-            coverImg.onerror = function() {
+            coverImg.onerror = function () {
                 coverImg.src = 'https://via.placeholder.com/400x300?text=No+Cover';
             };
 
@@ -1009,13 +1027,13 @@
             tabsContainer.innerHTML = '';
 
             var keys = Object.keys(allStreamData);
-            keys.forEach(function(qn) {
+            keys.forEach(function (qn) {
                 var data = allStreamData[qn];
                 var btn = document.createElement('button');
                 btn.className = 'quality-tab' + (parseInt(qn) === currentQuality ? ' active' : '');
                 btn.textContent = data.desc;
-                btn.onclick = (function(q) {
-                    return function() {
+                btn.onclick = (function (q) {
+                    return function () {
                         currentQuality = q;
                         displayStreamList();
                     };
@@ -1040,13 +1058,13 @@
                 return;
             }
 
-            currentData.durl.forEach(function(stream, index) {
+            currentData.durl.forEach(function (stream, index) {
                 var streamName = stream.name || ('线路 ' + (index + 1));
 
                 var item = document.createElement('div');
                 item.className = 'stream-item';
-                item.innerHTML = 
-                    '<div class="stream-name">' + streamName + 
+                item.innerHTML =
+                    '<div class="stream-name">' + streamName +
                     '<span class="stream-quality">' + currentData.desc + '</span></div>' +
                     '<div class="stream-url-container">' +
                     '<input type="text" readonly value="' + stream.url + '" class="stream-url" id="streamUrl' + index + '">' +
@@ -1064,7 +1082,7 @@
         function copyUrl(index) {
             var input = document.getElementById('streamUrl' + index);
             var url = input.value;
-            copyToClipboard(url, function() {
+            copyToClipboard(url, function () {
                 showToast('链接已复制到剪贴板');
             });
         }
@@ -1092,7 +1110,7 @@
             videoPlayer.pause();
             videoPlayer.src = url;
 
-            videoPlayer.onloadedmetadata = function() {
+            videoPlayer.onloadedmetadata = function () {
                 try {
                     videoPlayer.play();
                 } catch (e) {
@@ -1100,7 +1118,7 @@
                 }
             };
 
-            videoPlayer.onerror = function() {
+            videoPlayer.onerror = function () {
                 showToast('视频加载失败，请尝试复制链接到本地播放器');
             };
         }
@@ -1152,7 +1170,7 @@
             xhr.open('GET', coverSrc, true);
             xhr.responseType = 'blob';
 
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var blob = xhr.response;
                     var blobUrl = URL.createObjectURL(blob);
@@ -1194,7 +1212,7 @@
             var playUrl = currentData.durl[0].url;
             var qualityDesc = currentData.desc;
 
-            copyToClipboard(playUrl, function() {
+            copyToClipboard(playUrl, function () {
                 showToast(qualityDesc + '播放链接已复制！');
             });
         }
@@ -1205,12 +1223,12 @@
 
         function saveToHistory(roomId, roomInfo) {
             var history = JSON.parse(localStorage.getItem('bilibiliStreamHistory') || '[]');
-            
+
             // Remove existing
-            history = history.filter(function(item) {
+            history = history.filter(function (item) {
                 return item.roomId !== roomId;
             });
-            
+
             // Add to beginning
             history.unshift({
                 roomId: roomId,
@@ -1218,12 +1236,12 @@
                 cover: roomInfo.keyframe || roomInfo.user_cover,
                 anchor: roomInfo.uname
             });
-            
+
             // Max 20 items
             if (history.length > 20) {
                 history = history.slice(0, 20);
             }
-            
+
             localStorage.setItem('bilibiliStreamHistory', JSON.stringify(history));
             renderHistory();
         }
@@ -1231,13 +1249,13 @@
         function renderHistory() {
             var history = JSON.parse(localStorage.getItem('bilibiliStreamHistory') || '[]');
             var container = document.getElementById('historyGrid');
-            
+
             if (history.length === 0) {
                 container.innerHTML = '<p class="text-gray-400 text-xs col-span-2 text-center py-4">暂无提取记录</p>';
                 return;
             }
-            
-            container.innerHTML = history.slice(0, 6).map(function(item) {
+
+            container.innerHTML = history.slice(0, 6).map(function (item) {
                 return '<div class="history-item" onclick="loadRoom(\'' + item.roomId + '\')">' +
                     '<img src="' + (item.cover || 'https://via.placeholder.com/200x120?text=No+Cover') + '" alt="' + item.title + '">' +
                     '<p>' + (item.title || '未知标题') + '</p>' +
@@ -1250,7 +1268,7 @@
                 showError('请输入有效的房间号');
                 return;
             }
-            
+
             document.getElementById('roomInput').value = roomId;
             fetchStream();
         }
@@ -1259,16 +1277,16 @@
         // Event Listeners
         // ========================================
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Enter key to search
-            document.getElementById('roomInput').addEventListener('keypress', function(e) {
+            document.getElementById('roomInput').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     fetchStream();
                 }
             });
 
             // Quick room buttons
-            document.getElementById('quickRooms').addEventListener('click', function(e) {
+            document.getElementById('quickRooms').addEventListener('click', function (e) {
                 var btn = e.target.closest('button');
                 if (btn) {
                     var roomId = btn.dataset.roomId;
@@ -1277,31 +1295,31 @@
             });
 
             // Click outside modal to close
-            document.getElementById('videoModal').addEventListener('click', function(e) {
+            document.getElementById('videoModal').addEventListener('click', function (e) {
                 if (e.target === this) {
                     closeModal();
                 }
             });
 
             // ESC key to close modal
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     closeModal();
                 }
             });
 
             // Window control buttons
-            document.getElementById('closeBtn').addEventListener('click', function() {
+            document.getElementById('closeBtn').addEventListener('click', function () {
                 if (confirm('确定要关闭 Bilibili 直播流提取工具吗？')) {
                     showToast('在实际应用中，这里将关闭窗口');
                 }
             });
 
-            document.getElementById('minimizeBtn').addEventListener('click', function() {
+            document.getElementById('minimizeBtn').addEventListener('click', function () {
                 showToast('最小化窗口');
             });
 
-            document.getElementById('maximizeBtn').addEventListener('click', function() {
+            document.getElementById('maximizeBtn').addEventListener('click', function () {
                 showToast('最大化/还原窗口');
             });
 

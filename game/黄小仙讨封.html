@@ -1612,8 +1612,8 @@
     if (k === 'Menu' || k === 'ContextMenu' || k === 'Settings' ||
         k === 'Info' || k === 'F1' || k === 'Keyboard' || k === 'ShowSettings' ||
         k === 'ColorF0Red' || k === 'MediaContextMenu') return true;
-    // keyCode
-    if (c === 82 /* KEYCODE_MENU */ || c === 93 /* Menu */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
+    // keyCode：Android TV KEYCODE_MENU=82；部分系统PageDown=93；国产盒子=139/229/230
+    if (c === 82 /* KEYCODE_MENU */ || c === 93 /* Menu */ || c === 139 /* KEYCODE_MENU 变体 */ || c === 229 /* 部分盒子菜单键 */ || c === 230 /* 部分盒子菜单键 */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
     // Tizen / webOS 电视：调用了历史菜单
     if (k && k.startsWith('ColorF') && k.includes('Red')) return true;
     return false;
@@ -1625,6 +1625,22 @@
     const inSettings = overlay && overlay.classList.contains('show');
     const startOverlay = document.getElementById('startOverlay');
     const inStart = startOverlay && startOverlay.style.display !== 'none';
+
+    // keyup 事件特殊处理：某些电视系统（如Amazon Fire TV）只在 keyup 时发送菜单键
+    if (e.type === 'keyup' && isMenuKey(e)) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (inSettings) {
+        closeSettings();
+      } else {
+        const confirmEl = document.getElementById('confirmOverlay');
+        if (confirmEl && confirmEl.classList.contains('show')) {
+          closeConfirm();
+        }
+        openSettings();
+      }
+      return;
+    }
 
     // 【最高优先级】菜单键（KEYCODE_MENU=82）：任何界面都能打开/关闭设置
     if (isMenuKey(e)) {
@@ -1769,7 +1785,15 @@
     });
 
     // 电视遥控器
+    // 调试模式：捕获所有按键事件，输出到控制台（帮助诊断遥控器按键问题）
+    document.addEventListener('keydown', function(e) {
+      console.log('[DEBUG keydown]', 'key=' + e.key, 'keyCode=' + e.keyCode, 'code=' + e.code, 'which=' + e.which);
+    });
+    document.addEventListener('keyup', function(e) {
+      console.log('[DEBUG keyup]', 'key=' + e.key, 'keyCode=' + e.keyCode, 'code=' + e.code, 'which=' + e.which);
+    });
     document.addEventListener('keydown', handleRemoteKey);
+    document.addEventListener('keyup', handleRemoteKey);
     // 鼠标点击时同步焦点
     document.addEventListener('click', (e) => {
       const target = e.target.closest('.focusable');

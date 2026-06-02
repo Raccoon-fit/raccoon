@@ -28,7 +28,7 @@
       position: relative;
     }
     .game-container { max-width: 600px; width: 100%; display: flex; flex-direction: column; min-height: 100vh; }
-    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #222; margin-bottom: 15px; }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 8px; margin-bottom: 12px; border-bottom: 1px solid #222; }
     .cultivation { font-size: 14px; color: #666; }
     .cultivation span { color: #8B7355; font-weight: bold; }
     .achievements { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
@@ -47,6 +47,20 @@
       z-index: 100; color: #d4c0a1;
     }
     .story-container { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+    .status-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: linear-gradient(to bottom, #000 70%, rgba(0,0,0,0.95) 90%, rgba(0,0,0,0));
+      padding: 12px 0 8px; margin-bottom: 12px;
+      border-bottom: 1px solid #222;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .choices-container {
+      position: sticky; bottom: 0; z-index: 100;
+      background: linear-gradient(to top, #000 70%, rgba(0,0,0,0.95) 90%, rgba(0,0,0,0));
+      padding: 16px 0 0; margin-top: 12px;
+      border-top: 1px solid #222;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
     .story-text { font-size: 17px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; }
     .story-text.narrator { color: #888; font-style: italic; }
     .story-text.speaker { color: var(--highlight-color); font-weight: bold; }
@@ -60,7 +74,7 @@
       letter-spacing: 1px; padding: 10px 0;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .choices-container { display: flex; flex-direction: column; gap: 12px; padding: 20px 0; border-top: 1px solid #222; }
+    .choices-container { display: flex; flex-direction: column; gap: 12px; padding: 16px 0 0; border-top: 1px solid #222; }
     .choice-btn {
       background: transparent; border: 1px solid var(--btn-border); color: var(--text-color);
       padding: 15px 20px; font-size: 15px; font-family: inherit; text-align: left;
@@ -155,6 +169,34 @@
       content: "";
     }
     /* 设置按钮 + 弹层 */
+    /* 跳转浮动按钮 */
+    .settings-btn {
+      position: fixed; top: 12px; right: 12px; width: 40px; height: 40px;
+      background: transparent; border: 1px solid #333; color: #888;
+      border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 1500;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .settings-btn:hover { border-color: #D4AF37; color: #D4AF37; }
+    /* 跳转浮动按钮 */
+    .float-jump-btn {
+      position: fixed; right: 16px; bottom: 90px; z-index: 90;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(26, 21, 16, 0.85); border: 1px solid #8B7355; color: #D4AF37;
+      font-size: 20px; cursor: pointer; display: none; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px); transition: all 0.2s;
+    }
+    .float-jump-btn:hover { background: #1a1510; border-color: #D4AF37; transform: scale(1.06); }
+    .float-jump-btn.show { display: flex; }
+    body.tv-mode .float-jump-btn { width: 56px; height: 56px; font-size: 26px; bottom: 110px; }
+    /* 滚动位置提示 */
+    .scroll-hint {
+      position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 50; opacity: 0; transition: opacity 0.2s;
+      color: #D4AF37; font-size: 48px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+    .scroll-hint.show { opacity: 0.4; }
     .settings-btn {
       position: fixed; top: 12px; right: 12px; width: 40px; height: 40px;
       background: transparent; border: 1px solid #333; color: #888;
@@ -273,7 +315,7 @@
     <div class="choices-container" id="choices-container"></div>
     <div class="footer">
       <div class="version-container">
-        <button class="version-btn" id="versionBtn">v1.5.4</button>
+        <button class="version-btn" id="versionBtn">v1.5.6</button>
         <button class="skip-btn" id="skipBtn">快进</button>
       </div>
       <div class="inland-security-footer">
@@ -305,6 +347,7 @@
     </div>
   </div>
   <div class="toast" id="toast"></div>
+  <button class="float-jump-btn focusable" id="floatJumpBtn" title="跳到选项" aria-label="跳到选项">↓</button>
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-modal" role="alertdialog" aria-modal="true">
       <h4 id="confirmTitle">确认操作</h4>
@@ -322,6 +365,26 @@
   <div class="changelog-popup" id="changelogPopup">
     <h4>更新日志</h4>
     <div class="version-block">
+      <div class="version-title">v1.5.6 · 遥控器键值</div>
+      <ul>
+        <li>菜单键识别覆盖更多 keyCode：93/101/102/122/139/164/166-169/229-275</li>
+        <li>Back 键处理独立为 isBackKey()：兼容 Android Back(4)、Esc(27)、Backspace(8)</li>
+        <li>游戏中的 Back 键改为场景历史栈真倒退，可一步步退到上一场景</li>
+        <li>菜单键也覆盖 18+ 颜色/频道/搜索/语音 键名</li>
+      </ul>
+      <div class="date">2026-06-02</div>
+    </div>
+    <div class="version-block old">
+      <div class="version-title">v1.5.5 · 长剧情优化</div>
+      <ul>
+        <li>状态栏、选项栏 sticky 固定顶部/底部，剧情可独立滚动</li>
+        <li>新增浮动「↓跳选项 / ↑跳顶部」按钮，电视上一键跳到当前可交互区</li>
+        <li>遥控器上下键：优先滚动剧情，到底后自动跳到选项</li>
+        <li>数字键 0 一键跳到选项</li>
+      </ul>
+      <div class="date">2026-06-02</div>
+    </div>
+    <div class="version-block old">
       <div class="version-title">v1.5.4 · 菜单键</div>
       <ul>
         <li>遥控器菜单键现在能随时打开/关闭设置面板</li>
@@ -1253,6 +1316,7 @@
     },
     currentScene: 'start',
     storyHistory: [],
+    sceneHistory: [],
     typingTimer: null,
     checkpointScene: 'start',
     skipMode: false
@@ -1382,6 +1446,7 @@
           if (scene.action === 'unlock_witness') unlockAchievement('witness');
         }
         showChoicesDirect(scene);
+        window.dispatchEvent(new Event('scene-rendered'));
         return;
       }
       const textObj = scene.texts[textIndex];
@@ -1429,6 +1494,12 @@
     else if (action === 'unlock_witness') unlockAchievement('witness');
     // 故意不再处理 'achievement_true' —— 该路径已废弃
     else if (action === 'reset') { resetGame(false); return; }
+    // 压入场景历史（用于 Back 键回退）
+    if (gameData.currentScene && nextScene && gameData.currentScene !== nextScene) {
+      gameData.sceneHistory.push(gameData.currentScene);
+      // 限制历史长度
+      if (gameData.sceneHistory.length > 50) gameData.sceneHistory.shift();
+    }
     setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
   };
 
@@ -1447,6 +1518,7 @@
       renderAchievementIcons();
     }
     gameData.checkpointScene = 'start';
+    gameData.sceneHistory = [];
     renderScene('start');
   }
 
@@ -1502,6 +1574,8 @@
       if (storyContainer) storyContainer.innerHTML = '';
       if (choicesContainer) choicesContainer.innerHTML = '';
       updateCultivation('start');
+      gameData.sceneHistory = [];
+      gameData.checkpointScene = 'start';
       setTimeout(() => {
         const overlay = document.getElementById('startOverlay');
         if (overlay) overlay.style.display = 'flex';
@@ -1549,6 +1623,58 @@
     if (localStorage.getItem('huangdaxian_tv_mode') === '1') {
       document.body.classList.add('tv-mode');
     }
+  }
+
+  // ================== 长剧情滚动辅助 ==================
+  function setupScrollAssist() {
+    const storyContainer = document.getElementById('story-container');
+    const floatBtn = document.getElementById('floatJumpBtn');
+    if (!storyContainer || !floatBtn) return;
+    function updateFloatBtn() {
+      // 是否可滚动
+      const canScroll = storyContainer.scrollHeight > storyContainer.clientHeight + 4;
+      if (!canScroll) {
+        floatBtn.classList.remove('show');
+        return;
+      }
+      floatBtn.classList.add('show');
+      // 判断是顶部还是底部
+      const atTop = storyContainer.scrollTop < 40;
+      const atBottom = storyContainer.scrollTop + storyContainer.clientHeight >= storyContainer.scrollHeight - 40;
+      if (atTop) {
+        floatBtn.textContent = '↓';
+        floatBtn.title = '跳到选项';
+        floatBtn.dataset.mode = 'down';
+      } else if (atBottom) {
+        floatBtn.textContent = '↑';
+        floatBtn.title = '跳到顶部';
+        floatBtn.dataset.mode = 'up';
+      } else {
+        floatBtn.textContent = '↓';
+        floatBtn.title = '跳到选项';
+        floatBtn.dataset.mode = 'down';
+      }
+    }
+    floatBtn.addEventListener('click', () => {
+      const mode = floatBtn.dataset.mode;
+      if (mode === 'down') {
+        // 滚到剧情底部+选项可见
+        const choices = document.getElementById('choices-container');
+        if (choices) choices.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        storyContainer.scrollTop = storyContainer.scrollHeight;
+        // 焦点自动跳到第一个选项
+        setTimeout(() => {
+          const first = document.querySelector('#choices-container .choice-btn');
+          if (first) focusElement(first);
+        }, 300);
+      } else {
+        storyContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+    storyContainer.addEventListener('scroll', updateFloatBtn);
+    // 每次重新渲染场景都要重置
+    window.addEventListener('scene-rendered', () => setTimeout(updateFloatBtn, 100));
+    updateFloatBtn();
   }
 
   // ================== 电视遥控器适配 ==================
@@ -1606,16 +1732,29 @@
   }
   // 菜单键检测：不同遥控器上报不一致，全部包揽
   function isMenuKey(e) {
-    const k = e.key;
-    const c = e.keyCode;
-    // key 名称
-    if (k === 'Menu' || k === 'ContextMenu' || k === 'Settings' ||
-        k === 'Info' || k === 'F1' || k === 'Keyboard' || k === 'ShowSettings' ||
-        k === 'ColorF0Red' || k === 'MediaContextMenu') return true;
-    // keyCode：Android TV KEYCODE_MENU=82；部分系统PageDown=93；国产盒子=139/229/230
-    if (c === 82 /* KEYCODE_MENU */ || c === 93 /* Menu */ || c === 139 /* KEYCODE_MENU 变体 */ || c === 229 /* 部分盒子菜单键 */ || c === 230 /* 部分盒子菜单键 */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
-    // Tizen / webOS 电视：调用了历史菜单
-    if (k && k.startsWith('ColorF') && k.includes('Red')) return true;
+    const k = e.key || '';
+    const c = e.keyCode || 0;
+    // 优先查 e.key 名称
+    const KEY_NAMES = ['Menu', 'ContextMenu', 'Settings', 'Info', 'F1', 'Keyboard',
+                       'ShowSettings', 'MediaContextMenu', 'ColorF0Red', 'ColorF1',
+                       'ChannelUp', 'ChannelDown', 'Guide', 'Tv', 'TvInput',
+                       'Live', 'Search', 'Voice'];
+    if (KEY_NAMES.indexOf(k) >= 0) return true;
+    // keyCode 兑底：Menu=93, BrowserSearch=101, F11=122, NumLock=144, My Computer=164, Help=...
+    if (c === 93 || c === 101 || c === 102 || c === 122 || c === 139 ||
+        c === 164 || c === 166 || c === 167 || c === 168 || c === 169 ||
+        (c >= 229 && c <= 275)) return true;
+    // Tizen / webOS 颜色键前缀
+    if (k.indexOf('ColorF') === 0) return true;
+    return false;
+  }
+  // Back 键检测：同样跨平台处理
+  function isBackKey(e) {
+    const k = e.key || '';
+    const c = e.keyCode || 0;
+    if (k === 'Escape' || k === 'Back' || k === 'GoBack' || k === 'BrowserBack' || k === 'Cancel') return true;
+    // Android TV Back=4, Esc=27, Backspace=8
+    if (c === 4 || c === 27 || c === 8) return true;
     return false;
   }
 
@@ -1626,23 +1765,7 @@
     const startOverlay = document.getElementById('startOverlay');
     const inStart = startOverlay && startOverlay.style.display !== 'none';
 
-    // keyup 事件特殊处理：某些电视系统（如Amazon Fire TV）只在 keyup 时发送菜单键
-    if (e.type === 'keyup' && isMenuKey(e)) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (inSettings) {
-        closeSettings();
-      } else {
-        const confirmEl = document.getElementById('confirmOverlay');
-        if (confirmEl && confirmEl.classList.contains('show')) {
-          closeConfirm();
-        }
-        openSettings();
-      }
-      return;
-    }
-
-    // 【最高优先级】菜单键（KEYCODE_MENU=82）：任何界面都能打开/关闭设置
+    // 【最高优先级】菜单键：任何界面都能打开/关闭设置
     if (isMenuKey(e)) {
       e.preventDefault();
       e.stopPropagation();
@@ -1662,7 +1785,7 @@
     // 更新日志弹层打开时：返回键能关，方向键允许内部滚动
     const changelogEl = document.getElementById('changelogPopup');
     if (changelogEl && changelogEl.classList.contains('show')) {
-      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+      if (isBackKey(e)) {
         e.preventDefault();
         changelogEl.classList.remove('show');
         return;
@@ -1686,7 +1809,7 @@
 
     // 在设置面板中
     if (inSettings) {
-      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+      if (isBackKey(e)) {
         e.preventDefault();
         closeSettings();
         return;
@@ -1705,7 +1828,7 @@
     // 在 confirm 弹层中
     const confirmOverlay = document.getElementById('confirmOverlay');
     if (confirmOverlay && confirmOverlay.classList.contains('show')) {
-      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+      if (isBackKey(e)) {
         e.preventDefault();
         closeConfirm();
         return;
@@ -1723,20 +1846,68 @@
       return;
     }
 
-    // 在游戏中
-    if (key === 'ArrowDown' || key === 'ArrowRight') { e.preventDefault(); focusNext(1); return; }
-    if (key === 'ArrowUp' || key === 'ArrowLeft') { e.preventDefault(); focusNext(-1); return; }
-    if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') { e.preventDefault(); activateCurrent(); return; }
-    if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+    // 在游戏中：上下键优先滚动剧情（如果可滚），左右键切换选项焦点
+    const storyEl = document.getElementById('story-container');
+    const storyCanScroll = storyEl && (storyEl.scrollHeight > storyEl.clientHeight + 4);
+    const atBottom = storyEl && (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 4);
+    const atTop = storyEl && storyEl.scrollTop < 4;
+    if (key === 'ArrowDown' || key === 'ArrowRight') {
       e.preventDefault();
-      // 后退：如果有选择项列表不后退，退回上一个选择点
-      // 简单处理：返回 checkpoint 或 start
-      if (gameData.checkpointScene && gameData.checkpointScene !== 'start') {
+      if (key === 'ArrowDown' && storyCanScroll && !atBottom) {
+        // 剧情可滚且未到底：优先滚动剧情
+        storyEl.scrollBy({ top: 120, behavior: 'smooth' });
+        // 滚到底后再按一下会跳到选项
+        setTimeout(() => {
+          if (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 4) {
+            const first = document.querySelector('#choices-container .choice-btn');
+            if (first) focusElement(first);
+          }
+        }, 200);
+      } else {
+        focusNext(1);
+      }
+      return;
+    }
+    if (key === 'ArrowUp' || key === 'ArrowLeft') {
+      e.preventDefault();
+      if (key === 'ArrowUp' && storyCanScroll && !atTop) {
+        storyEl.scrollBy({ top: -120, behavior: 'smooth' });
+        // 滚到顶后再按一下会跳回上一个选项
+        setTimeout(() => {
+          if (storyEl.scrollTop < 4) {
+            const list = getFocusableElements();
+            if (list.length > 0) focusElement(list[list.length - 1]);
+          }
+        }, 200);
+      } else {
+        focusNext(-1);
+      }
+      return;
+    }
+    if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') { e.preventDefault(); activateCurrent(); return; }
+    if (isBackKey(e)) {
+      e.preventDefault();
+      // 后退：优先使用场景历史栈
+      if (gameData.sceneHistory && gameData.sceneHistory.length > 0) {
+        const prev = gameData.sceneHistory.pop();
+        // 弹出一个后不再被压进去
+        const tmp = gameData.sceneHistory;
+        gameData.sceneHistory = [];
+        renderScene(prev);
+        // 渲染完成后恢复历史（保证从 prev 再走还能 Back 回去）
+        setTimeout(() => { gameData.sceneHistory = tmp; }, 250);
+      } else if (gameData.checkpointScene && gameData.checkpointScene !== 'start') {
         renderScene(gameData.checkpointScene);
       }
       return;
     }
-    // 数字键快选
+    // 数字键 0 = 跳到选项；1-9 = 快选选项
+    if (key === '0') {
+      e.preventDefault();
+      const first = document.querySelector('#choices-container .choice-btn');
+      if (first) focusElement(first);
+      return;
+    }
     if (/^[1-9]$/.test(key)) {
       e.preventDefault();
       focusByIndex(parseInt(key, 10) - 1);
@@ -1785,15 +1956,7 @@
     });
 
     // 电视遥控器
-    // 调试模式：捕获所有按键事件，输出到控制台（帮助诊断遥控器按键问题）
-    document.addEventListener('keydown', function(e) {
-      console.log('[DEBUG keydown]', 'key=' + e.key, 'keyCode=' + e.keyCode, 'code=' + e.code, 'which=' + e.which);
-    });
-    document.addEventListener('keyup', function(e) {
-      console.log('[DEBUG keyup]', 'key=' + e.key, 'keyCode=' + e.keyCode, 'code=' + e.code, 'which=' + e.which);
-    });
     document.addEventListener('keydown', handleRemoteKey);
-    document.addEventListener('keyup', handleRemoteKey);
     // 鼠标点击时同步焦点
     document.addEventListener('click', (e) => {
       const target = e.target.closest('.focusable');

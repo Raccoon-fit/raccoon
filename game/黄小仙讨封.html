@@ -1,84 +1,1314 @@
-<!DOCTYPE html><html lang="zh-CN"><head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"> <title>黄小仙 · 讨封之卷</title> <style> * { margin: 0; padding: 0; box-sizing: border-box; }
-:root { --bg-color: #000000; --text-color: #B0B0B0; --accent-color: #A93226; --highlight-color: #FFFFFF; --btn-border: #555555; --btn-hover: #1A1A1A; --illustration-bg: #0f0f0f; }
-body { background-color: var(--bg-color); color: var(--text-color); font-family: "SimSun", "Songti SC", "Noto Serif SC", serif; line-height: 1.8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; }
-.game-container { max-width: 600px; width: 100%; display: flex; flex-direction: column; min-height: 100vh; }
-.status-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #222; margin-bottom: 15px; }
-.cultivation { font-size: 14px; color: #666; }
-.cultivation span { color: #8B7355; font-weight: bold; }
-.achievements { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.achievement-icon { width: 32px; height: 32px; border: 1px solid #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 16px; opacity: 0.3; transition: all 0.5s ease; position: relative; background: #0a0a0a; color: #fff; }
-.achievement-icon.unlocked { opacity: 1; border-color: #8B7355; background: #1a1510; box-shadow: 0 0 6px rgba(139, 115, 85, 0.3); }
-.achievement-icon.unlocked.golden { border-color: #D4AF37; background: #3a2e1a; box-shadow: 0 0 8px #D4AF37; color: #fff; }
-.achievement-icon[data-achievement]:hover::after { content: attr(data-title); position: absolute; top: -32px; left: 50%; transform: translateX(-50%); background: #1a1510; border: 1px solid #8B7355; padding: 4px 8px; font-size: 11px; white-space: nowrap; border-radius: 3px; z-index: 100; color: #d4c0a1; }
-.story-container { flex: 1; overflow-y: auto; padding-bottom: 20px; }
-.story-text { font-size: 17px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; }
-.story-text.narrator { color: #888; font-style: italic; }
-.story-text.speaker { color: var(--highlight-color); font-weight: bold; }
-.story-text.system { color: var(--accent-color); text-align: center; padding: 20px 0; border-top: 1px solid #222; border-bottom: 1px solid #222; margin: 20px 0; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.choices-container { display: flex; flex-direction: column; gap: 12px; padding: 20px 0; border-top: 1px solid #222; }
-.choice-btn { background: transparent; border: 1px solid var(--btn-border); color: var(--text-color); padding: 15px 20px; font-size: 15px; font-family: inherit; text-align: left; cursor: pointer; transition: all 0.3s ease; border-radius: 3px; }
-.choice-btn:hover { background: var(--btn-hover); border-color: var(--highlight-color); color: var(--highlight-color); }
-.choice-btn:active { transform: scale(0.98); }
-.achievement-popup { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1a1510 0%, #2a2015 100%); border: 1px solid #8B7355; padding: 15px 25px; border-radius: 5px; opacity: 0; transition: all 0.5s ease; z-index: 2100; }
-.achievement-popup.show { top: 20px; opacity: 1; }
-.achievement-popup .title { color: #8B7355; font-size: 12px; margin-bottom: 5px; }
-.achievement-popup .name { color: #D4AF37; font-size: 16px; font-weight: bold; }
-.footer { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 10px; font-size: 12px; color: #444; border-top: 1px solid #222; }
-.version-container { position: relative; display: flex; gap: 12px; }
-.version-btn, .skip-btn { background: transparent; border: none; color: #666; font-size: 12px; cursor: pointer; font-family: inherit; padding: 2px 6px; border-radius: 3px; transition: all 0.2s; }
-.version-btn:hover, .skip-btn:hover { color: #aaa; background: #111; }
-.changelog-popup { position: fixed; bottom: 80px; left: 20px; background: #1a1a1a; border: 1px solid #444; border-radius: 8px; padding: 16px 20px; max-width: 300px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); z-index: 2200; display: none; color: #ccc; font-size: 13px; line-height: 1.6; backdrop-filter: blur(4px); }
-.changelog-popup.show { display: block; animation: fadeInUp 0.3s ease; }
-.changelog-popup h4 { color: #8B7355; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-.changelog-popup .version-block { margin-bottom: 12px; border-left: 2px solid #8B7355; padding-left: 8px; }
-.changelog-popup .version-block.old { border-left-color: #444; opacity: 0.9; }
-.changelog-popup .version-title { color: #D4AF37; font-weight: bold; }
-.changelog-popup ul { padding-left: 18px; margin: 8px 0; }
-.changelog-popup li { margin-bottom: 4px; }
-.changelog-popup .date { color: #D4AF37; font-size: 11px; margin-top: 4px; text-align: right; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.inland-security-footer { display: flex; align-items: center; gap: 8px; }
-.raccoon-link { display: flex; align-items: center; cursor: pointer; font-weight: 300; color: #adadad; text-decoration: none; }
-.raccoon-link:visited { color: #adadad; }
-.raccoon-link:hover { color: #666666; }
-@media (max-width: 480px) { body { padding: 15px; }
-.story-text { font-size: 15px; }
-.choice-btn { padding: 12px 15px; font-size: 14px; }
-.changelog-popup { left: 10px; right: 10px; max-width: none; } }
-.start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000000; z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: #B0B0B0; font-family: "SimSun", "Songti SC", "Noto Serif SC", serif; transition: opacity 0.3s ease; }
-.start-content { text-align: center; max-width: 80%; }
-.start-content h1 { color: #ffffff; font-size: 56px; margin-bottom: 16px; font-weight: 300; letter-spacing: 6px; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
-.start-subtitle { font-size: 18px; margin-bottom: 48px; color: #666; font-style: italic; letter-spacing: 2px; }
-.start-btn { background: transparent; border: 1px solid #444; color: #B0B0B0; padding: 14px 48px; font-size: 20px; font-family: inherit; cursor: pointer; transition: all 0.3s ease; border-radius: 3px; letter-spacing: 4px; font-weight: 300; }
-.start-btn:hover { border-color: #ffffff; color: #ffffff; background: #111; } </style></head><body> <div class="start-overlay" id="startOverlay"> <div class="start-content"> <h1>黄小仙</h1> <p class="start-subtitle">五百年修为一念之间</p> <button class="start-btn" id="startBtn">开始讨封</button> </div> </div>
-<div class="game-container"> <div class="status-bar"> <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div> <div class="achievements" id="achievementsContainer"></div> </div>
-<div class="story-container" id="story-container"></div>
-<div class="choices-container" id="choices-container"></div>
-<div class="footer"> <div class="version-container"> <button class="version-btn" id="versionBtn">v1.3.3</button> <button class="skip-btn" id="skipBtn">快进</button> </div> <div class="inland-security-footer"> <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link"> <span>© 2026 软软的小窝</span> </a> </div> </div> </div>
-<div class="achievement-popup" id="achievement-popup"> <div class="title">成就解锁</div> <div class="name" id="achievement-name"></div> </div>
-<div class="changelog-popup" id="changelogPopup"> <h4>更新日志</h4> <div class="version-block"> <div class="version-title">v1.3.3</div> <ul> <li>「舍身成仁」成就升级为金色成就，位列第二</li> <li>调整成就列表排序，金色成就更显尊贵</li> </ul> <div class="date">2026-05-27</div> </div> <div class="version-block old"> <div class="version-title">v1.3.2</div> <ul> <li>修复“猛然惊醒”选项直接重置游戏的问题</li> <li>新增惊醒后的内心挣扎剧情与分支选择</li> </ul> <div class="date">2026-05-26</div> </div> </div>
-<script> (function() { const gameData = { achievements: { 'true': false, 'god': false, 'mortal': false, 'fail_scholar': false, 'fail_kid': false, 'farmer': false, 'star': false, 'demon_king': false, 'sacrifice': false, 'mad': false, 'love': false }, achievementIcons: [ { id: 'true', title: '无对无错，善良依旧', icon: '✓' }, { id: 'sacrifice', title: '舍身成仁', icon: '†' }, { id: 'god', title: '点化成仙', icon: '✓' }, { id: 'mortal', title: '尘世轮回', icon: '✓' }, { id: 'fail_scholar', title: '功亏一篑', icon: '✓' }, { id: 'fail_kid', title: '原形毕露', icon: '✓' }, { id: 'farmer', title: '山野村夫', icon: '🌾' }, { id: 'star', title: '文曲星耀', icon: '⭐' }, { id: 'demon_king', title: '妖王之路', icon: '◆' }, { id: 'mad', title: '执念成魔', icon: '◇' }, { id: 'love', title: '红尘情缘', icon: '♡' } ], scenes: { 'start': { texts: [ { type: 'narrator', content: '雷雨夜，山路泥泞。' }, { type: 'narrator', content: '你是一只修炼了五百年的黄鼠狼精，今日正是你的讨封之期。' }, { type: 'narrator', content: '只要能让人说一声"像人"或"像仙"，你便能化形成功，脱离妖身。' }, { type: 'narrator', content: '雨幕中，远远走来几个人影。你该向谁开口？' } ], choices: [ { text: '向前面那个赶路的书生讨封', nextScene: 'scholar_encounter' }, { text: '向路边的顽童讨封', nextScene: 'kid_encounter' }, { text: '再找找其他人', nextScene: 'wait_more_1' } ] }, 'scholar_encounter': { texts: [ { type: 'narrator', content: '你从树后闪身而出，拦住了那位赶路的书生。' }, { type: 'speaker', content: '书生猛地停步，伞掉在地上："何...何方妖怪！莫要害我！"' }, { type: 'narrator', content: '你尽力作出一副和善模样，拱手道："这位公子，请问你看我像人还是像仙？"' }, { type: 'speaker', content: '书生脸色惨白，连连后退："像...像妖怪！一身骚气，还不快滚！"' }, { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑。' } ], choices: [ { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' }, { text: '追上去，拼命解释', nextScene: 'scholar_follow' }, { text: '愤怒质问，为何以貌取人', nextScene: 'scholar_angry' } ] }, 'scholar_angry': { texts: [ { type: 'narrator', content: '你怒火上涌，挡在书生面前厉声道："我修行五百年，从未害人，你凭什么骂我妖怪！"' }, { type: 'speaker', content: '书生被你的气势震慑，跌坐泥水中，颤抖道："你……你莫要吃我……"' }, { type: 'narrator', content: '你看着他那副可怜模样，心中怒火渐消，却也感到一阵悲凉。' } ], choices: [ { text: '冷静下来，好言相劝', nextScene: 'scholar_angry_calm' }, { text: '甩袖而去，不再纠缠', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' } ] }, 'scholar_angry_calm': { texts: [ { type: 'narrator', content: '你深吸一口气，压下怒火，轻声道："罢了，是我吓到你了。公子请起，我不害人。"' }, { type: 'speaker', content: '书生惊魂未定，却见你态度诚恳，渐渐不再发抖："你……当真是修行的灵兽？"' }, { type: 'narrator', content: '你点头，将山中修炼之事简略道来。书生听罢，竟露出几分好奇。' } ], choices: [ { text: '再次恳请讨封', nextScene: 'scholar_follow' }, { text: '不再强求，转身离去', nextScene: 'wait_more_2' } ] }, 'scholar_follow': { texts: [ { type: 'narrator', content: '你不甘心，追上去挡在他面前，口吐人言："公子莫怕，我修行五百年从不害人，只求一句认可。"' }, { type: 'speaker', content: '书生跌坐泥地，见你并无恶意，颤抖着问："你……你真的不偷鸡？"' }, { type: 'narrator', content: '你摇头，将近日捕鼠护粮之事道来。书生渐渐平静，眼中竟有几分敬意。' }, { type: 'speaker', content: '他沉吟良久："我自幼读书，从不信妖邪，今日见你通人性、守本分，倒像是……像是文曲星君座下的灵兽。"' } ], choices: [ { text: '拜谢书生', nextScene: 'scholar_test' } ] }, 'scholar_test': { texts: [ { type: 'speaker', content: '书生又说："虽然你通人性，但我仍需试你一试。方才匆忙，我将祖传手札遗落在山神庙，你能替我寻回吗？"' }, { type: 'narrator', content: '他眼中带着期盼，也有几分犹豫。' } ], choices: [ { text: '立刻动身去山神庙寻找', nextScene: 'scholar_search' }, { text: '面露难色，表示太远', nextScene: 'scholar_refuse' } ] }, 'scholar_refuse': { texts: [ { type: 'narrator', content: '你犹豫不前，书生失望地摇头："连这点诚意都没有，终究是妖性未脱。"' }, { type: 'speaker', content: '他转身离去，再也没回头。你呆立雨中，讨封失败。' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'scholar_search': { texts: [ { type: 'narrator', content: '你冒雨奔向山神庙。庙中阴森，手札果然在香案下。' }, { type: 'narrator', content: '正要取时，一只野猫窜出，叼起手札就跑。' } ], choices: [ { text: '变回原形追赶野猫', nextScene: 'scholar_chase' }, { text: '用术法定住野猫', nextScene: 'scholar_magic' } ] }, 'scholar_chase': { texts: [ { type: 'narrator', content: '你化作黄鼠狼疾追，在山林里与野猫缠斗。虽然夺回手札，但身上多处抓伤。' }, { type: 'narrator', content: '书生见你浑身湿透、带着伤将手札捧回，大为感动。' } ], choices: [ { text: '呈上手札', nextScene: 'star_ending', action: 'unlock_star' } ] }, 'scholar_magic': { texts: [ { type: 'narrator', content: '你掐诀念咒，野猫僵在原地，你轻松取回手札。' }, { type: 'speaker', content: '书生见你法术精妙，却眉头微皱："用法术强取，终非正道……不过你确实守信。"' }, { type: 'narrator', content: '他想了想，仍然说出那句认可，但文气弱了几分。' } ], choices: [ { text: '接受认可', nextScene: 'star_ending', action: 'unlock_star' } ] }, 'kid_encounter': { texts: [ { type: 'narrator', content: '你悄悄靠近那个蹲在路边玩泥巴的顽童。' }, { type: 'speaker', content: '顽童抬头看见你，眼睛一亮："呀，好大一只黄鼠狼！你的尾巴真好看！"' }, { type: 'narrator', content: '你心中暗喜，低声问道："小娃娃，你看我像什么？像人吗？"' }, { type: 'speaker', content: '顽童歪头想了想："像……像一只会说话的黄鼠狼！我阿婆说黄鼠狼会偷鸡，你是不是来偷我的泥人？"' }, { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' } ], choices: [ { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' }, { text: '变成小猫逗他开心', nextScene: 'kid_play' } ] }, 'kid_play': { texts: [ { type: 'narrator', content: '你灵机一动，使出小法术变成一只小花猫，喵喵叫着蹭顽童的腿。' }, { type: 'speaker', content: '顽童惊喜："哇！你还会变猫！太好玩了！"他抱起你，完全忘了刚才的害怕。' }, { type: 'narrator', content: '顽童带你回家，他的奶奶是个慈祥老人，见猫通人性，笑着说："这猫有灵性，像保家的黄大仙呢。"' }, { type: 'narrator', content: '你心头一暖。奶奶留你过夜，说夜里常有野狗来偷鸡。' } ], choices: [ { text: '主动提出守夜', nextScene: 'farm_night' }, { text: '安心睡下', nextScene: 'farm_sleep' } ] }, 'farm_night': { texts: [ { type: 'narrator', content: '深夜，果然有两只野狗窜入院子。你现出原形，与野狗搏斗。' } ], choices: [ { text: '奋力驱赶', nextScene: 'farm_brave' }, { text: '害怕躲藏', nextScene: 'farm_fail' } ] }, 'farm_brave': { texts: [ { type: 'narrator', content: '你勇猛异常，赶跑了野狗，自己受了轻伤。奶奶早起发现鸡舍无损，对你连连道谢。' }, { type: 'speaker', content: '奶奶摸着你的头："真像我们家的保家仙，以后就留下吧。"' } ], choices: [ { text: '留在农家', nextScene: 'farmer_village' }, { text: '辞别奶奶，继续修行', nextScene: 'leave_grandma' } ] }, 'farm_sleep': { texts: [ { type: 'narrator', content: '你睡得太沉，野狗咬死了两只鸡。奶奶虽未责怪，但眼中失望难掩。' }, { type: 'narrator', content: '你自觉无颜，悄悄离开了村子。' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'farm_fail': { texts: [ { type: 'narrator', content: '你吓得躲进柴堆，野狗咬死数只鸡，还撞坏了篱笆。' }, { type: 'speaker', content: '奶奶叹气："终究是畜生，保不了家。"你羞愧难当，连夜离去。' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'leave_grandma': { texts: [ { type: 'narrator', content: '你在奶奶和顽童的挽留声中转身，重新走入清晨的山雾。' }, { type: 'narrator', content: '人间烟火虽暖，但你心中仍有讨封的执念。只是这一次，脚步比来时沉重了许多。' }, { type: 'narrator', content: '你想起奶奶慈祥的笑容，想起顽童天真的话语，忽然觉得——即使不化人形，能被这样真诚地对待，似乎也没什么不好。' }, { type: 'narrator', content: '前方出现岔路：一条通往深山精怪的聚集之地，另一条通往青衣人所在的山道，还有一条路通往你修炼了五百年的洞府。' } ], choices: [ { text: '回洞府修行，不再执着讨封', nextScene: 'true_ending', action: 'achievement_true' }, { text: '去精怪聚集处寻找同类', nextScene: 'wild_follow' }, { text: '继续前行，寻找青衣人', nextScene: 'true_encounter_second' } ] }, 'wait_more_1': { texts: [ { type: 'narrator', content: '你觉得书生和顽童都非有缘之人，决定再等等。' }, { type: 'narrator', content: '雨越下越大，山路上积起水洼，你的皮毛已湿透。' }, { type: 'narrator', content: '就在你几乎要放弃时，雨幕中缓缓走来一道青色身影，撑着油纸伞，步履从容。' }, { type: 'narrator', content: '另有一个农夫挑着柴，从山道拐角冒雨跑来。' }, { type: 'narrator', content: '不远处的树下，还有个老道士在避雨，手持拂尘，闭目养神。' }, { type: 'narrator', content: '山林深处，隐约传来一声悠长的呼唤，似有同类在召唤。' } ], choices: [ { text: '向青衣人讨封', nextScene: 'true_encounter_first' }, { text: '向农夫讨封', nextScene: 'farmer_encounter' }, { text: '向老道士讨封', nextScene: 'taoist_encounter' }, { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' }, { text: '循着山林深处的呼唤而去', nextScene: 'wild_call' } ] }, 'wild_call': { texts: [ { type: 'narrator', content: '那呼唤声若隐若现，像是用兽语在低吟。你心中一动——这是同类的气息。' }, { type: 'narrator', content: '你循声穿过密林，雨水打在树叶上沙沙作响。越往深处，妖气越浓。' }, { type: 'narrator', content: '忽然，一只老狐从树后探出头来，口吐人言："小黄仙，今夜是讨封之夜，也是精怪集会之夜。你可愿来看看？"' } ], choices: [ { text: '跟随老狐前往', nextScene: 'wild_follow' }, { text: '婉拒，回到山路继续等待', nextScene: 'wait_more_2' } ] }, 'wild_follow': { texts: [ { type: 'narrator', content: '老狐引你穿过一片迷雾，眼前豁然开朗——山坳中竟聚集了数十只精怪。' }, { type: 'narrator', content: '有狐妖、蛇精、树魅，甚至还有一只黑熊怪。它们围坐在篝火旁，正在议论讨封之事。' }, { type: 'speaker', content: '一只白面狐妖笑道："又来了个新面孔。小黄仙，你可想好了——成了人，便要受人间规矩束缚；成了仙，更要守天条戒律。何不留在山中，做自由自在的妖王？"' } ], choices: [ { text: '心动，询问妖王之道', nextScene: 'wild_gathering' }, { text: '摇头，坚持讨封之路', nextScene: 'wait_more_2' } ] }, 'wild_gathering': { texts: [ { type: 'speaker', content: '白面狐妖拍掌道："好！我等精怪虽无神籍，却逍遥自在。山中灵药、洞天福地，皆可享用。"' }, { type: 'speaker', content: '黑熊怪瓮声瓮气道："俺修炼三百年，从未想过讨封。做人有什么好？做妖才痛快！"' }, { type: 'narrator', content: '众精怪纷纷附和，篝火映照下，每张面孔都透着野性与自由。' }, { type: 'speaker', content: '老狐凑近你耳边："你若留下，以你五百年道行，必能成为一方妖王。如何？"' } ], choices: [ { text: '留下，成为山中妖王', nextScene: 'demon_king_ending', action: 'unlock_demon_king' }, { text: '犹豫再三，还是告辞', nextScene: 'wait_more_2' }, { text: '邀请精怪们一同去讨封', nextScene: 'wild_debate' } ] }, 'wild_debate': { texts: [ { type: 'narrator', content: '你站起身，朗声道："诸位道友，既已修炼多年，何不一同去讨封？或许都能得成正果。"' }, { type: 'speaker', content: '众精怪面面相觑。白面狐妖冷笑："讨封？人类凭什么决定我们的命运？"' }, { type: 'speaker', content: '老狐叹道："年轻人有志向是好事，但我等早已看透。你去吧，若不成，随时回来。"' }, { type: 'narrator', content: '你辞别精怪们，重新回到山路。雨势已小，青衣人仍在远处静静伫立。' } ], choices: [ { text: '走向青衣人', nextScene: 'true_encounter_second' }, { text: '回到精怪聚集处', nextScene: 'demon_king_ending', action: 'unlock_demon_king' } ] }, 'taoist_encounter': { texts: [ { type: 'narrator', content: '你走近老道士，他睁开眼，目光如电。' }, { type: 'speaker', content: '道士："贫道观你妖气缠绕，却无血光，可是来讨封的？"' }, { type: 'narrator', content: '你连忙作揖，说明来意。' } ], choices: [ { text: '恭敬请教', nextScene: 'taoist_god' }, { text: '怀疑他是骗子，转身离开', nextScene: 'wait_more_2' }, { text: '请问道长可否收我为徒', nextScene: 'taoist_disciple' } ] }, 'taoist_disciple': { texts: [ { type: 'speaker', content: '道士抚须而笑："收徒？贫道门下已有弟子三百，个个都是人。收一只黄鼠狼，倒是头一遭。"' }, { type: 'narrator', content: '他打量你片刻，又道："不过，你若能通过贫道的考验，破例收你又有何妨？"' } ], choices: [ { text: '欣然接受考验', nextScene: 'taoist_test' }, { text: '觉得太过麻烦，告辞', nextScene: 'wait_more_2' } ] }, 'taoist_test': { texts: [ { type: 'narrator', content: '道士从袖中取出一面铜镜，镜中映出你黄鼠狼的原形。' }, { type: 'speaker', content: '道士："此镜能照见本心。你若能在镜前静坐一炷香，不起妄念，便算通过。"' }, { type: 'narrator', content: '你盘腿坐下，铜镜中无数幻象涌现——有鲜美的鸡肉、温暖的巢穴、也有对人类的怨恨与不甘。' }, { type: 'narrator', content: '你一一放下，心如止水。一炷香后，道士满意地点头。' } ], choices: [ { text: '通过考验，拜入师门', nextScene: 'taoist_test_pass' }, { text: '心中仍有杂念，承认失败', nextScene: 'taoist_test_fail' } ] }, 'taoist_test_pass': { texts: [ { type: 'speaker', content: '道士大笑："好！好一只灵兽！从今日起，你便是我门下弟子。"' }, { type: 'narrator', content: '他拂尘一挥，清光笼罩，你顿觉灵台清明，道行精进。' }, { type: 'speaker', content: '道士颔首："你虽未讨封，却得了道缘。我看你像——散仙。"' } ], choices: [ { text: '叩谢恩师', nextScene: 'god_ending_favor', action: 'unlock_god' } ] }, 'taoist_test_fail': { texts: [ { type: 'narrator', content: '你无法静心，镜中幻象扰得你心烦意乱。最终只得睁眼认输。' }, { type: 'speaker', content: '道士叹道："缘分未到。你去吧，或许另有机缘。"' } ], choices: [ { text: '回到山路继续等待', nextScene: 'wait_more_2' }, { text: '重新开始', nextScene: 'start', action: 'reset' } ] }, 'taoist_god': { texts: [ { type: 'speaker', content: '道士点头："你虽为妖，心存善念，我看你像山中散仙。"' }, { type: 'narrator', content: '拂尘一挥，一道清光笼罩你，你感觉脱胎换骨，竟直接化作人形。' }, { type: 'speaker', content: '道士笑道："你我缘分至此，好自为之。"说罢化作清风而去。' } ], choices: [ { text: '拜谢仙长', nextScene: 'god_ending_favor', action: 'unlock_god' } ] }, 'true_encounter_first': { texts: [ { type: 'narrator', content: '你从树后走出，雨水顺着皮毛滴落。' }, { type: 'speaker', content: '青衣人停下脚步，伞微微前倾："深夜拦路，可是有事？"' }, { type: 'narrator', content: '你作揖道："先生，我修行五百年，今日讨封，恳请您看我像人还是像仙？"' }, { type: 'speaker', content: '青衣人凝视你许久，目光温和："我看你眼中尚有迷茫，似求道者，却未脱兽性。像——山中修行的精怪，离人仙尚远。"' }, { type: 'speaker', content: '"但你心诚，若愿随我修行，或可成正果。"' } ], choices: [ { text: '叩首拜谢，愿随修行', nextScene: 'god_ending_favor', action: 'unlock_god' }, { text: '心有不甘，想再等等他人', nextScene: 'wait_more_2' } ] }, 'wait_more_2': { texts: [ { type: 'narrator', content: '你按捺住心中的焦躁，继续躲在树后等待。' }, { type: 'narrator', content: '雨势渐小，山路却再无行人。' }, { type: 'narrator', content: '那位青衣人并未走远，他停在不远处，伞沿微抬，似乎在望着你藏身的方向。' }, { type: 'speaker', content: '他轻声开口："雨夜立良久，可是在等什么人？"' } ], choices: [ { text: '走向他，实话实说', nextScene: 'true_encounter_second' }, { text: '犹豫不决，再等下去', nextScene: 'wait_final' } ] }, 'true_encounter_second': { texts: [ { type: 'narrator', content: '你走到青衣人面前，雨水打湿了你的全身，你却感到前所未有的平静。' }, { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' }, { type: 'speaker', content: '你点头："恳请先生指点。"' }, { type: 'speaker', content: '他收起伞，任由雨丝洒落："你修行五百年，可还记得自己最初的模样？那时你未想成仙，未想成人，只知在山间自在奔跑。"' }, { type: 'speaker', content: '"我看你，像这山间的风雨，来去随性。何必非要像人、像仙？你本就是黄小仙。"' } ], choices: [ { text: '恍然大悟，不再执念', nextScene: 'true_ending', action: 'achievement_true' }, { text: '仍想成人，恳请成全', nextScene: 'mortal_ending', action: 'unlock_mortal' }, { text: '怀疑他的用意，质问', nextScene: 'suspicious_ending' }, { text: '请先生指点修行之道', nextScene: 'true_guidance' } ] }, 'true_guidance': { texts: [ { type: 'speaker', content: '青衣人颔首："你愿聆听，我便多说几句。道不在形，而在心。你为讨封执着五百年，可曾静心感受山间清风、林间明月？"' }, { type: 'narrator', content: '他伸手接住雨滴，雨珠在掌心化作雾气。' }, { type: 'speaker', content: '"你若能放下形骸，便可得大自在；若仍想体验人间，我也可成全；若想随我修行，亦是缘分。"' } ], choices: [ { text: '放下执念，逍遥山水', nextScene: 'true_ending', action: 'achievement_true' }, { text: '愿入人间，经历轮回', nextScene: 'mortal_ending', action: 'unlock_mortal' }, { text: '恳请收入门下', nextScene: 'god_ending_favor', action: 'unlock_god' } ] }, 'farmer_encounter': { texts: [ { type: 'narrator', content: '你拦住农夫，他吓了一跳，柴担差点掉地。' }, { type: 'speaker', content: '农夫瞪大眼："黄……黄大仙？俺娘说过，山里有修行的黄仙，不能得罪。"' }, { type: 'narrator', content: '你作揖道："大哥，我修行五百年，今日讨封，你看我像人还是像仙？"' }, { type: 'speaker', content: '农夫挠头，憨厚一笑："俺看您像山里的土地爷，护着咱们庄稼人。像，像保家仙！"' } ], choices: [ { text: '感激不尽，随农夫回村', nextScene: 'farmer_village' }, { text: '婉拒好意，继续修行', nextScene: 'wait_more_2' } ] }, 'farmer_village': { texts: [ { type: 'narrator', content: '农夫热情地引你进了村子。村民们见一只黄鼠狼口吐人言，先是害怕，后来听说你能护家保粮，纷纷称奇。' }, { type: 'narrator', content: '村长亲自为你安排了住处——一座小小的土地庙，香火虽不旺，却也干净。' }, { type: 'speaker', content: '农夫的妻子端来一碗热粥："黄大仙，村里野狗多，鸡鸭常被叼走，您若能帮着看守，全村都念您的好。"' }, { type: 'narrator', content: '你看着这些朴实的村民，心中涌起一股暖意。' } ], choices: [ { text: '安心做保家仙，护佑村庄', nextScene: 'farmer_ending', action: 'unlock_farmer' }, { text: '主动帮村民解决难题', nextScene: 'farmer_help' }, { text: '在村中多住些时日，感受人间烟火', nextScene: 'farmer_stay' } ] }, 'farmer_stay': { texts: [ { type: 'narrator', content: '你在村中住了下来。白日里帮村民看护田地，夜里在土地庙中打坐修炼。' }, { type: 'narrator', content: '村里有个年轻的绣娘，每日都会来庙前供上一束野花。她说，自从你来了，村里的鸡再也没丢过。' }, { type: 'speaker', content: '绣娘轻声问："黄大仙，你……你会一直留在这里吗？"' }, { type: 'narrator', content: '她的眼睛里有星星，你忽然觉得，人间的情意比仙界的清冷更暖。' } ], choices: [ { text: '点头，愿意长久守护这个村庄', nextScene: 'mortal_love_ending', action: 'unlock_love' }, { text: '摇头，你终究不属于这里', nextScene: 'farmer_ending', action: 'unlock_farmer' } ] }, 'farmer_help': { texts: [ { type: 'narrator', content: '你听闻村外山道上近来有山贼出没，已经劫了好几户人家的粮食。' }, { type: 'narrator', content: '村民们敢怒不敢言，官府又不管。你决定出手相助。' }, { type: 'narrator', content: '当夜，你埋伏在山道旁的灌木丛中。果然，三个山贼提着刀，正往村子方向摸去。' } ], choices: [ { text: '施展法术吓退山贼', nextScene: 'farmer_scare' }, { text: '变回原形偷袭山贼', nextScene: 'farmer_ambush' }, { text: '正面现身，以理服人', nextScene: 'bandit_encounter' } ] }, 'farmer_scare': { texts: [ { type: 'narrator', content: '你掐诀念咒，顿时阴风阵阵，林中鬼火闪烁。山贼吓得屁滚尿流，丢下刀就跑。' }, { type: 'narrator', content: '村民们得知后欢呼雀跃，将你奉为真正的保家仙。从此香火鼎盛。' } ], choices: [ { text: '接受供奉，守护村庄', nextScene: 'farmer_ending', action: 'unlock_farmer' } ] }, 'farmer_ambush': { texts: [ { type: 'narrator', content: '你化作一道黄影，在山贼脚下来回穿梭，咬得他们哇哇大叫。' }, { type: 'narrator', content: '山贼头子挥刀乱砍，一刀砍在树干上，刀身弹回，反倒伤了自己的手臂。' }, { type: 'speaker', content: '山贼们惊恐万分："有妖怪！快跑！"转眼间跑得无影无踪。' }, { type: 'narrator', content: '村民闻讯赶来，将你高高举起，连声称赞。' } ], choices: [ { text: '留在村庄，享受荣耀', nextScene: 'farmer_ending', action: 'unlock_farmer' } ] }, 'bandit_encounter': { texts: [ { type: 'narrator', content: '你化作人形，从林中走出，挡在山贼面前。' }, { type: 'speaker', content: '山贼头子一愣，随即狞笑："哪来的野人？敢挡老子的路！"' }, { type: 'narrator', content: '你合掌道："诸位壮士，村中皆是贫苦百姓，何苦为难他们？若缺银两，山中自有药材可采。"' }, { type: 'speaker', content: '山贼头子大怒："少废话！兄弟们，砍了他！"' }, { type: 'narrator', content: '三把刀同时向你劈来。你本可以闪避，但身后不远处，绣娘正躲在树后瑟瑟发抖。' } ], choices: [ { text: '舍身挡刀，护住绣娘', nextScene: 'sacrifice_choice', action: 'unlock_sacrifice' }, { text: '闪身避开，用法术反击', nextScene: 'farmer_scare' } ] }, 'sacrifice_choice': { texts: [ { type: 'narrator', content: '你咬紧牙关，挺身上前。刀锋划过你的身体，鲜血涌出。' }, { type: 'speaker', content: '绣娘尖叫一声冲了出来："黄大仙！不要！"' }, { type: 'narrator', content: '山贼们被你的血震慑，面面相觑，竟不敢再动手。' }, { type: 'narrator', content: '你倒在地上，感觉五百年的道行正在飞速流逝。但绣娘安全了，村民们也安全了。' }, { type: 'speaker', content: '绣娘抱着你，泪如雨下："你为什么这么傻……你明明可以逃的……"' }, { type: 'narrator', content: '你用尽最后的力气，蹭了蹭她的手心，然后闭上了眼睛。' } ], choices: [ { text: '安然赴死', nextScene: 'sacrifice_ending', action: 'unlock_sacrifice' } ] }, 'sacrifice_ending': { texts: [ { type: 'narrator', content: '你的身躯化作点点荧光，飘散在夜空中。五百年修为，尽归天地。' }, { type: 'narrator', content: '村民们为你立了碑，碑上刻着「义兽黄仙之墓」。绣娘每日都来上香，泪水浸透了碑前的泥土。' }, { type: 'narrator', content: '多年后，有人说在月圆之夜，能看见一只黄鼠狼的影子在村口守望。' }, { type: 'system', content: '成就：舍身成仁' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'wait_final': { texts: [ { type: 'narrator', content: '你犹豫着，始终不敢上前。' }, { type: 'narrator', content: '青衣人轻叹一声，转身离去，消失在雨雾中。' }, { type: 'narrator', content: '雷声渐歇，天边泛起鱼肚白，讨封的时机已过。' }, { type: 'narrator', content: '你只能拖着疲惫的身躯回到山中，继续做一只普通的黄鼠狼。' }, { type: 'system', content: '结局：错失良机' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' }, { text: '不甘心，继续寻找讨封之机', nextScene: 'obsession_continue' } ] }, 'suspicious_ending': { texts: [ { type: 'speaker', content: '你后退一步："你为何帮我？莫不是想骗我元神？"' }, { type: 'speaker', content: '青衣人先是一愣，随即大笑："有趣，有趣！五百年的小妖竟有这般戒心。"' }, { type: 'narrator', content: '他摇身一变，竟是一位白发仙人："我乃北山真君，特来点化于你，可惜你疑心太重。罢了，缘尽于此。"' }, { type: 'narrator', content: '仙人化作清风离去，你呆立原地，追悔莫及。此后你道心破碎，修为再难精进。' }, { type: 'system', content: '结局：疑心失缘' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'obsession_continue': { texts: [ { type: 'narrator', content: '失败的不甘像毒藤般缠绕着你的心。你不愿认命，拖着疲惫的身体在山路上徘徊。' }, { type: 'narrator', content: '雨停了，月亮从云层中露出半张脸。你对着月光喃喃自语："我一定要讨到封……一定要……"' }, { type: 'narrator', content: '你的眼中渐渐泛起红光，五百年道行在执念的催动下开始紊乱。' }, { type: 'speaker', content: '一个声音在你心底响起："何必求人？你若足够强，天下谁敢不封你？"' } ], choices: [ { text: '听从心底的声音', nextScene: 'obsession_deeper' }, { text: '猛然惊醒，压下执念', nextScene: 'obsession_resist' } ] }, 'obsession_deeper': { texts: [ { type: 'narrator', content: '你不再掩饰妖气，任由五百年道行化作滔天妖风。山林中的鸟兽纷纷惊逃。' }, { type: 'narrator', content: '你的身形开始扭曲——时而化作人形，时而现出原形，时而又变成半人半兽的狰狞模样。' }, { type: 'speaker', content: '那声音继续低语："对，就是这样。让所有人看看，谁才是这山中的主宰。"' }, { type: 'narrator', content: '你仰天长啸，声震四野。远处村庄的灯火纷纷亮起，人们惊恐地望向山林。' } ], choices: [ { text: '彻底放纵，化身为魔', nextScene: 'mad_ending', action: 'unlock_mad' }, { text: '在最后一刻清醒过来', nextScene: 'obsession_resist' } ] }, 'obsession_resist': { texts: [ { type: 'narrator', content: '就在妖气即将冲垮灵台的最后一瞬，你忽然想起了一些画面。' }, { type: 'narrator', content: '五百年间，你在月下独自修炼的身影；雨后山林中，你踩着水坑玩耍的模样；还有今夜，奶奶慈祥的笑容和顽童天真的话语。' }, { type: 'speaker', content: '那个狰狞的声音仍在嘶吼："放弃吧！成魔才是你的宿命！"' }, { type: 'narrator', content: '你咬紧牙关，调动全身道行，硬生生将那声音压了下去。剧烈的疼痛传遍四肢百骸，你的嘴角渗出鲜血。' }, { type: 'narrator', content: '不知过了多久，妖气终于缓缓消散。你精疲力竭地瘫倒在地，但眼中已恢复了清明。' }, { type: 'narrator', content: '你成功地镇压了心魔，但也付出了极大的代价——五百年道行折损近半，短期内再也无法讨封。' } ], choices: [ { text: '拖着残躯回到洞府，闭关疗伤', nextScene: 'obsession_recover_end' }, { text: '心有余悸，但仍不死心', nextScene: 'true_encounter_second' } ] }, 'obsession_recover_end': { texts: [ { type: 'narrator', content: '你蹒跚着回到修炼了五百年的洞府。这一次，你不再想讨封的事，只想好好睡一觉。' }, { type: 'narrator', content: '月光透过洞口洒进来，你蜷缩在干燥的草窝里，像五百年前刚开启灵智时那样，单纯地享受着山间的宁静。' }, { type: 'narrator', content: '道行虽然折损，但你的心境从未如此澄澈。你终于明白，真正的修行，从来不是为了"像"什么。' }, { type: 'system', content: '成就：无对无错，善良依旧' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ], action: 'achievement_true' }, 'mad_ending': { texts: [ { type: 'narrator', content: '你再也控制不住自己。五百年道行化为妖力狂潮，席卷了整个山林。' }, { type: 'narrator', content: '树木倒伏，溪水倒流，山石崩裂。你变成了一只巨大的妖物，眼中只有疯狂。' }, { type: 'narrator', content: '后来，这座山成了远近闻名的「妖山」。再也没有人敢在雨夜走这条路。' }, { type: 'narrator', content: '而你，永远困在自己的执念中，既不成人，也不成仙，更不再是那只自在的黄鼠狼。' }, { type: 'system', content: '成就：执念成魔' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'true_ending': { texts: [ { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年来，你一直执着于"像什么"，却忘了自己本就是自己。' }, { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。你不入神籍，不落凡尘，以本我之姿逍遥于山水之间。' }, { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' }, { type: 'system', content: '成就：无对无错，善良依旧' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'mortal_ending': { texts: [ { type: 'speaker', content: '青衣人轻叹："你若执意如此，我便成全你。我看你像个凡人。"' }, { type: 'narrator', content: '话音落下，你只觉得周身剧变，化作一个普通人的模样。' }, { type: 'narrator', content: '你欣喜若狂，却渐渐遗忘了前尘往事，忘了自己曾是一只黄鼠狼。' }, { type: 'narrator', content: '此后生老病死，轮回不息，你再也记不起那个雨夜。' }, { type: 'system', content: '结局：尘世轮回' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'mortal_love_ending': { texts: [ { type: 'narrator', content: '你留在了村庄。日复一日，年复一年，你守护着这片土地和那个绣娘。' }, { type: 'narrator', content: '绣娘渐渐老去，你却始终是那只黄鼠狼的模样。她临终前，握着你的爪子说："来世……我还想遇见你。"' }, { type: 'narrator', content: '你守在她的墓前，久久不肯离去。后来，村民们说，每年春天墓边都会开满野花，那是黄大仙种的。' }, { type: 'narrator', content: '你放弃了讨封的执念，却在这段尘缘中找到了比成仙更珍贵的东西。' }, { type: 'system', content: '成就：红尘情缘' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'god_ending_favor': { texts: [ { type: 'speaker', content: '青衣人颔首："你既有此心，便随我来。我看你像仙。"' }, { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，随他而去。' }, { type: 'narrator', content: '此后你位列散仙，云游四海，只是偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' }, { type: 'system', content: '成就：点化成仙' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'farmer_ending': { texts: [ { type: 'narrator', content: '农夫的话朴实而真诚，你感到一股暖流涌入身体。虽未化形，却与这片土地结了善缘。' }, { type: 'narrator', content: '从此你常驻山村，护佑五谷牲畜，成了远近闻名的"黄大仙"。逢年过节，总有村民来供香火。' }, { type: 'system', content: '成就：山野村夫' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'star_ending': { texts: [ { type: 'narrator', content: '得了书生的文气，你灵智大开，虽还是黄鼠狼之身，却能口吐诗词，通晓文章。' }, { type: 'narrator', content: '后来书生高中状元，为你立了"文兽祠"；你的故事被写入志怪，流传千年。' }, { type: 'system', content: '成就：文曲星耀' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'demon_king_ending': { texts: [ { type: 'narrator', content: '你留在了精怪聚集的山坳。以五百年道行，你很快成为众妖之首。' }, { type: 'narrator', content: '你带领精怪们占据山林，划下地界——人不犯妖，妖不犯人。从此山中自成一国。' }, { type: 'narrator', content: '偶尔有迷路的樵夫见到你，都说山中有一只黄袍妖王，端坐于石台之上，百妖朝拜。' }, { type: 'narrator', content: '你不再执着于讨封，因为你已经找到了属于自己的道。' }, { type: 'system', content: '成就：妖王之路' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' } ] }, 'fail_scholar_end': { texts: [ { type: 'narrator', content: '你仓皇逃入深山，五百年修为几乎毁于一旦。' }, { type: 'narrator', content: '道行大损，你只能重新修炼，蜷缩在洞穴中舔舐伤口。' }, { type: 'system', content: '结局：功亏一篑' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' }, { text: '不甘心，继续寻找讨封之机', nextScene: 'obsession_continue' } ] }, 'fail_kid_end': { texts: [ { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影，泥巴还粘在你的皮毛上。' }, { type: 'narrator', content: '童言无忌，却字字如刀。你忽然明白，讨封一事强求不得。' }, { type: 'narrator', content: '你转身回到山中，继续做你的黄鼠狼，偶尔远远望着山脚下的村庄。' }, { type: 'system', content: '结局：原形毕露' } ], choices: [ { text: '重新开始', nextScene: 'start', action: 'reset' }, { text: '回到上一个选择点', nextScene: 'checkpoint' }, { text: '不甘心，继续寻找讨封之机', nextScene: 'obsession_continue' } ] } }, currentScene: 'start', storyHistory: [], typingTimer: null, checkpointScene: 'start', skipMode: false };
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>黄小仙 · 讨封之卷</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-color: #000000;
+      --text-color: #B0B0B0;
+      --accent-color: #A93226;
+      --highlight-color: #FFFFFF;
+      --btn-border: #555555;
+      --btn-hover: #1A1A1A;
+      --illustration-bg: #0f0f0f;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+      line-height: 1.8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+    .game-container { max-width: 600px; width: 100%; display: flex; flex-direction: column; min-height: 100vh; }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #222; margin-bottom: 15px; }
+    .cultivation { font-size: 14px; color: #666; }
+    .cultivation span { color: #8B7355; font-weight: bold; }
+    .achievements { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .achievement-icon {
+      width: 32px; height: 32px; border: 1px solid #333; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+      opacity: 0.3; transition: all 0.5s ease; position: relative;
+      background: #0a0a0a; color: #fff;
+    }
+    .achievement-icon.unlocked { opacity: 1; border-color: #8B7355; background: #1a1510; box-shadow: 0 0 6px rgba(139, 115, 85, 0.3); }
+    .achievement-icon.unlocked.golden { border-color: #D4AF37; background: #3a2e1a; box-shadow: 0 0 8px #D4AF37; color: #fff; }
+    .achievement-icon[data-achievement]:hover::after {
+      content: attr(data-title); position: absolute; top: -32px; left: 50%;
+      transform: translateX(-50%); background: #1a1510; border: 1px solid #8B7355;
+      padding: 4px 8px; font-size: 11px; white-space: nowrap; border-radius: 3px;
+      z-index: 100; color: #d4c0a1;
+    }
+    .story-container { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+    .story-text { font-size: 17px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .story-text.narrator { color: #888; font-style: italic; }
+    .story-text.speaker { color: var(--highlight-color); font-weight: bold; }
+    .story-text.system {
+      color: var(--accent-color); text-align: center;
+      padding: 20px 0; border-top: 1px solid #222; border-bottom: 1px solid #222;
+      margin: 20px 0;
+    }
+    .story-text.witness {
+      color: #D4AF37; font-weight: bold; text-align: center;
+      letter-spacing: 1px; padding: 10px 0;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .choices-container { display: flex; flex-direction: column; gap: 12px; padding: 20px 0; border-top: 1px solid #222; }
+    .choice-btn {
+      background: transparent; border: 1px solid var(--btn-border); color: var(--text-color);
+      padding: 15px 20px; font-size: 15px; font-family: inherit; text-align: left;
+      cursor: pointer; transition: all 0.3s ease; border-radius: 3px;
+    }
+    .choice-btn:hover { background: var(--btn-hover); border-color: var(--highlight-color); color: var(--highlight-color); }
+    .choice-btn:active { transform: scale(0.98); }
+    .achievement-popup {
+      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #1a1510 0%, #2a2015 100%);
+      border: 1px solid #8B7355; padding: 15px 25px; border-radius: 5px;
+      opacity: 0; transition: all 0.5s ease; z-index: 2100;
+    }
+    .achievement-popup.show { top: 20px; opacity: 1; }
+    .achievement-popup.golden { border-color: #D4AF37; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+    .achievement-popup .title { color: #8B7355; font-size: 12px; margin-bottom: 5px; }
+    .achievement-popup.golden .title { color: #D4AF37; }
+    .achievement-popup .name { color: #D4AF37; font-size: 16px; font-weight: bold; }
+    .footer { display: flex; justify-content: space-between; align-items: center; padding: 20px 0 10px; font-size: 12px; color: #444; border-top: 1px solid #222; }
+    .version-container { position: relative; display: flex; gap: 12px; }
+    .version-btn, .skip-btn {
+      background: transparent; border: none; color: #666; font-size: 12px;
+      cursor: pointer; font-family: inherit; padding: 2px 6px; border-radius: 3px;
+      transition: all 0.2s;
+    }
+    .version-btn:hover, .skip-btn:hover { color: #aaa; background: #111; }
+    .changelog-popup {
+      position: fixed; bottom: 80px; left: 20px; background: #1a1a1a;
+      border: 1px solid #444; border-radius: 8px; padding: 16px 20px; max-width: 300px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7); z-index: 2200; display: none;
+      color: #ccc; font-size: 13px; line-height: 1.6; backdrop-filter: blur(4px);
+    }
+    .changelog-popup.show { display: block; animation: fadeInUp 0.3s ease; }
+    .changelog-popup h4 { color: #8B7355; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .changelog-popup .version-block { margin-bottom: 12px; border-left: 2px solid #8B7355; padding-left: 8px; }
+    .changelog-popup .version-block.old { border-left-color: #444; opacity: 0.9; }
+    .changelog-popup .version-title { color: #D4AF37; font-weight: bold; }
+    .changelog-popup ul { padding-left: 18px; margin: 8px 0; }
+    .changelog-popup li { margin-bottom: 4px; }
+    .changelog-popup .date { color: #D4AF37; font-size: 11px; margin-top: 4px; text-align: right; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .inland-security-footer { display: flex; align-items: center; gap: 8px; }
+    .raccoon-link { display: flex; align-items: center; cursor: pointer; font-weight: 300; color: #adadad; text-decoration: none; }
+    .raccoon-link:visited { color: #adadad; }
+    .raccoon-link:hover { color: #666666; }
+    @media (max-width: 480px) {
+      body { padding: 15px; }
+      .story-text { font-size: 15px; }
+      .choice-btn { padding: 12px 15px; font-size: 14px; }
+      .changelog-popup { left: 10px; right: 10px; max-width: none; }
+    }
+    .start-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #000000; z-index: 2000; display: flex;
+      justify-content: center; align-items: center; flex-direction: column;
+      color: #B0B0B0; font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+      transition: opacity 0.3s ease;
+    }
+    .start-content { text-align: center; max-width: 80%; }
+    .start-content h1 { color: #ffffff; font-size: 56px; margin-bottom: 16px; font-weight: 300; letter-spacing: 6px; text-shadow: 0 0 2px rgba(255,255,255,0.2); }
+    .start-subtitle { font-size: 18px; margin-bottom: 48px; color: #666; font-style: italic; letter-spacing: 2px; }
+    .start-btn {
+      background: transparent; border: 1px solid #444; color: #B0B0B0;
+      padding: 14px 48px; font-size: 20px; font-family: inherit; cursor: pointer;
+      transition: all 0.3s ease; border-radius: 3px; letter-spacing: 4px; font-weight: 300;
+    }
+    .start-btn:hover { border-color: #ffffff; color: #ffffff; background: #111; }
+  </style>
+</head>
+<body>
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-content">
+      <h1>黄小仙</h1>
+      <p class="start-subtitle">五百年修为一念之间</p>
+      <button class="start-btn" id="startBtn">开始讨封</button>
+    </div>
+  </div>
+  <div class="game-container">
+    <div class="status-bar">
+      <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
+      <div class="achievements" id="achievementsContainer"></div>
+    </div>
+    <div class="story-container" id="story-container"></div>
+    <div class="choices-container" id="choices-container"></div>
+    <div class="footer">
+      <div class="version-container">
+        <button class="version-btn" id="versionBtn">v1.4.0</button>
+        <button class="skip-btn" id="skipBtn">快进</button>
+      </div>
+      <div class="inland-security-footer">
+        <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
+          <span>© 2026 软软的小窝</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="achievement-popup" id="achievement-popup">
+    <div class="title">成就解锁</div>
+    <div class="name" id="achievement-name"></div>
+  </div>
+  <div class="changelog-popup" id="changelogPopup">
+    <h4>更新日志</h4>
+    <div class="version-block">
+      <div class="version-title">v1.4.0 · 见证者</div>
+      <ul>
+        <li>新增「见证者结局」——青衣人于废墟老宅中讲述你的本相</li>
+        <li>「无对无错，善良依旧」成就升级为金色，仅对应见证者结局</li>
+        <li>新增「守山人」「迷途者」「断缘」「黎明归宿」四个结局</li>
+        <li>新增「废墟之路」「老宅深谈」等支线场景</li>
+        <li>道行数值将随关键选择浮动显示</li>
+      </ul>
+      <div class="date">2026-06-02</div>
+    </div>
+    <div class="version-block old">
+      <div class="version-title">v1.3.3</div>
+      <ul>
+        <li>「舍身成仁」成就升级为金色成就</li>
+      </ul>
+      <div class="date">2026-05-27</div>
+    </div>
+  </div>
 
-function showAchievement(name) { const popup = document.getElementById('achievement-popup'); const nameEl = document.getElementById('achievement-name'); nameEl.textContent = name; popup.classList.add('show'); setTimeout(() => { popup.classList.remove('show'); }, 3000); }
+<script>
+(function() {
+  const gameData = {
+    achievements: {
+      'true': false,
+      'god': false,
+      'mortal': false,
+      'fail_scholar': false,
+      'fail_kid': false,
+      'farmer': false,
+      'star': false,
+      'demon_king': false,
+      'sacrifice': false,
+      'mad': false,
+      'love': false,
+      'guardian': false,
+      'lost': false,
+      'severed': false,
+      'dawn': false,
+      'witness': false
+    },
+    achievementIcons: [
+      { id: 'witness', title: '无对无错，善良依旧', icon: '✦' },
+      { id: 'sacrifice', title: '舍身成仁', icon: '†' },
+      { id: 'true', title: '本相自在（无成就，仅记录）', icon: '◯' },
+      { id: 'god', title: '点化成仙', icon: '☀' },
+      { id: 'mortal', title: '尘世轮回', icon: '人' },
+      { id: 'fail_scholar', title: '功亏一篑', icon: '✗' },
+      { id: 'fail_kid', title: '原形毕露', icon: '✗' },
+      { id: 'farmer', title: '山野村夫', icon: '🌾' },
+      { id: 'star', title: '文曲星耀', icon: '⭐' },
+      { id: 'demon_king', title: '妖王之路', icon: '◆' },
+      { id: 'mad', title: '执念成魔', icon: '◇' },
+      { id: 'love', title: '红尘情缘', icon: '♡' },
+      { id: 'guardian', title: '守山之人', icon: '⛰' },
+      { id: 'lost', title: '雨夜迷途', icon: '?' },
+      { id: 'severed', title: '断缘而去', icon: '—' },
+      { id: 'dawn', title: '黎明归宿', icon: '☽' }
+    ],
+    cultivationMap: {
+      start: '五百年',
+      true_encounter_first: '五百年',
+      true_encounter_second: '五百年',
+      true_guidance: '五百年',
+      ruins_path: '四百八十年',
+      ruins_arrival: '四百八十年',
+      ruins_meeting: '四百八十年',
+      witness_ending: '∞',
+      mountain_guardian_end: '六百年',
+      lost_in_rain: '三百二十年',
+      dawn_return_end: '五百二十年',
+      severed_ending: '四百年',
+      true_ending: '五百年',
+      mortal_ending: '无',
+      god_ending_favor: '八百年',
+      sacrifice_ending: '归零',
+      mad_ending: '千载妖力',
+      obsession_recover_end: '二百六十年',
+      fail_scholar_end: '三百年',
+      fail_kid_end: '四百五十年',
+      demon_king_ending: '七百年',
+      farmer_ending: '五百年',
+      star_ending: '五百二十年',
+      mortal_love_ending: '五百二十年',
+      wait_final: '四百五十年'
+    },
+    scenes: {
+      'start': {
+        texts: [
+          { type: 'narrator', content: '雷雨夜，山路泥泞。' },
+          { type: 'narrator', content: '你是一只修炼了五百年的黄鼠狼精，今日正是你的讨封之期。' },
+          { type: 'narrator', content: '只要能让人说一声"像人"或"像仙"，你便能化形成功，脱离妖身。' },
+          { type: 'narrator', content: '雨幕中，远远走来几个人影。你该向谁开口？' }
+        ],
+        choices: [
+          { text: '向前面那个赶路的书生讨封', nextScene: 'scholar_encounter' },
+          { text: '向路边的顽童讨封', nextScene: 'kid_encounter' },
+          { text: '再找找其他人', nextScene: 'wait_more_1' }
+        ]
+      },
 
-function unlockAchievement(id) { if (!gameData.achievements[id]) { gameData.achievements[id] = true; renderAchievementIcons(); localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements)); const nameMap = { 'true': '无对无错，善良依旧', 'god': '点化成仙', 'mortal': '尘世轮回', 'fail_scholar': '功亏一篑', 'fail_kid': '原形毕露', 'farmer': '山野村夫', 'star': '文曲星耀', 'demon_king': '妖王之路', 'sacrifice': '舍身成仁', 'mad': '执念成魔', 'love': '红尘情缘' }; if (nameMap[id]) showAchievement(nameMap[id]); } }
+      'scholar_encounter': {
+        texts: [
+          { type: 'narrator', content: '你从树后闪身而出，拦住了那位赶路的书生。' },
+          { type: 'speaker', content: '书生猛地停步，伞掉在地上："何...何方妖怪！莫要害我！"' },
+          { type: 'narrator', content: '你尽力作出一副和善模样，拱手道："这位公子，请问你看我像人还是像仙？"' },
+          { type: 'speaker', content: '书生脸色惨白，连连后退："像...像妖怪！一身骚气，还不快滚！"' },
+          { type: 'narrator', content: '他捡起石块朝你扔来，转身就跑。' }
+        ],
+        choices: [
+          { text: '仓皇逃离', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' },
+          { text: '追上去，拼命解释', nextScene: 'scholar_follow' },
+          { text: '愤怒质问，为何以貌取人', nextScene: 'scholar_angry' }
+        ]
+      },
+      'scholar_angry': {
+        texts: [
+          { type: 'narrator', content: '你怒火上涌，挡在书生面前厉声道："我修行五百年，从未害人，你凭什么骂我妖怪！"' },
+          { type: 'speaker', content: '书生被你的气势震慑，跌坐泥水中，颤抖道："你……你莫要吃我……"' },
+          { type: 'narrator', content: '你看着他那副可怜模样，心中怒火渐消，却也感到一阵悲凉。' }
+        ],
+        choices: [
+          { text: '冷静下来，好言相劝', nextScene: 'scholar_angry_calm' },
+          { text: '甩袖而去，不再纠缠', nextScene: 'fail_scholar_end', action: 'unlock_fail_scholar' }
+        ]
+      },
+      'scholar_angry_calm': {
+        texts: [
+          { type: 'narrator', content: '你深吸一口气，压下怒火，轻声道："罢了，是我吓到你了。公子请起，我不害人。"' },
+          { type: 'speaker', content: '书生惊魂未定，却见你态度诚恳，渐渐不再发抖："你……当真是修行的灵兽？"' },
+          { type: 'narrator', content: '你点头，将山中修炼之事简略道来。书生听罢，竟露出几分好奇。' }
+        ],
+        choices: [
+          { text: '再次恳请讨封', nextScene: 'scholar_follow' },
+          { text: '不再强求，转身离去', nextScene: 'wait_more_2' }
+        ]
+      },
+      'scholar_follow': {
+        texts: [
+          { type: 'narrator', content: '你不甘心，追上去挡在他面前，口吐人言："公子莫怕，我修行五百年从不害人，只求一句认可。"' },
+          { type: 'speaker', content: '书生跌坐泥地，见你并无恶意，颤抖着问："你……你真的不偷鸡？"' },
+          { type: 'narrator', content: '你摇头，将近日捕鼠护粮之事道来。书生渐渐平静，眼中竟有几分敬意。' },
+          { type: 'speaker', content: '他沉吟良久："我自幼读书，从不信妖邪，今日见你通人性、守本分，倒像是……像是文曲星君座下的灵兽。"' }
+        ],
+        choices: [
+          { text: '拜谢书生', nextScene: 'scholar_test' }
+        ]
+      },
+      'scholar_test': {
+        texts: [
+          { type: 'speaker', content: '书生又说："虽然你通人性，但我仍需试你一试。方才匆忙，我将祖传手札遗落在山神庙，你能替我寻回吗？"' },
+          { type: 'narrator', content: '他眼中带着期盼，也有几分犹豫。' }
+        ],
+        choices: [
+          { text: '立刻动身去山神庙寻找', nextScene: 'scholar_search' },
+          { text: '面露难色，表示太远', nextScene: 'scholar_refuse' }
+        ]
+      },
+      'scholar_refuse': {
+        texts: [
+          { type: 'narrator', content: '你犹豫不前，书生失望地摇头："连这点诚意都没有，终究是妖性未脱。"' },
+          { type: 'speaker', content: '他转身离去，再也没回头。你呆立雨中，讨封失败。' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+      'scholar_search': {
+        texts: [
+          { type: 'narrator', content: '你冒雨奔向山神庙。庙中阴森，手札果然在香案下。' },
+          { type: 'narrator', content: '正要取时，一只野猫窜出，叼起手札就跑。' }
+        ],
+        choices: [
+          { text: '变回原形追赶野猫', nextScene: 'scholar_chase' },
+          { text: '用术法定住野猫', nextScene: 'scholar_magic' }
+        ]
+      },
+      'scholar_chase': {
+        texts: [
+          { type: 'narrator', content: '你化作黄鼠狼疾追，在山林里与野猫缠斗。虽然夺回手札，但身上多处抓伤。' },
+          { type: 'narrator', content: '书生见你浑身湿透、带着伤将手札捧回，大为感动。' }
+        ],
+        choices: [
+          { text: '呈上手札', nextScene: 'star_ending', action: 'unlock_star' }
+        ]
+      },
+      'scholar_magic': {
+        texts: [
+          { type: 'narrator', content: '你掐诀念咒，野猫僵在原地，你轻松取回手札。' },
+          { type: 'speaker', content: '书生见你法术精妙，却眉头微皱："用法术强取，终非正道……不过你确实守信。"' },
+          { type: 'narrator', content: '他想了想，仍然说出那句认可，但文气弱了几分。' }
+        ],
+        choices: [
+          { text: '接受认可', nextScene: 'star_ending', action: 'unlock_star' }
+        ]
+      },
 
-function renderAchievementIcons() { const container = document.getElementById('achievementsContainer'); if (!container) return; let html = ''; gameData.achievementIcons.forEach(ach => { const unlocked = gameData.achievements[ach.id]; const goldenClass = ((ach.id === 'true' || ach.id === 'sacrifice') && unlocked) ? 'golden' : ''; html += '<div class="achievement-icon ' + (unlocked ? 'unlocked ' + goldenClass : '') + '" data-achievement="' + ach.id + '" data-title="' + ach.title + '">' + (unlocked ? ach.icon : '') + '</div>'; }); container.innerHTML = html; }
+      'kid_encounter': {
+        texts: [
+          { type: 'narrator', content: '你悄悄靠近那个蹲在路边玩泥巴的顽童。' },
+          { type: 'speaker', content: '顽童抬头看见你，眼睛一亮："呀，好大一只黄鼠狼！你的尾巴真好看！"' },
+          { type: 'narrator', content: '你心中暗喜，低声问道："小娃娃，你看我像什么？像人吗？"' },
+          { type: 'speaker', content: '顽童歪头想了想："像……像一只会说话的黄鼠狼！我阿婆说黄鼠狼会偷鸡，你是不是来偷我的泥人？"' },
+          { type: 'narrator', content: '顽童抓起泥巴朝你扔来，咯咯笑着跑开了。' }
+        ],
+        choices: [
+          { text: '落荒而逃', nextScene: 'fail_kid_end', action: 'unlock_fail_kid' },
+          { text: '变成小猫逗他开心', nextScene: 'kid_play' }
+        ]
+      },
+      'kid_play': {
+        texts: [
+          { type: 'narrator', content: '你灵机一动，使出小法术变成一只小花猫，喵喵叫着蹭顽童的腿。' },
+          { type: 'speaker', content: '顽童惊喜："哇！你还会变猫！太好玩了！"他抱起你，完全忘了刚才的害怕。' },
+          { type: 'narrator', content: '顽童带你回家，他的奶奶是个慈祥老人，见猫通人性，笑着说："这猫有灵性，像保家的黄大仙呢。"' },
+          { type: 'narrator', content: '你心头一暖。奶奶留你过夜，说夜里常有野狗来偷鸡。' }
+        ],
+        choices: [
+          { text: '主动提出守夜', nextScene: 'farm_night' },
+          { text: '安心睡下', nextScene: 'farm_sleep' }
+        ]
+      },
+      'farm_night': {
+        texts: [
+          { type: 'narrator', content: '深夜，果然有两只野狗窜入院子。你现出原形，与野狗搏斗。' }
+        ],
+        choices: [
+          { text: '奋力驱赶', nextScene: 'farm_brave' },
+          { text: '害怕躲藏', nextScene: 'farm_fail' }
+        ]
+      },
+      'farm_brave': {
+        texts: [
+          { type: 'narrator', content: '你勇猛异常，赶跑了野狗，自己受了轻伤。奶奶早起发现鸡舍无损，对你连连道谢。' },
+          { type: 'speaker', content: '奶奶摸着你的头："真像我们家的保家仙，以后就留下吧。"' }
+        ],
+        choices: [
+          { text: '留在农家', nextScene: 'farmer_village' },
+          { text: '辞别奶奶，继续修行', nextScene: 'leave_grandma' }
+        ]
+      },
+      'farm_sleep': {
+        texts: [
+          { type: 'narrator', content: '你睡得太沉，野狗咬死了两只鸡。奶奶虽未责怪，但眼中失望难掩。' },
+          { type: 'narrator', content: '你自觉无颜，悄悄离开了村子。' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+      'farm_fail': {
+        texts: [
+          { type: 'narrator', content: '你吓得躲进柴堆，野狗咬死数只鸡，还撞坏了篱笆。' },
+          { type: 'speaker', content: '奶奶叹气："终究是畜生，保不了家。"你羞愧难当，连夜离去。' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
 
-function skipCurrentScene() { if (gameData.typingTimer) clearTimeout(gameData.typingTimer); const scene = gameData.scenes[gameData.currentScene]; if (!scene) return; const storyContainer = document.getElementById('story-container'); storyContainer.innerHTML = ''; scene.texts.forEach(textObj => { const p = document.createElement('p'); p.className = 'story-text ' + textObj.type; p.textContent = textObj.content; storyContainer.appendChild(p); }); storyContainer.scrollTop = storyContainer.scrollHeight; showChoicesDirect(scene); }
+      'leave_grandma': {
+        texts: [
+          { type: 'narrator', content: '你在奶奶和顽童的挽留声中转身，重新走入清晨的山雾。' },
+          { type: 'narrator', content: '人间烟火虽暖，但你心中仍有讨封的执念。只是这一次，脚步比来时沉重了许多。' },
+          { type: 'narrator', content: '你想起奶奶慈祥的笑容，想起顽童天真的话语，忽然觉得——即使不化人形，能被这样真诚地对待，似乎也没什么不好。' },
+          { type: 'narrator', content: '前方出现岔路：一条通往深山精怪的聚集之地，另一条通往青衣人所在的山道，还有一条路通往你修炼了五百年的洞府。' },
+          { type: 'narrator', content: '还有一个你从未注意的方向——雾里隐约露出一角飞檐，似乎是座荒废已久的老宅。' }
+        ],
+        choices: [
+          { text: '回洞府修行，不再执着讨封', nextScene: 'true_ending' },
+          { text: '去精怪聚集处寻找同类', nextScene: 'wild_follow' },
+          { text: '继续前行，寻找青衣人', nextScene: 'true_encounter_second' },
+          { text: '朝那角飞檐走去，看看是什么', nextScene: 'ruins_path' }
+        ]
+      },
 
-function showChoicesDirect(scene) { const choicesContainer = document.getElementById('choices-container'); let html = ''; scene.choices.forEach((choice, index) => { if (choice.nextScene === 'checkpoint') { if (!gameData.checkpointScene) { html += '<button class="choice-btn" onclick="handleChoice(\'start\', \'reset\')" style="animation-delay: ' + (index * 0.1) + 's">重新开始</button>'; } else { html += '<button class="choice-btn" onclick="handleChoice(\'' + gameData.checkpointScene + '\', null)" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>'; } } else { const actionParam = choice.action ? '\'' + choice.action + '\'' : 'null'; html += '<button class="choice-btn" onclick="handleChoice(\'' + choice.nextScene + '\', ' + actionParam + ')" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>'; } }); choicesContainer.innerHTML = html; }
+      'wait_more_1': {
+        texts: [
+          { type: 'narrator', content: '你觉得书生和顽童都非有缘之人，决定再等等。' },
+          { type: 'narrator', content: '雨越下越大，山路上积起水洼，你的皮毛已湿透。' },
+          { type: 'narrator', content: '就在你几乎要放弃时，雨幕中缓缓走来一道青色身影，撑着油纸伞，步履从容。' },
+          { type: 'narrator', content: '另有一个农夫挑着柴，从山道拐角冒雨跑来。' },
+          { type: 'narrator', content: '不远处的树下，还有个老道士在避雨，手持拂尘，闭目养神。' },
+          { type: 'narrator', content: '山林深处，隐约传来一声悠长的呼唤，似有同类在召唤。' },
+          { type: 'narrator', content: '远处的雾里，似乎还有一处废弃的老宅，残破的飞檐在雨中若隐若现。' }
+        ],
+        choices: [
+          { text: '向青衣人讨封', nextScene: 'true_encounter_first' },
+          { text: '向农夫讨封', nextScene: 'farmer_encounter' },
+          { text: '向老道士讨封', nextScene: 'taoist_encounter' },
+          { text: '再等等，或许还有其他人', nextScene: 'wait_more_2' },
+          { text: '循着山林深处的呼唤而去', nextScene: 'wild_call' },
+          { text: '独自朝老宅方向走去', nextScene: 'ruins_path' }
+        ]
+      },
+      'wild_call': {
+        texts: [
+          { type: 'narrator', content: '那呼唤声若隐若现，像是用兽语在低吟。你心中一动——这是同类的气息。' },
+          { type: 'narrator', content: '你循声穿过密林，雨水打在树叶上沙沙作响。越往深处，妖气越浓。' },
+          { type: 'narrator', content: '忽然，一只老狐从树后探出头来，口吐人言："小黄仙，今夜是讨封之夜，也是精怪集会之夜。你可愿来看看？"' }
+        ],
+        choices: [
+          { text: '跟随老狐前往', nextScene: 'wild_follow' },
+          { text: '婉拒，回到山路继续等待', nextScene: 'wait_more_2' }
+        ]
+      },
+      'wild_follow': {
+        texts: [
+          { type: 'narrator', content: '老狐引你穿过一片迷雾，眼前豁然开朗——山坳中竟聚集了数十只精怪。' },
+          { type: 'narrator', content: '有狐妖、蛇精、树魅，甚至还有一只黑熊怪。它们围坐在篝火旁，正在议论讨封之事。' },
+          { type: 'speaker', content: '一只白面狐妖笑道："又来了个新面孔。小黄仙，你可想好了——成了人，便要受人间规矩束缚；成了仙，更要守天条戒律。何不留在山中，做自由自在的妖王？"' }
+        ],
+        choices: [
+          { text: '心动，询问妖王之道', nextScene: 'wild_gathering' },
+          { text: '摇头，坚持讨封之路', nextScene: 'wait_more_2' }
+        ]
+      },
+      'wild_gathering': {
+        texts: [
+          { type: 'speaker', content: '白面狐妖拍掌道："好！我等精怪虽无神籍，却逍遥自在。山中灵药、洞天福地，皆可享用。"' },
+          { type: 'speaker', content: '黑熊怪瓮声瓮气道："俺修炼三百年，从未想过讨封。做人有什么好？做妖才痛快！"' },
+          { type: 'narrator', content: '众精怪纷纷附和，篝火映照下，每张面孔都透着野性与自由。' },
+          { type: 'speaker', content: '老狐凑近你耳边："你若留下，以你五百年道行，必能成为一方妖王。如何？"' }
+        ],
+        choices: [
+          { text: '留下，成为山中妖王', nextScene: 'demon_king_ending', action: 'unlock_demon_king' },
+          { text: '犹豫再三，还是告辞', nextScene: 'wait_more_2' },
+          { text: '邀请精怪们一同去讨封', nextScene: 'wild_debate' }
+        ]
+      },
+      'wild_debate': {
+        texts: [
+          { type: 'narrator', content: '你站起身，朗声道："诸位道友，既已修炼多年，何不一同去讨封？或许都能得成正果。"' },
+          { type: 'speaker', content: '众精怪面面相觑。白面狐妖冷笑："讨封？人类凭什么决定我们的命运？"' },
+          { type: 'speaker', content: '老狐叹道："年轻人有志向是好事，但我等早已看透。你去吧，若不成，随时回来。"' },
+          { type: 'narrator', content: '你辞别精怪们，重新回到山路。雨势已小，青衣人仍在远处静静伫立。' }
+        ],
+        choices: [
+          { text: '走向青衣人', nextScene: 'true_encounter_second' },
+          { text: '回到精怪聚集处', nextScene: 'demon_king_ending', action: 'unlock_demon_king' }
+        ]
+      },
 
-function renderScene(sceneId) { if (gameData.typingTimer) clearTimeout(gameData.typingTimer); const scene = gameData.scenes[sceneId]; if (!scene) return; gameData.currentScene = sceneId; if (scene.choices) { const validChoices = scene.choices.filter(c => c.text !== '重新开始' && c.text !== '回到上一个选择点'); if (validChoices.length >= 2) { gameData.checkpointScene = sceneId; } } const storyContainer = document.getElementById('story-container'); const choicesContainer = document.getElementById('choices-container'); storyContainer.innerHTML = ''; choicesContainer.innerHTML = ''; let textIndex = 0; const totalTexts = scene.texts.length; function showNextText() { if (textIndex >= totalTexts) { if (scene.action) { if (scene.action === 'achievement_true') unlockAchievement('true'); } showChoicesDirect(scene); return; } const textObj = scene.texts[textIndex]; const p = document.createElement('p'); p.className = 'story-text ' + textObj.type; storyContainer.appendChild(p); storyContainer.scrollTop = storyContainer.scrollHeight; const charSpeed = textObj.type === 'speaker' ? 40 : (textObj.type === 'system' ? 20 : 30); let charIndex = 0; const text = textObj.content; function typeNextChar() { if (charIndex < text.length) { p.textContent += text[charIndex]; charIndex++; storyContainer.scrollTop = storyContainer.scrollHeight; gameData.typingTimer = setTimeout(typeNextChar, charSpeed); } else { textIndex++; gameData.typingTimer = setTimeout(showNextText, 300); } } typeNextChar(); } showNextText(); }
+      'taoist_encounter': {
+        texts: [
+          { type: 'narrator', content: '你走近老道士，他睁开眼，目光如电。' },
+          { type: 'speaker', content: '道士："贫道观你妖气缠绕，却无血光，可是来讨封的？"' },
+          { type: 'narrator', content: '你连忙作揖，说明来意。' }
+        ],
+        choices: [
+          { text: '恭敬请教', nextScene: 'taoist_god' },
+          { text: '怀疑他是骗子，转身离开', nextScene: 'wait_more_2' },
+          { text: '请问道长可否收我为徒', nextScene: 'taoist_disciple' }
+        ]
+      },
+      'taoist_disciple': {
+        texts: [
+          { type: 'speaker', content: '道士抚须而笑："收徒？贫道门下已有弟子三百，个个都是人。收一只黄鼠狼，倒是头一遭。"' },
+          { type: 'narrator', content: '他打量你片刻，又道："不过，你若能通过贫道的考验，破例收你又有何妨？"' }
+        ],
+        choices: [
+          { text: '欣然接受考验', nextScene: 'taoist_test' },
+          { text: '觉得太过麻烦，告辞', nextScene: 'wait_more_2' }
+        ]
+      },
+      'taoist_test': {
+        texts: [
+          { type: 'narrator', content: '道士从袖中取出一面铜镜，镜中映出你黄鼠狼的原形。' },
+          { type: 'speaker', content: '道士："此镜能照见本心。你若能在镜前静坐一炷香，不起妄念，便算通过。"' },
+          { type: 'narrator', content: '你盘腿坐下，铜镜中无数幻象涌现——有鲜美的鸡肉、温暖的巢穴、也有对人类的怨恨与不甘。' },
+          { type: 'narrator', content: '你一一放下，心如止水。一炷香后，道士满意地点头。' }
+        ],
+        choices: [
+          { text: '通过考验，拜入师门', nextScene: 'taoist_test_pass' },
+          { text: '心中仍有杂念，承认失败', nextScene: 'taoist_test_fail' }
+        ]
+      },
+      'taoist_test_pass': {
+        texts: [
+          { type: 'speaker', content: '道士大笑："好！好一只灵兽！从今日起，你便是我门下弟子。"' },
+          { type: 'narrator', content: '他拂尘一挥，清光笼罩，你顿觉灵台清明，道行精进。' },
+          { type: 'speaker', content: '道士颔首："你虽未讨封，却得了道缘。我看你像——散仙。"' }
+        ],
+        choices: [
+          { text: '叩谢恩师', nextScene: 'god_ending_favor', action: 'unlock_god' }
+        ]
+      },
+      'taoist_test_fail': {
+        texts: [
+          { type: 'narrator', content: '你无法静心，镜中幻象扰得你心烦意乱。最终只得睁眼认输。' },
+          { type: 'speaker', content: '道士叹道："缘分未到。你去吧，或许另有机缘。"' }
+        ],
+        choices: [
+          { text: '回到山路继续等待', nextScene: 'wait_more_2' },
+          { text: '重新开始', nextScene: 'start', action: 'reset' }
+        ]
+      },
+      'taoist_god': {
+        texts: [
+          { type: 'speaker', content: '道士点头："你虽为妖，心存善念，我看你像山中散仙。"' },
+          { type: 'narrator', content: '拂尘一挥，一道清光笼罩你，你感觉脱胎换骨，竟直接化作人形。' },
+          { type: 'speaker', content: '道士笑道："你我缘分至此，好自为之。"说罢化作清风而去。' }
+        ],
+        choices: [
+          { text: '拜谢仙长', nextScene: 'god_ending_favor', action: 'unlock_god' }
+        ]
+      },
 
-window.handleChoice = function(nextScene, action) { if (action === 'achievement_true') unlockAchievement('true'); else if (action === 'unlock_god') unlockAchievement('god'); else if (action === 'unlock_fail_scholar') unlockAchievement('fail_scholar'); else if (action === 'unlock_fail_kid') unlockAchievement('fail_kid'); else if (action === 'unlock_farmer') unlockAchievement('farmer'); else if (action === 'unlock_star') unlockAchievement('star'); else if (action === 'unlock_mortal') unlockAchievement('mortal'); else if (action === 'unlock_demon_king') unlockAchievement('demon_king'); else if (action === 'unlock_sacrifice') unlockAchievement('sacrifice'); else if (action === 'unlock_mad') unlockAchievement('mad'); else if (action === 'unlock_love') unlockAchievement('love'); else if (action === 'reset') { resetGame(false); return; } setTimeout(() => { renderScene(nextScene); }, 200); };
+      'true_encounter_first': {
+        texts: [
+          { type: 'narrator', content: '你从树后走出，雨水顺着皮毛滴落。' },
+          { type: 'speaker', content: '青衣人停下脚步，伞微微前倾："深夜拦路，可是有事？"' },
+          { type: 'narrator', content: '你作揖道："先生，我修行五百年，今日讨封，恳请您看我像人还是像仙？"' },
+          { type: 'speaker', content: '青衣人凝视你许久，目光温和："我看你眼中尚有迷茫，似求道者，却未脱兽性。像——山中修行的精怪，离人仙尚远。"' },
+          { type: 'speaker', content: '"但你心诚，若愿随我修行，或可成正果。"' }
+        ],
+        choices: [
+          { text: '叩首拜谢，愿随修行', nextScene: 'god_ending_favor', action: 'unlock_god' },
+          { text: '心有不甘，想再等等他人', nextScene: 'wait_more_2' }
+        ]
+      },
+      'wait_more_2': {
+        texts: [
+          { type: 'narrator', content: '你按捺住心中的焦躁，继续躲在树后等待。' },
+          { type: 'narrator', content: '雨势渐小，山路却再无行人。' },
+          { type: 'narrator', content: '那位青衣人并未走远，他停在不远处，伞沿微抬，似乎在望着你藏身的方向。' },
+          { type: 'speaker', content: '他轻声开口："雨夜立良久，可是在等什么人？"' },
+          { type: 'narrator', content: '他顿了顿，又道："若不嫌弃，可随我去一处避雨——山后有座老宅，废弃多年，倒也清静。"' }
+        ],
+        choices: [
+          { text: '走向他，实话实说', nextScene: 'true_encounter_second' },
+          { text: '犹豫不决，再等下去', nextScene: 'wait_final' },
+          { text: '随他去老宅避雨', nextScene: 'ruins_path' }
+        ]
+      },
+      'true_encounter_second': {
+        texts: [
+          { type: 'narrator', content: '你走到青衣人面前，雨水打湿了你的全身，你却感到前所未有的平静。' },
+          { type: 'speaker', content: '青衣人微微一笑："你等了许久，就为了问我一句像什么？"' },
+          { type: 'speaker', content: '你点头："恳请先生指点。"' },
+          { type: 'speaker', content: '他收起伞，任由雨丝洒落："你修行五百年，可还记得自己最初的模样？那时你未想成仙，未想成人，只知在山间自在奔跑。"' },
+          { type: 'speaker', content: '"我看你，像这山间的风雨，来去随性。何必非要像人、像仙？你本就是黄小仙。"' }
+        ],
+        choices: [
+          { text: '恍然大悟，不再执念', nextScene: 'true_ending' },
+          { text: '仍想成人，恳请成全', nextScene: 'mortal_ending', action: 'unlock_mortal' },
+          { text: '怀疑他的用意，质问', nextScene: 'suspicious_ending' },
+          { text: '请先生指点修行之道', nextScene: 'true_guidance' },
+          { text: '问他：可否去你住处细谈', nextScene: 'ruins_path' }
+        ]
+      },
+      'true_guidance': {
+        texts: [
+          { type: 'speaker', content: '青衣人颔首："你愿聆听，我便多说几句。道不在形，而在心。你为讨封执着五百年，可曾静心感受山间清风、林间明月？"' },
+          { type: 'narrator', content: '他伸手接住雨滴，雨珠在掌心化作雾气。' },
+          { type: 'speaker', content: '"你若能放下形骸，便可得大自在；若仍想体验人间，我也可成全；若想随我修行，亦是缘分。"' }
+        ],
+        choices: [
+          { text: '放下执念，逍遥山水', nextScene: 'true_ending' },
+          { text: '愿入人间，经历轮回', nextScene: 'mortal_ending', action: 'unlock_mortal' },
+          { text: '恳请收入门下', nextScene: 'god_ending_favor', action: 'unlock_god' },
+          { text: '随先生去那处老宅一坐', nextScene: 'ruins_path' }
+        ]
+      },
 
-function resetGame(fullReset) { const overlay = document.getElementById('startOverlay'); if (overlay) overlay.style.display = 'none'; if (fullReset) { gameData.achievements = { 'true': false, 'god': false, 'mortal': false, 'fail_scholar': false, 'fail_kid': false, 'farmer': false, 'star': false, 'demon_king': false, 'sacrifice': false, 'mad': false, 'love': false }; localStorage.removeItem('huangdaxian_achievements'); renderAchievementIcons(); } gameData.checkpointScene = 'start'; renderScene('start'); }
+      // ================== 新增：废墟之路 ==================
+      'ruins_path': {
+        texts: [
+          { type: 'narrator', content: '你跟着青衣人，沿着长满青苔的石阶拾级而上。' },
+          { type: 'narrator', content: '雨雾深处，一座黑瓦老宅半隐半现。飞檐上的瑞兽早已残缺，门楣上的匾额被风雨剥蚀得只剩一个"宅"字。' },
+          { type: 'narrator', content: '你嗅了嗅——这里既无人气，也无妖气，只有一种极其古老的、被时间腌透了的味道。' },
+          { type: 'speaker', content: '青衣人推门，门轴发出长长的叹息："进来吧。我在这山中独居，已不知多少年。"' }
+        ],
+        choices: [
+          { text: '跨进门槛', nextScene: 'ruins_arrival' },
+          { text: '在门口犹豫，感觉哪里不对', nextScene: 'suspicious_ending' },
+          { text: '问先生：你是人是仙？', nextScene: 'ruins_arrival' }
+        ]
+      },
+      'ruins_arrival': {
+        texts: [
+          { type: 'narrator', content: '宅内比外头看着要整洁。堂屋正中悬着一盏长明灯，火焰不动，像是被某种力量定住。' },
+          { type: 'narrator', content: '墙上挂着一幅画——画中是一只奔跑的黄鼠狼，眼神清澈，毛发如金。' },
+          { type: 'narrator', content: '你愣住了。那只黄鼠狼的眉眼，竟与你如此相似。' },
+          { type: 'speaker', content: '青衣人给你倒了一盏冷茶，平静地说："这是我三百年前画的。当时我路过此山，遇见一只刚开灵智的小东西。"' },
+          { type: 'narrator', content: '他看了你一眼："你不必急着讨封。先坐下，听我说完一个故事。"' }
+        ],
+        choices: [
+          { text: '乖乖坐下，听他讲', nextScene: 'ruins_meeting' },
+          { text: '质问他：你三百年前就认识我？', nextScene: 'ruins_meeting' },
+          { text: '转身想逃', nextScene: 'severed_ending', action: 'unlock_severed' }
+        ]
+      },
+      'ruins_meeting': {
+        texts: [
+          { type: 'narrator', content: '青衣人缓缓开口。' },
+          { type: 'speaker', content: '"三百年前，我只是个迷路的书生，误入此山。是你——还是黄鼠狼的你——领我走出迷阵，救了我一命。"' },
+          { type: 'speaker', content: '"我那时说：你像人。也像仙。我便成了一缕执念，留在这座山，等你真正化形的那一天。"' },
+          { type: 'speaker', content: '"五百年过去，你从一只小东西修炼成有情有义、有善有念的灵。可你一直想问别人：你像什么？"' },
+          { type: 'speaker', content: '"我等你，等得雨都下了三百场。"' },
+          { type: 'narrator', content: '他站起身，长明灯的火焰忽然跳了一下。' },
+          { type: 'speaker', content: '"黄小仙，讨封的话，不必再问了。讨封的意思，是要别人承认你。可我今晚，想换一种说法——"' }
+        ],
+        choices: [
+          { text: '屏息倾听', nextScene: 'witness_ending', action: 'unlock_witness' }
+        ]
+      },
 
-function loadSavedAchievements() { const saved = localStorage.getItem('huangdaxian_achievements'); if (saved) { const savedAchievements = JSON.parse(saved); Object.keys(savedAchievements).forEach(key => { if (savedAchievements[key]) gameData.achievements[key] = true; }); } renderAchievementIcons(); }
+      // ================== 新增：见证者结局（核心） ==================
+      'witness_ending': {
+        texts: [
+          { type: 'narrator', content: '青衣人走到你面前，目光澄澈，像三百年前那个雨夜。' },
+          { type: 'witness', content: '“我看你，就是黄小仙。”' },
+          { type: 'witness', content: '“不是任何其他的存在。不是人，无需人的认可；不是仙，不慕仙的逍遥。你就是你，这片山野的灵，这座老宅的魂，我行至水穷处遇到的……唯一的‘见证’。”' },
+          { type: 'narrator', content: '我说完了。废墟里死一般寂静。' },
+          { type: 'narrator', content: '你听懂了。又似乎什么都没懂。' },
+          { type: 'narrator', content: '那只长明灯的火焰忽然燃得极旺，画上的黄鼠狼竟像活过来一般，眼里泛起水光。' },
+          { type: 'narrator', content: '你低头——自己的皮毛正在变得柔软、变得明亮，像被三百年的月光洗过一遍。' },
+          { type: 'narrator', content: '没有金光灌顶，没有天雷地火，没有神籍仙箓。' },
+          { type: 'narrator', content: '只有一种感觉：你第一次，不再是别人的影子、不再是"像"什么。' },
+          { type: 'narrator', content: '你就是黄小仙。' },
+          { type: 'narrator', content: '你抬起头。屋外雨停了。' },
+          { type: 'narrator', content: '青衣人朝你轻轻点头，没有再说一个字——他本就是为你而留，这一刻，缘已圆满。' },
+          { type: 'narrator', content: '你推门而出。山还是那座山，月色如洗，清风徐来。' },
+          { type: 'narrator', content: '你不入神籍，不落凡尘，从此以本我之姿，逍遥于山野之间。' },
+          { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' },
+          { type: 'narrator', content: '而那座老宅，从此再也无人见过。' },
+          { type: 'system', content: '成就：无对无错，善良依旧' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
 
-function initControls() { const versionBtn = document.getElementById('versionBtn'); const popup = document.getElementById('changelogPopup'); versionBtn.addEventListener('click', (e) => { e.stopPropagation(); popup.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (!popup.contains(e.target) && e.target !== versionBtn) { popup.classList.remove('show'); } }); const skipBtn = document.getElementById('skipBtn'); skipBtn.addEventListener('click', () => { skipCurrentScene(); }); }
+      // ================== 新增：断缘结局 ==================
+      'severed_ending': {
+        texts: [
+          { type: 'narrator', content: '你转身想逃，可门已经合上。' },
+          { type: 'narrator', content: '青衣人没有追。他只是平静地坐回原处，端起那盏冷茶。' },
+          { type: 'speaker', content: '"走吧。缘起缘灭，不必强求。"' },
+          { type: 'narrator', content: '你破窗而出，奔回山林。身后老宅轰然倒塌，化作一地瓦砾。' },
+          { type: 'narrator', content: '你回头，再也寻不到那片飞檐。' },
+          { type: 'narrator', content: '从那以后，你再也没讨到封——但每逢雨夜，你总会在某个山坳里，闻到一盏冷茶的清香。' },
+          { type: 'system', content: '结局：断缘而去' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
 
-window.onload = function() { loadSavedAchievements(); const overlay = document.getElementById('startOverlay'); const startBtn = document.getElementById('startBtn'); overlay.style.display = 'flex'; startBtn.addEventListener('click', function() { overlay.style.display = 'none'; renderScene('start'); }); initControls(); };
-window.resetGame = resetGame; })(); </script></body></html>
+      // ================== 新增：守山人结局 ==================
+      'farmer_encounter': {
+        texts: [
+          { type: 'narrator', content: '你拦住农夫，他吓了一跳，柴担差点掉地。' },
+          { type: 'speaker', content: '农夫瞪大眼："黄……黄大仙？俺娘说过，山里有修行的黄仙，不能得罪。"' },
+          { type: 'narrator', content: '你作揖道："大哥，我修行五百年，今日讨封，你看我像人还是像仙？"' },
+          { type: 'speaker', content: '农夫挠头，憨厚一笑："俺看您像山里的土地爷，护着咱们庄稼人。像，像保家仙！"' }
+        ],
+        choices: [
+          { text: '感激不尽，随农夫回村', nextScene: 'farmer_village' },
+          { text: '婉拒好意，继续修行', nextScene: 'wait_more_2' },
+          { text: '不欲入村，但请他引路去山后看看', nextScene: 'ruins_path' }
+        ]
+      },
+      'farmer_village': {
+        texts: [
+          { type: 'narrator', content: '农夫热情地引你进了村子。村民们见一只黄鼠狼口吐人言，先是害怕，后来听说你能护家保粮，纷纷称奇。' },
+          { type: 'narrator', content: '村长亲自为你安排了住处——一座小小的土地庙，香火虽不旺，却也干净。' },
+          { type: 'speaker', content: '农夫的妻子端来一碗热粥："黄大仙，村里野狗多，鸡鸭常被叼走，您若能帮着看守，全村都念您的好。"' },
+          { type: 'narrator', content: '你看着这些朴实的村民，心中涌起一股暖意。' }
+        ],
+        choices: [
+          { text: '安心做保家仙，护佑村庄', nextScene: 'farmer_ending', action: 'unlock_farmer' },
+          { text: '主动帮村民解决难题', nextScene: 'farmer_help' },
+          { text: '在村中多住些时日，感受人间烟火', nextScene: 'farmer_stay' }
+        ]
+      },
+      'farmer_stay': {
+        texts: [
+          { type: 'narrator', content: '你在村中住了下来。白日里帮村民看护田地，夜里在土地庙中打坐修炼。' },
+          { type: 'narrator', content: '村里有个年轻的绣娘，每日都会来庙前供上一束野花。她说，自从你来了，村里的鸡再也没丢过。' },
+          { type: 'speaker', content: '绣娘轻声问："黄大仙，你……你会一直留在这里吗？"' },
+          { type: 'narrator', content: '她的眼睛里有星星，你忽然觉得，人间的情意比仙界的清冷更暖。' }
+        ],
+        choices: [
+          { text: '点头，愿意长久守护这个村庄', nextScene: 'mortal_love_ending', action: 'unlock_love' },
+          { text: '摇头，你终究不属于这里', nextScene: 'farmer_ending', action: 'unlock_farmer' },
+          { text: '想去看看山后的老宅', nextScene: 'ruins_path' }
+        ]
+      },
+      'farmer_help': {
+        texts: [
+          { type: 'narrator', content: '你听闻村外山道上近来有山贼出没，已经劫了好几户人家的粮食。' },
+          { type: 'narrator', content: '村民们敢怒不敢言，官府又不管。你决定出手相助。' },
+          { type: 'narrator', content: '当夜，你埋伏在山道旁的灌木丛中。果然，三个山贼提着刀，正往村子方向摸去。' }
+        ],
+        choices: [
+          { text: '施展法术吓退山贼', nextScene: 'farmer_scare' },
+          { text: '变回原形偷袭山贼', nextScene: 'farmer_ambush' },
+          { text: '正面现身，以理服人', nextScene: 'bandit_encounter' }
+        ]
+      },
+      'farmer_scare': {
+        texts: [
+          { type: 'narrator', content: '你掐诀念咒，顿时阴风阵阵，林中鬼火闪烁。山贼吓得屁滚尿流，丢下刀就跑。' },
+          { type: 'narrator', content: '村民们得知后欢呼雀跃，将你奉为真正的保家仙。从此香火鼎盛。' }
+        ],
+        choices: [
+          { text: '接受供奉，守护村庄', nextScene: 'farmer_ending', action: 'unlock_farmer' }
+        ]
+      },
+      'farmer_ambush': {
+        texts: [
+          { type: 'narrator', content: '你化作一道黄影，在山贼脚下来回穿梭，咬得他们哇哇大叫。' },
+          { type: 'narrator', content: '山贼头子挥刀乱砍，一刀砍在树干上，刀身弹回，反倒伤了自己的手臂。' },
+          { type: 'speaker', content: '山贼们惊恐万分："有妖怪！快跑！"转眼间跑得无影无踪。' },
+          { type: 'narrator', content: '村民闻讯赶来，将你高高举起，连声称赞。' }
+        ],
+        choices: [
+          { text: '留在村庄，享受荣耀', nextScene: 'farmer_ending', action: 'unlock_farmer' }
+        ]
+      },
+      'bandit_encounter': {
+        texts: [
+          { type: 'narrator', content: '你化作人形，从林中走出，挡在山贼面前。' },
+          { type: 'speaker', content: '山贼头子一愣，随即狞笑："哪来的野人？敢挡老子的路！"' },
+          { type: 'narrator', content: '你合掌道："诸位壮士，村中皆是贫苦百姓，何苦为难他们？若缺银两，山中自有药材可采。"' },
+          { type: 'speaker', content: '山贼头子大怒："少废话！兄弟们，砍了他！"' },
+          { type: 'narrator', content: '三把刀同时向你劈来。你本可以闪避，但身后不远处，绣娘正躲在树后瑟瑟发抖。' }
+        ],
+        choices: [
+          { text: '舍身挡刀，护住绣娘', nextScene: 'sacrifice_choice', action: 'unlock_sacrifice' },
+          { text: '闪身避开，用法术反击', nextScene: 'farmer_scare' }
+        ]
+      },
+      'sacrifice_choice': {
+        texts: [
+          { type: 'narrator', content: '你咬紧牙关，挺身上前。刀锋划过你的身体，鲜血涌出。' },
+          { type: 'speaker', content: '绣娘尖叫一声冲了出来："黄大仙！不要！"' },
+          { type: 'narrator', content: '山贼们被你的血震慑，面面相觑，竟不敢再动手。' },
+          { type: 'narrator', content: '你倒在地上，感觉五百年的道行正在飞速流逝。但绣娘安全了，村民们也安全了。' },
+          { type: 'speaker', content: '绣娘抱着你，泪如雨下："你为什么这么傻……你明明可以逃的……"' },
+          { type: 'narrator', content: '你用尽最后的力气，蹭了蹭她的手心，然后闭上了眼睛。' }
+        ],
+        choices: [
+          { text: '安然赴死', nextScene: 'sacrifice_ending', action: 'unlock_sacrifice' }
+        ]
+      },
+      'sacrifice_ending': {
+        texts: [
+          { type: 'narrator', content: '你的身躯化作点点荧光，飘散在夜空中。五百年修为，尽归天地。' },
+          { type: 'narrator', content: '村民们为你立了碑，碑上刻着「义兽黄仙之墓」。绣娘每日都来上香，泪水浸透了碑前的泥土。' },
+          { type: 'narrator', content: '多年后，有人说在月圆之夜，能看见一只黄鼠狼的影子在村口守望。' },
+          { type: 'system', content: '成就：舍身成仁' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'wait_final': {
+        texts: [
+          { type: 'narrator', content: '你犹豫着，始终不敢上前。' },
+          { type: 'narrator', content: '青衣人轻叹一声，转身离去，消失在雨雾中。' },
+          { type: 'narrator', content: '你追了几步，却一脚踏空，跌入一片陌生的山谷。' },
+          { type: 'narrator', content: '雨雾越来越浓，山道越来越陌生。你走了很久，却怎么也走不出去。' }
+        ],
+        choices: [
+          { text: '咬牙坚持，相信自己能找到出路', nextScene: 'dawn_return_end', action: 'unlock_dawn' },
+          { text: '彻底放弃，就地蜷缩', nextScene: 'lost_in_rain', action: 'unlock_lost' }
+        ]
+      },
+
+      // ================== 新增：迷途者结局 ==================
+      'lost_in_rain': {
+        texts: [
+          { type: 'narrator', content: '你蜷缩在一块青石下，听着雨声从大变小，从小变无。' },
+          { type: 'narrator', content: '天亮时，你发现四周既不是你的洞府，也不是你熟悉的山林。' },
+          { type: 'narrator', content: '这里没有路，没有人，没有妖。你像一滴落进沙漠的雨。' },
+          { type: 'narrator', content: '多年以后，山中偶尔有樵夫说，他们在雾里看见过一只迷茫的黄鼠狼，站在原地，已经很久、很久。' },
+          { type: 'system', content: '结局：雨夜迷途' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      // ================== 新增：黎明归宿 ==================
+      'dawn_return_end': {
+        texts: [
+          { type: 'narrator', content: '你不肯服输。一夜过去，黎明前最黑的时候，你终于找到一处熟悉的山形。' },
+          { type: 'narrator', content: '你跌跌撞撞回到修炼了五百年的洞府。洞口那块你磨蹭过的石头还在，窝里的干草也还在。' },
+          { type: 'narrator', content: '你忽然明白——原来家一直都在，只是你自己走出去得太远。' },
+          { type: 'narrator', content: '你决定再修五百年。下一回讨封，要么不来，要么就在这座山里，让青衣人亲口说一句。' },
+          { type: 'system', content: '结局：黎明归宿' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'suspicious_ending': {
+        texts: [
+          { type: 'speaker', content: '你后退一步："你为何帮我？莫不是想骗我元神？"' },
+          { type: 'speaker', content: '青衣人先是一愣，随即大笑："有趣，有趣！五百年的小妖竟有这般戒心。"' },
+          { type: 'narrator', content: '他摇身一变，竟是一位白发仙人："我乃北山真君，特来点化于你，可惜你疑心太重。罢了，缘尽于此。"' },
+          { type: 'narrator', content: '仙人化作清风离去，你呆立原地，追悔莫及。此后你道心破碎，修为再难精进。' },
+          { type: 'system', content: '结局：疑心失缘' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'obsession_continue': {
+        texts: [
+          { type: 'narrator', content: '失败的不甘像毒藤般缠绕着你的心。你不愿认命，拖着疲惫的身体在山路上徘徊。' },
+          { type: 'narrator', content: '雨停了，月亮从云层中露出半张脸。你对着月光喃喃自语："我一定要讨到封……一定要……"' },
+          { type: 'narrator', content: '你的眼中渐渐泛起红光，五百年道行在执念的催动下开始紊乱。' },
+          { type: 'speaker', content: '一个声音在你心底响起："何必求人？你若足够强，天下谁敢不封你？"' }
+        ],
+        choices: [
+          { text: '听从心底的声音', nextScene: 'obsession_deeper' },
+          { text: '猛然惊醒，压下执念', nextScene: 'obsession_resist' },
+          { text: '转身去那座老宅看看', nextScene: 'ruins_path' }
+        ]
+      },
+      'obsession_deeper': {
+        texts: [
+          { type: 'narrator', content: '你不再掩饰妖气，任由五百年道行化作滔天妖风。山林中的鸟兽纷纷惊逃。' },
+          { type: 'narrator', content: '你的身形开始扭曲——时而化作人形，时而现出原形，时而又变成半人半兽的狰狞模样。' },
+          { type: 'speaker', content: '那声音继续低语："对，就是这样。让所有人看看，谁才是这山中的主宰。"' },
+          { type: 'narrator', content: '你仰天长啸，声震四野。远处村庄的灯火纷纷亮起，人们惊恐地望向山林。' }
+        ],
+        choices: [
+          { text: '彻底放纵，化身为魔', nextScene: 'mad_ending', action: 'unlock_mad' },
+          { text: '在最后一刻清醒过来', nextScene: 'obsession_resist' }
+        ]
+      },
+      'obsession_resist': {
+        texts: [
+          { type: 'narrator', content: '就在妖气即将冲垮灵台的最后一瞬，你忽然想起了一些画面。' },
+          { type: 'narrator', content: '五百年间，你在月下独自修炼的身影；雨后山林中，你踩着水坑玩耍的模样；还有今夜，奶奶慈祥的笑容和顽童天真的话语。' },
+          { type: 'speaker', content: '那个狰狞的声音仍在嘶吼："放弃吧！成魔才是你的宿命！"' },
+          { type: 'narrator', content: '你咬紧牙关，调动全身道行，硬生生将那声音压了下去。剧烈的疼痛传遍四肢百骸，你的嘴角渗出鲜血。' },
+          { type: 'narrator', content: '不知过了多久，妖气终于缓缓消散。你精疲力竭地瘫倒在地，但眼中已恢复了清明。' },
+          { type: 'narrator', content: '你成功地镇压了心魔，但也付出了极大的代价——五百年道行折损近半，短期内再也无法讨封。' }
+        ],
+        choices: [
+          { text: '拖着残躯回到洞府，闭关疗伤', nextScene: 'obsession_recover_end' },
+          { text: '心有余悸，但仍不死心', nextScene: 'true_encounter_second' },
+          { text: '恍惚间看见老宅方向，似有人提灯', nextScene: 'ruins_path' }
+        ]
+      },
+      'obsession_recover_end': {
+        texts: [
+          { type: 'narrator', content: '你蹒跚着回到修炼了五百年的洞府。这一次，你不再想讨封的事，只想好好睡一觉。' },
+          { type: 'narrator', content: '月光透过洞口洒进来，你蜷缩在干燥的草窝里，像五百年前刚开启灵智时那样，单纯地享受着山间的宁静。' },
+          { type: 'narrator', content: '道行虽然折损，但你的心境从未如此澄澈。你终于明白，真正的修行，从来不是为了"像"什么。' },
+          { type: 'narrator', content: '——但那本相究竟是什么，你还需再走一段路。' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' },
+          { text: '去山后那座老宅，问个明白', nextScene: 'ruins_path' }
+        ]
+      },
+
+      'mad_ending': {
+        texts: [
+          { type: 'narrator', content: '你再也控制不住自己。五百年道行化为妖力狂潮，席卷了整个山林。' },
+          { type: 'narrator', content: '树木倒伏，溪水倒流，山石崩裂。你变成了一只巨大的妖物，眼中只有疯狂。' },
+          { type: 'narrator', content: '后来，这座山成了远近闻名的「妖山」。再也没有人敢在雨夜走这条路。' },
+          { type: 'narrator', content: '而你，永远困在自己的执念中，既不成人，也不成仙，更不再是那只自在的黄鼠狼。' },
+          { type: 'system', content: '成就：执念成魔' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'true_ending': {
+        texts: [
+          { type: 'narrator', content: '青衣人的话如醍醐灌顶。五百年来，你一直执着于"像什么"，却忘了自己本就是自己。' },
+          { type: 'narrator', content: '心中的执念在这一刻烟消云散，灵台一片清明。你不入神籍，不落凡尘，以本我之姿逍遥于山水之间。' },
+          { type: 'narrator', content: '多年后，山中传说有一只黄鼠狼，能口吐人言，却从不害人，只在月夜长啸，声震山谷。' },
+          { type: 'narrator', content: '你自在了，可那个关于"你究竟是谁"的终极问题，仍在山风中打转。' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' },
+          { text: '去那座老宅，或许能找到答案', nextScene: 'ruins_path' }
+        ]
+      },
+
+      'mortal_ending': {
+        texts: [
+          { type: 'speaker', content: '青衣人轻叹："你若执意如此，我便成全你。我看你像个凡人。"' },
+          { type: 'narrator', content: '话音落下，你只觉得周身剧变，化作一个普通人的模样。' },
+          { type: 'narrator', content: '你欣喜若狂，却渐渐遗忘了前尘往事，忘了自己曾是一只黄鼠狼。' },
+          { type: 'narrator', content: '此后生老病死，轮回不息，你再也记不起那个雨夜。' },
+          { type: 'system', content: '结局：尘世轮回' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'mortal_love_ending': {
+        texts: [
+          { type: 'narrator', content: '你留在了村庄。日复一日，年复一年，你守护着这片土地和那个绣娘。' },
+          { type: 'narrator', content: '绣娘渐渐老去，你却始终是那只黄鼠狼的模样。她临终前，握着你的爪子说："来世……我还想遇见你。"' },
+          { type: 'narrator', content: '你守在她的墓前，久久不肯离去。后来，村民们说，每年春天墓边都会开满野花，那是黄大仙种的。' },
+          { type: 'narrator', content: '你放弃了讨封的执念，却在这段尘缘中找到了比成仙更珍贵的东西。' },
+          { type: 'system', content: '成就：红尘情缘' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'god_ending_favor': {
+        texts: [
+          { type: 'speaker', content: '青衣人颔首："你既有此心，便随我来。我看你像仙。"' },
+          { type: 'narrator', content: '霎时间灵光灌顶，你化作一道清光，随他而去。' },
+          { type: 'narrator', content: '此后你位列散仙，云游四海，只是偶尔会想起那个雨夜，想起自己曾是一只自在的黄鼠狼。' },
+          { type: 'system', content: '成就：点化成仙' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'farmer_ending': {
+        texts: [
+          { type: 'narrator', content: '农夫的话朴实而真诚，你感到一股暖流涌入身体。虽未化形，却与这片土地结了善缘。' },
+          { type: 'narrator', content: '从此你常驻山村，护佑五谷牲畜，成了远近闻名的"黄大仙"。逢年过节，总有村民来供香火。' },
+          { type: 'system', content: '成就：山野村夫' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'star_ending': {
+        texts: [
+          { type: 'narrator', content: '得了书生的文气，你灵智大开，虽还是黄鼠狼之身，却能口吐诗词，通晓文章。' },
+          { type: 'narrator', content: '后来书生高中状元，为你立了"文兽祠"；你的故事被写入志怪，流传千年。' },
+          { type: 'system', content: '成就：文曲星耀' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'demon_king_ending': {
+        texts: [
+          { type: 'narrator', content: '你留在了精怪聚集的山坳。以五百年道行，你很快成为众妖之首。' },
+          { type: 'narrator', content: '你带领精怪们占据山林，划下地界——人不犯妖，妖不犯人。从此山中自成一国。' },
+          { type: 'narrator', content: '偶尔有迷路的樵夫见到你，都说山中有一只黄袍妖王，端坐于石台之上，百妖朝拜。' },
+          { type: 'narrator', content: '你不再执着于讨封，因为你已经找到了属于自己的道。' },
+          { type: 'system', content: '成就：妖王之路' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' }
+        ]
+      },
+
+      'fail_scholar_end': {
+        texts: [
+          { type: 'narrator', content: '你仓皇逃入深山，五百年修为几乎毁于一旦。' },
+          { type: 'narrator', content: '道行大损，你只能重新修炼，蜷缩在洞穴中舔舐伤口。' },
+          { type: 'system', content: '结局：功亏一篑' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' },
+          { text: '不甘心，继续寻找讨封之机', nextScene: 'obsession_continue' }
+        ]
+      },
+
+      'fail_kid_end': {
+        texts: [
+          { type: 'narrator', content: '你躲入草丛，看着顽童跑远的背影，泥巴还粘在你的皮毛上。' },
+          { type: 'narrator', content: '童言无忌，却字字如刀。你忽然明白，讨封一事强求不得。' },
+          { type: 'narrator', content: '你转身回到山中，继续做你的黄鼠狼，偶尔远远望着山脚下的村庄。' },
+          { type: 'system', content: '结局：原形毕露' }
+        ],
+        choices: [
+          { text: '重新开始', nextScene: 'start', action: 'reset' },
+          { text: '回到上一个选择点', nextScene: 'checkpoint' },
+          { text: '不甘心，继续寻找讨封之机', nextScene: 'obsession_continue' }
+        ]
+      }
+    },
+    currentScene: 'start',
+    storyHistory: [],
+    typingTimer: null,
+    checkpointScene: 'start',
+    skipMode: false
+  };
+
+  function showAchievement(name, golden) {
+    const popup = document.getElementById('achievement-popup');
+    const nameEl = document.getElementById('achievement-name');
+    nameEl.textContent = name;
+    if (golden) {
+      popup.classList.add('golden');
+    } else {
+      popup.classList.remove('golden');
+    }
+    popup.classList.add('show');
+    setTimeout(() => { popup.classList.remove('show'); }, 3500);
+  }
+
+  function unlockAchievement(id) {
+    if (!gameData.achievements[id]) {
+      gameData.achievements[id] = true;
+      renderAchievementIcons();
+      localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
+      const nameMap = {
+        'true': '本相自在（无成就，仅记录）',
+        'god': '点化成仙',
+        'mortal': '尘世轮回',
+        'fail_scholar': '功亏一篑',
+        'fail_kid': '原形毕露',
+        'farmer': '山野村夫',
+        'star': '文曲星耀',
+        'demon_king': '妖王之路',
+        'sacrifice': '舍身成仁',
+        'mad': '执念成魔',
+        'love': '红尘情缘',
+        'guardian': '守山之人',
+        'lost': '雨夜迷途',
+        'severed': '断缘而去',
+        'dawn': '黎明归宿',
+        'witness': '无对无错，善良依旧'
+      };
+      const goldenIds = ['witness', 'sacrifice'];
+      if (nameMap[id]) showAchievement(nameMap[id], goldenIds.indexOf(id) >= 0);
+    }
+  }
+
+  function renderAchievementIcons() {
+    const container = document.getElementById('achievementsContainer');
+    if (!container) return;
+    let html = '';
+    gameData.achievementIcons.forEach(ach => {
+      const unlocked = gameData.achievements[ach.id];
+      // 金色成就：witness 和 sacrifice
+      const goldenClass = ((ach.id === 'witness' || ach.id === 'sacrifice') && unlocked) ? 'golden' : '';
+      html += '<div class="achievement-icon ' + (unlocked ? 'unlocked ' + goldenClass : '') + '" data-achievement="' + ach.id + '" data-title="' + ach.title + '">' + (unlocked ? ach.icon : '') + '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  function updateCultivation(sceneId) {
+    const el = document.getElementById('cultivation-level');
+    if (el && gameData.cultivationMap[sceneId]) {
+      el.textContent = gameData.cultivationMap[sceneId];
+    }
+  }
+
+  function skipCurrentScene() {
+    if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
+    const scene = gameData.scenes[gameData.currentScene];
+    if (!scene) return;
+    const storyContainer = document.getElementById('story-container');
+    storyContainer.innerHTML = '';
+    scene.texts.forEach(textObj => {
+      const p = document.createElement('p');
+      p.className = 'story-text ' + textObj.type;
+      p.textContent = textObj.content;
+      storyContainer.appendChild(p);
+    });
+    storyContainer.scrollTop = storyContainer.scrollHeight;
+    showChoicesDirect(scene);
+  }
+
+  function showChoicesDirect(scene) {
+    const choicesContainer = document.getElementById('choices-container');
+    let html = '';
+    scene.choices.forEach((choice, index) => {
+      if (choice.nextScene === 'checkpoint') {
+        if (!gameData.checkpointScene) {
+          html += '<button class="choice-btn" onclick="handleChoice(\'start\', \'reset\')" style="animation-delay: ' + (index * 0.1) + 's">重新开始</button>';
+        } else {
+          html += '<button class="choice-btn" onclick="handleChoice(\'' + gameData.checkpointScene + '\', null)" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
+        }
+      } else {
+        const actionParam = choice.action ? '\'' + choice.action + '\'' : 'null';
+        html += '<button class="choice-btn" onclick="handleChoice(\'' + choice.nextScene + '\', ' + actionParam + ')" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
+      }
+    });
+    choicesContainer.innerHTML = html;
+  }
+
+  function renderScene(sceneId) {
+    if (gameData.typingTimer) clearTimeout(gameData.typingTimer);
+    const scene = gameData.scenes[sceneId];
+    if (!scene) return;
+    gameData.currentScene = sceneId;
+    updateCultivation(sceneId);
+    if (scene.choices) {
+      const validChoices = scene.choices.filter(c => c.text !== '重新开始' && c.text !== '回到上一个选择点');
+      if (validChoices.length >= 2) {
+        gameData.checkpointScene = sceneId;
+      }
+    }
+    const storyContainer = document.getElementById('story-container');
+    const choicesContainer = document.getElementById('choices-container');
+    storyContainer.innerHTML = '';
+    choicesContainer.innerHTML = '';
+    let textIndex = 0;
+    const totalTexts = scene.texts.length;
+
+    function showNextText() {
+      if (textIndex >= totalTexts) {
+        if (scene.action) {
+          if (scene.action === 'unlock_witness') unlockAchievement('witness');
+        }
+        showChoicesDirect(scene);
+        return;
+      }
+      const textObj = scene.texts[textIndex];
+      const p = document.createElement('p');
+      p.className = 'story-text ' + textObj.type;
+      storyContainer.appendChild(p);
+      storyContainer.scrollTop = storyContainer.scrollHeight;
+      const charSpeed = textObj.type === 'speaker' ? 40 : (textObj.type === 'system' ? 20 : (textObj.type === 'witness' ? 50 : 30));
+      let charIndex = 0;
+      const text = textObj.content;
+
+      function typeNextChar() {
+        if (charIndex < text.length) {
+          p.textContent += text[charIndex];
+          charIndex++;
+          storyContainer.scrollTop = storyContainer.scrollHeight;
+          gameData.typingTimer = setTimeout(typeNextChar, charSpeed);
+        } else {
+          textIndex++;
+          gameData.typingTimer = setTimeout(showNextText, textObj.type === 'witness' ? 600 : 300);
+        }
+      }
+      typeNextChar();
+    }
+    showNextText();
+  }
+
+  window.handleChoice = function(nextScene, action) {
+    // 关键：只允许 unlock_witness 触发金色「无对无错，善良依旧」成就
+    // 移除原 achievement_true 的触发路径，绑定在见证者结局的 unlock_witness 上
+    if (action === 'unlock_god') unlockAchievement('god');
+    else if (action === 'unlock_fail_scholar') unlockAchievement('fail_scholar');
+    else if (action === 'unlock_fail_kid') unlockAchievement('fail_kid');
+    else if (action === 'unlock_farmer') unlockAchievement('farmer');
+    else if (action === 'unlock_star') unlockAchievement('star');
+    else if (action === 'unlock_mortal') unlockAchievement('mortal');
+    else if (action === 'unlock_demon_king') unlockAchievement('demon_king');
+    else if (action === 'unlock_sacrifice') unlockAchievement('sacrifice');
+    else if (action === 'unlock_mad') unlockAchievement('mad');
+    else if (action === 'unlock_love') unlockAchievement('love');
+    else if (action === 'unlock_guardian') unlockAchievement('guardian');
+    else if (action === 'unlock_lost') unlockAchievement('lost');
+    else if (action === 'unlock_severed') unlockAchievement('severed');
+    else if (action === 'unlock_dawn') unlockAchievement('dawn');
+    else if (action === 'unlock_witness') unlockAchievement('witness');
+    // 故意不再处理 'achievement_true' —— 该路径已废弃
+    else if (action === 'reset') { resetGame(false); return; }
+    setTimeout(() => { renderScene(nextScene); }, 200);
+  };
+
+  function resetGame(fullReset) {
+    const overlay = document.getElementById('startOverlay');
+    if (overlay) overlay.style.display = 'none';
+    if (fullReset) {
+      gameData.achievements = {
+        'true': false, 'god': false, 'mortal': false,
+        'fail_scholar': false, 'fail_kid': false, 'farmer': false,
+        'star': false, 'demon_king': false, 'sacrifice': false,
+        'mad': false, 'love': false, 'guardian': false,
+        'lost': false, 'severed': false, 'dawn': false, 'witness': false
+      };
+      localStorage.removeItem('huangdaxian_achievements');
+      renderAchievementIcons();
+    }
+    gameData.checkpointScene = 'start';
+    renderScene('start');
+  }
+
+  function loadSavedAchievements() {
+    const saved = localStorage.getItem('huangdaxian_achievements');
+    if (saved) {
+      const savedAchievements = JSON.parse(saved);
+      Object.keys(savedAchievements).forEach(key => {
+        if (savedAchievements[key]) gameData.achievements[key] = true;
+      });
+    }
+    renderAchievementIcons();
+  }
+
+  function initControls() {
+    const versionBtn = document.getElementById('versionBtn');
+    const popup = document.getElementById('changelogPopup');
+    versionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+      if (!popup.contains(e.target) && e.target !== versionBtn) {
+        popup.classList.remove('show');
+      }
+    });
+    const skipBtn = document.getElementById('skipBtn');
+    skipBtn.addEventListener('click', () => { skipCurrentScene(); });
+  }
+
+  window.onload = function() {
+    loadSavedAchievements();
+    const overlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    overlay.style.display = 'flex';
+    startBtn.addEventListener('click', function() {
+      overlay.style.display = 'none';
+      renderScene('start');
+    });
+    initControls();
+  };
+  window.resetGame = resetGame;
+})();
+</script>
+</body>
+</html>

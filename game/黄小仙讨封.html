@@ -90,8 +90,20 @@
     .changelog-popup {
       position: fixed; bottom: 80px; left: 20px; background: #1a1a1a;
       border: 1px solid #444; border-radius: 8px; padding: 16px 20px; max-width: 300px;
+      max-height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.7); z-index: 2200; display: none;
       color: #ccc; font-size: 13px; line-height: 1.6; backdrop-filter: blur(4px);
+      -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #555 #1a1a1a;
+    }
+    .changelog-popup::-webkit-scrollbar { width: 6px; }
+    .changelog-popup::-webkit-scrollbar-track { background: #1a1a1a; }
+    .changelog-popup::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+    .changelog-popup::-webkit-scrollbar-thumb:hover { background: #8B7355; }
+    .changelog-popup::before {
+      content: ""; position: sticky; top: -16px; left: 0; right: 0; height: 14px;
+      display: block; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(26,26,26,0.95), rgba(26,26,26,0));
+      margin: -16px -20px 6px;
     }
     .changelog-popup.show { display: block; animation: fadeInUp 0.3s ease; }
     .changelog-popup h4 { color: #8B7355; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 4px; }
@@ -261,7 +273,7 @@
     <div class="choices-container" id="choices-container"></div>
     <div class="footer">
       <div class="version-container">
-        <button class="version-btn" id="versionBtn">v1.5.0</button>
+        <button class="version-btn" id="versionBtn">v1.5.4</button>
         <button class="skip-btn" id="skipBtn">快进</button>
       </div>
       <div class="inland-security-footer">
@@ -310,6 +322,15 @@
   <div class="changelog-popup" id="changelogPopup">
     <h4>更新日志</h4>
     <div class="version-block">
+      <div class="version-title">v1.5.4 · 菜单键</div>
+      <ul>
+        <li>遥控器菜单键现在能随时打开/关闭设置面板</li>
+        <li>兼容各品牌电视菜单键上报：Menu / ContextMenu / Info / F1 / ColorF0Red / keyCode 93 等</li>
+        <li>弹层状态下按菜单键会先关闭 confirm，再打开设置</li>
+      </ul>
+      <div class="date">2026-06-02</div>
+    </div>
+    <div class="version-block old">
       <div class="version-title">v1.5.0 · 遥控器适配</div>
       <ul>
         <li>右上角设置按钮：清除所有进度 + 电视模式开关</li>
@@ -1583,12 +1604,59 @@
     const el = list[currentFocusIndex];
     if (el) el.click();
   }
+  // 菜单键检测：不同遥控器上报不一致，全部包揽
+  function isMenuKey(e) {
+    const k = e.key;
+    const c = e.keyCode;
+    // key 名称
+    if (k === 'Menu' || k === 'ContextMenu' || k === 'Settings' ||
+        k === 'Info' || k === 'F1' || k === 'Keyboard' || k === 'ShowSettings' ||
+        k === 'ColorF0Red' || k === 'MediaContextMenu') return true;
+    // keyCode
+    if (c === 93 /* Menu */ || c === 17 /* Ctrl 偶发 */ || c === 101 /* Search? */) return true;
+    // Tizen / webOS 电视：调用了历史菜单
+    if (k && k.startsWith('ColorF') && k.includes('Red')) return true;
+    return false;
+  }
+
   function handleRemoteKey(e) {
     const key = e.key;
     const overlay = document.getElementById('settingsOverlay');
     const inSettings = overlay && overlay.classList.contains('show');
     const startOverlay = document.getElementById('startOverlay');
     const inStart = startOverlay && startOverlay.style.display !== 'none';
+
+    // 【最高优先级】菜单键：任何界面都能打开/关闭设置
+    if (isMenuKey(e)) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (inSettings) {
+        closeSettings();
+      } else {
+        // 优先关掉 confirm 弹层
+        const confirmEl = document.getElementById('confirmOverlay');
+        if (confirmEl && confirmEl.classList.contains('show')) {
+          closeConfirm();
+        }
+        openSettings();
+      }
+      return;
+    }
+
+    // 更新日志弹层打开时：返回键能关，方向键允许内部滚动
+    const changelogEl = document.getElementById('changelogPopup');
+    if (changelogEl && changelogEl.classList.contains('show')) {
+      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+        e.preventDefault();
+        changelogEl.classList.remove('show');
+        return;
+      }
+      if (key === 'ArrowUp' || key === 'ArrowDown') {
+        // 允许原生滚动，不 preventDefault
+        return;
+      }
+      // 其他键不拦截
+    }
 
     // 在开始界面：方向键、Enter、空格都能开始
     if (inStart) {
@@ -1650,11 +1718,6 @@
       if (gameData.checkpointScene && gameData.checkpointScene !== 'start') {
         renderScene(gameData.checkpointScene);
       }
-      return;
-    }
-    if (key === 'Settings' || key === 'Menu' || key === 'ContextMenu') {
-      e.preventDefault();
-      openSettings();
       return;
     }
     // 数字键快选

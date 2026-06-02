@@ -128,6 +128,120 @@
       transition: all 0.3s ease; border-radius: 3px; letter-spacing: 4px; font-weight: 300;
     }
     .start-btn:hover { border-color: #ffffff; color: #ffffff; background: #111; }
+    /* 焦点高亮（电视遥控器） */
+    .focusable { outline: none; }
+    .focusable:focus,
+    .focusable.tv-focus {
+      outline: 2px solid #D4AF37 !important;
+      box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25), 0 0 12px rgba(212, 175, 55, 0.4) !important;
+      background: var(--btn-hover) !important;
+      color: var(--highlight-color) !important;
+      transform: scale(1.02);
+      transition: all 0.15s ease;
+    }
+    .focusable:focus::after, .focusable.tv-focus::after {
+      content: "";
+    }
+    /* 设置按钮 + 弹层 */
+    .settings-btn {
+      position: fixed; top: 12px; right: 12px; width: 40px; height: 40px;
+      background: transparent; border: 1px solid #333; color: #888;
+      border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 1500;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .settings-btn:hover { border-color: #D4AF37; color: #D4AF37; }
+    .settings-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); z-index: 3000; display: none;
+      justify-content: center; align-items: center;
+    }
+    .settings-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+    .settings-modal {
+      background: #0a0a0a; border: 1px solid #444; border-radius: 8px;
+      padding: 28px; max-width: 360px; width: 90%;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+    }
+    .settings-modal h3 {
+      color: #D4AF37; font-size: 18px; margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid #222; text-align: center; letter-spacing: 2px;
+    }
+    .settings-item { margin-bottom: 12px; }
+    .settings-item .label {
+      color: #888; font-size: 13px; margin-bottom: 6px; display: block;
+    }
+    .settings-row { display: flex; gap: 10px; margin-top: 20px; }
+    .settings-btn-action {
+      flex: 1; background: transparent; border: 1px solid #555; color: #ccc;
+      padding: 12px 16px; font-size: 14px; font-family: inherit;
+      cursor: pointer; border-radius: 3px; transition: all 0.2s;
+    }
+    .settings-btn-action:hover { background: #1a1a1a; border-color: #aaa; }
+    .settings-btn-action.danger { border-color: #A93226; color: #A93226; }
+    .settings-btn-action.danger:hover { background: #2a0d0a; color: #fff; }
+    .settings-btn-action.primary { border-color: #8B7355; color: #D4AF37; }
+    .settings-btn-action.primary:hover { background: #1a1510; }
+    .tv-hint {
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid #222;
+      color: #666; font-size: 12px; line-height: 1.7; text-align: center;
+    }
+    .tv-hint kbd {
+      display: inline-block; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 3px; padding: 1px 6px; font-family: monospace;
+      color: #D4AF37; font-size: 11px; margin: 0 2px;
+    }
+    /* 电视模式字号放大 */
+    body.tv-mode { padding: 32px; }
+    body.tv-mode .story-text { font-size: 22px; line-height: 2.0; }
+    body.tv-mode .choice-btn { font-size: 18px; padding: 18px 24px; }
+    body.tv-mode .start-btn { font-size: 24px; padding: 18px 56px; }
+    body.tv-mode .start-content h1 { font-size: 72px; }
+    body.tv-mode .start-subtitle { font-size: 22px; }
+    body.tv-mode .achievement-icon { width: 40px; height: 40px; font-size: 20px; }
+    body.tv-mode .footer { font-size: 14px; padding: 24px 0 14px; }
+    body.tv-mode .version-btn, body.tv-mode .skip-btn { font-size: 14px; padding: 4px 10px; }
+    /* toast 提示 */
+    .toast {
+      position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%) translateY(40px);
+      background: linear-gradient(135deg, #1a1510 0%, #2a2015 100%);
+      border: 1px solid #8B7355; color: #D4AF37; padding: 12px 24px;
+      border-radius: 5px; font-size: 14px; z-index: 5000;
+      opacity: 0; transition: all 0.3s ease; pointer-events: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* 自定义确认弹层 */
+    .confirm-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); z-index: 4000; display: none;
+      justify-content: center; align-items: center;
+    }
+    .confirm-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+    .confirm-modal {
+      background: #0a0a0a; border: 1px solid #A93226; border-radius: 8px;
+      padding: 24px 28px; max-width: 320px; width: 90%;
+      box-shadow: 0 8px 40px rgba(169, 50, 38, 0.4);
+    }
+    .confirm-modal h4 { color: #A93226; font-size: 16px; margin-bottom: 12px; }
+    .confirm-modal p { color: #ccc; font-size: 14px; line-height: 1.7; margin-bottom: 18px; }
+    .confirm-row { display: flex; gap: 10px; }
+    .confirm-row .settings-btn-action { flex: 1; }
+    /* 开始界面的按钮隐藏默认焦点框，默认不聚焦 */
+    #startOverlay .focusable:focus,
+    #startOverlay .focusable.tv-focus {
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      color: #B0B0B0 !important;
+      transform: none !important;
+    }
+    #startOverlay .focusable:hover,
+    #startOverlay .focusable:focus:hover,
+    #startOverlay .focusable.tv-focus:hover {
+      border-color: #ffffff !important;
+      color: #ffffff !important;
+      background: #111 !important;
+    }
   </style>
 </head>
 <body>
@@ -135,7 +249,7 @@
     <div class="start-content">
       <h1>黄小仙</h1>
       <p class="start-subtitle">五百年修为一念之间</p>
-      <button class="start-btn" id="startBtn">开始讨封</button>
+      <button class="start-btn focusable" id="startBtn">开始讨封</button>
     </div>
   </div>
   <div class="game-container">
@@ -147,13 +261,45 @@
     <div class="choices-container" id="choices-container"></div>
     <div class="footer">
       <div class="version-container">
-        <button class="version-btn" id="versionBtn">v1.4.0</button>
+        <button class="version-btn" id="versionBtn">v1.5.0</button>
         <button class="skip-btn" id="skipBtn">快进</button>
       </div>
       <div class="inland-security-footer">
         <a href="https://raccoon.fit/" target="_blank" rel="noreferrer" class="raccoon-link">
           <span>© 2026 软软的小窝</span>
         </a>
+      </div>
+    </div>
+  </div>
+  <button class="settings-btn focusable" id="settingsBtn" title="设置" aria-label="设置">⚙</button>
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-modal">
+      <h3>设置</h3>
+      <div class="settings-item">
+        <span class="label">当前进度</span>
+        <div id="progressInfo" style="color:#D4AF37;font-size:14px;padding:6px 0;">加载中…</div>
+      </div>
+      <div class="settings-item">
+        <span class="label">显示模式</span>
+        <button class="settings-btn-action primary focusable" id="tvModeBtn">切换普通模式</button>
+      </div>
+      <div class="settings-row">
+        <button class="settings-btn-action focusable" id="closeSettingsBtn">关闭</button>
+        <button class="settings-btn-action danger focusable" id="clearProgressBtn">清除所有进度</button>
+      </div>
+      <div class="tv-hint">
+        电视遥控器：<kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 移动焦点　<kbd>OK</kbd> 确认　<kbd>返回</kbd> 后退　<kbd>1-9</kbd> 选择选项
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-modal" role="alertdialog" aria-modal="true">
+      <h4 id="confirmTitle">确认操作</h4>
+      <p id="confirmMessage">确定要继续吗？</p>
+      <div class="confirm-row">
+        <button class="settings-btn-action focusable" id="confirmCancelBtn">取消</button>
+        <button class="settings-btn-action danger focusable" id="confirmOkBtn">确定</button>
       </div>
     </div>
   </div>
@@ -164,6 +310,16 @@
   <div class="changelog-popup" id="changelogPopup">
     <h4>更新日志</h4>
     <div class="version-block">
+      <div class="version-title">v1.5.0 · 遥控器适配</div>
+      <ul>
+        <li>右上角设置按钮：清除所有进度 + 电视模式开关</li>
+        <li>遥控器适配：方向键移动焦点、OK 确认、返回后退、1-9 数字键快选、菜单键打开设置</li>
+        <li>电视模式：自动加大字号与点击区域</li>
+        <li>进度信息：设置面板显示「已解锁 X / 16 项成就」</li>
+      </ul>
+      <div class="date">2026-06-02</div>
+    </div>
+    <div class="version-block old">
       <div class="version-title">v1.4.0 · 见证者</div>
       <ul>
         <li>新增「见证者结局」——青衣人于废墟老宅中讲述你的本相</li>
@@ -1156,6 +1312,10 @@
     });
     storyContainer.scrollTop = storyContainer.scrollHeight;
     showChoicesDirect(scene);
+    setTimeout(() => {
+      const first = document.querySelector('#choices-container .choice-btn');
+      if (first) focusElement(first);
+    }, 50);
   }
 
   function showChoicesDirect(scene) {
@@ -1164,13 +1324,13 @@
     scene.choices.forEach((choice, index) => {
       if (choice.nextScene === 'checkpoint') {
         if (!gameData.checkpointScene) {
-          html += '<button class="choice-btn" onclick="handleChoice(\'start\', \'reset\')" style="animation-delay: ' + (index * 0.1) + 's">重新开始</button>';
+          html += '<button class="choice-btn focusable" onclick="handleChoice(\'start\', \'reset\')" style="animation-delay: ' + (index * 0.1) + 's">重新开始</button>';
         } else {
-          html += '<button class="choice-btn" onclick="handleChoice(\'' + gameData.checkpointScene + '\', null)" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
+          html += '<button class="choice-btn focusable" onclick="handleChoice(\'' + gameData.checkpointScene + '\', null)" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
         }
       } else {
         const actionParam = choice.action ? '\'' + choice.action + '\'' : 'null';
-        html += '<button class="choice-btn" onclick="handleChoice(\'' + choice.nextScene + '\', ' + actionParam + ')" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
+        html += '<button class="choice-btn focusable" onclick="handleChoice(\'' + choice.nextScene + '\', ' + actionParam + ')" style="animation-delay: ' + (index * 0.1) + 's">' + choice.text + '</button>';
       }
     });
     choicesContainer.innerHTML = html;
@@ -1248,7 +1408,7 @@
     else if (action === 'unlock_witness') unlockAchievement('witness');
     // 故意不再处理 'achievement_true' —— 该路径已废弃
     else if (action === 'reset') { resetGame(false); return; }
-    setTimeout(() => { renderScene(nextScene); }, 200);
+    setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
   };
 
   function resetGame(fullReset) {
@@ -1280,6 +1440,233 @@
     renderAchievementIcons();
   }
 
+  // ================== 设置 / 清除进度 ==================
+  function getUnlockedCount() {
+    return Object.values(gameData.achievements).filter(v => v).length;
+  }
+  function updateProgressInfo() {
+    const total = gameData.achievementIcons.length;
+    const unlocked = getUnlockedCount();
+    const el = document.getElementById('progressInfo');
+    if (el) {
+      el.textContent = '已解锁 ' + unlocked + ' / ' + total + ' 项成就';
+    }
+  }
+  function openSettings() {
+    updateProgressInfo();
+    updateTvModeBtn();
+    document.getElementById('settingsOverlay').classList.add('show');
+    // 焦点移到第一个可聚焦元素
+    setTimeout(() => {
+      const first = document.querySelector('#settingsOverlay .focusable');
+      if (first) focusElement(first);
+    }, 50);
+  }
+  function closeSettings() {
+    document.getElementById('settingsOverlay').classList.remove('show');
+  }
+  function clearAllProgress() {
+    customConfirm('确认清除进度', '将清除所有已解锁的成就和游戏进度，此操作不可恢复。', () => {
+      gameData.achievements = Object.keys(gameData.achievements).reduce((o, k) => { o[k] = false; return o; }, {});
+      localStorage.removeItem('huangdaxian_achievements');
+      renderAchievementIcons();
+      updateProgressInfo();
+      closeSettings();
+      showToast('已清除所有进度，即将重新开始');
+      // 重置游戏状态
+      gameData.currentScene = 'start';
+      gameData.checkpointScene = 'start';
+      const storyContainer = document.getElementById('story-container');
+      const choicesContainer = document.getElementById('choices-container');
+      if (storyContainer) storyContainer.innerHTML = '';
+      if (choicesContainer) choicesContainer.innerHTML = '';
+      updateCultivation('start');
+      setTimeout(() => {
+        const overlay = document.getElementById('startOverlay');
+        if (overlay) overlay.style.display = 'flex';
+      }, 1200);
+    });
+  }
+  // ================== 自定义 confirm 与 toast ==================
+  let _confirmCallback = null;
+  function customConfirm(title, message, onOk) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    _confirmCallback = onOk;
+    document.getElementById('confirmOverlay').classList.add('show');
+    setTimeout(() => {
+      const cancel = document.getElementById('confirmCancelBtn');
+      if (cancel) focusElement(cancel);
+    }, 50);
+  }
+  function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.remove('show');
+    _confirmCallback = null;
+  }
+  let _toastTimer = null;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    if (_toastTimer) clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+  function toggleTvMode() {
+    document.body.classList.toggle('tv-mode');
+    const enabled = document.body.classList.contains('tv-mode');
+    localStorage.setItem('huangdaxian_tv_mode', enabled ? '1' : '0');
+    updateTvModeBtn();
+  }
+  function updateTvModeBtn() {
+    const btn = document.getElementById('tvModeBtn');
+    if (!btn) return;
+    const enabled = document.body.classList.contains('tv-mode');
+    btn.textContent = enabled ? '切换普通模式' : '切换电视模式';
+  }
+  function loadTvMode() {
+    if (localStorage.getItem('huangdaxian_tv_mode') === '1') {
+      document.body.classList.add('tv-mode');
+    }
+  }
+
+  // ================== 电视遥控器适配 ==================
+  // 焦点管理
+  let currentFocusIndex = 0;
+  function getFocusableElements() {
+    // 优先取 confirm 弹层中的（最高优先级）
+    const confirmEl = document.getElementById('confirmOverlay');
+    if (confirmEl && confirmEl.classList.contains('show')) {
+      return Array.from(confirmEl.querySelectorAll('.focusable'));
+    }
+    // 其次取设置弹层中的
+    const overlay = document.getElementById('settingsOverlay');
+    if (overlay && overlay.classList.contains('show')) {
+      return Array.from(overlay.querySelectorAll('.focusable'));
+    }
+    const startOverlay = document.getElementById('startOverlay');
+    if (startOverlay && startOverlay.style.display !== 'none') {
+      return Array.from(startOverlay.querySelectorAll('.focusable'));
+    }
+    return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
+  }
+  function focusElement(el) {
+    if (!el) return;
+    // 移除所有 tv-focus
+    document.querySelectorAll('.tv-focus').forEach(e => e.classList.remove('tv-focus'));
+    el.classList.add('tv-focus');
+    el.focus({ preventScroll: false });
+    // 滚动到可见区域
+    if (el.scrollIntoView) {
+      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    const list = getFocusableElements();
+    currentFocusIndex = list.indexOf(el);
+  }
+  function focusNext(direction) {
+    const list = getFocusableElements();
+    if (list.length === 0) return;
+    if (currentFocusIndex < 0) currentFocusIndex = 0;
+    let next = currentFocusIndex + direction;
+    if (next < 0) next = list.length - 1;
+    if (next >= list.length) next = 0;
+    focusElement(list[next]);
+  }
+  function focusByIndex(i) {
+    const list = getFocusableElements();
+    if (i >= 0 && i < list.length) {
+      focusElement(list[i]);
+    }
+  }
+  function activateCurrent() {
+    const list = getFocusableElements();
+    const el = list[currentFocusIndex];
+    if (el) el.click();
+  }
+  function handleRemoteKey(e) {
+    const key = e.key;
+    const overlay = document.getElementById('settingsOverlay');
+    const inSettings = overlay && overlay.classList.contains('show');
+    const startOverlay = document.getElementById('startOverlay');
+    const inStart = startOverlay && startOverlay.style.display !== 'none';
+
+    // 在开始界面：方向键、Enter、空格都能开始
+    if (inStart) {
+      if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') {
+        e.preventDefault();
+        const btn = document.getElementById('startBtn');
+        if (btn) btn.click();
+        return;
+      }
+    }
+
+    // 在设置面板中
+    if (inSettings) {
+      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+        e.preventDefault();
+        closeSettings();
+        return;
+      }
+      if (key === 'ArrowDown') { e.preventDefault(); focusNext(1); return; }
+      if (key === 'ArrowUp') { e.preventDefault(); focusNext(-1); return; }
+      if (key === 'ArrowLeft' || key === 'ArrowRight') { e.preventDefault(); focusNext(1); return; }
+      if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') {
+        e.preventDefault();
+        activateCurrent();
+        return;
+      }
+      return;
+    }
+
+    // 在 confirm 弹层中
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    if (confirmOverlay && confirmOverlay.classList.contains('show')) {
+      if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+        e.preventDefault();
+        closeConfirm();
+        return;
+      }
+      if (key === 'ArrowDown' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowLeft') {
+        e.preventDefault();
+        focusNext(key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1);
+        return;
+      }
+      if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') {
+        e.preventDefault();
+        activateCurrent();
+        return;
+      }
+      return;
+    }
+
+    // 在游戏中
+    if (key === 'ArrowDown' || key === 'ArrowRight') { e.preventDefault(); focusNext(1); return; }
+    if (key === 'ArrowUp' || key === 'ArrowLeft') { e.preventDefault(); focusNext(-1); return; }
+    if (key === 'Enter' || key === ' ' || key === 'OK' || key === 'Select') { e.preventDefault(); activateCurrent(); return; }
+    if (key === 'Escape' || key === 'Back' || key === 'GoBack' || key === 'BrowserBack' || key === '0x1000') {
+      e.preventDefault();
+      // 后退：如果有选择项列表不后退，退回上一个选择点
+      // 简单处理：返回 checkpoint 或 start
+      if (gameData.checkpointScene && gameData.checkpointScene !== 'start') {
+        renderScene(gameData.checkpointScene);
+      }
+      return;
+    }
+    if (key === 'Settings' || key === 'Menu' || key === 'ContextMenu') {
+      e.preventDefault();
+      openSettings();
+      return;
+    }
+    // 数字键快选
+    if (/^[1-9]$/.test(key)) {
+      e.preventDefault();
+      focusByIndex(parseInt(key, 10) - 1);
+      // 延迟点击让用户看清
+      setTimeout(activateCurrent, 200);
+      return;
+    }
+  }
+
   function initControls() {
     const versionBtn = document.getElementById('versionBtn');
     const popup = document.getElementById('changelogPopup');
@@ -1294,18 +1681,60 @@
     });
     const skipBtn = document.getElementById('skipBtn');
     skipBtn.addEventListener('click', () => { skipCurrentScene(); });
+
+    // 设置面板
+    document.getElementById('settingsBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSettings();
+    });
+    document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+    document.getElementById('clearProgressBtn').addEventListener('click', clearAllProgress);
+    document.getElementById('tvModeBtn').addEventListener('click', toggleTvMode);
+    document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'settingsOverlay') closeSettings();
+    });
+
+    // 自定义 confirm
+    document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
+    document.getElementById('confirmOkBtn').addEventListener('click', () => {
+      const cb = _confirmCallback;
+      closeConfirm();
+      if (cb) cb();
+    });
+    document.getElementById('confirmOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'confirmOverlay') closeConfirm();
+    });
+
+    // 电视遥控器
+    document.addEventListener('keydown', handleRemoteKey);
+    // 鼠标点击时同步焦点
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('.focusable');
+      if (target) {
+        const list = getFocusableElements();
+        currentFocusIndex = list.indexOf(target);
+      }
+    });
   }
 
   window.onload = function() {
     loadSavedAchievements();
+    loadTvMode();
+    updateTvModeBtn();
     const overlay = document.getElementById('startOverlay');
     const startBtn = document.getElementById('startBtn');
     overlay.style.display = 'flex';
     startBtn.addEventListener('click', function() {
       overlay.style.display = 'none';
       renderScene('start');
+      // 进入游戏后默认焦点在第一个选项
+      setTimeout(() => {
+        const first = document.querySelector('#choices-container .choice-btn');
+        if (first) focusElement(first);
+      }, 200);
     });
     initControls();
+    // 开始界面默认不自动聚焦，避免黄框。但保留按 OK 启动的逻辑
   };
   window.resetGame = resetGame;
 })();

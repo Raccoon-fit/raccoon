@@ -1700,15 +1700,13 @@
     floatBtn.addEventListener('click', () => {
       const mode = floatBtn.dataset.mode;
       if (mode === 'down') {
-        // 滚到剧情末尾（选项现在是 fixed，永远可见）
-        storyContainer.scrollTo({ top: storyContainer.scrollHeight, behavior: 'smooth' });
-        // 焦点自动跳到第一个选项
+        storyContainer.scrollTop = storyContainer.scrollHeight;
         setTimeout(() => {
           const first = document.querySelector('#choices-container .choice-btn');
           if (first) focusElement(first);
-        }, 300);
+        }, 100);
       } else {
-        storyContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        storyContainer.scrollTop = 0;
       }
     });
     storyContainer.addEventListener('scroll', updateFloatBtn);
@@ -1900,16 +1898,16 @@
     const atTop = storyEl && storyEl.scrollTop < 4;
     if (key === 'ArrowDown' || key === 'ArrowRight') {
       e.preventDefault();
-      if (key === 'ArrowDown' && storyCanScroll && !atBottom) {
+      if (key === 'ArrowDown' && storyEl && storyCanScroll && !atBottom) {
         // 剧情可滚且未到底：优先滚动剧情
-        storyEl.scrollBy({ top: 120, behavior: 'smooth' });
+        storyEl.scrollTop += 120;
         // 滚到底后再按一下会跳到选项
         setTimeout(() => {
-          if (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 4) {
+          if (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 10) {
             const first = document.querySelector('#choices-container .choice-btn');
             if (first) focusElement(first);
           }
-        }, 200);
+        }, 100);
       } else {
         focusNext(1);
       }
@@ -1917,15 +1915,15 @@
     }
     if (key === 'ArrowUp' || key === 'ArrowLeft') {
       e.preventDefault();
-      if (key === 'ArrowUp' && storyCanScroll && !atTop) {
-        storyEl.scrollBy({ top: -120, behavior: 'smooth' });
+      if (key === 'ArrowUp' && storyEl && storyCanScroll && !atTop) {
+        storyEl.scrollTop -= 120;
         // 滚到顶后再按一下会跳回上一个选项
         setTimeout(() => {
-          if (storyEl.scrollTop < 4) {
+          if (storyEl.scrollTop < 10) {
             const list = getFocusableElements();
             if (list.length > 0) focusElement(list[list.length - 1]);
           }
-        }, 200);
+        }, 100);
       } else {
         focusNext(-1);
       }

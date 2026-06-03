@@ -412,7 +412,7 @@
         <span class="label">显示模式</span>
         <button class="settings-btn-action primary focusable" id="tvModeBtn">切换普通模式</button>
       </div>
-      <div class="settings-item" id="installItem" style="display:none;">
+      <div class="settings-item" id="installItem">
         <span class="label">安装应用</span>
         <install class="settings-btn-action primary focusable" id="installBtn">安装到主屏幕</install>
       </div>
@@ -2104,8 +2104,6 @@
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
-    var installItem = document.getElementById('installItem');
-    if (installItem) installItem.style.display = 'block';
   });
   window.addEventListener('appinstalled', function() {
     deferredPrompt = null;
@@ -2115,6 +2113,11 @@
   });
 
   window.onload = function() {
+    // 检测是否已经是 PWA 模式，如果是则隐藏安装按钮
+    if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+      var installItem = document.getElementById('installItem');
+      if (installItem) installItem.style.display = 'none';
+    }
     loadSavedAchievements();
     loadTvMode();
     updateTvModeBtn();

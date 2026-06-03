@@ -2,13 +2,20 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content">
   <title>黄小仙 · 讨封之卷</title>
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="黄小仙">
   <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi6buE5bCP5Lu2IC0g6K+I5a6e5LmL5YWDIiwic2hvcnRfbmFtZSI6IuW8gOWPtyIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIQ0c5d2FYSmhkR2x2Ymk1bGRTNXZjbWMrIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJwdXJwb3NlIjoiYW55In0seyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIQ0c5d2FYSmhkR2x2Ymk1bGRTNXZjbWMrIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJwdXJwb3NlIjoiYW55In1dfQ==">
+  <script>
+  // <install> 标签 polyfill - 注册自定义元素使其在所有浏览器中可样式化
+  if (!window.customElements || !window.customElements.get('install')) {
+    // 旧浏览器：用 document.createElement 注册，使其成为块级/可样式化元素
+    document.createElement('install');
+  }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -274,17 +281,34 @@
       margin-top: 16px; padding-top: 12px; border-top: 1px solid #222;
       color: #666; font-size: 12px; line-height: 1.7; text-align: center;
     }
-    .tv-hint kbd {
-      display: inline-block; background: #1a1a1a; border: 1px solid #333;
-      border-radius: 3px; padding: 1px 6px; font-family: "Courier New", Courier, monospace;
-      color: #D4AF37; font-size: 11px; margin: 0 2px;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    /* <kbd> 标签样式 - 标准 HTML 标签，所有浏览器支持 */
+    kbd {
+      display: inline-block;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: "Courier New", Courier, monospace;
+      color: #D4AF37;
+      font-size: 11px;
+      margin: 0 2px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
       white-space: nowrap;
+      line-height: 1.4;
+      vertical-align: middle;
     }
-    /* install 标签样式 */
+    kbd:hover {
+      border-color: #555;
+    }
+    /* install 标签样式 - 所有浏览器 */
     install {
       display: inline-block;
       cursor: pointer;
+      /* 未知元素默认是行内，这里显式设为 inline-block 确保可点击区域 */
+    }
+    /* 对不支持 <install> 的浏览器，确保样式仍然应用 */
+    .settings-btn-action {
+      /* 已有样式，确保 install 标签继承 */
     }
     install:focus,
     install.tv-focus {
@@ -2020,18 +2044,31 @@
     var installBtn = document.getElementById('installBtn');
     if (installBtn) {
       installBtn.addEventListener('click', function() {
+        // 优先使用 beforeinstallprompt（Chrome/Edge/Android）
         if (deferredPrompt) {
           deferredPrompt.prompt();
           deferredPrompt.userChoice.then(function(choiceResult) {
             if (choiceResult.outcome === 'accepted') {
               showToast('安装成功');
+            } else {
+              showToast('已取消安装');
             }
             deferredPrompt = null;
+          }).catch(function() {
+            showToast('安装失败，请重试');
           });
-        } else if (window.navigator.standalone === true) {
+        }
+        // iOS Safari：提示用户用"分享→添加到主屏幕"
+        else if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+          showToast('请用 Safari 的分享按钮 → 添加到主屏幕');
+        }
+        // 已经是 PWA 模式
+        else if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
           showToast('已经是独立应用模式');
-        } else {
-          showToast('请使用浏览器菜单添加到主屏幕');
+        }
+        // 其他浏览器：通用提示
+        else {
+          showToast('请用浏览器菜单 → 添加到主屏幕/桌面');
         }
       });
     }

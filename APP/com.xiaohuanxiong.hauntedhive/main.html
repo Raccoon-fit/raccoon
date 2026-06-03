@@ -762,7 +762,7 @@
             <div class="modal-title">📢 停运公告</div>
             <div class="modal-content">
                 <p>亲爱的灵熊小记用户：</p>
-                <p>感谢您一路以来的陪伴与支持。由于业务战略调整，我们遗憾地宣布：<strong>灵熊小记将于2026年4月5日正式停止运营</strong>，届时所有线上服务将关闭。</p>
+                <p>感谢您一路以来的陪伴与支持。由于业务战略调整，我们遗憾地宣布：<strong>灵熊小记将于2026年4月15日正式停止运营</strong>，届时所有线上服务将关闭。</p>
                 <p>为保障您的权益，请您点击下方“查看详情”了解具体安排及数据备份指引。</p>
                 <p style="margin-top: 8px; font-size: 13px; color:#a94442;">—— 感恩相遇，江湖再见 ——</p>
             </div>
@@ -778,31 +778,7 @@
             // 强制显示APP内容
             document.getElementById('app-content').style.display = 'block';
 
-            // 获取公告API
-            function fetchAnnouncement() {
-                const adminId = "2051775505";
-                const apiUrl = "http://shuixian.ltd/main/api/bulletin/bulletin.php";
-                fetch(`${apiUrl}?admin=${encodeURIComponent(adminId)}`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const bar = document.getElementById('announcementBar');
-                    const textDiv = document.getElementById('announcementText');
-                    if (data.code === 1 && data.data && data.data.trim() !== "") {
-                        textDiv.innerText = data.data;
-                        bar.classList.remove('hidden');
-                    } else {
-                        bar.classList.add('hidden');
-                    }
-                })
-                .catch(err => {
-                    console.error("获取公告失败:", err);
-                    document.getElementById('announcementBar').classList.add('hidden');
-                });
-            }
-
+            
             fetchAnnouncement();
 
             // ---------- 停运公告弹窗逻辑 (电视遥控焦点管理) ----------

@@ -213,6 +213,13 @@
     }
     .start-hint b { color: #8B7355; font-weight: normal; }
     body.tv-mode .start-hint { font-size: 15px; margin-top: 48px; }
+    /* 开始界面选项选中样式 */
+    .start-overlay .choice-btn.selected,
+    .start-overlay .start-btn.selected {
+      border-color: #D4AF37 !important;
+      color: #D4AF37 !important;
+      background: #1a1510 !important;
+    }
     /* 焦点高亮已移除，用户要求取消 */
     .focusable { outline: none; }
     .focusable:focus,
@@ -2711,11 +2718,20 @@
     if (inStart) {
       const k = e.key || '';
       const c = e.keyCode || 0;
-      const isConfirmKey = key === 'Enter' || key === ' ' || key === 'OK' ||
-                           key === 'Select' || key === 'GoForward' ||
-                           c === 13 /* Enter */ || c === 32 /* Space */ ||
-                           c === 23 /* Num Enter */ || c === 66 /* Android Enter/OK */;
-      // 上报为不可识别键但 keyCode 是 0/229，也当作确认兑底
+      // 方向键切换焦点
+      if (key === 'ArrowDown' || key === 'ArrowRight') {
+        e.preventDefault();
+        focusNext(1);
+        return;
+      }
+      if (key === 'ArrowUp' || key === 'ArrowLeft') {
+        e.preventDefault();
+        focusNext(-1);
+        return;
+      }
+      const isConfirmKey = k === 'Enter' || k === ' ' || k === 'OK' ||
+                           k === 'Select' || k === 'GoForward' ||
+                           c === 13 || c === 32 || c === 23 || c === 66;
       if (isConfirmKey || (c === 0 && !k) || c === 229) {
         e.preventDefault();
         const btn = document.getElementById('startBtn');

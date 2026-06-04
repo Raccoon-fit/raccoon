@@ -213,12 +213,13 @@
     }
     .start-hint b { color: #8B7355; font-weight: normal; }
     body.tv-mode .start-hint { font-size: 15px; margin-top: 48px; }
-    /* 开始界面选项选中样式 */
+    /* 开始界面选项选中样式 - 金色金灿灿 */
     .start-overlay .choice-btn.selected,
     .start-overlay .start-btn.selected {
-      border-color: #D4AF37 !important;
-      color: #D4AF37 !important;
-      background: #1a1510 !important;
+      border-color: #FFD700 !important;
+      color: #FFD700 !important;
+      background: rgba(255, 215, 0, 0.15) !important;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.2) !important;
     }
     /* 焦点高亮已移除，用户要求取消 */
     .focusable { outline: none; }
@@ -2610,7 +2611,15 @@
     }
     const startOverlay = document.getElementById('startOverlay');
     if (startOverlay && startOverlay.style.display !== 'none') {
-      return Array.from(startOverlay.querySelectorAll('.focusable'));
+      // 开始界面：优先聚焦难度按钮，其次开始按钮
+      const btns = Array.from(startOverlay.querySelectorAll('.focusable'));
+      // 按难度按钮、开始按钮排序
+      btns.sort((a, b) => {
+        if (a.classList.contains('difficulty-btn')) return -1;
+        if (b.classList.contains('difficulty-btn')) return 1;
+        return 0;
+      });
+      return btns;
     }
     return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
   }
@@ -2957,17 +2966,12 @@
     const overlay = document.getElementById('startOverlay');
     const startBtn = document.getElementById('startBtn');
     overlay.style.display = 'flex';
-    startBtn.addEventListener('click', function() {
-      overlay.style.display = 'none';
-      renderScene('start');
-      // 进入游戏后默认焦点在第一个选项
-      setTimeout(() => {
-        const first = document.querySelector('#choices-container .choice-btn');
-        if (first) focusElement(first);
-      }, 200);
-    });
+    // 初始聚焦到第一个难度按钮
+    setTimeout(() => {
+      const first = document.querySelector('#startOverlay .difficulty-btn');
+      if (first) focusElement(first);
+    }, 100);
     initControls();
-    // 开始界面默认不自动聚焦，避免黄框。但保留按 OK 启动的逻辑
   };
   window.resetGame = resetGame;
 

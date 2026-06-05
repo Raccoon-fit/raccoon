@@ -1,23 +1,11 @@
+
 <!-- 该文件为exe使用的，与网站上分开 -->
 
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content">
   <title>黄小仙 · 讨封之卷</title>
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="黄小仙">
-  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi6buE5bCP5Lu2IC0g6K+I5a6e5LmL5YWDIiwic2hvcnRfbmFtZSI6IuW8gOWPtyIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAwMDAwMCIsInRoZW1lX2NvbG9yIjoiIzAwMDAwMCIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIQ0c5d2FYSmhkR2x2Ymk1bGRTNXZjbWMrIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJwdXJwb3NlIjoiYW55In0seyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBIQ0c5d2FYSmhkR2x2Ymk1bGRTNXZjbWMrIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJwdXJwb3NlIjoiYW55In1dfQ==">
-  <script>
-  // <install> 标签 polyfill - 注册自定义元素使其在所有浏览器中可样式化
-  if (!window.customElements || !window.customElements.get('install')) {
-    // 旧浏览器：用 document.createElement 注册，使其成为块级/可样式化元素
-    document.createElement('install');
-  }
-  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -30,7 +18,7 @@
       --illustration-bg: #0f0f0f;
     }
     body {
-      background-color: var(--bg-color);
+      background: linear-gradient(180deg, #0a0a0a 0%, #000000 50%, #0f0f0f 100%);
       color: var(--text-color);
       font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
       line-height: 1.8;
@@ -43,7 +31,16 @@
       overflow: hidden;
       position: relative;
     }
-    .game-container { max-width: 600px; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .game-container {
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    }
     .cultivation { font-size: 14px; color: #666; }
     .cultivation span { color: #8B7355; font-weight: bold; }
     .achievements { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
@@ -88,15 +85,15 @@
       flex-shrink: 0;
       z-index: 100;
       background: linear-gradient(to top, #000 75%, rgba(0,0,0,0.95) 92%, rgba(0,0,0,0));
-      padding: 14px 20px 10px;
+      padding: 16px 24px 14px;
       border-top: 1px solid #222;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: flex; flex-wrap: wrap;
       box-sizing: border-box;
-      min-height: 60px;
+      min-height: 70px;
     }
     .choices-container .choice-btn {
-      width: calc(50% - 6px);
+      width: calc(50% - 8px);
       margin-bottom: 12px;
       box-sizing: border-box;
     }
@@ -108,7 +105,7 @@
       margin-right: 0;
     }
 
-    .story-text { font-size: 17px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    .story-text { font-size: 18px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; line-height: 1.9; }
     .story-text.narrator { color: #888; font-style: italic; }
     .story-text.speaker { color: var(--highlight-color); font-weight: bold; }
     .story-text.system {
@@ -123,8 +120,8 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .choice-btn {
       background: transparent; border: 1px solid var(--btn-border); color: var(--text-color);
-      padding: 15px 20px; font-size: 15px; font-family: inherit; text-align: left;
-      cursor: pointer; transition: all 0.3s ease; border-radius: 3px;
+      padding: 14px 24px; font-size: 16px; font-family: inherit; text-align: left;
+      cursor: pointer; transition: all 0.3s ease; border-radius: 4px;
     }
     .choice-btn:hover { background: var(--btn-hover); border-color: var(--highlight-color); color: var(--highlight-color); }
     .choice-btn:active { transform: scale(0.98); }
@@ -209,11 +206,10 @@
     .start-btn.selected { border-color: #ffffff; color: #ffffff; background: #111; }
     .difficulty-btn.selected { border-color: #D4AF37; color: #D4AF37; background: #1a1510; }
     .start-hint {
-      margin-top: 36px; color: #555; font-size: 13px; line-height: 2;
-      letter-spacing: 0.5px; max-width: 540px;
+      margin-top: 36px; color: #555; font-size: 14px; line-height: 1.8;
+      letter-spacing: 0.5px; max-width: 600px;
     }
     .start-hint b { color: #8B7355; font-weight: normal; }
-    body.tv-mode .start-hint { font-size: 15px; margin-top: 48px; }
     /* 开始界面选项选中样式 - 金色金灿灿 */
     .start-overlay .choice-btn.selected,
     .start-overlay .start-btn.selected {
@@ -393,6 +389,10 @@
       color: #ffffff !important;
       background: #111 !important;
     }
+    /* 桌面版隐藏窗口控制按钮 */
+    .window-controls { display: none; }
+    /* 桌面版隐藏安装按钮 */
+    #installItem { display: none; }
     /* 窗口控制按钮容器 */
 .window-controls {
   position: fixed;
@@ -467,7 +467,7 @@ body.tv-mode .window-btn {
         </div>
       </div>
       <div class="start-hint">
-        剧情页面：<b>↑↓</b> 滚动剧情　<b>←→</b> 切换选项　<b>OK</b> 确认　<b>返回</b> 后退　<b>菜单</b> 设置
+        剧情页面：<b>↑↓</b> 滚动剧情　<b>←→</b> 切换选项　<b>Enter</b> 确认　<b>Esc</b> 后退　<b>空格</b> 打开设置
       </div>
     </div>
   </div>
@@ -521,7 +521,7 @@ body.tv-mode .window-btn {
         <button class="settings-btn-action danger focusable" id="clearProgressBtn">清除所有进度</button>
       </div>
       <div class="tv-hint">
-        电视遥控器：<kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 移动焦点　<kbd>OK</kbd> 确认　<kbd>返回</kbd> 后退　<kbd>1-9</kbd> 选择选项
+        键盘操作：<kbd>↑</kbd><kbd>↓</kbd> 滚动剧情　<kbd>←</kbd><kbd>→</kbd> 切换选项　<kbd>Enter</kbd> 确认　<kbd>Esc</kbd> 后退
       </div>
     </div>
   </div>

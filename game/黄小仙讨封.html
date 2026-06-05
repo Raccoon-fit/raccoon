@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -399,18 +400,9 @@
     <div class="start-content">
       <h1>黄小仙</h1>
       <p class="start-subtitle">五百年修为一念之间</p>
-      <button class="start-btn focusable" id="startBtn" disabled onclick="startGame()">开始讨封</button>
-      <!-- 难度选择 -->
-      <div class="difficulty-select" style="margin-top: 20px;">
-        <p style="color:#666;font-size:13px;margin-bottom:8px;">选择难度</p>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="choice-btn focusable difficulty-btn" style="padding:8px 14px;font-size:12px;" data-diff="easy" onclick="startWithDifficulty('easy')">简单</button>
-          <button class="choice-btn focusable difficulty-btn" style="padding:8px 14px;font-size:12px;" data-diff="normal" onclick="startWithDifficulty('normal')">普通</button>
-          <button class="choice-btn focusable difficulty-btn" style="padding:8px 14px;font-size:12px;" data-diff="hard" onclick="startWithDifficulty('hard')">困难</button>
-        </div>
-      </div>
+      <button class="start-btn focusable" id="startBtn" onclick="startGame()">开始讨封</button>
       <div class="start-hint">
-        剧情页面：<b>↑↓</b> 滚动剧情　<b>←→</b> 切换选项　<b>OK</b> 确认　<b>返回</b> 后退　<b>菜单</b> 设置
+        剧情页面：<b>↑↓</b> 滚动剧情　<b>←→</b> 切换选项　<b>Enter</b> 确认　<b>Esc</b> 后退
       </div>
     </div>
   </div>
@@ -2212,21 +2204,9 @@
     updateKarmaDisplay();
   }
   
-  window.startWithDifficulty = function(difficulty) {
-    playerDifficulty = difficulty;
-    localStorage.setItem('huangdaxian_difficulty', difficulty);
-    // 高亮选中的难度按钮
-    document.querySelectorAll('.difficulty-btn').forEach(btn => {
-      btn.classList.remove('selected');
-      if (btn.dataset.diff === difficulty) btn.classList.add('selected');
-    });
-    // 启用开始按钮
-    const startBtn = document.getElementById('startBtn');
-    startBtn.disabled = false;
-    startBtn.classList.add('selected');
-  };
-  
   window.startGame = function() {
+    playerDifficulty = 'normal';
+    localStorage.setItem('huangdaxian_difficulty', 'normal');
     document.getElementById('startOverlay').style.display = 'none';
     renderScene('start');
     setTimeout(() => {
@@ -2611,15 +2591,8 @@
     }
     const startOverlay = document.getElementById('startOverlay');
     if (startOverlay && startOverlay.style.display !== 'none') {
-      // 开始界面：优先聚焦难度按钮，其次开始按钮
-      const btns = Array.from(startOverlay.querySelectorAll('.focusable'));
-      // 按难度按钮、开始按钮排序
-      btns.sort((a, b) => {
-        if (a.classList.contains('difficulty-btn')) return -1;
-        if (b.classList.contains('difficulty-btn')) return 1;
-        return 0;
-      });
-      return btns;
+      // 开始界面：只聚焦开始按钮
+      return Array.from(startOverlay.querySelectorAll('.focusable'));
     }
     return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
   }
@@ -2966,10 +2939,10 @@
     const overlay = document.getElementById('startOverlay');
     const startBtn = document.getElementById('startBtn');
     overlay.style.display = 'flex';
-    // 初始聚焦到第一个难度按钮
+    // 初始聚焦到开始按钮
     setTimeout(() => {
-      const first = document.querySelector('#startOverlay .difficulty-btn');
-      if (first) focusElement(first);
+      const startBtn = document.getElementById('startBtn');
+      if (startBtn) focusElement(startBtn);
     }, 100);
     initControls();
   };

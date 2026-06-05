@@ -486,6 +486,8 @@
 <button id="fullscreen-btn" class="fixed top-4 left-4 z-[10001] bg-black/60 hover:bg-black/80 text-white p-2 rounded transition-all opacity-0 pointer-events-none" title="全屏" style="display: none;">
 <span class="material-symbols-outlined text-xl">fullscreen</span>
 </button>
+<!-- 顶部屏障：阻止鼠标到达屏幕最顶端，隐藏浏览器原生全屏退出按钮 -->
+<div id="fullscreen-shield" style="position: fixed; top: 0; left: 0; right: 0; height: 40px; z-index: 99999; pointer-events: none; background: transparent; cursor: default;"></div>
 <main class="relative h-[calc(100vh-40px)] w-full flex flex-col p-2" id="desktop">
 <!-- Desktop Icons -->
 <div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="file-manager">
@@ -572,7 +574,7 @@
 <div class="p-4 bg-white/5 rounded border border-white/5">
 <p class="text-sm">操作系统: Raccoon OS Enterprise Edition</p>
 <p class="text-sm">版本: 2026.refined_charcoal</p>
-<p class="text-sm">构建: 2026年2月18日</p>
+<p class="text-sm">构建: 2026年6月6日</p>
 </div>
 </div>
 </div>
@@ -881,7 +883,7 @@
 </div>
 
 <!-- Bottom right watermark -->
-<div class="absolute bottom-6 right-6 text-right opacity-10 text-[9px] pointer-events-none tracking-widest uppercase">
+<div class="absolute bottom-6 right-6 text-right opacity-50 text-xs pointer-events-none tracking-widest uppercase">
 <p>Raccoon OS Enterprise Edition</p>
 <p>Built 2026.raccoon</p>
 </div>
@@ -1098,6 +1100,7 @@ class RaccoonOS {
     init() {
         this.initEventListeners();
         this.initErrorDialogSystem();
+        this.initFullscreenShield();
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
     }
@@ -2456,6 +2459,26 @@ class RaccoonOS {
     initFullscreen() {
         // 全屏功能已在登录成功后处理
         console.log('全屏功能已启用');
+    }
+    
+    // 顶部屏障：阻止鼠标进入屏幕最顶部几像素，隐藏浏览器原生全屏退出按钮
+    initFullscreenShield() {
+        const shield = document.getElementById('fullscreen-shield');
+        if (!shield) return;
+        
+        // 防止鼠标到达 clientY <= 2 的位置
+        document.addEventListener('mousemove', (e) => {
+            if (e.clientY <= 2) {
+                shield.style.pointerEvents = 'auto';
+            } else if (e.clientY > 8) {
+                shield.style.pointerEvents = 'none';
+            }
+        }, true);
+        
+        // 鼠标进入/离开屏障时维持状态
+        shield.addEventListener('mouseenter', () => {
+            shield.style.pointerEvents = 'auto';
+        });
     }
     
     handleFullscreenChange() {

@@ -987,7 +987,7 @@
 </div>
 
 <!-- Taskbar -->
-<footer class="fixed bottom-0 left-0 w-full h-10 acrylic flex items-center z-[10000]">
+<footer class="fixed bottom-0 left-0 w-full h-14 acrylic flex items-center z-[10000]">
 <!-- 开始按钮 -->
 <div class="taskbar-item w-10 h-full flex items-center justify-center transition-colors hover:bg-white/10" id="start-menu">
 <span class="text-xl">🦝</span>
@@ -1636,19 +1636,18 @@ class RaccoonOS {
     
     // 屏蔽浏览器快捷键
     blockBrowserShortcuts() {
-        // 屏蔽F11 (退出全屏)
+        // 屏蔽F11 和 ESC
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'F11' || e.key === 'Escape') {
+            if (e.key === 'F11') {
                 e.preventDefault();
                 e.stopPropagation();
-                
-                // 显示提示信息
-                if (e.key === 'F11') {
-                    this.showNotification('全屏模式已锁定，请使用应用程序内的退出选项');
-                } else if (e.key === 'Escape') {
-                    this.showNotification('系统运行中，无法退出全屏模式');
-                }
-                
+                this.showNotification('全屏模式已锁定，请使用应用程序内的退出选项');
+                return false;
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.showNotification('系统运行中，无法退出 RaccoonOS');
                 return false;
             }
         }, true);
@@ -2288,15 +2287,15 @@ class RaccoonOS {
                 if (action === 'shutdown') {
                     // 真正的关机
                     document.getElementById('start-menu-popup').style.display = 'none';
-                    
+
                     // 显示关机动画
                     const shutdownScreen = document.getElementById('shutdown-screen');
                     shutdownScreen.style.display = 'flex';
-                    
+
                     // 进度条动画
                     const progress = document.getElementById('shutdown-progress');
                     setTimeout(() => { progress.style.width = '100%'; }, 100);
-                    
+
                     // 3秒后黑屏
                     setTimeout(() => {
                         // 隐藏桌面和所有窗口
@@ -2308,6 +2307,20 @@ class RaccoonOS {
                         shutdownScreen.style.display = 'flex';
                         shutdownScreen.innerHTML = '<div class="bg-black w-full h-full"></div>';
                     }, 3200);
+
+                    // 5秒后自动退出 RaccoonOS
+                    setTimeout(() => {
+                        try { window.close(); } catch (e) {}
+                        // 兜底：尝试退出全屏后再次关闭
+                        try {
+                            if (document.exitFullscreen) document.exitFullscreen();
+                        } catch (e) {}
+                        setTimeout(() => {
+                            try { window.close(); } catch (e) {}
+                            // 最后兜底：跳转到空白页
+                            window.location.href = 'about:blank';
+                        }, 500);
+                    }, 5000);
                     
                 } else if (action === 'restart') {
                     // 真正的重启 - 刷新页面

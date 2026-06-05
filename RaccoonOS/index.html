@@ -776,6 +776,7 @@
 <input type="text" class="flex-1 bg-transparent text-xs outline-none text-white" placeholder="搜索或输入网址" id="browser-url">
 </div>
 <button class="p-1.5 hover:bg-white/10 rounded" id="browser-go"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+<button class="p-1.5 hover:bg-white/10 rounded" id="browser-menu" title="更多操作"><span class="material-symbols-outlined text-base">more_horiz</span></button>
 </div>
 <div class="flex-1 bg-[#1a1a1a] relative">
 <div id="browser-home" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black">
@@ -805,7 +806,6 @@
 </div>
 </div>
 <iframe id="browser-frame" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-presentation" style="display: none;"></iframe>
-<div id="browser-frame-overlay" style="position: absolute; inset: 0; z-index: 5;"></div>
 </div>
 </div>
 
@@ -1897,32 +1897,9 @@ class RaccoonOS {
         const browserBack = document.getElementById('browser-back');
         const browserForward = document.getElementById('browser-forward');
         const browserRefresh = document.getElementById('browser-refresh');
-        const browserOverlay = document.getElementById('browser-frame-overlay');
-        
-        // 用覆盖层拦截 iframe 内的右键菜单
-        if (browserOverlay) {
-            // mousedown 左键时让事件穿透到 iframe，下一帧后恢复拦截
-            browserOverlay.addEventListener('mousedown', (e) => {
-                if (e.button === 0) {
-                    browserOverlay.style.pointerEvents = 'none';
-                    // 下一帧后恢复：跨域 iframe 事件不冒泡到父 document，
-                    // 所以不能用 document.mouseup/contextmenu 来恢复
-                    requestAnimationFrame(() => {
-                        browserOverlay.style.pointerEvents = 'auto';
-                    });
-                }
-            });
-            // 拦截右键菜单
-            browserOverlay.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.hideAllMenus();
-                browserMenu.style.left = e.clientX + 'px';
-                browserMenu.style.top = e.clientY + 'px';
-                browserMenu.style.display = 'block';
-            });
-        }
-        
+        const browserViewSource = document.getElementById('browser-view-source');
+        const browserMenuBtn = document.getElementById('browser-menu');
+
         if (browserUrl) {
             browserUrl.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -1930,7 +1907,7 @@ class RaccoonOS {
                 }
             });
         }
-        
+
         if (browserHomeSearch) {
             browserHomeSearch.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -1945,23 +1922,50 @@ class RaccoonOS {
                 }
             });
         }
-        
+
         const browserGo = document.getElementById('browser-go');
         if (browserGo) {
             browserGo.addEventListener('click', () => this.navigateToUrl());
         }
-        
-        // 拦截浏览器窗口内的右键菜单
+
+        // 工具栏：查看网页源代码
+        if (browserViewSource) {
+            browserViewSource.addEventListener('click', () => {
+                try {
+                    const url = browserFrame.contentWindow.location.href;
+                    window.open('view-source:' + url, '_blank');
+                } catch (err) {
+                    this.showNotification('跨域限制：无法查看源代码');
+                }
+            });
+        }
+
+        // 工具栏：更多菜单按钮（显示自定义右键菜单）
+        const showBrowserMenu = (x, y) => {
+            if (!browserMenu) return;
+            this.hideAllMenus();
+            browserMenu.style.left = x + 'px';
+            browserMenu.style.top = y + 'px';
+            browserMenu.style.display = 'block';
+        };
+        if (browserMenuBtn) {
+            browserMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const rect = browserMenuBtn.getBoundingClientRect();
+                showBrowserMenu(rect.left, rect.bottom);
+            });
+        }
+
+        // 在工具栏等非 iframe 区域右键显示自定义菜单
         if (browserWindow && browserMenu) {
             browserWindow.addEventListener('contextmenu', (e) => {
+                // 如果右键发生在 iframe 上（target 是 iframe），不阻止原生菜单
+                if (e.target.tagName === 'IFRAME') return;
                 e.preventDefault();
                 e.stopPropagation();
-                this.hideAllMenus();
-                browserMenu.style.left = e.clientX + 'px';
-                browserMenu.style.top = e.clientY + 'px';
-                browserMenu.style.display = 'block';
+                showBrowserMenu(e.clientX, e.clientY);
             });
-            
+
             // 处理菜单项点击
             browserMenu.addEventListener('click', (e) => {
                 const item = e.target.closest('.menu-item');

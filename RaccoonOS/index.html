@@ -1,3 +1,4 @@
+
 <html lang="zh-CN"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -402,6 +403,14 @@
         .hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}
     </style></head>
 <body class="font-sans overflow-hidden select-none text-white h-screen w-full">
+<!-- 关机动画界面 -->
+<div id="shutdown-screen" class="fixed inset-0 z-[20000] flex flex-col items-center justify-center bg-black" style="display: none;">
+    <div class="text-4xl font-light mb-8">RaccoonOS 正在关闭</div>
+    <div class="w-48 h-1 bg-gray-800 rounded overflow-hidden">
+        <div id="shutdown-progress" class="h-full bg-white transition-all duration-[3000ms]" style="width: 0%;"></div>
+    </div>
+</div>
+
 <!-- 系统错误弹窗遮罩 -->
 <div id="error-overlay" class="fixed inset-0 z-[10002] flex items-center justify-center" style="background: rgba(0, 0, 0, 0.8);">
 <div class="bg-gray-800 rounded-lg shadow-2xl border border-gray-600 w-96 max-w-md mx-4 error-dialog-enter">
@@ -457,7 +466,7 @@
 </button>
 <main class="relative h-[calc(100vh-40px)] w-full flex flex-col p-2" id="desktop">
 <!-- Desktop Icons -->
-<div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="computer">
+<div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="file-manager">
 <div class="relative w-12 h-12 flex items-center justify-center">
 <span class="material-symbols-outlined text-4xl text-gray-200">desktop_windows</span>
 <div class="absolute -top-1 -right-1 text-[8px] bg-[#333] rounded-full px-1 py-0.5 border border-white/10">OS</div>
@@ -652,14 +661,203 @@
 </div>
 </div>
 
+<!-- 文件管理器窗口 -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="file-manager-window" style="display: none;" data-app="file-manager">
+<div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base opacity-70">folder</span>
+<span class="text-xs">文件资源管理器</span>
+</div>
+<div class="flex">
+<div class="win-control-btn window-minimize" data-window="file-manager-window">
+<span class="material-symbols-outlined text-base">remove</span>
+</div>
+<div class="win-control-btn window-maximize" data-window="file-manager-window">
+<span class="material-symbols-outlined text-[14px]">crop_square</span>
+</div>
+<div class="win-control-btn win-control-close window-close" data-window="file-manager-window">
+<span class="material-symbols-outlined text-base">close</span>
+</div>
+</div>
+</div>
+<div class="h-9 bg-[#1a1a1a] flex items-center px-2 border-b border-white/5">
+<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="back"><span class="material-symbols-outlined text-base">arrow_back</span></button>
+<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="up"><span class="material-symbols-outlined text-base">arrow_upward</span></button>
+<div class="flex-1 mx-2 h-6 bg-[#2a2a2a] rounded flex items-center px-2">
+<span class="material-symbols-outlined text-xs text-white/50 mr-1">folder</span>
+<span class="text-xs" id="file-manager-path">此电脑</span>
+</div>
+</div>
+<div class="flex flex-1 overflow-hidden">
+<div class="w-48 bg-[#1a1a1a] border-r border-white/5 p-2">
+<div class="text-xs text-white/50 mb-2 px-1">快速访问</div>
+<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="desktop">
+<span class="material-symbols-outlined text-sm">desktop_windows</span>
+<span class="text-xs">桌面</span>
+</div>
+<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="documents">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="text-xs">文档</span>
+</div>
+<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="downloads">
+<span class="material-symbols-outlined text-sm">download</span>
+<span class="text-xs">下载</span>
+</div>
+<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="pictures">
+<span class="material-symbols-outlined text-sm">image</span>
+<span class="text-xs">图片</span>
+</div>
+</div>
+<div class="flex-1 p-2 overflow-auto" id="file-manager-content">
+<div class="grid grid-cols-6 gap-2" id="file-list">
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="文档">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">文档</span>
+</div>
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="下载">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">下载</span>
+</div>
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="图片">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">图片</span>
+</div>
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="音乐">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">音乐</span>
+</div>
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="视频">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">视频</span>
+</div>
+<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="桌面">
+<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
+<span class="text-xs mt-1 text-center">桌面</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 浏览器窗口 -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="browser-window" style="display: none;" data-app="browser">
+<div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base opacity-70">public</span>
+<span class="text-xs">Raccoon Browser</span>
+</div>
+<div class="flex">
+<div class="win-control-btn window-minimize" data-window="browser-window">
+<span class="material-symbols-outlined text-base">remove</span>
+</div>
+<div class="win-control-btn window-maximize" data-window="browser-window">
+<span class="material-symbols-outlined text-[14px]">crop_square</span>
+</div>
+<div class="win-control-btn win-control-close window-close" data-window="browser-window">
+<span class="material-symbols-outlined text-base">close</span>
+</div>
+</div>
+</div>
+<div class="h-10 bg-[#1a1a1a] flex items-center px-2 gap-2 border-b border-white/5">
+<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-back"><span class="material-symbols-outlined text-base">arrow_back</span></button>
+<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-refresh"><span class="material-symbols-outlined text-base">refresh</span></button>
+<div class="flex-1 h-7 bg-[#2a2a2a] rounded flex items-center px-3">
+<span class="material-symbols-outlined text-xs text-white/50 mr-2">lock</span>
+<input type="text" class="flex-1 bg-transparent text-xs outline-none text-white" placeholder="搜索或输入网址" id="browser-url">
+</div>
+<button class="p-1.5 hover:bg-white/10 rounded" id="browser-go"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+</div>
+<div class="flex-1 bg-[#1a1a1a] relative">
+<div id="browser-home" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+<div class="text-6xl mb-4">🦝</div>
+<div class="text-2xl font-light text-white/80 mb-8">Raccoon Browser</div>
+<div class="w-96 h-10 bg-[#2a2a2a] rounded-full shadow-lg flex items-center px-4 border border-white/10">
+<span class="material-symbols-outlined text-white/50 mr-2">search</span>
+<input type="text" class="flex-1 outline-none text-sm bg-transparent text-white" placeholder="搜索或输入网址" id="browser-home-search">
+</div>
+<div class="mt-8 flex gap-4">
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.baidu.com';document.getElementById('browser-url').value='https://www.baidu.com';document.getElementById('browser-frame').src='https://www.baidu.com';document.getElementById('browser-home').style.display='none';">
+<span class="material-symbols-outlined text-3xl text-blue-500">language</span>
+<span class="text-xs text-gray-500">百度</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.google.com';document.getElementById('browser-url').value='https://www.google.com';document.getElementById('browser-frame').src='https://www.google.com';document.getElementById('browser-home').style.display='none';">
+<span class="material-symbols-outlined text-3xl text-red-500">movie</span>
+<span class="text-xs text-gray-500">视频</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://github.com';document.getElementById('browser-url').value='https://github.com';document.getElementById('browser-frame').src='https://github.com';document.getElementById('browser-home').style.display='none';">
+<span class="material-symbols-outlined text-3xl text-gray-700">code</span>
+<span class="text-xs text-gray-500">GitHub</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.bilibili.com';document.getElementById('browser-url').value='https://www.bilibili.com';document.getElementById('browser-frame').src='https://www.bilibili.com';document.getElementById('browser-home').style.display='none';">
+<span class="material-symbols-outlined text-3xl text-pink-500">smart_display</span>
+<span class="text-xs text-gray-500">B站</span>
+</div>
+</div>
+</div>
+<iframe id="browser-frame" class="w-full h-full" style="display: none;"></iframe>
+</div>
+</div>
+
+<!-- 终端窗口 -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#0c0c0c] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="terminal-window" style="display: none;" data-app="terminal">
+<div class="h-8 bg-[#1a1a1a] flex items-center justify-between pl-3 drag-handle">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base opacity-70">terminal</span>
+<span class="text-xs">终端</span>
+</div>
+<div class="flex">
+<div class="win-control-btn window-minimize" data-window="terminal-window">
+<span class="material-symbols-outlined text-base">remove</span>
+</div>
+<div class="win-control-btn window-maximize" data-window="terminal-window">
+<span class="material-symbols-outlined text-[14px]">crop_square</span>
+</div>
+<div class="win-control-btn win-control-close window-close" data-window="terminal-window">
+<span class="material-symbols-outlined text-base">close</span>
+</div>
+</div>
+</div>
+<div class="flex-1 p-3 font-mono text-sm text-green-400 overflow-auto" id="terminal-content">
+<div>raccoon@raccoon-os:~$ <span class="text-white">_</span></div>
+</div>
+</div>
+
+<!-- 搜索面板 -->
+<div id="search-panel" class="fixed bottom-12 left-2 w-96 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-2xl z-[9998]" style="display: none;">
+<div class="p-3 border-b border-white/10">
+<input type="text" class="w-full bg-[#2a2a2a] rounded px-3 py-2 text-sm outline-none" placeholder="搜索应用、文件和设置" id="search-input">
+</div>
+<div class="p-2">
+<div class="text-xs text-white/50 px-2 py-1">应用</div>
+<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="file-manager">
+<span class="material-symbols-outlined text-lg">folder</span>
+<span class="text-sm">文件资源管理器</span>
+</div>
+<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="browser">
+<span class="material-symbols-outlined text-lg">public</span>
+<span class="text-sm">浏览器</span>
+</div>
+<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="terminal">
+<span class="material-symbols-outlined text-lg">terminal</span>
+<span class="text-sm">终端</span>
+</div>
+<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="settings">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span class="text-sm">设置</span>
+</div>
+</div>
+</div>
+
 <!-- Bottom right watermark -->
 <div class="absolute bottom-6 right-6 text-right opacity-10 text-[9px] pointer-events-none tracking-widest uppercase">
 <p>Raccoon OS Enterprise Edition</p>
-<p>Built 2024.refined_charcoal</p>
+<p>Built 2026.raccoon</p>
 </div>
 </main>
 
-<!-- Context Menu -->
+<!-- Context Menu for Desktop -->
 <div class="py-1 rounded-[2px]" id="context-menu" style="display: none;">
 <div class="menu-item" data-action="view">
 <span>查看(V)</span>
@@ -683,6 +881,21 @@
 </div>
 <div class="menu-item" data-action="personalize">
 <span class="font-medium">个性化(R)</span>
+</div>
+</div>
+
+<!-- Context Menu for Desktop Icons -->
+<div class="py-1 rounded-[2px]" id="icon-context-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="menu-item" data-action="icon-open">
+<span>打开(O)</span>
+</div>
+<div class="menu-divider"></div>
+<div class="menu-item" data-action="icon-runas">
+<span>以管理员身份运行(A)</span>
+</div>
+<div class="menu-divider"></div>
+<div class="menu-item" data-action="icon-properties">
+<span>属性(P)</span>
 </div>
 </div>
 
@@ -726,52 +939,77 @@
 </div>
 </div>
 
+<!-- 开始菜单弹出层 -->
+<div id="start-menu-popup" class="fixed bottom-12 left-2 w-64 acrylic rounded-lg shadow-2xl border border-white/10 z-[9999]" style="display: none;">
+    <div class="p-2">
+        <div class="text-xs text-white/50 px-3 py-2">电源</div>
+        <div class="grid grid-cols-3 gap-1">
+            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="shutdown">
+                <span class="material-symbols-outlined text-xl">power_settings_new</span>
+                <span class="text-[10px] mt-1">关机</span>
+            </button>
+            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="restart">
+                <span class="material-symbols-outlined text-xl">restart_alt</span>
+                <span class="text-[10px] mt-1">重启</span>
+            </button>
+            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="sleep">
+                <span class="material-symbols-outlined text-xl">bedtime</span>
+                <span class="text-[10px] mt-1">睡眠</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Taskbar -->
-<footer class="fixed bottom-0 left-0 w-full h-10 acrylic flex items-center justify-between z-[10000]">
+<footer class="fixed bottom-0 left-0 w-full h-10 acrylic flex items-center z-[10000]">
+<!-- 开始按钮 -->
+<div class="taskbar-item w-10 h-full flex items-center justify-center transition-colors hover:bg-white/10" id="start-menu">
+<span class="text-xl">🦝</span>
+</div>
+
+<!-- 搜索框 -->
+<div class="taskbar-item h-8 w-48 flex items-center justify-center mx-1 bg-white/5 rounded hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-sm text-white/50 mr-2">search</span>
+<span class="text-xs text-white/40">搜索</span>
+</div>
+
+<!-- 任务栏图标（居中） -->
+<div class="flex-1 flex items-center justify-center h-full gap-0.5">
+<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
+<span class="material-symbols-outlined text-gray-300 text-lg">folder</span>
+</div>
+<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
+<span class="material-symbols-outlined text-gray-300 text-lg">public</span>
+</div>
+<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
+<span class="material-symbols-outlined text-gray-300 text-lg">terminal</span>
+</div>
+<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
+<span class="material-symbols-outlined text-gray-300 text-lg">settings</span>
+</div>
+</div>
+
+<!-- 系统托盘 -->
 <div class="flex items-center h-full">
-<div class="taskbar-item w-12 h-full flex items-center justify-center transition-colors" id="start-menu">
-<span class="material-symbols-outlined text-xl text-white/90">grid_view</span>
+<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
+<span class="material-symbols-outlined text-[14px] opacity-60">expand_less</span>
 </div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-xl text-white/50">search</span>
+<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
+<span class="material-symbols-outlined text-[14px] opacity-60">wifi</span>
 </div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-xl text-white/50">layers</span>
+<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
+<span class="material-symbols-outlined text-[14px] opacity-60">volume_up</span>
 </div>
-<div class="h-5 w-px bg-white/5 mx-1"></div>
-<div class="flex items-center h-full gap-0.5 px-1">
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-gray-400 text-lg">folder</span>
+<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
+<span class="material-symbols-outlined text-[14px] opacity-60">brightness_6</span>
 </div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-gray-400 text-lg">public</span>
+<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
+<span class="material-symbols-outlined text-[14px] opacity-60">battery_full</span>
 </div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-gray-400 text-lg">terminal</span>
-</div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center">
-<span class="material-symbols-outlined text-gray-400 text-lg">settings</span>
-</div>
-</div>
-</div>
-<div class="flex items-center h-full">
-<div class="taskbar-item px-2 h-full flex items-center">
-<span class="material-symbols-outlined text-[16px] opacity-60">expand_less</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center">
-<span class="material-symbols-outlined text-[16px] opacity-60">wifi</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center">
-<span class="material-symbols-outlined text-[16px] opacity-60">volume_up</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center text-[11px] font-bold opacity-70">
-                拼
-            </div>
-<div class="taskbar-item px-3 h-full flex flex-col items-end justify-center leading-none border-l border-white/5 ml-1">
+<div class="taskbar-item px-3 h-full flex flex-col items-end justify-center leading-none border-l border-white/5 ml-1 hover:bg-white/10">
 <span class="text-[10px] font-medium mb-0.5" id="current-time">17:29</span>
-<span class="text-[10px] opacity-50" id="current-date">2026/2/18</span>
+<span class="text-[10px] opacity-50" id="current-date">2026/06/05</span>
 </div>
-<div class="w-[4px] border-l border-white/10 h-full hover:bg-white/10 ml-1"></div>
 </div>
 </footer>
 
@@ -805,12 +1043,21 @@ class RaccoonOS {
         // Desktop right-click context menu
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            this.showContextMenu(e.clientX, e.clientY);
+            
+            // 检查是否点击在桌面图标上
+            const desktopIcon = e.target.closest('.desktop-icon');
+            if (desktopIcon) {
+                // 图标右键菜单
+                this.showIconContextMenu(e.clientX, e.clientY, desktopIcon);
+            } else {
+                // 桌面右键菜单
+                this.showContextMenu(e.clientX, e.clientY);
+            }
         });
 
         // Hide menus when clicking elsewhere
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#context-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) {
+            if (!e.target.closest('#context-menu, #icon-context-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) {
                 this.hideAllMenus();
             }
         });
@@ -955,9 +1202,32 @@ class RaccoonOS {
         this.contextMenu.style.top = y + 'px';
         this.contextMenu.style.display = 'block';
     }
+    
+    showIconContextMenu(x, y, iconElement) {
+        this.hideAllMenus();
+        const iconMenu = document.getElementById('icon-context-menu');
+        iconMenu.style.left = x + 'px';
+        iconMenu.style.top = y + 'px';
+        iconMenu.style.display = 'block';
+        
+        // 绑定图标右键菜单的操作
+        iconMenu.onclick = (e) => {
+            const action = e.target.closest('.menu-item')?.dataset.action;
+            if (action === 'icon-open') {
+                const type = iconElement.dataset.type;
+                this.openApplication(type, iconElement.querySelector('span:last-child').textContent);
+            } else if (action === 'icon-runas') {
+                this.showNotification('以管理员身份运行');
+            } else if (action === 'icon-properties') {
+                this.showSettings('system');
+            }
+            this.hideAllMenus();
+        };
+    }
 
     hideAllMenus() {
         this.contextMenu.style.display = 'none';
+        document.getElementById('icon-context-menu').style.display = 'none';
         this.viewMenu.style.display = 'none';
         this.sortMenu.style.display = 'none';
         this.newMenu.style.display = 'none';
@@ -1239,8 +1509,11 @@ class RaccoonOS {
 
     updateClock() {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' });
-        const dateStr = now.toLocaleDateString('zh-CN');
+        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${year}/${month}/${day}`;
         
         document.getElementById('current-time').textContent = timeStr;
         document.getElementById('current-date').textContent = dateStr;
@@ -1395,6 +1668,329 @@ class RaccoonOS {
         
         // 重新初始化任务栏按钮
         this.initTaskbarButtons();
+        
+        // 初始化应用窗口
+        this.initAppWindows();
+        
+        // 初始化搜索面板
+        this.initSearchPanel();
+    }
+    
+    // 初始化应用窗口
+    initAppWindows() {
+        // 窗口最小化按钮
+        document.querySelectorAll('.window-minimize').forEach(btn => {
+            btn.onclick = () => {
+                const windowId = btn.dataset.window;
+                document.getElementById(windowId).style.display = 'none';
+            };
+        });
+        
+        // 窗口最大化/还原按钮
+        document.querySelectorAll('.window-maximize').forEach(btn => {
+            btn.onclick = () => {
+                const windowId = btn.dataset.window;
+                const win = document.getElementById(windowId);
+                if (win.style.width === '100%') {
+                    win.style.width = '';
+                    win.style.height = '';
+                    win.style.top = '50%';
+                    win.style.left = '50%';
+                    win.style.transform = 'translate(-50%, -50%)';
+                } else {
+                    win.style.width = '100%';
+                    win.style.height = 'calc(100% - 40px)';
+                    win.style.top = '0';
+                    win.style.left = '0';
+                    win.style.transform = 'none';
+                }
+            };
+        });
+        
+        // 窗口关闭按钮
+        document.querySelectorAll('.window-close').forEach(btn => {
+            btn.onclick = () => {
+                const windowId = btn.dataset.window;
+                document.getElementById(windowId).style.display = 'none';
+            };
+        });
+        
+        // 窗口拖拽
+        this.initWindowDrag();
+        
+        // 初始化浏览器功能
+        this.initBrowser();
+        
+        // 初始化文件管理器功能
+        this.initFileManager();
+    }
+    
+    // 初始化窗口拖拽
+    initWindowDrag() {
+        document.querySelectorAll('.app-window').forEach(win => {
+            const handle = win.querySelector('.drag-handle');
+            if (handle) {
+                handle.onmousedown = (e) => {
+                    if (e.target.closest('.win-control-btn')) return;
+                    const rect = win.getBoundingClientRect();
+                    const offsetX = e.clientX - rect.left;
+                    const offsetY = e.clientY - rect.top;
+                    
+                    const onMouseMove = (e) => {
+                        win.style.left = (e.clientX - offsetX) + 'px';
+                        win.style.top = (e.clientY - offsetY) + 'px';
+                        win.style.transform = 'none';
+                    };
+                    
+                    const onMouseUp = () => {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                };
+            }
+        });
+        
+        // 初始化窗口调整大小
+        this.initWindowResize();
+    }
+    
+    // 初始化窗口调整大小
+    initWindowResize() {
+        document.querySelectorAll('.app-window').forEach(win => {
+            // 右下角调整大小
+            const resizer = document.createElement('div');
+            resizer.style.cssText = 'position: absolute; right: 0; bottom: 0; width: 15px; height: 15px; cursor: se-resize; z-index: 10;';
+            win.appendChild(resizer);
+            
+            resizer.onmousedown = (e) => {
+                e.stopPropagation();
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = win.offsetWidth;
+                const startHeight = win.offsetHeight;
+                
+                const onMouseMove = (e) => {
+                    const newWidth = Math.max(400, startWidth + (e.clientX - startX));
+                    const newHeight = Math.max(300, startHeight + (e.clientY - startY));
+                    win.style.width = newWidth + 'px';
+                    win.style.height = newHeight + 'px';
+                };
+                
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            };
+        });
+    }
+    
+    // 初始化搜索面板
+    initSearchPanel() {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                const query = e.target.value.toLowerCase();
+                document.querySelectorAll('.search-result').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(query) ? 'flex' : 'none';
+                });
+            };
+        }
+        
+        // 搜索结果点击
+        document.querySelectorAll('.search-result').forEach(item => {
+            item.onclick = () => {
+                const app = item.dataset.app;
+                this.openApp(app);
+                document.getElementById('search-panel').style.display = 'none';
+            };
+        });
+    }
+    
+    // 打开应用
+    openApp(appName) {
+        let windowId;
+        switch(appName) {
+            case 'file-manager':
+                windowId = 'file-manager-window';
+                break;
+            case 'browser':
+                windowId = 'browser-window';
+                break;
+            case 'terminal':
+                windowId = 'terminal-window';
+                break;
+            case 'settings':
+                this.showSettings();
+                return;
+            default:
+                this.showNotification('未找到应用');
+                return;
+        }
+        
+        const win = document.getElementById(windowId);
+        win.style.display = 'flex';
+        // 窗口居中
+        win.style.left = '50%';
+        win.style.top = '50%';
+        win.style.transform = 'translate(-50%, -50%)';
+        
+        // 打开浏览器时显示主页
+        if (appName === 'browser') {
+            setTimeout(() => {
+                document.getElementById('browser-home').style.display = 'flex';
+                document.getElementById('browser-frame').style.display = 'none';
+                document.getElementById('browser-url').value = '';
+            }, 100);
+        }
+    }
+    
+    // 初始化浏览器功能
+    initBrowser() {
+        const browserUrl = document.getElementById('browser-url');
+        const browserFrame = document.getElementById('browser-frame');
+        const browserHomeSearch = document.getElementById('browser-home-search');
+        
+        if (browserUrl) {
+            browserUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.navigateToUrl();
+                }
+            });
+        }
+        
+        if (browserHomeSearch) {
+            browserHomeSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    let url = browserHomeSearch.value;
+                    if (!url.startsWith('http')) {
+                        url = 'https://www.baidu.com/s?wd=' + encodeURIComponent(url);
+                    }
+                    document.getElementById('browser-url').value = url;
+                    document.getElementById('browser-frame').src = url;
+                    document.getElementById('browser-home').style.display = 'none';
+                    document.getElementById('browser-frame').style.display = 'block';
+                }
+            });
+        }
+        
+        const browserGo = document.getElementById('browser-go');
+        if (browserGo) {
+            browserGo.addEventListener('click', () => this.navigateToUrl());
+        }
+        
+        const browserRefresh = document.getElementById('browser-refresh');
+        if (browserRefresh) {
+            browserRefresh.addEventListener('click', () => {
+                browserFrame.src = browserFrame.src;
+            });
+        }
+    }
+    
+    navigateToUrl() {
+        let url = document.getElementById('browser-url').value;
+        if (!url) return;
+        
+        if (!url.startsWith('http')) {
+            // 搜索
+            url = 'https://www.baidu.com/s?wd=' + encodeURIComponent(url);
+        }
+        
+        document.getElementById('browser-frame').src = url;
+        document.getElementById('browser-home').style.display = 'none';
+        document.getElementById('browser-frame').style.display = 'block';
+    }
+    
+    // 初始化文件管理器功能
+    initFileManager() {
+        const sidebarItems = document.querySelectorAll('.window-sidebar-item');
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const path = item.dataset.path;
+                this.navigateToFolder(path);
+            });
+        });
+        
+        const fileItems = document.querySelectorAll('.file-item');
+        fileItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const type = item.dataset.type;
+                if (type === 'folder') {
+                    const name = item.dataset.name;
+                    this.navigateToFolder(name);
+                }
+            });
+            
+            item.addEventListener('dblclick', () => {
+                const type = item.dataset.type;
+                const name = item.dataset.name;
+                if (type === 'folder') {
+                    this.navigateToFolder(name);
+                }
+            });
+        });
+    }
+    
+    navigateToFolder(folderName) {
+        document.getElementById('file-manager-path').textContent = folderName;
+        
+        const fileList = document.getElementById('file-list');
+        let files = [];
+        
+        if (folderName === '此电脑' || folderName === 'desktop') {
+            files = [
+                { name: '文档', type: 'folder', icon: 'folder', color: 'text-yellow-400' },
+                { name: '下载', type: 'folder', icon: 'folder', color: 'text-yellow-400' },
+                { name: '图片', type: 'folder', icon: 'folder', color: 'text-yellow-400' },
+                { name: '音乐', type: 'folder', icon: 'folder', color: 'text-yellow-400' },
+                { name: '视频', type: 'folder', icon: 'folder', color: 'text-yellow-400' },
+                { name: '桌面', type: 'folder', icon: 'folder', color: 'text-yellow-400' }
+            ];
+        } else if (folderName === '文档' || folderName === 'documents') {
+            files = [
+                { name: '新建文档.txt', type: 'file', icon: 'description', color: 'text-gray-300' },
+                { name: '工作报告.docx', type: 'file', icon: 'description', color: 'text-blue-400' },
+                { name: '项目计划.xlsx', type: 'file', icon: 'table_chart', color: 'text-green-400' }
+            ];
+        } else if (folderName === '下载' || folderName === 'downloads') {
+            files = [
+                { name: '图片1.jpg', type: 'file', icon: 'image', color: 'text-purple-400' },
+                { name: '视频.mp4', type: 'file', icon: 'video_file', color: 'text-red-400' },
+                { name: '文档.pdf', type: 'file', icon: 'picture_as_pdf', color: 'text-red-400' }
+            ];
+        } else if (folderName === '图片' || folderName === 'pictures') {
+            files = [
+                { name: '照片1.jpg', type: 'file', icon: 'image', color: 'text-purple-400' },
+                { name: '截图.png', type: 'file', icon: 'image', color: 'text-purple-400' },
+                { name: '头像.gif', type: 'file', icon: 'image', color: 'text-purple-400' }
+            ];
+        } else if (folderName === '音乐' || folderName === 'music') {
+            files = [
+                { name: '歌曲1.mp3', type: 'file', icon: 'audio_file', color: 'text-pink-400' },
+                { name: '歌单.flac', type: 'file', icon: 'audio_file', color: 'text-pink-400' }
+            ];
+        } else if (folderName === '视频' || folderName === 'videos') {
+            files = [
+                { name: '电影.mp4', type: 'file', icon: 'video_file', color: 'text-red-400' },
+                { name: '教程.mkv', type: 'file', icon: 'video_file', color: 'text-red-400' }
+            ];
+        }
+        
+        fileList.innerHTML = files.map(f => `
+            <div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="${f.type}" data-name="${f.name}">
+                <span class="material-symbols-outlined text-4xl ${f.color}">${f.icon}</span>
+                <span class="text-xs mt-1 text-center">${f.name}</span>
+            </div>
+        `).join('');
+        
+        // 重新绑定点击事件
+        this.initFileManager();
     }
     
     // 重新初始化桌面图标
@@ -1459,22 +2055,122 @@ class RaccoonOS {
     initTaskbarButtons() {
         const taskbarItems = document.querySelectorAll('.taskbar-item');
         taskbarItems.forEach(item => {
-            const icon = item.querySelector('.material-symbols-outlined');
-            if (icon) {
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (icon.textContent === 'search') {
-                        this.showNotification('搜索功能已激活');
-                    } else if (icon.textContent === 'layers') {
-                        this.showNotification('任务视图已打开');
-                    } else if (icon.textContent === 'folder' || icon.textContent === 'public' || icon.textContent === 'terminal' || icon.textContent === 'settings') {
-                        const appName = icon.textContent === 'folder' ? '文件管理器' : 
-                                      icon.textContent === 'public' ? '浏览器' :
-                                      icon.textContent === 'terminal' ? '终端' : '设置';
-                        this.showNotification(`${appName}已启动`);
-                    }
-                });
-            }
+            // 移除旧的事件监听器（通过克隆节点）
+            const newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
+            
+            // 为所有 taskbar-item 添加点击事件
+            newItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const icon = newItem.querySelector('.material-symbols-outlined');
+                const textContent = icon ? icon.textContent : '';
+                
+                // 检查是否是开始菜单
+                if (newItem.id === 'start-menu') {
+                    this.toggleStartMenu();
+                    return;
+                }
+                
+                // 检查是否是搜索框
+                if (newItem.classList.contains('mx-1') && newItem.classList.contains('w-48')) {
+                    this.toggleSearchPanel();
+                    return;
+                }
+                
+                if (textContent === 'search' || textContent === '') {
+                    this.toggleSearchPanel();
+                } else if (textContent === 'layers' || textContent === 'view_module') {
+                    this.showNotification('任务视图已打开');
+                } else if (textContent === 'expand_less') {
+                    this.showNotification('通知面板已打开');
+                } else if (textContent === 'wifi' || textContent === 'signal_wifi_4_bar') {
+                    this.showNotification('网络状态：已连接');
+                } else if (textContent === 'volume_up') {
+                    this.showNotification('音量：50%');
+                } else if (textContent === 'brightness_6') {
+                    this.showNotification('亮度：80%');
+                } else if (textContent === 'battery_full') {
+                    this.showNotification('电池：100%');
+                } else if (textContent === 'folder') {
+                    this.openApp('file-manager');
+                } else if (textContent === 'public') {
+                    this.openApp('browser');
+                } else if (textContent === 'terminal') {
+                    this.openApp('terminal');
+                } else if (textContent === 'settings') {
+                    this.showSettings();
+                }
+            });
+        });
+    }
+    
+    // 切换搜索面板显示
+    toggleSearchPanel() {
+        const panel = document.getElementById('search-panel');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            document.getElementById('search-input').focus();
+            // 关闭开始菜单
+            document.getElementById('start-menu-popup').style.display = 'none';
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+    
+    // 切换开始菜单显示
+    toggleStartMenu() {
+        const popup = document.getElementById('start-menu-popup');
+        if (popup.style.display === 'none') {
+            popup.style.display = 'block';
+            this.initStartMenuButtons();
+        } else {
+            popup.style.display = 'none';
+        }
+    }
+    
+    // 初始化开始菜单按钮
+    initStartMenuButtons() {
+        const popup = document.getElementById('start-menu-popup');
+        const buttons = popup.querySelectorAll('.start-menu-btn');
+        buttons.forEach(btn => {
+            btn.onclick = () => {
+                const action = btn.dataset.action;
+                if (action === 'shutdown') {
+                    // 真正的关机
+                    document.getElementById('start-menu-popup').style.display = 'none';
+                    
+                    // 显示关机动画
+                    const shutdownScreen = document.getElementById('shutdown-screen');
+                    shutdownScreen.style.display = 'flex';
+                    
+                    // 进度条动画
+                    const progress = document.getElementById('shutdown-progress');
+                    setTimeout(() => { progress.style.width = '100%'; }, 100);
+                    
+                    // 3秒后黑屏
+                    setTimeout(() => {
+                        // 隐藏桌面和所有窗口
+                        document.getElementById('desktop').classList.remove('show');
+                        document.querySelectorAll('.app-window').forEach(win => {
+                            win.style.display = 'none';
+                        });
+                        // 整个屏幕保持黑屏
+                        shutdownScreen.style.display = 'flex';
+                        shutdownScreen.innerHTML = '<div class="bg-black w-full h-full"></div>';
+                    }, 3200);
+                    
+                } else if (action === 'restart') {
+                    // 真正的重启 - 刷新页面
+                    document.getElementById('start-menu-popup').style.display = 'none';
+                    this.showNotification('系统正在重启...');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else if (action === 'sleep') {
+                    this.showNotification('系统即将进入睡眠模式');
+                }
+                popup.style.display = 'none';
+            };
         });
     }
     

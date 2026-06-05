@@ -486,8 +486,8 @@
 <button id="fullscreen-btn" class="fixed top-4 left-4 z-[10001] bg-black/60 hover:bg-black/80 text-white p-2 rounded transition-all opacity-0 pointer-events-none" title="全屏" style="display: none;">
 <span class="material-symbols-outlined text-xl">fullscreen</span>
 </button>
-<!-- 顶部屏障：配合 Pointer Lock 使用 -->
-<div id="fullscreen-shield" style="position: fixed; top: 0; left: 0; right: 0; height: 1px; z-index: 99999; pointer-events: none;"></div>
+<!-- 顶部屏障：覆盖顶部 30px -->
+<div id="fullscreen-shield" style="position: fixed; top: 0; left: 0; right: 0; height: 30px; z-index: 99999; pointer-events: auto; background: transparent; cursor: default;"></div>
 <main class="relative h-[calc(100vh-40px)] w-full flex flex-col p-2" id="desktop">
 <!-- Desktop Icons -->
 <div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="file-manager">
@@ -1008,11 +1008,12 @@
 <div id="start-menu-popup" class="fixed bottom-12 left-2 w-64 acrylic rounded-lg shadow-2xl border border-white/10 z-[9999]" style="display: none;">
     <div class="p-2">
         <div class="text-xs text-white/50 px-3 py-2">电源</div>
-        <div class="grid grid-cols-3 gap-1">
+        <div class="grid grid-cols-2 gap-1">
             <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="shutdown">
                 <span class="material-symbols-outlined text-xl">power_settings_new</span>
                 <span class="text-[10px] mt-1">关机</span>
             </button>
+            <!--
             <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="restart">
                 <span class="material-symbols-outlined text-xl">restart_alt</span>
                 <span class="text-[10px] mt-1">重启</span>
@@ -1021,6 +1022,7 @@
                 <span class="material-symbols-outlined text-xl">bedtime</span>
                 <span class="text-[10px] mt-1">睡眠</span>
             </button>
+            -->
         </div>
     </div>
 </div>
@@ -1101,8 +1103,31 @@ class RaccoonOS {
         this.initEventListeners();
         this.initErrorDialogSystem();
         this.initFullscreenShield();
+        this.initKeyBlock();
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
+    }
+    
+    // 屏蔽 Win 键和其他系统快捷键
+    initKeyBlock() {
+        document.addEventListener('keydown', (e) => {
+            // 屏蔽 Win 键 (Meta 键)
+            if (e.key === 'Meta') {
+                e.preventDefault();
+                return false;
+            }
+            // 屏蔽 Win + 其他键组合
+            if (e.metaKey || e.ctrlKey) {
+                // 允许 Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+A 等常用快捷键
+                const allowed = ['c', 'v', 'x', 'z', 'a', 's', 'f', 'w', 'n', 't', 'r', 'p', 'l', 'o'];
+                if (allowed.includes(e.key.toLowerCase())) {
+                    return;
+                }
+                // 屏蔽其他 Ctrl/Win 组合键
+                e.preventDefault();
+                return false;
+            }
+        });
     }
 
     initEventListeners() {
@@ -2442,13 +2467,17 @@ class RaccoonOS {
                     
                 } else if (action === 'restart') {
                     // 真正的重启 - 刷新页面
+                    /*
                     document.getElementById('start-menu-popup').style.display = 'none';
                     this.showNotification('系统正在重启...');
                     setTimeout(() => {
                         location.reload();
                     }, 1500);
+                    */
                 } else if (action === 'sleep') {
+                    /*
                     this.showNotification('系统即将进入睡眠模式');
+                    */
                 }
                 popup.style.display = 'none';
             };
@@ -2461,73 +2490,10 @@ class RaccoonOS {
         console.log('全屏功能已启用');
     }
     
-    // 顶部屏障：使用 Pointer Lock API 锁定鼠标，阻止 Chrome 全屏退出 UI
+    // 顶部屏障：防止 Chrome 全屏退出 UI
     initFullscreenShield() {
-        const shield = document.getElementById('fullscreen-shield');
-        if (!shield) return;
-        
-        shield.style.pointerEvents = 'auto';
-        
-        // 点击 shield 时请求指针锁定
-        shield.addEventListener('click', () => {
-            if (this.isFullscreen && !document.pointerLockElement) {
-                document.body.requestPointerLock();
-            }
-        });
-        
-        // 监听指针锁定变化
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement) {
-                console.log('指针已锁定');
-                this.startPointerLockMovement();
-            } else {
-                console.log('指针已解锁');
-                this.stopPointerLockMovement();
-                // 如果在全屏状态下解锁，重新锁定
-                if (this.isFullscreen) {
-                    setTimeout(() => {
-                        document.body.requestPointerLock();
-                    }, 100);
-                }
-            }
-        });
-    }
-    
-    // 启动指针锁定状态下的鼠标移动处理
-    startPointerLockMovement() {
-        this._pointerLockMoving = true;
-        
-        const moveHandler = (e) => {
-            if (!document.pointerLockElement || !this.isFullscreen) return;
-            
-            // 计算移动增量
-            const movementX = e.movementX || 0;
-            const movementY = e.movementY || 0;
-            
-            // 获取当前鼠标位置
-            let currentX = this._pointerLockX || window.innerWidth / 2;
-            let currentY = this._pointerLockY || window.innerHeight / 2;
-            
-            currentX += movementX;
-            currentY += movementY;
-            
-            // 只限制顶部 30px 区域，保留其他方向的交互
-            const topMargin = 30;
-            if (currentY < topMargin) {
-                currentY = topMargin;
-            }
-            
-            this._pointerLockX = currentX;
-            this._pointerLockY = currentY;
-        };
-        
-        document.addEventListener('mousemove', moveHandler, true);
-        this._pointerLockMoveHandler = moveHandler;
-    }
-    
-    // 停止指针锁定移动处理
-    stopPointerLockMovement() {
-        this._pointerLockMoving = false;
+        // 浏览器安全策略限制，无法完全阻止 Chrome 全屏 UI
+        // 这里留空，后续可以通过其他方式处理
     }
     
     handleFullscreenChange() {
@@ -2583,12 +2549,6 @@ class RaccoonOS {
                     console.warn('Keyboard lock failed:', e);
                 }
             }
-            // 请求指针锁定，防止 Chrome 全屏 UI
-            setTimeout(() => {
-                if (this.isFullscreen && !document.pointerLockElement) {
-                    document.body.requestPointerLock().catch(e => console.warn('Pointer lock failed:', e));
-                }
-            }, 500);
             console.log('全屏模式已启用');
             return true;
         } catch (error) {

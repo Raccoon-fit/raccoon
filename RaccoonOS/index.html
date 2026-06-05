@@ -27,6 +27,14 @@
             background-color: var(--glass-bg);
             border: 1px solid var(--glass-border);
         }
+        #browser-context-menu {
+            position: fixed;
+            min-width: 180px;
+            z-index: 10000;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            border: 1px solid #454545;
+            background: #2b2b2b;
+        }
         .desktop-icon-active {
             background-color: rgba(255, 255, 255, 0.1);
             outline: 1px solid rgba(255, 255, 255, 0.2);
@@ -797,6 +805,7 @@
 </div>
 </div>
 <iframe id="browser-frame" class="w-full h-full" style="display: none;"></iframe>
+<div id="browser-frame-overlay" style="position: absolute; inset: 0; z-index: 5;"></div>
 </div>
 </div>
 
@@ -896,6 +905,23 @@
 <div class="menu-divider"></div>
 <div class="menu-item" data-action="icon-properties">
 <span>属性(P)</span>
+</div>
+</div>
+
+<!-- Context Menu for Browser -->
+<div class="py-1 rounded-[2px]" id="browser-context-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="menu-item" data-action="browser-back">
+<span>返回</span>
+</div>
+<div class="menu-item" data-action="browser-forward">
+<span>前进</span>
+</div>
+<div class="menu-item" data-action="browser-reload">
+<span>重新加载</span>
+</div>
+<div class="menu-divider"></div>
+<div class="menu-item" data-action="browser-view-source">
+<span>查看网页源代码</span>
 </div>
 </div>
 
@@ -1042,6 +1068,11 @@ class RaccoonOS {
     initEventListeners() {
         // Desktop right-click context menu
         document.addEventListener('contextmenu', (e) => {
+            // 如果右键发生在可活动窗口内部，不显示桌面菜单
+            if (e.target.closest('.app-window, #settings-window')) {
+                return;
+            }
+            
             e.preventDefault();
             
             // 检查是否点击在桌面图标上
@@ -1231,6 +1262,8 @@ class RaccoonOS {
         this.viewMenu.style.display = 'none';
         this.sortMenu.style.display = 'none';
         this.newMenu.style.display = 'none';
+        const browserMenu = document.getElementById('browser-context-menu');
+        if (browserMenu) browserMenu.style.display = 'none';
     }
 
     handleContextAction(action, e) {
@@ -1456,6 +1489,9 @@ class RaccoonOS {
         switch(type) {
             case 'computer':
                 this.showSettings('system');
+                break;
+            case 'file-manager':
+                this.openApp('file-manager');
                 break;
             case 'new':
                 this.showNotification('文件夹已打开');
@@ -1856,6 +1892,39 @@ class RaccoonOS {
         const browserUrl = document.getElementById('browser-url');
         const browserFrame = document.getElementById('browser-frame');
         const browserHomeSearch = document.getElementById('browser-home-search');
+        const browserWindow = document.getElementById('browser-window');
+        const browserMenu = document.getElementById('browser-context-menu');
+        const browserBack = document.getElementById('browser-back');
+        const browserForward = document.getElementById('browser-forward');
+        const browserRefresh = document.getElementById('browser-refresh');
+        const browserOverlay = document.getElementById('browser-frame-overlay');
+        
+        // 用覆盖层拦截 iframe 内的右键菜单
+        if (browserOverlay) {
+            // mousedown 左键时让事件穿透到 iframe，右键时不穿透
+            browserOverlay.addEventListener('mousedown', (e) => {
+                if (e.button === 0) {
+                    browserOverlay.style.pointerEvents = 'none';
+                }
+            });
+            // 拦截右键菜单
+            browserOverlay.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideAllMenus();
+                browserMenu.style.left = e.clientX + 'px';
+                browserMenu.style.top = e.clientY + 'px';
+                browserMenu.style.display = 'block';
+            });
+            // 各种事件后恢复 overlay 拦截
+            const restoreOverlay = () => {
+                if (browserOverlay.style.pointerEvents === 'none') {
+                    browserOverlay.style.pointerEvents = 'auto';
+                }
+            };
+            document.addEventListener('mouseup', restoreOverlay);
+            document.addEventListener('contextmenu', restoreOverlay);
+        }
         
         if (browserUrl) {
             browserUrl.addEventListener('keypress', (e) => {
@@ -1885,12 +1954,92 @@ class RaccoonOS {
             browserGo.addEventListener('click', () => this.navigateToUrl());
         }
         
-        const browserRefresh = document.getElementById('browser-refresh');
-        if (browserRefresh) {
-            browserRefresh.addEventListener('click', () => {
-                browserFrame.src = browserFrame.src;
+        // 拦截浏览器窗口内的右键菜单
+        if (browserWindow && browserMenu) {
+            browserWindow.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideAllMenus();
+                browserMenu.style.left = e.clientX + 'px';
+                browserMenu.style.top = e.clientY + 'px';
+                browserMenu.style.display = 'block';
+            });
+            
+            // 处理菜单项点击
+            browserMenu.addEventListener('click', (e) => {
+                const item = e.target.closest('.menu-item');
+                if (!item) return;
+                const action = item.dataset.action;
+                if (!action) return;
+                
+                if (action === 'browser-back') {
+                    try {
+                        const cw = browserFrame.contentWindow;
+                        if (cw && cw.history.length > 1) {
+                            cw.history.back();
+                        } else {
+                            this.showNotification('已是第一页');
+                        }
+                    } catch (e) {}
+                } else if (action === 'browser-forward') {
+                    try {
+                        browserFrame.contentWindow.history.forward();
+                    } catch (e) {}
+                } else if (action === 'browser-reload') {
+                    try {
+                        browserFrame.contentWindow.location.reload();
+                    } catch (e) {
+                        const src = browserFrame.src;
+                        if (src) { browserFrame.src = ''; setTimeout(() => browserFrame.src = src, 0); }
+                    }
+                } else if (action === 'browser-view-source') {
+                    try {
+                        const url = browserFrame.contentWindow.location.href;
+                        window.open('view-source:' + url, '_blank');
+                    } catch (err) {
+                        this.showNotification('跨域限制：无法查看源代码');
+                    }
+                }
+                browserMenu.style.display = 'none';
             });
         }
+        
+        // 绑定工具栏按钮
+        if (browserBack) {
+            browserBack.addEventListener('click', () => {
+                try {
+                    const cw = browserFrame.contentWindow;
+                    if (cw && cw.history.length > 1) {
+                        cw.history.back();
+                    } else {
+                        this.showNotification('已是第一页');
+                    }
+                } catch (e) {}
+            });
+        }
+        if (browserForward) {
+            browserForward.addEventListener('click', () => {
+                try { browserFrame.contentWindow.history.forward(); } catch (e) {}
+            });
+        }
+        if (browserRefresh) {
+            browserRefresh.addEventListener('click', () => {
+                try { browserFrame.contentWindow.location.reload(); }
+                catch (e) { const src = browserFrame.src; if (src) { browserFrame.src = ''; setTimeout(() => browserFrame.src = src, 0); } }
+            });
+        }
+        
+        // iframe 加载完成后尝试更新地址栏（仅同源时可读取）
+        browserFrame.addEventListener('load', () => {
+            try {
+                const newUrl = browserFrame.contentWindow.location.href;
+                if (newUrl && newUrl !== 'about:blank') {
+                    browserUrl.value = newUrl;
+                }
+            } catch (e) {
+                // 跨域时无法读取
+            }
+        });
     }
     
     navigateToUrl() {

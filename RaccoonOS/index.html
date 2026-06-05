@@ -485,7 +485,7 @@
 </div>
 
 <!-- Settings Window -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable" id="settings-window" style="display: none;">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000]" id="settings-window" style="display: none;">
 <div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-base opacity-70">settings</span>
@@ -662,7 +662,7 @@
 </div>
 
 <!-- 文件管理器窗口 -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="file-manager-window" style="display: none;" data-app="file-manager">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="file-manager-window" style="display: none;" data-app="file-manager">
 <div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-base opacity-70">folder</span>
@@ -741,7 +741,7 @@
 </div>
 
 <!-- 浏览器窗口 -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="browser-window" style="display: none;" data-app="browser">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="browser-window" style="display: none;" data-app="browser">
 <div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-base opacity-70">public</span>
@@ -801,7 +801,7 @@
 </div>
 
 <!-- 终端窗口 -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#0c0c0c] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] window-draggable app-window" id="terminal-window" style="display: none;" data-app="terminal">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#0c0c0c] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="terminal-window" style="display: none;" data-app="terminal">
 <div class="h-8 bg-[#1a1a1a] flex items-center justify-between pl-3 drag-handle">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-base opacity-70">terminal</span>
@@ -2260,153 +2260,5 @@ document.addEventListener('DOMContentLoaded', () => {
     os.loadPreferences();
 });
 </script>
-
-
-<style>
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.inland-security-footer {
-  position: fixed;
-  z-index: 10;
-  bottom: 0;
-  right: 0;
-  width: fit-content;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.tooltip-container {
-  position: relative;
-}
-
-.trigger-content {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  background-color: transparent;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.minimax-link {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 300;
-  color: #adadad;
-  text-decoration: none;
-}
-
-.minimax-link:visited {
-  color: #adadad;
-}
-
-.minimax-link:hover {
-  color: #666666;
-}
-
-.tooltip-content {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
-  font-size: 12px;
-  line-height: 17px;
-  background-color: #fafafa;
-  border-radius: 12px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  color: #171717;
-}
-
-/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
-.tooltip-content::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  right: 0;
-  height: 16px;
-}
-
-.tooltip-container:hover .tooltip-content {
-  display: flex;
-}
-
-.info-section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-}
-
-.beian-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: #171717;
-}
-
-.beian-icon {
-  width: 14px;
-  height: 14px;
-  margin-right: 2px;
-}
-
-.underline-text {
-  color: #171717;
-  text-decoration: underline;
-}
-
-.underline-text:hover {
-  color: #000000;
-}
-
-/* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .trigger-content {
-    background-color: transparent;
-  }
-
-  .minimax-link,
-  .minimax-link:visited {
-    color: #666666;
-  }
-
-  .minimax-link:hover {
-    color: #adadad;
-  }
-
-  .tooltip-content {
-    background-color: #262626;
-    color: #ededed;
-  }
-
-  .beian-link,
-  .underline-text {
-    color: #ededed;
-  }
-
-  .underline-text:hover {
-    color: #ffffff;
-  }
-}
-
 
 </body></html>

@@ -2345,17 +2345,19 @@ class RaccoonOS {
     
     handleFullscreenChange() {
         const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
-        
+
         if (isFullscreen) {
             this.isFullscreen = true;
             console.log('已进入全屏模式');
+            // 重新锁定键盘（防止 ESC/F11 退出全屏）
+            if (navigator.keyboard && navigator.keyboard.lock) {
+                navigator.keyboard.lock().catch(e => console.warn('Keyboard lock failed:', e));
+            }
         } else {
-            // 尝试重新进入全屏（防止意外退出）
-            setTimeout(() => {
-                if (this.isSystemStarted && !this.isFullscreen) {
-                    this.enterFullscreen();
-                }
-            }, 100);
+            // 立即强制重新进入全屏（防止顶部小叉号或 ESC 退出）
+            if (this.isSystemStarted) {
+                this.enterFullscreen();
+            }
         }
     }
     
@@ -2386,6 +2388,14 @@ class RaccoonOS {
             }
             this.isFullscreen = true;
             this.updateFullscreenButton();
+            // 锁定键盘，防止 ESC/F11 退出全屏（仅 Chrome/Edge 支持）
+            if (navigator.keyboard && navigator.keyboard.lock) {
+                try {
+                    await navigator.keyboard.lock();
+                } catch (e) {
+                    console.warn('Keyboard lock failed:', e);
+                }
+            }
             console.log('全屏模式已启用');
             return true;
         } catch (error) {

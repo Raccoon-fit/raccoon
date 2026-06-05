@@ -62,6 +62,13 @@
         .menu-item:hover {
             background-color: #404040;
         }
+        .menu-item.menu-item-disabled {
+            color: #6b6b6b;
+            pointer-events: none;
+        }
+        .menu-item.menu-item-disabled .material-symbols-outlined {
+            color: #6b6b6b;
+        }
         .menu-divider {
             height: 1px;
             background: #454545;
@@ -253,6 +260,13 @@
         }
         .menu-item:hover {
             background-color: #404040;
+        }
+        .menu-item.menu-item-disabled {
+            color: #6b6b6b;
+            pointer-events: none;
+        }
+        .menu-item.menu-item-disabled .material-symbols-outlined {
+            color: #6b6b6b;
         }
         .menu-divider {
             height: 1px;
@@ -480,6 +494,13 @@
 <div class="absolute -top-1 -right-1 text-[8px] bg-[#333] rounded-full px-1 py-0.5 border border-white/10">OS</div>
 </div>
 <span class="text-[11px] mt-1 text-center drop-shadow-md text-white">此电脑</span>
+</div>
+<div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="browser">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-gray-200">public</span>
+<div class="absolute -top-1 -right-1 text-[8px] bg-[#333] rounded-full px-1 py-0.5 border border-white/10">WEB</div>
+</div>
+<span class="text-[11px] mt-1 text-center drop-shadow-md text-white">浏览器</span>
 </div>
 
 <!-- Login Button -->
@@ -923,6 +944,22 @@
 <div class="menu-item" data-action="browser-view-source">
 <span>查看网页源代码</span>
 </div>
+</div>
+
+<!-- Context Menu for Browser Address Bar -->
+<div class="py-1 rounded-[2px]" id="urlbar-context-menu" style="display: none; position: fixed; z-index: 10001; min-width: 160px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); border: 1px solid #454545; background: #2b2b2b;">
+    <div class="menu-item" data-action="urlbar-cut" id="urlbar-cut-item">
+        <span>剪切</span>
+        <span class="material-symbols-outlined text-xs opacity-60">content_cut</span>
+    </div>
+    <div class="menu-item" data-action="urlbar-copy" id="urlbar-copy-item">
+        <span>复制</span>
+        <span class="material-symbols-outlined text-xs opacity-60">content_copy</span>
+    </div>
+    <div class="menu-item" data-action="urlbar-paste" id="urlbar-paste-item">
+        <span>粘贴</span>
+        <span class="material-symbols-outlined text-xs opacity-60">content_paste</span>
+    </div>
 </div>
 
 <!-- Submenus -->
@@ -1493,6 +1530,9 @@ class RaccoonOS {
             case 'file-manager':
                 this.openApp('file-manager');
                 break;
+            case 'browser':
+                this.openApp('browser');
+                break;
             case 'new':
                 this.showNotification('文件夹已打开');
                 break;
@@ -1905,6 +1945,81 @@ class RaccoonOS {
                     this.navigateToUrl();
                 }
             });
+
+            // 地址栏右键菜单
+            const urlbarMenu = document.getElementById('urlbar-context-menu');
+            const cutItem = document.getElementById('urlbar-cut-item');
+            const copyItem = document.getElementById('urlbar-copy-item');
+            const pasteItem = document.getElementById('urlbar-paste-item');
+
+            const hasSelection = () => {
+                return browserUrl.selectionStart !== browserUrl.selectionEnd;
+            };
+
+            const refreshUrlbarMenuState = () => {
+                if (hasSelection()) {
+                    cutItem.classList.remove('menu-item-disabled');
+                    copyItem.classList.remove('menu-item-disabled');
+                } else {
+                    cutItem.classList.add('menu-item-disabled');
+                    copyItem.classList.add('menu-item-disabled');
+                }
+            };
+
+            browserUrl.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideAllMenus();
+                refreshUrlbarMenuState();
+                urlbarMenu.style.left = e.clientX + 'px';
+                urlbarMenu.style.top = e.clientY + 'px';
+                urlbarMenu.style.display = 'block';
+            });
+
+            browserUrl.addEventListener('keyup', refreshUrlbarMenuState);
+            browserUrl.addEventListener('mouseup', refreshUrlbarMenuState);
+            browserUrl.addEventListener('input', refreshUrlbarMenuState);
+
+            if (urlbarMenu) {
+                urlbarMenu.addEventListener('click', (e) => {
+                    const item = e.target.closest('.menu-item');
+                    if (!item || item.classList.contains('menu-item-disabled')) return;
+                    const action = item.dataset.action;
+                    browserUrl.focus();
+                    if (action === 'urlbar-cut') {
+                        document.execCommand('cut');
+                    } else if (action === 'urlbar-copy') {
+                        document.execCommand('copy');
+                    } else if (action === 'urlbar-paste') {
+                        if (navigator.clipboard && navigator.clipboard.readText) {
+                            navigator.clipboard.readText().then(text => {
+                                const start = browserUrl.selectionStart;
+                                const end = browserUrl.selectionEnd;
+                                const value = browserUrl.value;
+                                browserUrl.value = value.slice(0, start) + text + value.slice(end);
+                                const pos = start + text.length;
+                                browserUrl.setSelectionRange(pos, pos);
+                                this.navigateToUrl();
+                            }).catch(() => {
+                                document.execCommand('paste');
+                            });
+                        } else {
+                            document.execCommand('paste');
+                        }
+                    }
+                    setTimeout(() => {
+                        urlbarMenu.style.display = 'none';
+                        refreshUrlbarMenuState();
+                    }, 50);
+                });
+
+                // 点击其他地方关闭地址栏右键菜单
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#urlbar-context-menu')) {
+                        urlbarMenu.style.display = 'none';
+                    }
+                });
+            }
         }
 
         if (browserHomeSearch) {

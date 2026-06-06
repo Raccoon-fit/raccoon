@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raccoon OS - 稳定版</title>
+<title>Raccoon OS - 终极稳定版</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
 <style>
@@ -12,33 +12,171 @@
     --bg-panel: #1e1e1e;
     --bg-sidebar: #252525;
     --border-light: #333;
-    --text-white: #eee;
+    --text-white: #f0f0f0;
   }
-  * { user-select: none; margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #121212; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; }
-  .desktop-icon { width: 84px; padding: 8px; border-radius: 6px; transition: 0.1s; cursor: pointer; }
-  .desktop-icon:hover { background: rgba(255,255,255,0.08); }
-  .desktop-icon-active { background: rgba(255,255,255,0.12); outline: 1px solid rgba(255,255,255,0.2); }
-  .taskbar-item { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 12px; cursor: pointer; transition: 0.1s; }
-  .taskbar-item:hover { background: rgba(255,255,255,0.1); }
-  .win-menu { position: fixed; background: #2b2b2b; border: 1px solid #454545; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 10000; min-width: 180px; }
-  .menu-item { padding: 6px 20px 6px 16px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; cursor: default; color: #e0e0e0; }
-  .menu-item:hover { background: #3a3a3a; }
-  .menu-divider { height: 1px; background: #555; margin: 4px 0; }
-  .toggle-switch { width: 40px; height: 20px; background: #444; border-radius: 20px; border: 2px solid #666; position: relative; cursor: pointer; }
-  .toggle-switch::after { content: ''; width: 12px; height: 12px; background: #ccc; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; }
-  .toggle-active { border-color: #aaa; background: #555; }
-  .toggle-active::after { left: 22px; background: white; }
-  .app-window { position: fixed; background: #1f1f1f; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 5000; border-radius: 6px; overflow: hidden; }
-  .window-header { background: #1a1a1a; height: 32px; display: flex; justify-content: space-between; align-items: center; padding-left: 12px; cursor: move; }
-  .window-controls { display: flex; height: 100%; }
-  .win-btn { width: 46px; height: 100%; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-  .win-btn:hover { background: #2c2c2c; }
-  .win-btn.close:hover { background: #e81123 !important; }
-  .settings-page { display: none; }
-  .settings-page.active { display: block; }
-  .acrylic { backdrop-filter: blur(16px); background: rgba(20,20,20,0.8); }
-  .dragging { opacity: 0.95; }
+  * {
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--text-white);  /* 全局白色文字 */
+  }
+  body {
+    background: #121212;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  /* 强制所有文本为白色（覆盖可能深色） */
+  body, div, span, p, h1, h2, h3, h4, button, input, .menu-item, .taskbar-item, .sidebar-item {
+    color: #f0f0f0;
+  }
+  input::placeholder {
+    color: #aaa;
+  }
+  .desktop-icon {
+    width: 84px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: 0.1s;
+    cursor: pointer;
+  }
+  .desktop-icon:hover {
+    background: rgba(255,255,255,0.08);
+  }
+  .desktop-icon-active {
+    background: rgba(255,255,255,0.12);
+    outline: 1px solid rgba(255,255,255,0.2);
+  }
+  .taskbar-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 12px;
+    cursor: pointer;
+    transition: 0.1s;
+  }
+  .taskbar-item:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  .win-menu {
+    position: fixed;
+    background: #2b2b2b;
+    border: 1px solid #454545;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 10000;
+    min-width: 180px;
+  }
+  .menu-item {
+    padding: 6px 20px 6px 16px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+    color: #e0e0e0;
+  }
+  .menu-item:hover {
+    background: #3a3a3a;
+  }
+  .menu-divider {
+    height: 1px;
+    background: #555;
+    margin: 4px 0;
+  }
+  .toggle-switch {
+    width: 40px;
+    height: 20px;
+    background: #444;
+    border-radius: 20px;
+    border: 2px solid #666;
+    position: relative;
+    cursor: pointer;
+  }
+  .toggle-switch::after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #ccc;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: 0.2s;
+  }
+  .toggle-active {
+    border-color: #aaa;
+    background: #555;
+  }
+  .toggle-active::after {
+    left: 22px;
+    background: white;
+  }
+  .app-window {
+    position: fixed;
+    background: #1f1f1f;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none;
+    flex-direction: column;
+    z-index: 5000;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .window-header {
+    background: #1a1a1a;
+    height: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 12px;
+    cursor: move;
+  }
+  .window-controls {
+    display: flex;
+    height: 100%;
+  }
+  .win-btn {
+    width: 46px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.1s;
+  }
+  .win-btn:hover {
+    background: #2c2c2c;
+  }
+  .win-btn.close:hover {
+    background: #e81123 !important;
+  }
+  .settings-page {
+    display: none;
+  }
+  .settings-page.active {
+    display: block;
+  }
+  .acrylic {
+    backdrop-filter: blur(16px);
+    background: rgba(20,20,20,0.8);
+  }
+  /* 音量滑动条样式 */
+  .volume-slider {
+    width: 120px;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #555;
+    border-radius: 2px;
+    outline: none;
+  }
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -90,8 +228,10 @@
     </button>
   </div>
 
-  <!-- 底部水印 -->
-  <div class="absolute bottom-6 right-5 text-right text-[10px] opacity-40">Raccoon OS Enterprise<br>Build 2026.raccoon</div>
+  <!-- 右下角水印（已还原） -->
+  <div class="absolute bottom-6 right-5 text-right text-[10px] opacity-40 pointer-events-none">
+    Raccoon OS Enterprise<br>Build 2026.raccoon
+  </div>
 </main>
 
 <!-- 设置窗口 -->
@@ -174,9 +314,7 @@
       <div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="downloads">⬇️ 下载</div>
     </div>
     <div class="flex-1 p-3 overflow-auto" id="fm-content">
-      <div class="grid grid-cols-4 gap-3" id="fm-filelist">
-        <!-- 动态内容 -->
-      </div>
+      <div class="grid grid-cols-4 gap-3" id="fm-filelist"></div>
     </div>
   </div>
 </div>
@@ -217,7 +355,7 @@
   </div>
 </div>
 
-<!-- 终端窗口简单示例 -->
+<!-- 终端窗口 -->
 <div id="terminal-window" class="app-window w-[600px] h-[350px]" style="left:50%; top:50%; transform:translate(-50%,-50%); display:none;">
   <div class="window-header">
     <div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-base">terminal</span> 终端</div>
@@ -233,7 +371,7 @@
   </div>
 </div>
 
-<!-- 右键菜单主菜单 -->
+<!-- 右键菜单等（省略相同结构，但保持功能） -->
 <div id="desktop-context-menu" class="win-menu hidden">
   <div class="menu-item" data-menu="view">查看 <span class="material-symbols-outlined text-sm">chevron_right</span></div>
   <div class="menu-item" data-menu="sort">排序方式 <span class="material-symbols-outlined text-sm">chevron_right</span></div>
@@ -243,28 +381,14 @@
   <div class="menu-divider"></div>
   <div class="menu-item" data-action="personalize">个性化</div>
 </div>
-
-<!-- 图标右键菜单 -->
 <div id="icon-context-menu" class="win-menu hidden">
   <div class="menu-item" data-action="icon-open">打开</div>
   <div class="menu-divider"></div>
   <div class="menu-item" data-action="icon-properties">属性</div>
 </div>
-
-<!-- 二级子菜单 -->
-<div id="view-submenu" class="win-menu hidden">
-  <div class="menu-item" data-view="large">大图标</div>
-  <div class="menu-item" data-view="medium">中等图标</div>
-  <div class="menu-item" data-view="small">小图标</div>
-</div>
-<div id="sort-submenu" class="win-menu hidden">
-  <div class="menu-item" data-sort="name">按名称</div>
-  <div class="menu-item" data-sort="date">修改日期</div>
-</div>
-<div id="new-submenu" class="win-menu hidden">
-  <div class="menu-item" data-new="folder">文件夹</div>
-  <div class="menu-item" data-new="text">文本文档</div>
-</div>
+<div id="view-submenu" class="win-menu hidden"><div class="menu-item" data-view="large">大图标</div><div class="menu-item" data-view="medium">中等图标</div><div class="menu-item" data-view="small">小图标</div></div>
+<div id="sort-submenu" class="win-menu hidden"><div class="menu-item" data-sort="name">按名称</div><div class="menu-item" data-sort="date">修改日期</div></div>
+<div id="new-submenu" class="win-menu hidden"><div class="menu-item" data-new="folder">文件夹</div><div class="menu-item" data-new="text">文本文档</div></div>
 
 <!-- 开始菜单 -->
 <div id="start-popup" class="fixed bottom-14 left-2 w-64 acrylic rounded-lg shadow-xl border border-white/10 hidden z-50">
@@ -276,40 +400,49 @@
   </div>
 </div>
 
+<!-- 音量滑动条浮层 -->
+<div id="volume-popup" class="fixed bottom-14 right-20 bg-[#2a2a2a] border border-white/20 rounded-lg p-3 w-48 hidden z-50">
+  <div class="text-xs mb-2">系统音量</div>
+  <input type="range" id="volume-slider" min="0" max="100" value="70" class="volume-slider w-full">
+  <div class="text-right text-xs mt-1"><span id="volume-value">70</span>%</div>
+</div>
+
 <!-- 任务栏 -->
 <footer class="fixed bottom-0 left-0 w-full h-12 acrylic flex items-center px-2 z-50">
   <div id="start-button" class="taskbar-item w-10"><span class="text-xl">🦝</span></div>
-  <div class="taskbar-item px-3" id="search-trigger"><span class="material-symbols-outlined text-sm">search</span><span class="ml-1 text-xs">搜索</span></div>
+  <div class="taskbar-item px-3" id="search-trigger"><span class="material-symbols-outlined text-lg">search</span><span class="ml-1 text-sm font-medium">搜索</span></div>
   <div class="flex-1 flex justify-center gap-1">
-    <div class="taskbar-item w-10" data-app="file-manager"><span class="material-symbols-outlined">folder</span></div>
-    <div class="taskbar-item w-10" data-app="browser"><span class="material-symbols-outlined">public</span></div>
-    <div class="taskbar-item w-10" data-app="terminal"><span class="material-symbols-outlined">terminal</span></div>
-    <div class="taskbar-item w-10" data-app="settings"><span class="material-symbols-outlined">settings</span></div>
+    <div class="taskbar-item w-10" data-app="file-manager"><span class="material-symbols-outlined text-xl">folder</span></div>
+    <div class="taskbar-item w-10" data-app="browser"><span class="material-symbols-outlined text-xl">public</span></div>
+    <div class="taskbar-item w-10" data-app="terminal"><span class="material-symbols-outlined text-xl">terminal</span></div>
+    <div class="taskbar-item w-10" data-app="settings"><span class="material-symbols-outlined text-xl">settings</span></div>
   </div>
-  <div class="taskbar-item px-2"><span class="material-symbols-outlined text-sm">wifi</span></div>
-  <div class="taskbar-item px-2"><span class="material-symbols-outlined text-sm">volume_up</span></div>
+  <!-- 任务栏右侧：音量按钮（放大）和日期（放大） -->
+  <div class="taskbar-item px-3" id="volume-trigger">
+    <span class="material-symbols-outlined text-xl">volume_up</span>
+  </div>
   <div class="taskbar-item px-3 flex flex-col items-end leading-tight">
-    <span id="clock-time" class="text-xs"></span>
-    <span id="clock-date" class="text-[9px] opacity-70"></span>
+    <span id="clock-time" class="text-sm font-medium"></span>
+    <span id="clock-date" class="text-[11px] opacity-70"></span>
   </div>
 </footer>
 
-<!-- 搜索浮层 -->
-<div id="search-panel" class="fixed bottom-14 left-20 w-80 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-2xl hidden z-50">
-  <div class="p-3 border-b border-white/10"><input id="search-input" type="text" class="w-full bg-[#2a2a2a] rounded px-3 py-1.5 text-sm outline-none" placeholder="搜索应用..."></div>
+<!-- 搜索浮层（放大更明显） -->
+<div id="search-panel" class="fixed bottom-14 left-20 w-96 bg-[#1f1f1f] border-2 border-white/30 rounded-xl shadow-2xl hidden z-50">
+  <div class="p-3 border-b border-white/20"><input id="search-input" type="text" class="w-full bg-[#2a2a2a] rounded-lg px-4 py-2 text-base outline-none" placeholder="🔍 搜索应用、文件或设置..."></div>
   <div class="p-2 space-y-1">
-    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer" data-app="file-manager">📁 文件管理器</div>
-    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer" data-app="browser">🌐 浏览器</div>
-    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer" data-app="terminal">💻 终端</div>
-    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer" data-app="settings">⚙️ 设置</div>
+    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer text-base" data-app="file-manager">📁 文件管理器</div>
+    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer text-base" data-app="browser">🌐 浏览器</div>
+    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer text-base" data-app="terminal">💻 终端</div>
+    <div class="search-result p-2 hover:bg-white/10 rounded cursor-pointer text-base" data-app="settings">⚙️ 设置</div>
   </div>
 </div>
 
 <script>
-// 核心 RaccoonOS 类
+// 核心类
 class RaccoonOS {
   constructor() {
-    this.settings = { nightMode: true, animations: true, autoUpdate: true, backgroundColor: '#121212' };
+    this.settings = { nightMode: true, animations: true, autoUpdate: true, backgroundColor: '#121212', volume: 70 };
     this.opfsRoot = null;
     this.currentIcon = null;
     this.init();
@@ -318,9 +451,9 @@ class RaccoonOS {
     await this.initOPFS();
     await this.loadSettings();
     this.applySettings();
+    this.applyVolume();
     this.registerEvents();
     this.startClock();
-    // 显示确认对话框，等待用户点击
     document.getElementById('boot-confirm').onclick = async () => {
       document.getElementById('boot-overlay').style.display = 'none';
       document.getElementById('desktop').classList.remove('hidden');
@@ -353,45 +486,66 @@ class RaccoonOS {
     } catch(e) {}
   }
   applySettings() {
-    // 夜间模式
     const nightToggle = document.getElementById('night-mode-toggle');
     if (nightToggle) {
       if (this.settings.nightMode) nightToggle.classList.add('toggle-active');
       else nightToggle.classList.remove('toggle-active');
       document.body.style.backgroundColor = this.settings.nightMode ? '#0a0a0a' : '#121212';
-      document.documentElement.style.setProperty('--bg-dark', this.settings.nightMode ? '#0a0a0a' : '#121212');
     }
-    // 动画
     const animToggle = document.getElementById('anim-toggle');
     if (animToggle) {
       if (this.settings.animations) animToggle.classList.add('toggle-active');
       else animToggle.classList.remove('toggle-active');
     }
-    // 自动更新开关
     const autoToggle = document.getElementById('auto-update-toggle');
     if (autoToggle) {
       if (this.settings.autoUpdate) autoToggle.classList.add('toggle-active');
       else autoToggle.classList.remove('toggle-active');
     }
-    // 背景色
     document.body.style.backgroundColor = this.settings.backgroundColor;
-    document.querySelector(':root').style.setProperty('--bg-dark', this.settings.backgroundColor);
     const bgDiv = document.querySelector(`[data-bg="${this.settings.backgroundColor}"]`);
     if (bgDiv) {
       document.querySelectorAll('[data-bg]').forEach(el => el.classList.remove('border-white/80', 'border-2'));
       bgDiv.classList.add('border-2', 'border-white/80');
     }
   }
+  applyVolume() {
+    const vol = this.settings.volume !== undefined ? this.settings.volume : 70;
+    const slider = document.getElementById('volume-slider');
+    const valSpan = document.getElementById('volume-value');
+    if (slider) slider.value = vol;
+    if (valSpan) valSpan.innerText = vol;
+    // 实际调节页面中所有音频/视频元素的音量
+    this.setAllMediaVolume(vol / 100);
+  }
+  setAllMediaVolume(level) {
+    const media = document.querySelectorAll('audio, video');
+    media.forEach(el => { el.volume = level; });
+    // 劫持未来动态添加的媒体元素
+    if (!this._volumeObserver) {
+      this._volumeObserver = new MutationObserver(() => {
+        document.querySelectorAll('audio, video').forEach(el => { if (!el._volSet) { el.volume = level; el._volSet = true; } });
+      });
+      this._volumeObserver.observe(document.body, { childList: true, subtree: true });
+    }
+  }
   async updateAndSave(key, value) {
     this.settings[key] = value;
     await this.saveSettings();
-    if (key === 'nightMode') this.applySettings();
+    if (key === 'nightMode' || key === 'backgroundColor') this.applySettings();
     if (key === 'animations') this.applySettings();
-    if (key === 'backgroundColor') this.applySettings();
+    if (key === 'volume') {
+      this.applyVolume();
+    }
+  }
+  async setVolume(level) {
+    const vol = Math.min(100, Math.max(0, parseInt(level)));
+    await this.updateAndSave('volume', vol);
+    this.setAllMediaVolume(vol / 100);
   }
 
   registerEvents() {
-    // 桌面右键菜单
+    // 右键菜单
     document.addEventListener('contextmenu', (e) => {
       if (e.target.closest('.app-window') || e.target.closest('#settings-window')) return;
       e.preventDefault();
@@ -403,16 +557,15 @@ class RaccoonOS {
         this.showMenu(e.clientX, e.clientY, 'desktop-context-menu');
       }
     });
-    // 点击其他关闭所有菜单
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.win-menu')) this.hideAllMenus();
+      if (!e.target.closest('#volume-popup') && e.target.id !== 'volume-trigger') {
+        document.getElementById('volume-popup').classList.add('hidden');
+      }
     });
-    // 桌面图标双击打开应用
+    // 桌面图标双击
     document.querySelectorAll('.desktop-icon').forEach(icon => {
-      icon.addEventListener('dblclick', () => {
-        const app = icon.dataset.app;
-        if (app) this.openApp(app);
-      });
+      icon.addEventListener('dblclick', () => this.openApp(icon.dataset.app));
     });
     // 任务栏打开应用
     document.querySelectorAll('.taskbar-item[data-app]').forEach(btn => {
@@ -421,8 +574,7 @@ class RaccoonOS {
     // 开始菜单
     document.getElementById('start-button').addEventListener('click', (e) => {
       e.stopPropagation();
-      const popup = document.getElementById('start-popup');
-      popup.classList.toggle('hidden');
+      document.getElementById('start-popup').classList.toggle('hidden');
     });
     document.getElementById('shutdown-btn').addEventListener('click', () => this.shutdown());
     // 搜索
@@ -440,8 +592,7 @@ class RaccoonOS {
     document.querySelectorAll('.search-result').forEach(r => {
       r.addEventListener('click', () => { this.openApp(r.dataset.app); document.getElementById('search-panel').classList.add('hidden'); });
     });
-    // 设置窗口控制
-    const win = document.getElementById('settings-window');
+    // 设置窗口
     document.getElementById('show-settings-btn').addEventListener('click', () => this.openApp('settings'));
     document.querySelectorAll('.sidebar-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -463,7 +614,6 @@ class RaccoonOS {
     if (animToggle) animToggle.addEventListener('click', async () => {
       const active = animToggle.classList.toggle('toggle-active');
       await this.updateAndSave('animations', active);
-      // 动画效果暂不处理复杂逻辑
     });
     const autoToggle = document.getElementById('auto-update-toggle');
     if (autoToggle) autoToggle.addEventListener('click', async () => {
@@ -528,7 +678,7 @@ class RaccoonOS {
     homeInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') navigate(homeInput.value); });
     quickLinks.forEach(link => { link.addEventListener('click', () => navigate(link.dataset.quick)); });
     browserFrame.addEventListener('load', () => { try { urlInput.value = browserFrame.contentWindow.location.href; } catch(e) {} });
-    // 菜单子菜单逻辑
+    // 右键子菜单
     document.querySelectorAll('[data-menu]').forEach(item => {
       item.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -547,6 +697,21 @@ class RaccoonOS {
     document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => { this.showNotification(`视图: ${el.textContent}`); this.hideAllMenus(); }));
     document.querySelectorAll('[data-sort]').forEach(el => el.addEventListener('click', () => { this.showNotification(`排序: ${el.textContent}`); this.hideAllMenus(); }));
     document.querySelectorAll('[data-new]').forEach(el => el.addEventListener('click', () => { this.showNotification(`新建 ${el.textContent}`); this.hideAllMenus(); }));
+
+    // 音量按钮弹出滑动条
+    const volTrigger = document.getElementById('volume-trigger');
+    const volPopup = document.getElementById('volume-popup');
+    const volSlider = document.getElementById('volume-slider');
+    const volValue = document.getElementById('volume-value');
+    volTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      volPopup.classList.toggle('hidden');
+    });
+    volSlider.addEventListener('input', async (e) => {
+      const val = e.target.value;
+      volValue.innerText = val;
+      await this.setVolume(val);
+    });
   }
   showMenu(x, y, menuId) {
     this.hideAllMenus();
@@ -579,7 +744,7 @@ class RaccoonOS {
   refreshDesktop() {
     const icons = document.querySelectorAll('.desktop-icon');
     icons.forEach(ic => { ic.style.opacity = '0'; setTimeout(() => ic.style.opacity = '1', 100); });
-    this.showNotification('桌面已刷新');
+    // 已删除桌面已刷新弹窗
   }
   openApp(app) {
     let win = null;
@@ -652,10 +817,7 @@ class RaccoonOS {
     setTimeout(() => { window.close(); location.href = 'about:blank'; }, 3000);
   }
 }
-// 启动
-window.addEventListener('DOMContentLoaded', () => {
-  window.raccoon = new RaccoonOS();
-});
+window.addEventListener('DOMContentLoaded', () => { window.raccoon = new RaccoonOS(); });
 </script>
 </body>
 </html>

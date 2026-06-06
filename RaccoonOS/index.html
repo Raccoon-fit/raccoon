@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raccoon OS - 高性能优化版</title>
+<title>Raccoon OS - 最终修复版</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
 <style>
@@ -65,6 +65,7 @@
   }
   .menu-item:hover { background: #3a3a3a; }
   .menu-divider { height: 1px; background: #555; margin: 4px 0; }
+  .menu-item-disabled { color: #6b6b6b; pointer-events: none; }
   .toggle-switch {
     width: 40px;
     height: 20px;
@@ -124,7 +125,6 @@
   .acrylic { backdrop-filter: blur(16px); background: rgba(20,20,20,0.8); }
   .volume-slider { width: 120px; height: 4px; -webkit-appearance: none; background: #555; border-radius: 2px; outline: none; }
   .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: white; cursor: pointer; }
-  /* 移除所有全局过渡动画，仅保留必要效果 */
 </style>
 </head>
 <body>
@@ -154,19 +154,8 @@
 
 <!-- 主桌面 -->
 <main id="desktop" class="relative h-screen w-full pt-2 pb-14 px-2 hidden">
-  <!-- 桌面图标 -->
-  <div class="flex flex-col items-center w-20 p-2 rounded-lg cursor-pointer desktop-icon" data-app="file-manager">
-    <span class="material-symbols-outlined text-4xl text-gray-200">folder</span>
-    <span class="text-xs mt-1">此电脑</span>
-  </div>
-  <div class="flex flex-col items-center w-20 p-2 rounded-lg cursor-pointer desktop-icon" data-app="browser">
-    <span class="material-symbols-outlined text-4xl text-gray-200">public</span>
-    <span class="text-xs mt-1">浏览器</span>
-  </div>
-  <div class="flex flex-col items-center w-20 p-2 rounded-lg cursor-pointer desktop-icon" data-app="terminal">
-    <span class="material-symbols-outlined text-4xl text-gray-200">terminal</span>
-    <span class="text-xs mt-1">终端</span>
-  </div>
+  <!-- 桌面图标会动态生成，但保留静态占位，实际由 JS 渲染以保持同步 -->
+  <div id="desktop-icons-container" class="flex flex-col gap-2 absolute left-2 top-2"></div>
 
   <!-- 右侧登录按钮 -->
   <div class="absolute top-3 right-4">
@@ -230,10 +219,19 @@
 <!-- 文件管理器窗口 -->
 <div id="file-manager-window" class="app-window w-[700px] h-[450px]" style="left:50%; top:50%; transform:translate(-50%,-50%); display:none;">
   <div class="window-header"><div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-base">folder</span> 文件管理器</div><div class="window-controls"><div class="win-btn" data-win-action="minimize"><span class="material-symbols-outlined text-sm">remove</span></div><div class="win-btn" data-win-action="maximize"><span class="material-symbols-outlined text-sm">crop_square</span></div><div class="win-btn close" data-win-action="close"><span class="material-symbols-outlined text-sm">close</span></div></div></div>
-  <div class="flex flex-1"><div class="w-44 bg-[#1a1a1a] p-2 text-sm space-y-1"><div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="desktop">📁 桌面</div><div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="documents">📄 文档</div><div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="downloads">⬇️ 下载</div></div><div class="flex-1 p-3 overflow-auto"><div class="grid grid-cols-4 gap-3" id="fm-filelist"></div></div></div>
+  <div class="flex flex-1">
+    <div class="w-44 bg-[#1a1a1a] p-2 text-sm space-y-1">
+      <div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="desktop">📁 桌面</div>
+      <div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="documents">📄 文档</div>
+      <div class="p-1 cursor-pointer hover:bg-white/10 rounded fm-nav" data-folder="downloads">⬇️ 下载</div>
+    </div>
+    <div class="flex-1 p-3 overflow-auto">
+      <div class="grid grid-cols-4 gap-3" id="fm-filelist"></div>
+    </div>
+  </div>
 </div>
 
-<!-- 浏览器窗口（地址栏完全可见，拦截弹窗） -->
+<!-- 浏览器窗口 -->
 <div id="browser-window" class="app-window w-[900px] h-[550px]" style="left:50%; top:50%; transform:translate(-50%,-50%); display:none;">
   <div class="window-header"><div class="flex items-center gap-2 text-sm"><span class="material-symbols-outlined text-base">public</span> Raccoon Browser</div><div class="window-controls"><div class="win-btn" data-win-action="minimize"><span class="material-symbols-outlined text-sm">remove</span></div><div class="win-btn" data-win-action="maximize"><span class="material-symbols-outlined text-sm">crop_square</span></div><div class="win-btn close" data-win-action="close"><span class="material-symbols-outlined text-sm">close</span></div></div></div>
   <div class="bg-[#1a1a1a] px-2 py-1.5 flex gap-2 items-center border-b border-white/10">
@@ -265,6 +263,13 @@
 <div id="view-submenu" class="win-menu hidden"><div class="menu-item" data-view="large">大图标</div><div class="menu-item" data-view="medium">中等图标</div><div class="menu-item" data-view="small">小图标</div></div>
 <div id="sort-submenu" class="win-menu hidden"><div class="menu-item" data-sort="name">按名称</div><div class="menu-item" data-sort="date">修改日期</div></div>
 <div id="new-submenu" class="win-menu hidden"><div class="menu-item" data-new="folder">文件夹</div><div class="menu-item" data-new="text">文本文档</div></div>
+
+<!-- 地址栏右键菜单 -->
+<div id="urlbar-context-menu" class="win-menu hidden" style="min-width: 160px;">
+  <div class="menu-item" data-url-action="cut">剪切</div>
+  <div class="menu-item" data-url-action="copy">复制</div>
+  <div class="menu-item" data-url-action="paste">粘贴</div>
+</div>
 
 <!-- 任务栏右键菜单 -->
 <div id="taskbar-context-menu" class="win-menu hidden">
@@ -299,7 +304,7 @@
 </footer>
 
 <script>
-// 性能优化版 RaccoonOS
+// RaccoonOS 核心类 - 高性能 + 完整功能
 class RaccoonOS {
   constructor() {
     this.settings = { nightMode: true, animations: true, autoUpdate: true, backgroundColor: '#121212', volume: 70, showTaskView: false, taskbarLocked: false };
@@ -307,6 +312,11 @@ class RaccoonOS {
     this.currentIcon = null;
     this.dragging = false;
     this.dragData = { win: null, offsetX: 0, offsetY: 0 };
+    this.desktopIcons = [
+      { name: "此电脑", icon: "folder", app: "file-manager" },
+      { name: "浏览器", icon: "public", app: "browser" },
+      { name: "终端", icon: "terminal", app: "terminal" }
+    ];
     this.init();
   }
   async init() {
@@ -315,6 +325,7 @@ class RaccoonOS {
     this.applySettings();
     this.applyVolume();
     this.applyTaskbarSettings();
+    this.renderDesktopIcons();
     this.registerEvents();
     this.startClock();
     document.getElementById('boot-confirm').onclick = async () => {
@@ -372,7 +383,6 @@ class RaccoonOS {
     const valSpan = document.getElementById('volume-value');
     if (slider) slider.value = vol;
     if (valSpan) valSpan.innerText = vol;
-    // 直接设置所有现有媒体元素音量，不再使用MutationObserver
     document.querySelectorAll('audio, video').forEach(el => { el.volume = vol / 100; });
   }
   async updateAndSave(key, value) {
@@ -397,6 +407,47 @@ class RaccoonOS {
   async toggleTaskView() { await this.updateAndSave('showTaskView', !this.settings.showTaskView); this.applyTaskbarSettings(); }
   async toggleTaskbarLock() { await this.updateAndSave('taskbarLocked', !this.settings.taskbarLocked); this.applyTaskbarSettings(); }
 
+  renderDesktopIcons() {
+    const container = document.getElementById('desktop-icons-container');
+    if (!container) return;
+    container.innerHTML = '';
+    this.desktopIcons.forEach(icon => {
+      const div = document.createElement('div');
+      div.className = 'flex flex-col items-center w-20 p-2 rounded-lg cursor-pointer desktop-icon';
+      div.setAttribute('data-app', icon.app);
+      div.innerHTML = `<span class="material-symbols-outlined text-4xl text-gray-200">${icon.icon}</span><span class="text-xs mt-1">${icon.name}</span>`;
+      div.addEventListener('dblclick', () => this.openApp(icon.app));
+      container.appendChild(div);
+    });
+  }
+  addDesktopIcon(name, icon, app) {
+    this.desktopIcons.push({ name, icon, app });
+    this.renderDesktopIcons();
+    this.refreshFileManagerDesktop(); // 同步文件管理器桌面视图
+  }
+  refreshFileManagerDesktop() {
+    const fmFilelist = document.getElementById('fm-filelist');
+    if (fmFilelist && fmFilelist.dataset.currentFolder === 'desktop') {
+      this.showFolderContent('desktop', fmFilelist);
+    }
+  }
+  showFolderContent(folder, container) {
+    if (folder === 'desktop') {
+      container.innerHTML = '';
+      this.desktopIcons.forEach(icon => {
+        const item = document.createElement('div');
+        item.className = 'flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer';
+        item.innerHTML = `<span class="material-symbols-outlined text-4xl text-yellow-400">${icon.icon === 'folder' ? 'folder' : (icon.icon === 'public' ? 'public' : 'terminal')}</span><span class="text-xs mt-1">${icon.name}</span>`;
+        item.addEventListener('dblclick', () => this.openApp(icon.app));
+        container.appendChild(item);
+      });
+    } else if (folder === 'documents') {
+      container.innerHTML = '<div class="p-2 border rounded text-center">📄 示例文档.txt</div>';
+    } else if (folder === 'downloads') {
+      container.innerHTML = '<div class="p-2 border rounded text-center">📁 空文件夹</div>';
+    }
+  }
+
   registerEvents() {
     // 桌面右键菜单
     document.addEventListener('contextmenu', (e) => {
@@ -414,8 +465,7 @@ class RaccoonOS {
       if (!e.target.closest('.win-menu')) this.hideAllMenus();
       if (!e.target.closest('#volume-popup') && e.target.id !== 'volume-trigger') document.getElementById('volume-popup').classList.add('hidden');
     });
-    // 桌面图标双击
-    document.querySelectorAll('.desktop-icon').forEach(icon => { icon.addEventListener('dblclick', () => this.openApp(icon.dataset.app)); });
+    // 桌面图标双击 (由动态生成的图标负责)
     // 任务栏应用
     document.querySelectorAll('.taskbar-item[data-app]').forEach(btn => { btn.addEventListener('click', () => this.openApp(btn.dataset.app)); });
     // 开始菜单
@@ -438,22 +488,66 @@ class RaccoonOS {
     if (taskviewPageToggle) taskviewPageToggle.addEventListener('click', async () => { const active = taskviewPageToggle.classList.toggle('toggle-active'); await this.updateAndSave('showTaskView', active); this.applyTaskbarSettings(); });
     const lockPageToggle = document.getElementById('taskbar-lock-toggle');
     if (lockPageToggle) lockPageToggle.addEventListener('click', async () => { const active = lockPageToggle.classList.toggle('toggle-active'); await this.updateAndSave('taskbarLocked', active); this.applyTaskbarSettings(); });
-    // 窗口拖拽（优化：仅当鼠标按下时绑定，松开移除）
+    // 窗口拖拽
     document.querySelectorAll('.app-window').forEach(win => { this.makeWindowDraggable(win); });
     // 窗口按钮
     document.querySelectorAll('.win-btn').forEach(btn => { btn.addEventListener('click', (e) => { const win = btn.closest('.app-window'); if (!win) return; const action = btn.dataset.winAction; if (action === 'close') win.style.display = 'none'; else if (action === 'minimize') win.style.display = 'none'; else if (action === 'maximize') { if (win.style.width === '100%') { win.style.width = ''; win.style.height = ''; win.style.left = '50%'; win.style.top = '50%'; win.style.transform = 'translate(-50%,-50%)'; } else { win.style.width = '100%'; win.style.height = 'calc(100% - 48px)'; win.style.left = '0'; win.style.top = '0'; win.style.transform = 'none'; } } }); });
     // 文件管理器导航
-    document.querySelectorAll('.fm-nav').forEach(nav => { nav.addEventListener('click', () => { const folder = nav.dataset.folder; const container = document.getElementById('fm-filelist'); if (folder === 'desktop') container.innerHTML = '<div class="file-item p-2 border rounded text-center">📄 示例文件.txt</div>'; else container.innerHTML = '<div class="file-item p-2 border rounded text-center">📁 空文件夹</div>'; }); });
-    // 浏览器
-    const frame = document.getElementById('browser-frame'); const urlInp = document.getElementById('browser-url'); const go = document.getElementById('browser-go'); const back = document.getElementById('browser-back'); const fwd = document.getElementById('browser-forward'); const reload = document.getElementById('browser-reload'); const homeInp = document.getElementById('browser-home-input'); const quick = document.querySelectorAll('[data-quick]');
-    const nav = (url) => { if (!url.startsWith('http')) url = 'https://' + url; frame.src = url; urlInp.value = url; document.getElementById('browser-home').style.display = 'none'; frame.style.display = 'block'; };
-    go.onclick = () => nav(urlInp.value); urlInp.addEventListener('keypress', e => { if(e.key === 'Enter') nav(urlInp.value); });
+    document.querySelectorAll('.fm-nav').forEach(nav => {
+      nav.addEventListener('click', () => {
+        const folder = nav.dataset.folder;
+        const container = document.getElementById('fm-filelist');
+        container.dataset.currentFolder = folder;
+        this.showFolderContent(folder, container);
+      });
+    });
+    // 浏览器地址栏右键菜单
+    const urlInput = document.getElementById('browser-url');
+    const urlMenu = document.getElementById('urlbar-context-menu');
+    urlInput.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.hideAllMenus();
+      const hasSelection = urlInput.selectionStart !== urlInput.selectionEnd;
+      const cutItem = urlMenu.querySelector('[data-url-action="cut"]');
+      const copyItem = urlMenu.querySelector('[data-url-action="copy"]');
+      if (hasSelection) {
+        cutItem.classList.remove('menu-item-disabled');
+        copyItem.classList.remove('menu-item-disabled');
+      } else {
+        cutItem.classList.add('menu-item-disabled');
+        copyItem.classList.add('menu-item-disabled');
+      }
+      urlMenu.style.left = e.clientX + 'px';
+      urlMenu.style.top = e.clientY + 'px';
+      urlMenu.classList.remove('hidden');
+      // 绑定一次性事件
+      const handleCut = () => { if (urlInput.selectionStart !== urlInput.selectionEnd) document.execCommand('cut'); urlMenu.classList.add('hidden'); };
+      const handleCopy = () => { if (urlInput.selectionStart !== urlInput.selectionEnd) document.execCommand('copy'); urlMenu.classList.add('hidden'); };
+      const handlePaste = () => { document.execCommand('paste'); urlMenu.classList.add('hidden'); };
+      cutItem.removeEventListener('click', handleCut);
+      copyItem.removeEventListener('click', handleCopy);
+      urlMenu.querySelector('[data-url-action="paste"]').removeEventListener('click', handlePaste);
+      cutItem.addEventListener('click', handleCut);
+      copyItem.addEventListener('click', handleCopy);
+      urlMenu.querySelector('[data-url-action="paste"]').addEventListener('click', handlePaste);
+    });
+    // 浏览器导航
+    const frame = document.getElementById('browser-frame');
+    const go = document.getElementById('browser-go');
+    const back = document.getElementById('browser-back');
+    const fwd = document.getElementById('browser-forward');
+    const reload = document.getElementById('browser-reload');
+    const homeInp = document.getElementById('browser-home-input');
+    const quick = document.querySelectorAll('[data-quick]');
+    const nav = (url) => { if (!url.startsWith('http')) url = 'https://' + url; frame.src = url; urlInput.value = url; document.getElementById('browser-home').style.display = 'none'; frame.style.display = 'block'; };
+    go.onclick = () => nav(urlInput.value); urlInput.addEventListener('keypress', e => { if(e.key === 'Enter') nav(urlInput.value); });
     back.onclick = () => { try { frame.contentWindow.history.back(); } catch(e) {} };
     fwd.onclick = () => { try { frame.contentWindow.history.forward(); } catch(e) {} };
     reload.onclick = () => { try { frame.contentWindow.location.reload(); } catch(e) { frame.src = frame.src; } };
     homeInp.addEventListener('keypress', e => { if(e.key === 'Enter') nav(homeInp.value); });
     quick.forEach(q => { q.addEventListener('click', () => nav(q.dataset.quick)); });
-    frame.addEventListener('load', () => { try { urlInp.value = frame.contentWindow.location.href; } catch(e) {} });
+    frame.addEventListener('load', () => { try { urlInput.value = frame.contentWindow.location.href; } catch(e) {} });
     // 右键子菜单
     document.querySelectorAll('[data-menu]').forEach(item => { item.addEventListener('click', (e) => { e.stopPropagation(); const type = item.dataset.menu; let subId = ''; if (type === 'view') subId = 'view-submenu'; else if (type === 'sort') subId = 'sort-submenu'; else if (type === 'new') subId = 'new-submenu'; if (subId) this.showSubmenu(e.target, subId); }); });
     document.querySelectorAll('[data-action="refresh"]').forEach(el => el.addEventListener('click', () => this.refreshDesktop()));
@@ -520,7 +614,6 @@ class RaccoonOS {
   hideAllSubmenus() { ['view-submenu', 'sort-submenu', 'new-submenu'].forEach(id => { const m = document.getElementById(id); if (m) m.classList.add('hidden'); }); }
   refreshDesktop() {
     this.hideAllMenus();
-    // 简单淡入淡出，避免大量重绘
     const icons = document.querySelectorAll('.desktop-icon');
     icons.forEach(ic => { ic.style.transition = 'opacity 0.1s'; ic.style.opacity = '0.5'; setTimeout(() => ic.style.opacity = '1', 80); });
   }

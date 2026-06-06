@@ -1,4 +1,5 @@
 
+
 <html lang="zh-CN"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -39,6 +40,21 @@
             background-color: rgba(255, 255, 255, 0.1);
             outline: 1px solid rgba(255, 255, 255, 0.2);
         }
+        /* 桌面刷新：图标先隐藏 */
+        .desktop-icon-refresh-hide {
+            opacity: 0;
+            transform: scale(0.6);
+            transition: none;
+        }
+        /* 桌面刷新：图标重新淡入显示 */
+        @keyframes desktopIconRefreshShow {
+            0%   { opacity: 0; transform: scale(0.6) translateY(8px); }
+            60%  { opacity: 1; transform: scale(1.05) translateY(0); }
+            100% { opacity: 1; transform: scale(1)   translateY(0); }
+        }
+        .desktop-icon-refresh-show {
+            animation: desktopIconRefreshShow 0.28s ease-out;
+        }
         .taskbar-item:hover {
             background-color: rgba(255, 255, 255, 0.08);
         }
@@ -54,7 +70,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 12px 6px 32px;
+            padding: 6px 12px 6px 20px;
             font-size: 12px;
             color: #e0e0e0;
             position: relative;
@@ -253,7 +269,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 12px 6px 32px;
+            padding: 6px 12px 6px 20px;
             font-size: 12px;
             color: #e0e0e0;
             position: relative;
@@ -483,9 +499,7 @@
 </div>
 </div>
 
-<button id="fullscreen-btn" class="fixed top-4 left-4 z-[10001] bg-black/60 hover:bg-black/80 text-white p-2 rounded transition-all opacity-0 pointer-events-none" title="全屏" style="display: none;">
-<span class="material-symbols-outlined text-xl">fullscreen</span>
-</button>
+<!-- （原 fullscreen 按钮已隐藏移除） -->
 <!-- 顶部屏障：覆盖顶部 30px -->
 <div id="fullscreen-shield" style="position: fixed; top: 0; left: 0; right: 0; height: 30px; z-index: 99999; pointer-events: auto; background: transparent; cursor: default;"></div>
 <main class="relative h-[calc(100vh-40px)] w-full flex flex-col p-2" id="desktop">
@@ -890,7 +904,7 @@
 </main>
 
 <!-- Context Menu for Desktop -->
-<div class="py-1 rounded-[2px]" id="context-menu" style="display: none;">
+<div class="win-menu py-1 rounded-[2px]" id="context-menu" style="display: none;">
 <div class="menu-item" data-action="view">
 <span>查看(V)</span>
 <span class="material-symbols-outlined">chevron_right</span>
@@ -917,7 +931,7 @@
 </div>
 
 <!-- Context Menu for Desktop Icons -->
-<div class="py-1 rounded-[2px]" id="icon-context-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="win-menu py-1 rounded-[2px]" id="icon-context-menu" style="display: none;">
 <div class="menu-item" data-action="icon-open">
 <span>打开(O)</span>
 </div>
@@ -932,7 +946,7 @@
 </div>
 
 <!-- Context Menu for Browser -->
-<div class="py-1 rounded-[2px]" id="browser-context-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="win-menu py-1 rounded-[2px]" id="browser-context-menu" style="display: none;">
 <div class="menu-item" data-action="browser-back">
 <span>返回</span>
 </div>
@@ -965,7 +979,7 @@
 </div>
 
 <!-- Submenus -->
-<div class="py-1 rounded-[2px]" id="view-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="view-menu" style="display: none;">
 <div class="menu-item" data-view="large">
 <span>大图标</span>
 </div>
@@ -977,7 +991,7 @@
 </div>
 </div>
 
-<div class="py-1 rounded-[2px]" id="sort-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="sort-menu" style="display: none;">
 <div class="menu-item" data-sort="name">
 <span>名称</span>
 </div>
@@ -992,7 +1006,7 @@
 </div>
 </div>
 
-<div class="py-1 rounded-[2px]" id="new-menu" style="display: none; position: fixed; z-index: 10000;">
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="new-menu" style="display: none;">
 <div class="menu-item" data-new="folder">
 <span>文件夹</span>
 </div>
@@ -1198,7 +1212,7 @@ class RaccoonOS {
 
         // Hide menus when clicking elsewhere
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#context-menu, #icon-context-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) {
+            if (!e.target.closest('#context-menu, #icon-context-menu, #view-menu, #sort-menu, #new-menu, #browser-context-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) {
                 this.hideAllMenus();
             }
         });
@@ -1379,15 +1393,18 @@ class RaccoonOS {
     handleContextAction(action, e) {
         switch(action) {
             case 'view':
+                e.stopPropagation();
                 this.showSubMenu('view', e);
                 break;
             case 'sort':
+                e.stopPropagation();
                 this.showSubMenu('sort', e);
                 break;
             case 'refresh':
                 this.refreshDesktop();
                 break;
             case 'new':
+                e.stopPropagation();
                 this.showSubMenu('new', e);
                 break;
             case 'settings':
@@ -1401,12 +1418,31 @@ class RaccoonOS {
 
     showSubMenu(type, e) {
         this.hideAllMenus();
-        const rect = e.target.getBoundingClientRect();
+        const trigger = e.currentTarget || e.target;
+        const rect = trigger.getBoundingClientRect();
         const submenu = document.getElementById(type + '-menu');
-        
-        submenu.style.left = (rect.right + 5) + 'px';
-        submenu.style.top = rect.top + 'px';
+
+        // 先临时显示以获取子菜单尺寸
+        submenu.style.visibility = 'hidden';
         submenu.style.display = 'block';
+        const subW = submenu.offsetWidth;
+        const subH = submenu.offsetHeight;
+
+        // 计算位置：默认在右侧，出屏幕则改到左侧
+        const margin = 5;
+        let left = rect.right + margin;
+        if (left + subW > window.innerWidth - 4) {
+            left = rect.left - subW - margin;
+        }
+        let top = rect.top;
+        if (top + subH > window.innerHeight - 4) {
+            top = window.innerHeight - subH - 4;
+        }
+        if (top < 4) top = 4;
+
+        submenu.style.left = left + 'px';
+        submenu.style.top = top + 'px';
+        submenu.style.visibility = 'visible';
     }
 
     showSettings(page = 'personalization') {
@@ -1594,7 +1630,6 @@ class RaccoonOS {
     }
 
     openApplication(type, name) {
-        this.showNotification(`正在打开 ${name}...`);
         
         switch(type) {
             case 'computer':
@@ -1607,45 +1642,57 @@ class RaccoonOS {
                 this.openApp('browser');
                 break;
             case 'new':
-                this.showNotification('文件夹已打开');
                 break;
             case 'shortcut':
-                this.showNotification('快捷方式已打开');
                 break;
             case 'text':
-                this.showNotification('文本编辑器已打开');
                 break;
             default:
-                this.showNotification(`${name} 已启动`);
+                // 静默打开，不再提示
+                break;
         }
     }
 
     refreshDesktop() {
-        this.showNotification('桌面已刷新');
-        // Simulate refresh
-        document.querySelectorAll('.desktop-icon').forEach(icon => {
-            icon.classList.remove('desktop-icon-active');
+        // 先关掉所有右键菜单 / 子菜单 / 弹窗
+        this.hideAllMenus();
+
+        // 所有桌面图标隐藏 → 再显示
+        const icons = document.querySelectorAll('.desktop-icon');
+        icons.forEach((icon, i) => {
+            icon.classList.remove('desktop-icon-active', 'desktop-icon-flash');
+            icon.classList.add('desktop-icon-refresh-hide');
+            // 错位出现，看起来不是同时跳出来
+            setTimeout(() => {
+                icon.classList.remove('desktop-icon-refresh-hide');
+                icon.classList.add('desktop-icon-refresh-show');
+            }, 120 + i * 40);
+            setTimeout(() => {
+                icon.classList.remove('desktop-icon-refresh-show');
+            }, 120 + i * 40 + 280);
         });
+
+        // 不再弹提示，静默刷新
     }
 
     // 清理所有通知
     clearAllNotifications() {
-        const notifications = document.querySelectorAll('[class*="fixed top-4"]');
+        const notifications = document.querySelectorAll('.raccoon-toast');
         notifications.forEach(notification => {
             notification.remove();
         });
     }
-    
+
     showNotification(message) {
         // 先清理所有旧的通知
         this.clearAllNotifications();
-        
-        // Create notification
+
+        // Create notification - 底部居中，避免遮挡顶部
         const notification = document.createElement('div');
-        notification.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded shadow-lg z-[10001] pointer-events-none';
+        notification.className = 'raccoon-toast fixed bottom-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded shadow-lg z-[10001] pointer-events-none';
         notification.textContent = message;
         document.body.appendChild(notification);
-        
+
         // Auto remove after 2 seconds
         setTimeout(() => {
             if (notification.parentElement) {
@@ -2633,5 +2680,4 @@ document.addEventListener('DOMContentLoaded', () => {
     os.loadPreferences();
 });
 </script>
-
 </body></html>

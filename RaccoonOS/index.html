@@ -1110,22 +1110,67 @@ class RaccoonOS {
     
     // 屏蔽 Win 键和其他系统快捷键
     initKeyBlock() {
-        document.addEventListener('keydown', (e) => {
-            // 屏蔽 Win 键 (Meta 键)
-            if (e.key === 'Meta') {
+        // 使用 capture 阶段确保更早拦截
+        const keyHandler = (e) => {
+            console.log('Key pressed:', e.key, 'code:', e.code);
+            
+            // 屏蔽 ESC 键
+            if (e.key === 'Escape') {
                 e.preventDefault();
+                e.stopPropagation();
+                console.log('ESC 被拦截');
+                return false;
+            }
+            // 屏蔽 Win 键 (Meta 键)
+            if (e.key === 'Meta' || e.key === 'OS' || e.code === 'MetaLeft' || e.code === 'MetaRight') {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Meta 被拦截');
+                return false;
+            }
+            // 屏蔽 F11 键
+            if (e.key === 'F11') {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('F11 被拦截');
+                return false;
+            }
+            // 屏蔽 Alt 键（可能触发菜单）
+            if (e.key === 'Alt') {
+                e.preventDefault();
+                e.stopPropagation();
                 return false;
             }
             // 屏蔽 Win + 其他键组合
             if (e.metaKey || e.ctrlKey) {
-                // 允许 Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+A 等常用快捷键
                 const allowed = ['c', 'v', 'x', 'z', 'a', 's', 'f', 'w', 'n', 't', 'r', 'p', 'l', 'o'];
-                if (allowed.includes(e.key.toLowerCase())) {
-                    return;
+                if (!allowed.includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
                 }
-                // 屏蔽其他 Ctrl/Win 组合键
-                e.preventDefault();
-                return false;
+            }
+        };
+
+        // 多个阶段都添加监听
+        document.addEventListener('keydown', keyHandler, true);
+        document.addEventListener('keypress', keyHandler, true);
+        document.addEventListener('keyup', keyHandler, true);
+        
+        // 阻止页面使用 history API 退出全屏
+        try {
+            history.pushState = function() {};
+            history.replaceState = function() {};
+            history.back = function() {};
+            history.forward = function() {};
+            window.onhashchange = function() {};
+        } catch(e) {}
+        
+        // 监听全屏退出尝试
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && this.isFullscreen) {
+                console.log('检测到非正常退出全屏，尝试恢复');
+                setTimeout(() => this.enterFullscreen(), 100);
             }
         });
     }
@@ -2534,6 +2579,8 @@ class RaccoonOS {
         try {
             if (document.documentElement.requestFullscreen) {
                 await document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                await document.documentElement.mozRequestFullScreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
                 await document.documentElement.webkitRequestFullscreen();
             } else if (document.documentElement.msRequestFullscreen) {
@@ -2541,7 +2588,7 @@ class RaccoonOS {
             }
             this.isFullscreen = true;
             this.updateFullscreenButton();
-            // 锁定键盘，防止 ESC/F11 退出全屏（仅 Chrome/Edge 支持）
+            // 锁定键盘（仅 Chrome/Edge 支持）
             if (navigator.keyboard && navigator.keyboard.lock) {
                 try {
                     await navigator.keyboard.lock();

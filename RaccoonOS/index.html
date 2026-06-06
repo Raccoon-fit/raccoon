@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raccoon OS - 最终稳定版</title>
+<title>Raccoon OS - 自定义地址栏右键版</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
 <style>
@@ -31,7 +31,7 @@
     width: 84px;
     padding: 8px;
     border-radius: 6px;
-    transition: background 0.1s, opacity 0.2s ease-out;
+    transition: background 0.1s, opacity 1s ease-out; /* 图标消失动画改为1秒 */
     cursor: pointer;
   }
   .desktop-icon:hover { background: rgba(255,255,255,0.08); }
@@ -150,7 +150,7 @@
 <div id="shutdown-overlay" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center hidden">
   <div class="text-2xl mb-6 text-white">RaccoonOS 正在关闭...</div>
   <div class="w-64 h-1 bg-gray-700 rounded overflow-hidden">
-    <div id="shutdown-bar" class="h-full bg-white w-0 transition-all duration-3000"></div>
+    <div id="shutdown-bar" class="h-full bg-white w-0 transition-all duration-5000"></div> <!-- 5秒进度条 -->
   </div>
 </div>
 
@@ -188,6 +188,13 @@
 <div id="view-submenu" class="win-menu hidden"><div class="menu-item" data-view="large">大图标</div><div class="menu-item" data-view="medium">中等图标</div><div class="menu-item" data-view="small">小图标</div></div>
 <div id="sort-submenu" class="win-menu hidden"><div class="menu-item" data-sort="name">按名称</div><div class="menu-item" data-sort="date">修改日期</div></div>
 <div id="new-submenu" class="win-menu hidden"><div class="menu-item" data-new="folder">文件夹</div><div class="menu-item" data-new="text">文本文档</div></div>
+
+<!-- 地址栏自定义右键菜单 -->
+<div id="urlbar-context-menu" class="win-menu hidden" style="min-width: 160px;">
+  <div class="menu-item" data-url-action="cut">剪切</div>
+  <div class="menu-item" data-url-action="copy">复制</div>
+  <div class="menu-item" data-url-action="paste">粘贴</div>
+</div>
 
 <!-- 任务栏右键菜单 -->
 <div id="taskbar-context-menu" class="win-menu hidden"><div class="menu-item" data-taskbar-action="toggle-taskview" id="taskview-menu-item"><span class="check-mark"></span>显示任务视图按钮</div><div class="menu-item" data-taskbar-action="lock-taskbar" id="locktaskbar-menu-item"><span class="check-mark"></span>锁定任务栏</div><div class="menu-divider"></div><div class="menu-item" data-taskbar-action="taskbar-settings">任务栏设置</div></div>
@@ -359,13 +366,15 @@ class RaccoonOS {
   }
 
   registerEvents() {
-    // 全局右键菜单处理：桌面和任务栏用自定义，地址栏用原生
+    // 全局右键菜单：除地址栏外完全阻止原生并显示自定义菜单；地址栏显示自定义菜单（非原生）
     document.addEventListener('contextmenu', (e) => {
-      // 如果点击的是浏览器地址栏输入框 → 只阻止冒泡，不 preventDefault，让原生菜单显示
+      // 检查是否点击了浏览器地址栏输入框
       const urlInput = document.getElementById('browser-url');
       if (urlInput && (e.target === urlInput || urlInput.contains(e.target))) {
-        e.stopPropagation();  // 防止冒泡到桌面菜单
-        // 不调用 preventDefault，让浏览器显示原生右键菜单
+        // 地址栏：完全阻止原生，显示自定义菜单
+        e.preventDefault();
+        e.stopPropagation();
+        this.showUrlBarContextMenu(e.clientX, e.clientY);
         return;
       }
       // 其他所有区域：完全阻止原生菜单，显示自定义菜单
@@ -450,6 +459,69 @@ class RaccoonOS {
     volTrigger.addEventListener('click', (e) => { e.stopPropagation(); volPopup.classList.toggle('hidden'); });
     volSlider.addEventListener('input', async (e) => { const val = e.target.value; volVal.innerText = val; await this.setVolume(val); });
   }
+
+  // 地址栏自定义右键菜单显示及操作
+  showUrlBarContextMenu(x, y) {
+    this.hideAllMenus();
+    const menu = document.getElementById('urlbar-context-menu');
+    // 计算位置避免超出视口
+    let left = x, top = y;
+    const menuWidth = 160, menuHeight = 90;
+    if (left + menuWidth > window.innerWidth) left = window.innerWidth - menuWidth - 5;
+    if (top + menuHeight > window.innerHeight) top = window.innerHeight - menuHeight - 5;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.classList.remove('hidden');
+    const urlInput = document.getElementById('browser-url');
+    // 定义操作函数
+    const performCut = () => {
+      if (urlInput.selectionStart !== urlInput.selectionEnd) {
+        document.execCommand('cut');
+      }
+      menu.classList.add('hidden');
+    };
+    const performCopy = () => {
+      if (urlInput.selectionStart !== urlInput.selectionEnd) {
+        document.execCommand('copy');
+      }
+      menu.classList.add('hidden');
+    };
+    const performPaste = async () => {
+      menu.classList.add('hidden');
+      try {
+        // 请求剪贴板权限（如果尚未授权，浏览器会弹出提示）
+        const text = await navigator.clipboard.readText();
+        const start = urlInput.selectionStart;
+        const end = urlInput.selectionEnd;
+        const newValue = urlInput.value.substring(0, start) + text + urlInput.value.substring(end);
+        urlInput.value = newValue;
+        urlInput.setSelectionRange(start + text.length, start + text.length);
+        urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+      } catch (err) {
+        // 降级使用 execCommand，可能会失败但不会报错
+        document.execCommand('paste');
+      }
+    };
+    // 绑定事件（先移除旧监听避免重复）
+    const cutItem = menu.querySelector('[data-url-action="cut"]');
+    const copyItem = menu.querySelector('[data-url-action="copy"]');
+    const pasteItem = menu.querySelector('[data-url-action="paste"]');
+    cutItem.removeEventListener('click', performCut);
+    copyItem.removeEventListener('click', performCopy);
+    pasteItem.removeEventListener('click', performPaste);
+    cutItem.addEventListener('click', performCut);
+    copyItem.addEventListener('click', performCopy);
+    pasteItem.addEventListener('click', performPaste);
+    // 点击其他地方关闭菜单
+    const closeHandler = (e) => {
+      if (!menu.contains(e.target)) {
+        menu.classList.add('hidden');
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 0);
+  }
+
   makeWindowDraggable(win) {
     const header = win.querySelector('.window-header');
     let dragging = false, offsetX = 0, offsetY = 0;
@@ -511,19 +583,26 @@ class RaccoonOS {
   shutdown() {
     document.getElementById('start-popup').classList.add('hidden');
     const icons = document.querySelectorAll('.desktop-icon');
-    icons.forEach(ic => { ic.style.transition = 'opacity 0.2s'; ic.style.opacity = '0'; });
+    // 图标消失1秒
+    icons.forEach(ic => { ic.style.transition = 'opacity 1s ease-out'; ic.style.opacity = '0'; });
+    // 等待1秒后隐藏整个桌面
     setTimeout(() => {
       document.getElementById('desktop').classList.add('hidden');
       const taskbar = document.getElementById('taskbar');
       if (taskbar) taskbar.classList.add('taskbar-hidden');
-    }, 500);
+    }, 1000);
+    // 再等待0.6秒显示关机界面
     setTimeout(() => {
       const shutdownOverlay = document.getElementById('shutdown-overlay');
       shutdownOverlay.classList.remove('hidden');
       const bar = document.getElementById('shutdown-bar');
       setTimeout(() => bar.style.width = '100%', 50);
-    }, 1000);
-    setTimeout(() => { window.close(); location.href = 'about:blank'; }, 4000);
+    }, 1600);
+    // 进度条5秒后关闭页面
+    setTimeout(() => {
+      window.close();
+      location.href = 'about:blank';
+    }, 6600);
   }
 }
 window.addEventListener('DOMContentLoaded', () => { window.raccoon = new RaccoonOS(); });

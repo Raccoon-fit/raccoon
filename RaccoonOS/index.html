@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Raccoon OS - 自定义地址栏右键版</title>
+<title>Raccoon OS - 粘贴彻底修复版</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
 <style>
@@ -31,7 +31,7 @@
     width: 84px;
     padding: 8px;
     border-radius: 6px;
-    transition: background 0.1s, opacity 1s ease-out; /* 图标消失动画改为1秒 */
+    transition: background 0.1s, opacity 1s ease-out;
     cursor: pointer;
   }
   .desktop-icon:hover { background: rgba(255,255,255,0.08); }
@@ -150,7 +150,7 @@
 <div id="shutdown-overlay" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center hidden">
   <div class="text-2xl mb-6 text-white">RaccoonOS 正在关闭...</div>
   <div class="w-64 h-1 bg-gray-700 rounded overflow-hidden">
-    <div id="shutdown-bar" class="h-full bg-white w-0 transition-all duration-5000"></div> <!-- 5秒进度条 -->
+    <div id="shutdown-bar" class="h-full bg-white w-0 transition-all duration-5000"></div>
   </div>
 </div>
 
@@ -365,19 +365,28 @@ class RaccoonOS {
     }
   }
 
+  // 临时禁用 contextmenu 的辅助方法
+  disableContextMenuTemporarily() {
+    const handler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener('contextmenu', handler, { capture: true, once: true });
+    setTimeout(() => {
+      document.removeEventListener('contextmenu', handler, { capture: true });
+    }, 200);
+  }
+
   registerEvents() {
-    // 全局右键菜单：除地址栏外完全阻止原生并显示自定义菜单；地址栏显示自定义菜单（非原生）
+    // 全局右键菜单：除地址栏外完全阻止原生并显示自定义菜单；地址栏显示自定义菜单
     document.addEventListener('contextmenu', (e) => {
-      // 检查是否点击了浏览器地址栏输入框
       const urlInput = document.getElementById('browser-url');
       if (urlInput && (e.target === urlInput || urlInput.contains(e.target))) {
-        // 地址栏：完全阻止原生，显示自定义菜单
         e.preventDefault();
         e.stopPropagation();
         this.showUrlBarContextMenu(e.clientX, e.clientY);
         return;
       }
-      // 其他所有区域：完全阻止原生菜单，显示自定义菜单
       e.preventDefault();
       if (e.target.closest('.app-window') || e.target.closest('#settings-window')) return;
       if (e.target.closest('#taskbar') || e.target.closest('.taskbar-item')) {
@@ -388,38 +397,28 @@ class RaccoonOS {
       if (icon) { this.currentIcon = icon; this.showMenu(e.clientX, e.clientY, 'icon-context-menu'); }
       else { this.showMenu(e.clientX, e.clientY, 'desktop-context-menu'); }
     });
-    // 全局点击关闭菜单
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.win-menu')) this.hideAllMenus();
       if (!e.target.closest('#volume-popup') && e.target.id !== 'volume-trigger') document.getElementById('volume-popup').classList.add('hidden');
     });
-    // 任务栏应用
     document.querySelectorAll('.taskbar-item[data-app]').forEach(btn => { btn.addEventListener('click', () => this.openApp(btn.dataset.app)); });
-    // 开始菜单
     document.getElementById('start-button').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('start-popup').classList.toggle('hidden'); });
     document.getElementById('shutdown-btn').addEventListener('click', () => this.shutdown());
-    // 搜索
     document.getElementById('search-trigger').addEventListener('click', () => { const p = document.getElementById('search-panel'); p.classList.toggle('hidden'); if (!p.classList.contains('hidden')) document.getElementById('search-input').focus(); });
     document.getElementById('search-input')?.addEventListener('input', (e) => { const kw = e.target.value.toLowerCase(); document.querySelectorAll('.search-result').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(kw) ? 'block' : 'none'; }); });
     document.querySelectorAll('.search-result').forEach(r => { r.addEventListener('click', () => { this.openApp(r.dataset.app); document.getElementById('search-panel').classList.add('hidden'); }); });
-    // 设置窗口
     document.getElementById('show-settings-btn').addEventListener('click', () => this.openApp('settings'));
     document.querySelectorAll('.sidebar-item').forEach(item => { item.addEventListener('click', () => { const page = item.dataset.page; document.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active')); document.getElementById(`page-${page}`).classList.add('active'); document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('bg-white/10')); item.classList.add('bg-white/10'); }); });
-    // 个性化开关
     const night = document.getElementById('night-mode-toggle'); if (night) night.addEventListener('click', async () => { const active = night.classList.toggle('toggle-active'); await this.updateAndSave('nightMode', active); this.applySettings(); });
     const anim = document.getElementById('anim-toggle'); if (anim) anim.addEventListener('click', async () => { const active = anim.classList.toggle('toggle-active'); await this.updateAndSave('animations', active); });
     const auto = document.getElementById('auto-update-toggle'); if (auto) auto.addEventListener('click', async () => { const active = auto.classList.toggle('toggle-active'); await this.updateAndSave('autoUpdate', active); });
     document.querySelectorAll('[data-bg]').forEach(el => { el.addEventListener('click', async () => { const bg = el.dataset.bg; await this.updateAndSave('backgroundColor', bg); this.applySettings(); }); });
-    // 任务栏设置页面开关
     const taskviewPageToggle = document.getElementById('taskview-toggle');
     if (taskviewPageToggle) taskviewPageToggle.addEventListener('click', async () => { const active = taskviewPageToggle.classList.toggle('toggle-active'); await this.updateAndSave('showTaskView', active); this.applyTaskbarSettings(); });
     const lockPageToggle = document.getElementById('taskbar-lock-toggle');
     if (lockPageToggle) lockPageToggle.addEventListener('click', async () => { const active = lockPageToggle.classList.toggle('toggle-active'); await this.updateAndSave('taskbarLocked', active); this.applyTaskbarSettings(); });
-    // 窗口拖拽
     document.querySelectorAll('.app-window').forEach(win => { this.makeWindowDraggable(win); });
-    // 窗口按钮
     document.querySelectorAll('.win-btn').forEach(btn => { btn.addEventListener('click', (e) => { const win = btn.closest('.app-window'); if (!win) return; const action = btn.dataset.winAction; if (action === 'close') win.style.display = 'none'; else if (action === 'minimize') win.style.display = 'none'; else if (action === 'maximize') { if (win.style.width === '100%') { win.style.width = ''; win.style.height = ''; win.style.left = '50%'; win.style.top = '50%'; win.style.transform = 'translate(-50%,-50%)'; } else { win.style.width = '100%'; win.style.height = 'calc(100% - 48px)'; win.style.left = '0'; win.style.top = '0'; win.style.transform = 'none'; } } }); });
-    // 文件管理器导航
     document.querySelectorAll('.fm-nav').forEach(nav => {
       nav.addEventListener('click', () => {
         const folder = nav.dataset.folder;
@@ -428,7 +427,6 @@ class RaccoonOS {
         this.showFolderContent(folder, container);
       });
     });
-    // 浏览器导航
     const frame = document.getElementById('browser-frame');
     const urlInput = document.getElementById('browser-url');
     const go = document.getElementById('browser-go');
@@ -445,7 +443,6 @@ class RaccoonOS {
     homeInp.addEventListener('keypress', e => { if(e.key === 'Enter') nav(homeInp.value); });
     quick.forEach(q => { q.addEventListener('click', () => nav(q.dataset.quick)); });
     frame.addEventListener('load', () => { try { urlInput.value = frame.contentWindow.location.href; } catch(e) {} });
-    // 右键子菜单
     document.querySelectorAll('[data-menu]').forEach(item => { item.addEventListener('click', (e) => { e.stopPropagation(); const type = item.dataset.menu; let subId = ''; if (type === 'view') subId = 'view-submenu'; else if (type === 'sort') subId = 'sort-submenu'; else if (type === 'new') subId = 'new-submenu'; if (subId) this.showSubmenu(e.target, subId); }); });
     document.querySelectorAll('[data-action="refresh"]').forEach(el => el.addEventListener('click', () => this.refreshDesktop()));
     document.querySelectorAll('[data-action="personalize"]').forEach(el => el.addEventListener('click', () => this.openApp('settings')));
@@ -454,17 +451,14 @@ class RaccoonOS {
     document.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => { this.showNotification(`视图: ${el.textContent}`); this.hideAllMenus(); }));
     document.querySelectorAll('[data-sort]').forEach(el => el.addEventListener('click', () => { this.showNotification(`排序: ${el.textContent}`); this.hideAllMenus(); }));
     document.querySelectorAll('[data-new]').forEach(el => el.addEventListener('click', () => { this.showNotification(`新建 ${el.textContent}`); this.hideAllMenus(); }));
-    // 音量
     const volTrigger = document.getElementById('volume-trigger'); const volPopup = document.getElementById('volume-popup'); const volSlider = document.getElementById('volume-slider'); const volVal = document.getElementById('volume-value');
     volTrigger.addEventListener('click', (e) => { e.stopPropagation(); volPopup.classList.toggle('hidden'); });
     volSlider.addEventListener('input', async (e) => { const val = e.target.value; volVal.innerText = val; await this.setVolume(val); });
   }
 
-  // 地址栏自定义右键菜单显示及操作
   showUrlBarContextMenu(x, y) {
     this.hideAllMenus();
     const menu = document.getElementById('urlbar-context-menu');
-    // 计算位置避免超出视口
     let left = x, top = y;
     const menuWidth = 160, menuHeight = 90;
     if (left + menuWidth > window.innerWidth) left = window.innerWidth - menuWidth - 5;
@@ -473,23 +467,22 @@ class RaccoonOS {
     menu.style.top = top + 'px';
     menu.classList.remove('hidden');
     const urlInput = document.getElementById('browser-url');
-    // 定义操作函数
+    // 确保输入框获得焦点
+    urlInput.focus();
     const performCut = () => {
-      if (urlInput.selectionStart !== urlInput.selectionEnd) {
-        document.execCommand('cut');
-      }
+      this.disableContextMenuTemporarily();
+      if (urlInput.selectionStart !== urlInput.selectionEnd) document.execCommand('cut');
       menu.classList.add('hidden');
     };
     const performCopy = () => {
-      if (urlInput.selectionStart !== urlInput.selectionEnd) {
-        document.execCommand('copy');
-      }
+      this.disableContextMenuTemporarily();
+      if (urlInput.selectionStart !== urlInput.selectionEnd) document.execCommand('copy');
       menu.classList.add('hidden');
     };
     const performPaste = async () => {
+      this.disableContextMenuTemporarily();
       menu.classList.add('hidden');
       try {
-        // 请求剪贴板权限（如果尚未授权，浏览器会弹出提示）
         const text = await navigator.clipboard.readText();
         const start = urlInput.selectionStart;
         const end = urlInput.selectionEnd;
@@ -498,11 +491,11 @@ class RaccoonOS {
         urlInput.setSelectionRange(start + text.length, start + text.length);
         urlInput.dispatchEvent(new Event('input', { bubbles: true }));
       } catch (err) {
-        // 降级使用 execCommand，可能会失败但不会报错
+        // 降级使用 execCommand，但需要确保输入框焦点
+        urlInput.focus();
         document.execCommand('paste');
       }
     };
-    // 绑定事件（先移除旧监听避免重复）
     const cutItem = menu.querySelector('[data-url-action="cut"]');
     const copyItem = menu.querySelector('[data-url-action="copy"]');
     const pasteItem = menu.querySelector('[data-url-action="paste"]');
@@ -512,7 +505,6 @@ class RaccoonOS {
     cutItem.addEventListener('click', performCut);
     copyItem.addEventListener('click', performCopy);
     pasteItem.addEventListener('click', performPaste);
-    // 点击其他地方关闭菜单
     const closeHandler = (e) => {
       if (!menu.contains(e.target)) {
         menu.classList.add('hidden');
@@ -580,29 +572,36 @@ class RaccoonOS {
   showNotification(msg) { const toast = document.createElement('div'); toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded text-sm z-[9999]'; toast.innerText = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
   startClock() { const update = () => { const now = new Date(); document.getElementById('clock-time').innerText = now.toLocaleTimeString('zh-CN', { hour12: false }); document.getElementById('clock-date').innerText = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`; }; update(); setInterval(update, 1000); }
   enterFullscreen() { try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen(); } catch(e) {} }
+  
   shutdown() {
     document.getElementById('start-popup').classList.add('hidden');
-    const icons = document.querySelectorAll('.desktop-icon');
-    // 图标消失1秒
-    icons.forEach(ic => { ic.style.transition = 'opacity 1s ease-out'; ic.style.opacity = '0'; });
-    // 等待1秒后隐藏整个桌面
-    setTimeout(() => {
-      document.getElementById('desktop').classList.add('hidden');
-      const taskbar = document.getElementById('taskbar');
-      if (taskbar) taskbar.classList.add('taskbar-hidden');
-    }, 1000);
-    // 再等待0.6秒显示关机界面
-    setTimeout(() => {
-      const shutdownOverlay = document.getElementById('shutdown-overlay');
-      shutdownOverlay.classList.remove('hidden');
-      const bar = document.getElementById('shutdown-bar');
-      setTimeout(() => bar.style.width = '100%', 50);
-    }, 1600);
-    // 进度条5秒后关闭页面
-    setTimeout(() => {
-      window.close();
-      location.href = 'about:blank';
-    }, 6600);
+    const visibleWindows = Array.from(document.querySelectorAll('.app-window')).filter(win => win.style.display === 'flex');
+    const hasWindows = visibleWindows.length > 0;
+    const startShutdownAnim = () => {
+      const icons = document.querySelectorAll('.desktop-icon');
+      icons.forEach(ic => { ic.style.transition = 'opacity 1s ease-out'; ic.style.opacity = '0'; });
+      setTimeout(() => {
+        document.getElementById('desktop').classList.add('hidden');
+        const taskbar = document.getElementById('taskbar');
+        if (taskbar) taskbar.classList.add('taskbar-hidden');
+      }, 1000);
+      setTimeout(() => {
+        const shutdownOverlay = document.getElementById('shutdown-overlay');
+        shutdownOverlay.classList.remove('hidden');
+        const bar = document.getElementById('shutdown-bar');
+        setTimeout(() => bar.style.width = '100%', 50);
+      }, 1600);
+      setTimeout(() => {
+        window.close();
+        location.href = 'about:blank';
+      }, 6600);
+    };
+    if (hasWindows) {
+      visibleWindows.forEach(win => { win.style.display = 'none'; });
+      setTimeout(startShutdownAnim, 500);
+    } else {
+      startShutdownAnim();
+    }
   }
 }
 window.addEventListener('DOMContentLoaded', () => { window.raccoon = new RaccoonOS(); });

@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Raccoon OS Desktop - 永久个性化设置</title>
+<title>Raccoon OS Desktop - 永久个性化设置 (修复版)</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<style type="text/tailwindcss">
+<style>
+        /* 基础变量和样式（保持原有） */
         :root {
             --charcoal-deep: #121212;
             --charcoal-medium: #1e1e1e;
@@ -22,31 +23,24 @@
         body {
             background: #121212;
             cursor: default;
+            margin:0; padding:0;
+            overflow:hidden;
+            font-family: ui-sans-serif, system-ui, sans-serif;
         }
         .acrylic {
             backdrop-filter: blur(20px);
             background-color: var(--glass-bg);
             border: 1px solid var(--glass-border);
         }
-        #browser-context-menu {
-            position: fixed;
-            min-width: 180px;
-            z-index: 10000;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            border: 1px solid #454545;
-            background: #2b2b2b;
-        }
         .desktop-icon-active {
             background-color: rgba(255, 255, 255, 0.1);
             outline: 1px solid rgba(255, 255, 255, 0.2);
         }
-        /* 桌面刷新：图标先隐藏 */
         .desktop-icon-refresh-hide {
             opacity: 0;
             transform: scale(0.6);
             transition: none;
         }
-        /* 桌面刷新：图标重新淡入显示 */
         @keyframes desktopIconRefreshShow {
             0%   { opacity: 0; transform: scale(0.6) translateY(8px); }
             60%  { opacity: 1; transform: scale(1.05) translateY(0); }
@@ -58,11 +52,11 @@
         .taskbar-item:hover {
             background-color: rgba(255, 255, 255, 0.08);
         }
-        #context-menu {
+        #context-menu, #icon-context-menu {
             position: fixed;
             min-width: 210px;
             z-index: 9999;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
             border: 1px solid #454545;
             background: #2b2b2b;
         }
@@ -74,215 +68,14 @@
             font-size: 12px;
             color: #e0e0e0;
             position: relative;
-        }
-        .menu-item:hover {
-            background-color: #404040;
-        }
-        .menu-item.menu-item-disabled {
-            color: #6b6b6b;
-            pointer-events: none;
-        }
-        .menu-item.menu-item-disabled .material-symbols-outlined {
-            color: #6b6b6b;
-        }
-        .menu-divider {
-            height: 1px;
-            background: #454545;
-            margin: 4px 2px;
-        }
-        .win-control-btn {
-            width: 46px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.1s;
-        }
-        .win-control-btn:hover {
-            background-color: var(--win-hover);
-        }
-        .win-control-close:hover {
-            background-color: #e81123 !important;
-        }
-        .toggle-switch {
-            width: 40px;
-            height: 20px;
-            background: #333;
-            border-radius: 20px;
-            position: relative;
-            cursor: pointer;
-            border: 2px solid #555;
-        }
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #aaa;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.2s ease;
-        }
-        .toggle-active {
-            background: #444;
-            border-color: #777;
-        }
-        .toggle-active::after {
-            left: auto;
-            right: 2px;
-            background: #fff;
-        }
-        .window-draggable {
-            cursor: move;
-        }
-        .settings-page {
-            display: none;
-        }
-        .settings-page.active {
-            display: block;
-        }
-        
-        /* 全屏提示动画 */
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: scale(1.05);
-            }
-        }
-        
-        #fullscreen-hint {
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-        
-        /* 登录页面样式 */
-        #error-overlay {
-            animation: fadeInUp 0.6s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .error-dialog-enter {
-            animation: dialogSlideIn 0.8s ease-out 0.2s both;
-        }
-        
-        @keyframes dialogSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        
-        /* 隐藏主界面直到确认 */
-        #desktop {
-            display: none;
-        }
-        
-        #desktop.show {
-            display: flex;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        
-        /* 自定义旋转动画 */
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-    </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }
-        
-/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:0}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}[type='text'],input:where(:not([type])),[type='email'],[type='url'],[type='password'],[type='number'],[type='date'],[type='datetime-local'],[type='month'],[type='search'],[type='tel'],[type='time'],[type='week'],[multiple],textarea,select{-webkit-appearance:none;appearance:none;background-color:#fff;border-color:#6b7280;border-width:1px;border-radius:0px;padding-top:0.5rem;padding-right:0.75rem;padding-bottom:0.5rem;padding-left:0.75rem;font-size:1rem;line-height:1.5rem;--tw-shadow:0 0 #0000;}[type='text']:focus, input:where(:not([type])):focus, [type='email']:focus, [type='url']:focus, [type='password']:focus, [type='number']:focus, [type='date']:focus, [type='datetime-local']:focus, [type='month']:focus, [type='search']:focus, [type='tel']:focus, [type='time']:focus, [type='week']:focus, [multiple]:focus, textarea:focus, select:focus{outline:2px solid transparent;outline-offset:2px;--tw-ring-inset:var(--tw-empty,/*!*/ /*!*/);--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#2563eb;--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);border-color:#2563eb}input::placeholder,textarea::placeholder{color:#6b7280;opacity:1}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-date-and-time-value{min-height:1.5em;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit,::-webkit-datetime-edit-year-field,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute-field,::-webkit-datetime-edit-second-field,::-webkit-datetime-edit-millisecond-field,::-webkit-datetime-edit-meridiem-field{padding-top:0;padding-bottom:0}select{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");background-position:right 0.5rem center;background-repeat:no-repeat;background-size:1.5em 1.5em;padding-right:2.5rem;print-color-adjust:exact}[multiple],[size]:where(select:not([size="1"])){background-image:initial;background-position:initial;background-repeat:unset;background-size:initial;padding-right:0.75rem;print-color-adjust:unset}[type='checkbox'],[type='radio']{-webkit-appearance:none;appearance:none;padding:0;print-color-adjust:exact;display:inline-block;vertical-align:middle;background-origin:border-box;-webkit-user-select:none;user-select:none;flex-shrink:0;height:1rem;width:1rem;color:#2563eb;background-color:#fff;border-color:#6b7280;border-width:1px;--tw-shadow:0 0 #0000}[type='checkbox']{border-radius:0px}[type='radio']{border-radius:100%}[type='checkbox']:focus,[type='radio']:focus{outline:2px solid transparent;outline-offset:2px;--tw-ring-inset:var(--tw-empty,/*!*/ /*!*/);--tw-ring-offset-width:2px;--tw-ring-offset-color:#fff;--tw-ring-color:#2563eb;--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}[type='checkbox']:checked,[type='radio']:checked{border-color:transparent;background-color:currentColor;background-size:100% 100%;background-position:center;background-repeat:no-repeat}[type='checkbox']:checked{background-image:url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");}@media (forced-colors: active) {[type='checkbox']:checked{-webkit-appearance:auto;appearance:auto}}[type='radio']:checked{background-image:url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");}@media (forced-colors: active) {[type='radio']:checked{-webkit-appearance:auto;appearance:auto}}[type='checkbox']:checked:hover,[type='checkbox']:checked:focus,[type='radio']:checked:hover,[type='radio']:checked:focus{border-color:transparent;background-color:currentColor}[type='checkbox']:indeterminate{background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");border-color:transparent;background-color:currentColor;background-size:100% 100%;background-position:center;background-repeat:no-repeat;}@media (forced-colors: active) {[type='checkbox']:indeterminate{-webkit-appearance:auto;appearance:auto}}[type='checkbox']:indeterminate:hover,[type='checkbox']:indeterminate:focus{border-color:transparent;background-color:currentColor}[type='file']{background:unset;border-color:inherit;border-width:0;border-radius:0;padding:0;font-size:unset;line-height:inherit}[type='file']:focus{outline:1px solid ButtonText;outline:1px auto -webkit-focus-ring-color}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.-right-1{right:-0.25rem}.-top-1{top:-0.25rem}.bottom-0{bottom:0px}.bottom-6{bottom:1.5rem}.left-0{left:0px}.left-1\/2{left:50%}.left-4{left:1rem}.right-4{right:1rem}.right-6{right:1.5rem}.top-1\/2{top:50%}.top-4{top:1rem}.z-\[10000\]{z-index:10000}.z-\[10001\]{z-index:10001}.z-\[10002\]{z-index:10002}.z-\[5000\]{z-index:5000}.mx-1{margin-left:0.25rem;margin-right:0.25rem}.mx-4{margin-left:1rem;margin-right:1rem}.mb-0\.5{margin-bottom:0.125rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-8{margin-bottom:2rem}.ml-1{margin-left:0.25rem}.mr-1{margin-right:0.25rem}.mr-2{margin-right:0.5rem}.mr-3{margin-right:0.75rem}.mt-1{margin-top:0.25rem}.block{display:block}.flex{display:flex}.grid{display:grid}.aspect-square{aspect-ratio:1 / 1}.h-screen{height:100vh}.h-10{height:2.5rem}.h-12{height:3rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-\[600px\]{height:600px}.h-\[calc\(100vh-40px\)\]{height:calc(100vh - 40px)}.h-full{height:100%}.w-full{width:100%}.w-10{width:2.5rem}.w-12{width:3rem}.w-64{width:16rem}.w-96{width:24rem}.w-\[4px\]{width:4px}.w-\[84px\]{width:84px}.w-\[900px\]{width:900px}.w-px{width:1px}.max-w-md{max-width:28rem}.flex-grow{flex-grow:1}.-translate-x-1\/2{--tw-translate-x:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-not-allowed{cursor:not-allowed}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.grid-cols-6{grid-template-columns:repeat(6, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\.5{gap:0.125rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-y-0\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.125rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.125rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded{border-radius:0.25rem}.rounded-\[2px\]{border-radius:2px}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-sm{border-radius:0.125rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-l-\[3px\]{border-left-width:3px}.border-t{border-top-width:1px}.border-\[var\(--win-border\)\]{border-color:var(--win-border)}.border-gray-600{--tw-border-opacity:1;border-color:rgb(75 85 99 / var(--tw-border-opacity, 1))}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-white\/5{border-color:rgb(255 255 255 / 0.05)}.border-white\/80{border-color:rgb(255 255 255 / 0.8)}.bg-\[\#000000\]{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.bg-\[\#121212\]{--tw-bg-opacity:1;background-color:rgb(18 18 18 / var(--tw-bg-opacity, 1))}.bg-\[\#1a1a1a\]{--tw-bg-opacity:1;background-color:rgb(26 26 26 / var(--tw-bg-opacity, 1))}.bg-\[\#1e1e1e\]{--tw-bg-opacity:1;background-color:rgb(30 30 30 / var(--tw-bg-opacity, 1))}.bg-\[\#2a2a2a\]{--tw-bg-opacity:1;background-color:rgb(42 42 42 / var(--tw-bg-opacity, 1))}.bg-\[\#2c2c2c\]{--tw-bg-opacity:1;background-color:rgb(44 44 44 / var(--tw-bg-opacity, 1))}.bg-\[\#333\]{--tw-bg-opacity:1;background-color:rgb(51 51 51 / var(--tw-bg-opacity, 1))}.bg-\[\#3d342f\]{--tw-bg-opacity:1;background-color:rgb(61 52 47 / var(--tw-bg-opacity, 1))}.bg-\[var\(--win-bg\)\]{background-color:var(--win-bg)}.bg-\[var\(--win-header\)\]{background-color:var(--win-header)}.bg-\[var\(--win-sidebar\)\]{background-color:var(--win-sidebar)}.bg-black\/60{background-color:rgb(0 0 0 / 0.6)}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-gray-600{--tw-bg-opacity:1;background-color:rgb(75 85 99 / var(--tw-bg-opacity, 1))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity, 1))}.bg-gray-900{--tw-bg-opacity:1;background-color:rgb(17 24 39 / var(--tw-bg-opacity, 1))}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.bg-white\/\[0\.03\]{background-color:rgb(255 255 255 / 0.03)}.p-10{padding:2.5rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.pl-3{padding-left:0.75rem}.pt-4{padding-top:1rem}.pt-8{padding-top:2rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-sans{font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[14px\]{font-size:14px}.text-\[16px\]{font-size:16px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-light{font-weight:300}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-widest{letter-spacing:0.1em}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-gray-200{--tw-text-opacity:1;color:rgb(229 231 235 / var(--tw-text-opacity, 1))}.text-gray-300{--tw-text-opacity:1;color:rgb(209 213 219 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-white\/50{color:rgb(255 255 255 / 0.5)}.text-white\/90{color:rgb(255 255 255 / 0.9)}.text-yellow-500{--tw-text-opacity:1;color:rgb(234 179 8 / var(--tw-text-opacity, 1))}.opacity-0{opacity:0}.opacity-10{opacity:0.1}.opacity-40{opacity:0.4}.opacity-50{opacity:0.5}.opacity-60{opacity:0.6}.opacity-70{opacity:0.7}.opacity-90{opacity:0.9}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-\[0_25px_70px_rgba\(0\2c 0\2c 0\2c 0\.7\)\]{--tw-shadow:0 25px 70px rgba(0,0,0,0.7);--tw-shadow-colored:0 25px 70px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.drop-shadow-md{--tw-drop-shadow:drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}
-        :root {
-            --charcoal-deep: #121212;
-            --charcoal-medium: #1e1e1e;
-            --charcoal-light: #2c2c2c;
-            --glass-bg: rgba(20, 20, 20, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --win-border: #333333;
-            --win-header: #1a1a1a;
-            --win-bg: #1f1f1f;
-            --win-sidebar: #252525;
-            --win-hover: rgba(255, 255, 255, 0.1);
-        }
-        body {
-            background: #121212;
             cursor: default;
         }
-        .acrylic {
-            -webkit-backdrop-filter: blur(20px);
-                    backdrop-filter: blur(20px);
-            background-color: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-        }
-        .desktop-icon-active {
-            background-color: rgba(255, 255, 255, 0.1);
-            outline: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .taskbar-item:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-        #context-menu {
-            position: fixed;
-            min-width: 210px;
-            z-index: 9999;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            border: 1px solid #454545;
-            background: #2b2b2b;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 6px 12px 6px 20px;
-            font-size: 12px;
-            color: #e0e0e0;
-            position: relative;
-        }
         .menu-item:hover {
             background-color: #404040;
         }
         .menu-item.menu-item-disabled {
             color: #6b6b6b;
             pointer-events: none;
-        }
-        .menu-item.menu-item-disabled .material-symbols-outlined {
-            color: #6b6b6b;
         }
         .menu-divider {
             height: 1px;
@@ -341,107 +134,27 @@
         .settings-page.active {
             display: block;
         }
-        
-        /* 全屏提示动画 */
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: scale(1.05);
-            }
-        }
-        
-        #fullscreen-hint {
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-        
-        /* 登录页面样式 */
-        #error-overlay {
-            animation: fadeInUp 0.6s ease-out;
-        }
-        
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
         .error-dialog-enter {
             animation: dialogSlideIn 0.8s ease-out 0.2s both;
         }
-        
         @keyframes dialogSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        
-        /* 隐藏主界面直到确认 */
-        #desktop {
-            display: none;
-        }
-        
-        #desktop.show {
-            display: flex;
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        
-        /* 自定义旋转动画 */
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-        
-        .hover\:border-white\/30:hover{border-color:rgb(255 255 255 / 0.3)}
-        
-        .hover\:bg-\[\#333\]:hover{--tw-bg-opacity:1;background-color:rgb(51 51 51 / var(--tw-bg-opacity, 1))}
-        
-        .hover\:bg-black\/80:hover{background-color:rgb(0 0 0 / 0.8)}
-        
-        .hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}
-        
-        .hover\:bg-gray-700:hover{--tw-bg-opacity:1;background-color:rgb(55 65 81 / var(--tw-bg-opacity, 1))}
-        
-        .hover\:bg-white\/10:hover{background-color:rgb(255 255 255 / 0.1)}
-        
-        .hover\:bg-white\/5:hover{background-color:rgb(255 255 255 / 0.05)}
-        
-        .hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}
+        #desktop { display: none; }
+        #desktop.show { display: flex; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .is-submenu { background: #2b2b2b; border:1px solid #454545; box-shadow:0 8px 16px rgba(0,0,0,0.5); }
     </style>
 </head>
-<body class="font-sans overflow-hidden select-none text-white h-screen w-full">
+<body class="overflow-hidden select-none text-white h-screen w-full">
 <!-- 关机动画界面 -->
 <div id="shutdown-screen" class="fixed inset-0 z-[20000] flex flex-col items-center justify-center bg-black" style="display: none;">
     <div class="text-4xl font-light mb-8">RaccoonOS 正在关闭</div>
@@ -453,56 +166,34 @@
 <!-- 系统错误弹窗遮罩 -->
 <div id="error-overlay" class="fixed inset-0 z-[10002] flex items-center justify-center" style="background: rgba(0, 0, 0, 0.8);">
 <div class="bg-gray-800 rounded-lg shadow-2xl border border-gray-600 w-96 max-w-md mx-4 error-dialog-enter">
-<!-- 弹窗头部 -->
 <div class="flex items-center justify-between p-4 border-b border-gray-600">
 <div class="flex items-center">
 <span class="material-symbols-outlined text-red-400 mr-2">error</span>
 <span class="text-white font-medium">系统错误</span>
 </div>
-<button class="text-gray-400 hover:text-white cursor-not-allowed opacity-50" disabled="">
-<span class="material-symbols-outlined text-lg">close</span>
-</button>
+<button class="text-gray-400 hover:text-white cursor-not-allowed opacity-50" disabled><span class="material-symbols-outlined text-lg">close</span></button>
 </div>
-
-<!-- 弹窗内容 -->
 <div class="p-4">
 <div class="flex items-start mb-4">
 <span class="material-symbols-outlined text-yellow-500 mr-3 mt-1">warning</span>
 <div>
 <h3 class="text-white font-medium mb-2">系统启动异常</h3>
-<p class="text-gray-300 text-sm leading-relaxed">
-检测到系统配置异常，需要用户确认才能继续启动。<br>
-请点击确定按钮以修复并启动系统。
-</p>
+<p class="text-gray-300 text-sm leading-relaxed">检测到系统配置异常，需要用户确认才能继续启动。<br>请点击确定按钮以修复并启动系统。</p>
 </div>
 </div>
-
-<!-- 技术细节 -->
 <div class="bg-gray-900 rounded p-3 mb-4">
-<p class="text-xs text-gray-400 font-mono">
-错误代码: SYS_INIT_001<br>
-错误信息: Desktop environment initialization failed<br>
-建议操作: User confirmation required
-</p>
+<p class="text-xs text-gray-400 font-mono">错误代码: SYS_INIT_001<br>错误信息: Desktop environment initialization failed<br>建议操作: User confirmation required</p>
 </div>
 </div>
-
-<!-- 弹窗底部 -->
 <div class="flex justify-end items-center p-4 border-t border-gray-600 bg-gray-750">
 <button id="confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition-colors mr-3 flex items-center">
-<span class="material-symbols-outlined text-sm mr-1">check_circle</span>
-确定
+<span class="material-symbols-outlined text-sm mr-1">check_circle</span>确定
 </button>
-<button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded opacity-50 cursor-not-allowed" disabled="">
-取消
-</button>
+<button class="bg-gray-600 text-white px-4 py-2 rounded opacity-50 cursor-not-allowed" disabled>取消</button>
 </div>
 </div>
 </div>
 
-<!-- （原 fullscreen 按钮已隐藏移除） -->
-<!-- 顶部屏障：覆盖顶部 30px -->
-<div id="fullscreen-shield" style="position: fixed; top: 0; left: 0; right: 0; height: 30px; z-index: 99999; pointer-events: auto; background: transparent; cursor: default;"></div>
 <main class="relative h-[calc(100vh-40px)] w-full flex flex-col p-2" id="desktop">
 <!-- Desktop Icons -->
 <div class="flex flex-col items-center w-[84px] p-2 desktop-icon group rounded-sm cursor-pointer" data-type="file-manager">
@@ -520,104 +211,40 @@
 <span class="text-[11px] mt-1 text-center drop-shadow-md text-white">浏览器</span>
 </div>
 
-<!-- Login Button -->
 <div class="absolute top-4 right-4">
 <button class="bg-[#2a2a2a] border border-white/10 px-4 py-2 flex items-center gap-3 hover:bg-[#333] transition-all shadow-lg rounded" id="login-btn">
 <span class="material-symbols-outlined text-xl text-gray-400">account_circle</span>
-<div class="text-left">
-<p class="text-[10px] font-bold tracking-tight">登录</p>
-</div>
+<div class="text-left"><p class="text-[10px] font-bold tracking-tight">登录</p></div>
 </button>
 </div>
 
-<!-- Settings Window -->
+<!-- 设置窗口 -->
 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000]" id="settings-window" style="display: none;">
 <div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-base opacity-70">settings</span>
-<span class="text-xs">设置</span>
-</div>
-<div class="flex">
-<div class="win-control-btn" id="minimize-btn">
-<span class="material-symbols-outlined text-base">remove</span>
-</div>
-<div class="win-control-btn" id="maximize-btn">
-<span class="material-symbols-outlined text-[14px]">crop_square</span>
-</div>
-<div class="win-control-btn win-control-close" id="close-btn">
-<span class="material-symbols-outlined text-base">close</span>
-</div>
-</div>
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-base opacity-70">settings</span><span class="text-xs">设置</span></div>
+<div class="flex"><div class="win-control-btn" id="minimize-btn"><span class="material-symbols-outlined text-base">remove</span></div><div class="win-control-btn" id="maximize-btn"><span class="material-symbols-outlined text-[14px]">crop_square</span></div><div class="win-control-btn win-control-close" id="close-btn"><span class="material-symbols-outlined text-base">close</span></div></div>
 </div>
 <div class="flex flex-grow overflow-hidden">
-<!-- Sidebar -->
 <div class="w-64 bg-[var(--win-sidebar)] flex flex-col pt-8">
-<div class="px-6 mb-8">
-<h2 class="text-xl font-normal">设置</h2>
-</div>
+<div class="px-6 mb-8"><h2 class="text-xl font-normal">设置</h2></div>
 <div class="space-y-0.5">
-<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="system">
-<span class="material-symbols-outlined text-lg opacity-70">desktop_windows</span>
-<span class="text-xs">系统</span>
-</div>
-<div class="flex items-center px-4 py-3 gap-4 bg-white/[0.03] border-l-[3px] border-white/80 cursor-pointer settings-nav active" data-page="personalization">
-<span class="material-symbols-outlined text-lg opacity-70">palette</span>
-<span class="text-xs">个性化</span>
-</div>
-<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="apps">
-<span class="material-symbols-outlined text-lg opacity-70">apps</span>
-<span class="text-xs">应用</span>
-</div>
-<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="account">
-<span class="material-symbols-outlined text-lg opacity-70">person</span>
-<span class="text-xs">账户</span>
-</div>
-<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="update">
-<span class="material-symbols-outlined text-lg opacity-70">update</span>
-<span class="text-xs">更新和安全</span>
+<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="system"><span class="material-symbols-outlined text-lg opacity-70">desktop_windows</span><span class="text-xs">系统</span></div>
+<div class="flex items-center px-4 py-3 gap-4 bg-white/[0.03] border-l-[3px] border-white/80 cursor-pointer settings-nav active" data-page="personalization"><span class="material-symbols-outlined text-lg opacity-70">palette</span><span class="text-xs">个性化</span></div>
+<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="apps"><span class="material-symbols-outlined text-lg opacity-70">apps</span><span class="text-xs">应用</span></div>
+<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="account"><span class="material-symbols-outlined text-lg opacity-70">person</span><span class="text-xs">账户</span></div>
+<div class="flex items-center px-4 py-3 gap-4 hover:bg-white/5 cursor-pointer settings-nav" data-page="update"><span class="material-symbols-outlined text-lg opacity-70">update</span><span class="text-xs">更新和安全</span></div>
 </div>
 </div>
-</div>
-<!-- Content -->
 <div class="flex-grow p-10 bg-[var(--win-bg)] overflow-y-auto">
-<!-- System Page -->
-<div class="settings-page" id="page-system">
-<h3 class="text-2xl font-light mb-8">系统</h3>
-<div class="max-w-md space-y-8">
-<div class="space-y-4">
-<label class="text-sm font-semibold opacity-90 block">系统信息</label>
-<div class="p-4 bg-white/5 rounded border border-white/5">
-<p class="text-sm">操作系统: Raccoon OS Enterprise Edition</p>
-<p class="text-sm">版本: 2026.refined_charcoal</p>
-<p class="text-sm">构建: 2026年6月6日</p>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Personalization Page -->
+<div class="settings-page" id="page-system"><h3 class="text-2xl font-light mb-8">系统</h3><div class="max-w-md space-y-8"><div class="space-y-4"><label class="text-sm font-semibold opacity-90 block">系统信息</label><div class="p-4 bg-white/5 rounded border border-white/5"><p class="text-sm">操作系统: Raccoon OS Enterprise Edition</p><p class="text-sm">版本: 2026.refined_charcoal</p><p class="text-sm">构建: 2026年6月6日</p></div></div></div></div>
 <div class="settings-page active" id="page-personalization">
 <h3 class="text-2xl font-light mb-8">个性化</h3>
 <div class="max-w-md space-y-8">
-<div class="space-y-4">
-<label class="text-sm font-semibold opacity-90 block">显示设置</label>
-<div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5">
-<div>
-<p class="text-sm">夜间模式</p>
-<p class="text-[11px] opacity-40">自动调节屏幕色温以降低眼部疲劳</p>
+<div class="space-y-4"><label class="text-sm font-semibold opacity-90 block">显示设置</label>
+<div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5"><div><p class="text-sm">夜间模式</p><p class="text-[11px] opacity-40">自动调节屏幕色温以降低眼部疲劳</p></div><div class="toggle-switch toggle-active" id="night-mode-toggle"></div></div>
+<div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5"><div><p class="text-sm">动画效果</p><p class="text-[11px] opacity-40">启用窗口动画和过渡效果</p></div><div class="toggle-switch toggle-active" id="animations-toggle"></div></div>
 </div>
-<div class="toggle-switch toggle-active" id="night-mode-toggle"></div>
-</div>
-<div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5">
-<div>
-<p class="text-sm">动画效果</p>
-<p class="text-[11px] opacity-40">启用窗口动画和过渡效果</p>
-</div>
-<div class="toggle-switch toggle-active" id="animations-toggle"></div>
-</div>
-</div>
-<div class="space-y-4 pt-4 border-t border-white/10">
-<label class="text-sm font-semibold opacity-90 block">背景颜色</label>
+<div class="space-y-4 pt-4 border-t border-white/10"><label class="text-sm font-semibold opacity-90 block">背景颜色</label>
 <div class="grid grid-cols-6 gap-2">
 <div class="aspect-square bg-[#121212] border-2 border-white/80 cursor-pointer" data-color="#121212"></div>
 <div class="aspect-square bg-[#1e1e1e] border border-white/10 hover:border-white/30 cursor-pointer" data-color="#1e1e1e"></div>
@@ -629,1163 +256,217 @@
 </div>
 </div>
 </div>
-
-<!-- Apps Page -->
-<div class="settings-page" id="page-apps">
-<h3 class="text-2xl font-light mb-8">应用</h3>
-<div class="max-w-md space-y-8">
-<div class="space-y-4">
-<label class="text-sm font-semibold opacity-90 block">已安装的应用</label>
-<div class="space-y-2">
-<div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">folder</span>
-<span class="text-sm">文件管理器</span>
-</div>
-<span class="text-xs opacity-50">v1.0.0</span>
-</div>
-<div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">terminal</span>
-<span class="text-sm">终端</span>
-</div>
-<span class="text-xs opacity-50">v2.1.3</span>
-</div>
-<div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">settings</span>
-<span class="text-sm">设置</span>
-</div>
-<span class="text-xs opacity-50">v1.2.0</span>
-</div>
-</div>
+<div class="settings-page" id="page-apps"><h3 class="text-2xl font-light mb-8">应用</h3><div class="max-w-md space-y-8"><div class="space-y-4"><label class="text-sm font-semibold opacity-90 block">已安装的应用</label><div class="space-y-2"><div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">folder</span><span class="text-sm">文件管理器</span></div><span class="text-xs opacity-50">v1.0.0</span></div><div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">terminal</span><span class="text-sm">终端</span></div><span class="text-xs opacity-50">v2.1.3</span></div><div class="flex items-center justify-between p-3 bg-white/5 rounded border border-white/5"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg">settings</span><span class="text-sm">设置</span></div><span class="text-xs opacity-50">v1.2.0</span></div></div></div></div></div>
+<div class="settings-page" id="page-account"><h3 class="text-2xl font-light mb-8">账户</h3><div class="max-w-md space-y-8"><div class="space-y-4"><label class="text-sm font-semibold opacity-90 block">用户信息</label><div class="p-4 bg-white/5 rounded border border-white/5"><p class="text-sm">用户名: Admin</p><p class="text-sm">邮箱: admin@raccoon-os.com</p><p class="text-sm">类型: 管理员</p></div></div></div></div>
+<div class="settings-page" id="page-update"><h3 class="text-2xl font-light mb-8">更新和安全</h3><div class="max-w-md space-y-8"><div class="space-y-4"><label class="text-sm font-semibold opacity-90 block">系统更新</label><div class="p-4 bg-white/5 rounded border border-white/5"><p class="text-sm mb-2">当前版本: 2026.refined_charcoal</p><p class="text-sm mb-2">状态: 已是最新版本</p><button class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">检查更新</button></div></div><div class="space-y-4 pt-4 border-t border-white/10"><label class="text-sm font-semibold opacity-90 block">安全设置</label><div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5"><div><p class="text-sm">自动更新</p><p class="text-[11px] opacity-40">自动下载和安装安全更新</p></div><div class="toggle-switch toggle-active" id="auto-update-toggle"></div></div></div></div></div>
 </div>
 </div>
 </div>
 
-<!-- Account Page -->
-<div class="settings-page" id="page-account">
-<h3 class="text-2xl font-light mb-8">账户</h3>
-<div class="max-w-md space-y-8">
-<div class="space-y-4">
-<label class="text-sm font-semibold opacity-90 block">用户信息</label>
-<div class="p-4 bg-white/5 rounded border border-white/5">
-<p class="text-sm">用户名: Admin</p>
-<p class="text-sm">邮箱: admin@raccoon-os.com</p>
-<p class="text-sm">类型: 管理员</p>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Update Page -->
-<div class="settings-page" id="page-update">
-<h3 class="text-2xl font-light mb-8">更新和安全</h3>
-<div class="max-w-md space-y-8">
-<div class="space-y-4">
-<label class="text-sm font-semibold opacity-90 block">系统更新</label>
-<div class="p-4 bg-white/5 rounded border border-white/5">
-<p class="text-sm mb-2">当前版本: 2026.refined_charcoal</p>
-<p class="text-sm mb-2">状态: 已是最新版本</p>
-<button class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">检查更新</button>
-</div>
-</div>
-<div class="space-y-4 pt-4 border-t border-white/10">
-<label class="text-sm font-semibold opacity-90 block">安全设置</label>
-<div class="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5">
-<div>
-<p class="text-sm">自动更新</p>
-<p class="text-[11px] opacity-40">自动下载和安装安全更新</p>
-</div>
-<div class="toggle-switch toggle-active" id="auto-update-toggle"></div>
-</div>
-</div>
-</div>
-</div>
-
-</div>
-</div>
-</div>
-
-<!-- 文件管理器窗口 -->
+<!-- 文件管理器窗口 (简化，保持完整) -->
 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="file-manager-window" style="display: none;" data-app="file-manager">
-<div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-base opacity-70">folder</span>
-<span class="text-xs">文件资源管理器</span>
-</div>
-<div class="flex">
-<div class="win-control-btn window-minimize" data-window="file-manager-window">
-<span class="material-symbols-outlined text-base">remove</span>
-</div>
-<div class="win-control-btn window-maximize" data-window="file-manager-window">
-<span class="material-symbols-outlined text-[14px]">crop_square</span>
-</div>
-<div class="win-control-btn win-control-close window-close" data-window="file-manager-window">
-<span class="material-symbols-outlined text-base">close</span>
-</div>
-</div>
-</div>
-<div class="h-9 bg-[#1a1a1a] flex items-center px-2 border-b border-white/5">
-<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="back"><span class="material-symbols-outlined text-base">arrow_back</span></button>
-<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
-<button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="up"><span class="material-symbols-outlined text-base">arrow_upward</span></button>
-<div class="flex-1 mx-2 h-6 bg-[#2a2a2a] rounded flex items-center px-2">
-<span class="material-symbols-outlined text-xs text-white/50 mr-1">folder</span>
-<span class="text-xs" id="file-manager-path">此电脑</span>
-</div>
-</div>
-<div class="flex flex-1 overflow-hidden">
-<div class="w-48 bg-[#1a1a1a] border-r border-white/5 p-2">
-<div class="text-xs text-white/50 mb-2 px-1">快速访问</div>
-<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="desktop">
-<span class="material-symbols-outlined text-sm">desktop_windows</span>
-<span class="text-xs">桌面</span>
-</div>
-<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="documents">
-<span class="material-symbols-outlined text-sm">description</span>
-<span class="text-xs">文档</span>
-</div>
-<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="downloads">
-<span class="material-symbols-outlined text-sm">download</span>
-<span class="text-xs">下载</span>
-</div>
-<div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="pictures">
-<span class="material-symbols-outlined text-sm">image</span>
-<span class="text-xs">图片</span>
-</div>
-</div>
-<div class="flex-1 p-2 overflow-auto" id="file-manager-content">
-<div class="grid grid-cols-6 gap-2" id="file-list">
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="文档">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">文档</span>
-</div>
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="下载">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">下载</span>
-</div>
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="图片">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">图片</span>
-</div>
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="音乐">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">音乐</span>
-</div>
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="视频">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">视频</span>
-</div>
-<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="桌面">
-<span class="material-symbols-outlined text-4xl text-yellow-400">folder</span>
-<span class="text-xs mt-1 text-center">桌面</span>
-</div>
-</div>
-</div>
-</div>
+<div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base opacity-70">folder</span><span class="text-xs">文件资源管理器</span></div><div class="flex"><div class="win-control-btn window-minimize" data-window="file-manager-window"><span class="material-symbols-outlined text-base">remove</span></div><div class="win-control-btn window-maximize" data-window="file-manager-window"><span class="material-symbols-outlined text-[14px]">crop_square</span></div><div class="win-control-btn win-control-close window-close" data-window="file-manager-window"><span class="material-symbols-outlined text-base">close</span></div></div></div>
+<div class="h-9 bg-[#1a1a1a] flex items-center px-2 border-b border-white/5"><button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="back"><span class="material-symbols-outlined text-base">arrow_back</span></button><button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button><button class="window-nav-btn px-2 py-1 hover:bg-white/10 rounded text-xs" data-dir="up"><span class="material-symbols-outlined text-base">arrow_upward</span></button><div class="flex-1 mx-2 h-6 bg-[#2a2a2a] rounded flex items-center px-2"><span class="material-symbols-outlined text-xs text-white/50 mr-1">folder</span><span class="text-xs" id="file-manager-path">此电脑</span></div></div>
+<div class="flex flex-1 overflow-hidden"><div class="w-48 bg-[#1a1a1a] border-r border-white/5 p-2"><div class="text-xs text-white/50 mb-2 px-1">快速访问</div><div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="desktop"><span class="material-symbols-outlined text-sm">desktop_windows</span><span class="text-xs">桌面</span></div><div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="documents"><span class="material-symbols-outlined text-sm">description</span><span class="text-xs">文档</span></div><div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="downloads"><span class="material-symbols-outlined text-sm">download</span><span class="text-xs">下载</span></div><div class="window-sidebar-item flex items-center gap-2 px-2 py-1.5 hover:bg-white/5 rounded cursor-pointer" data-path="pictures"><span class="material-symbols-outlined text-sm">image</span><span class="text-xs">图片</span></div></div><div class="flex-1 p-2 overflow-auto" id="file-manager-content"><div class="grid grid-cols-6 gap-2" id="file-list"><div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="文档"><span class="material-symbols-outlined text-4xl text-yellow-400">folder</span><span class="text-xs mt-1 text-center">文档</span></div><div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="下载"><span class="material-symbols-outlined text-4xl text-yellow-400">folder</span><span class="text-xs mt-1 text-center">下载</span></div><div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="图片"><span class="material-symbols-outlined text-4xl text-yellow-400">folder</span><span class="text-xs mt-1 text-center">图片</span></div></div></div></div>
 </div>
 
-<!-- 浏览器窗口 -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="browser-window" style="display: none;" data-app="browser">
-<div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-base opacity-70">public</span>
-<span class="text-xs">Raccoon Browser</span>
-</div>
-<div class="flex">
-<div class="win-control-btn window-minimize" data-window="browser-window">
-<span class="material-symbols-outlined text-base">remove</span>
-</div>
-<div class="win-control-btn window-maximize" data-window="browser-window">
-<span class="material-symbols-outlined text-[14px]">crop_square</span>
-</div>
-<div class="win-control-btn win-control-close window-close" data-window="browser-window">
-<span class="material-symbols-outlined text-base">close</span>
-</div>
-</div>
-</div>
-<div class="h-10 bg-[#1a1a1a] flex items-center px-2 gap-2 border-b border-white/5">
-<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-back"><span class="material-symbols-outlined text-base">arrow_back</span></button>
-<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
-<button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-refresh"><span class="material-symbols-outlined text-base">refresh</span></button>
-<div class="flex-1 h-7 bg-[#2a2a2a] rounded flex items-center px-3">
-<span class="material-symbols-outlined text-xs text-white/50 mr-2">lock</span>
-<input type="text" class="flex-1 bg-transparent text-xs outline-none text-white" placeholder="搜索或输入网址" id="browser-url">
-</div>
-<button class="p-1.5 hover:bg-white/10 rounded" id="browser-go"><span class="material-symbols-outlined text-base">arrow_forward</span></button>
-<button class="p-1.5 hover:bg-white/10 rounded" id="browser-menu" title="更多操作"><span class="material-symbols-outlined text-base">more_horiz</span></button>
-</div>
-<div class="flex-1 bg-[#1a1a1a] relative">
-<div id="browser-home" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-<div class="text-6xl mb-4">🦝</div>
-<div class="text-2xl font-light text-white/80 mb-8">Raccoon Browser</div>
-<div class="w-96 h-10 bg-[#2a2a2a] rounded-full shadow-lg flex items-center px-4 border border-white/10">
-<span class="material-symbols-outlined text-white/50 mr-2">search</span>
-<input type="text" class="flex-1 outline-none text-sm bg-transparent text-white" placeholder="搜索或输入网址" id="browser-home-search">
-</div>
-<div class="mt-8 flex gap-4">
-<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.baidu.com';document.getElementById('browser-url').value='https://www.baidu.com';document.getElementById('browser-frame').src='https://www.baidu.com';document.getElementById('browser-home').style.display='none';">
-<span class="material-symbols-outlined text-3xl text-blue-500">language</span>
-<span class="text-xs text-gray-500">百度</span>
-</div>
-<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.google.com';document.getElementById('browser-url').value='https://www.google.com';document.getElementById('browser-frame').src='https://www.google.com';document.getElementById('browser-home').style.display='none';">
-<span class="material-symbols-outlined text-3xl text-red-500">movie</span>
-<span class="text-xs text-gray-500">视频</span>
-</div>
-<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://github.com';document.getElementById('browser-url').value='https://github.com';document.getElementById('browser-frame').src='https://github.com';document.getElementById('browser-home').style.display='none';">
-<span class="material-symbols-outlined text-3xl text-gray-700">code</span>
-<span class="text-xs text-gray-500">GitHub</span>
-</div>
-<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('browser-home-search').value='https://www.bilibili.com';document.getElementById('browser-url').value='https://www.bilibili.com';document.getElementById('browser-frame').src='https://www.bilibili.com';document.getElementById('browser-home').style.display='none';">
-<span class="material-symbols-outlined text-3xl text-pink-500">smart_display</span>
-<span class="text-xs text-gray-500">B站</span>
-</div>
-</div>
-</div>
-<iframe id="browser-frame" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-presentation" style="display: none;"></iframe>
-</div>
+<!-- 浏览器窗口 (简化) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[var(--win-bg)] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="browser-window" style="display: none;" data-app="browser"><div class="h-8 bg-[var(--win-header)] flex items-center justify-between pl-3 drag-handle"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base opacity-70">public</span><span class="text-xs">Raccoon Browser</span></div><div class="flex"><div class="win-control-btn window-minimize" data-window="browser-window"><span class="material-symbols-outlined text-base">remove</span></div><div class="win-control-btn window-maximize" data-window="browser-window"><span class="material-symbols-outlined text-[14px]">crop_square</span></div><div class="win-control-btn win-control-close window-close" data-window="browser-window"><span class="material-symbols-outlined text-base">close</span></div></div></div>
+<div class="h-10 bg-[#1a1a1a] flex items-center px-2 gap-2 border-b border-white/5"><button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-back"><span class="material-symbols-outlined text-base">arrow_back</span></button><button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-forward"><span class="material-symbols-outlined text-base">arrow_forward</span></button><button class="browser-nav-btn p-1 hover:bg-white/10 rounded" id="browser-refresh"><span class="material-symbols-outlined text-base">refresh</span></button><div class="flex-1 h-7 bg-[#2a2a2a] rounded flex items-center px-3"><span class="material-symbols-outlined text-xs text-white/50 mr-2">lock</span><input type="text" class="flex-1 bg-transparent text-xs outline-none text-white" id="browser-url"></div><button class="p-1.5 hover:bg-white/10 rounded" id="browser-go"><span class="material-symbols-outlined text-base">arrow_forward</span></button><button class="p-1.5 hover:bg-white/10 rounded" id="browser-menu"><span class="material-symbols-outlined text-base">more_horiz</span></button></div>
+<div class="flex-1 bg-[#1a1a1a] relative"><div id="browser-home" class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-black"><div class="text-6xl mb-4">🦝</div><div class="text-2xl font-light text-white/80 mb-8">Raccoon Browser</div><div class="w-96 h-10 bg-[#2a2a2a] rounded-full shadow-lg flex items-center px-4 border border-white/10"><span class="material-symbols-outlined text-white/50 mr-2">search</span><input type="text" class="flex-1 outline-none text-sm bg-transparent text-white" id="browser-home-search"></div></div><iframe id="browser-frame" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-presentation" style="display: none;"></iframe></div>
 </div>
 
-<!-- 终端窗口 -->
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#0c0c0c] border border-[var(--win-border)] shadow-[0_25px_70px_rgba(0,0,0,0.7)] flex flex-col z-[5000] app-window" id="terminal-window" style="display: none;" data-app="terminal">
-<div class="h-8 bg-[#1a1a1a] flex items-center justify-between pl-3 drag-handle">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-base opacity-70">terminal</span>
-<span class="text-xs">终端</span>
-</div>
-<div class="flex">
-<div class="win-control-btn window-minimize" data-window="terminal-window">
-<span class="material-symbols-outlined text-base">remove</span>
-</div>
-<div class="win-control-btn window-maximize" data-window="terminal-window">
-<span class="material-symbols-outlined text-[14px]">crop_square</span>
-</div>
-<div class="win-control-btn win-control-close window-close" data-window="terminal-window">
-<span class="material-symbols-outlined text-base">close</span>
-</div>
-</div>
-</div>
-<div class="flex-1 p-3 font-mono text-sm text-green-400 overflow-auto" id="terminal-content">
-<div>raccoon@raccoon-os:~$ <span class="text-white">_</span></div>
-</div>
-</div>
-
-<!-- 搜索面板 -->
-<div id="search-panel" class="fixed bottom-12 left-2 w-96 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-2xl z-[9998]" style="display: none;">
-<div class="p-3 border-b border-white/10">
-<input type="text" class="w-full bg-[#2a2a2a] rounded px-3 py-2 text-sm outline-none" placeholder="搜索应用、文件和设置" id="search-input">
-</div>
-<div class="p-2">
-<div class="text-xs text-white/50 px-2 py-1">应用</div>
-<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="file-manager">
-<span class="material-symbols-outlined text-lg">folder</span>
-<span class="text-sm">文件资源管理器</span>
-</div>
-<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="browser">
-<span class="material-symbols-outlined text-lg">public</span>
-<span class="text-sm">浏览器</span>
-</div>
-<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="terminal">
-<span class="material-symbols-outlined text-lg">terminal</span>
-<span class="text-sm">终端</span>
-</div>
-<div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="settings">
-<span class="material-symbols-outlined text-lg">settings</span>
-<span class="text-sm">设置</span>
-</div>
-</div>
-</div>
-
-<!-- Bottom right watermark -->
-<div class="absolute bottom-6 right-6 text-right opacity-50 text-xs pointer-events-none tracking-widest uppercase">
-<p>Raccoon OS Enterprise Edition</p>
-<p>Built 2026.raccoon</p>
-</div>
+<div class="absolute bottom-6 right-6 text-right opacity-50 text-xs pointer-events-none tracking-widest uppercase"><p>Raccoon OS Enterprise Edition</p><p>Built 2026.raccoon</p></div>
 </main>
 
-<!-- Context Menu for Desktop -->
+<!-- 右键菜单 -->
 <div class="win-menu py-1 rounded-[2px]" id="context-menu" style="display: none;">
-<div class="menu-item" data-action="view">
-<span>查看(V)</span>
-<span class="material-symbols-outlined">chevron_right</span>
-</div>
-<div class="menu-item" data-action="sort">
-<span>排序方式(O)</span>
-<span class="material-symbols-outlined">chevron_right</span>
-</div>
-<div class="menu-item" data-action="refresh">
-<span>刷新(E)</span>
-</div>
+<div class="menu-item" data-action="view"><span>查看(V)</span><span class="material-symbols-outlined">chevron_right</span></div>
+<div class="menu-item" data-action="sort"><span>排序方式(O)</span><span class="material-symbols-outlined">chevron_right</span></div>
+<div class="menu-item" data-action="refresh"><span>刷新(E)</span></div>
 <div class="menu-divider"></div>
-<div class="menu-item" data-action="new">
-<span>新建(W)</span>
-<span class="material-symbols-outlined">chevron_right</span>
-</div>
+<div class="menu-item" data-action="new"><span>新建(W)</span><span class="material-symbols-outlined">chevron_right</span></div>
 <div class="menu-divider"></div>
-<div class="menu-item" data-action="settings">
-<span>显示设置(D)</span>
+<div class="menu-item" data-action="settings"><span>显示设置(D)</span></div>
+<div class="menu-item" data-action="personalize"><span class="font-medium">个性化(R)</span></div>
 </div>
-<div class="menu-item" data-action="personalize">
-<span class="font-medium">个性化(R)</span>
-</div>
-</div>
+<div class="win-menu py-1 rounded-[2px]" id="icon-context-menu" style="display: none;"><div class="menu-item" data-action="icon-open"><span>打开(O)</span></div><div class="menu-divider"></div><div class="menu-item" data-action="icon-runas"><span>以管理员身份运行(A)</span></div><div class="menu-divider"></div><div class="menu-item" data-action="icon-properties"><span>属性(P)</span></div></div>
 
-<!-- Context Menu for Desktop Icons -->
-<div class="win-menu py-1 rounded-[2px]" id="icon-context-menu" style="display: none;">
-<div class="menu-item" data-action="icon-open">
-<span>打开(O)</span>
-</div>
-<div class="menu-divider"></div>
-<div class="menu-item" data-action="icon-runas">
-<span>以管理员身份运行(A)</span>
-</div>
-<div class="menu-divider"></div>
-<div class="menu-item" data-action="icon-properties">
-<span>属性(P)</span>
-</div>
-</div>
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="view-menu" style="display: none;"><div class="menu-item" data-view="large"><span>大图标</span></div><div class="menu-item" data-view="medium"><span>中等图标</span></div><div class="menu-item" data-view="small"><span>小图标</span></div></div>
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="sort-menu" style="display: none;"><div class="menu-item" data-sort="name"><span>名称</span></div><div class="menu-item" data-sort="date"><span>修改日期</span></div><div class="menu-item" data-sort="type"><span>文件类型</span></div><div class="menu-item" data-sort="size"><span>大小</span></div></div>
+<div class="win-menu is-submenu py-1 rounded-[2px]" id="new-menu" style="display: none;"><div class="menu-item" data-new="folder"><span>文件夹</span></div><div class="menu-item" data-new="shortcut"><span>快捷方式</span></div><div class="menu-item" data-new="text"><span>文本文档</span></div></div>
 
-<!-- Context Menu for Browser -->
-<div class="win-menu py-1 rounded-[2px]" id="browser-context-menu" style="display: none;">
-<div class="menu-item" data-action="browser-back">
-<span>返回</span>
-</div>
-<div class="menu-item" data-action="browser-forward">
-<span>前进</span>
-</div>
-<div class="menu-item" data-action="browser-reload">
-<span>重新加载</span>
-</div>
-<div class="menu-divider"></div>
-<div class="menu-item" data-action="browser-view-source">
-<span>查看网页源代码</span>
-</div>
-</div>
+<div id="start-menu-popup" class="fixed bottom-12 left-2 w-64 acrylic rounded-lg shadow-2xl border border-white/10 z-[9999]" style="display: none;"><div class="p-2"><div class="text-xs text-white/50 px-3 py-2">电源</div><div class="grid grid-cols-2 gap-1"><button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="shutdown"><span class="material-symbols-outlined text-xl">power_settings_new</span><span class="text-[10px] mt-1">关机</span></button></div></div></div>
 
-<!-- Context Menu for Browser Address Bar -->
-<div class="py-1 rounded-[2px]" id="urlbar-context-menu" style="display: none; position: fixed; z-index: 10001; min-width: 160px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); border: 1px solid #454545; background: #2b2b2b;">
-    <div class="menu-item" data-action="urlbar-cut" id="urlbar-cut-item">
-        <span>剪切</span>
-        <span class="material-symbols-outlined text-xs opacity-60">content_cut</span>
-    </div>
-    <div class="menu-item" data-action="urlbar-copy" id="urlbar-copy-item">
-        <span>复制</span>
-        <span class="material-symbols-outlined text-xs opacity-60">content_copy</span>
-    </div>
-    <div class="menu-item" data-action="urlbar-paste" id="urlbar-paste-item">
-        <span>粘贴</span>
-        <span class="material-symbols-outlined text-xs opacity-60">content_paste</span>
-    </div>
-</div>
-
-<!-- Submenus -->
-<div class="win-menu is-submenu py-1 rounded-[2px]" id="view-menu" style="display: none;">
-<div class="menu-item" data-view="large">
-<span>大图标</span>
-</div>
-<div class="menu-item" data-view="medium">
-<span>中等图标</span>
-</div>
-<div class="menu-item" data-view="small">
-<span>小图标</span>
-</div>
-</div>
-
-<div class="win-menu is-submenu py-1 rounded-[2px]" id="sort-menu" style="display: none;">
-<div class="menu-item" data-sort="name">
-<span>名称</span>
-</div>
-<div class="menu-item" data-sort="date">
-<span>修改日期</span>
-</div>
-<div class="menu-item" data-sort="type">
-<span>文件类型</span>
-</div>
-<div class="menu-item" data-sort="size">
-<span>大小</span>
-</div>
-</div>
-
-<div class="win-menu is-submenu py-1 rounded-[2px]" id="new-menu" style="display: none;">
-<div class="menu-item" data-new="folder">
-<span>文件夹</span>
-</div>
-<div class="menu-item" data-new="shortcut">
-<span>快捷方式</span>
-</div>
-<div class="menu-item" data-new="text">
-<span>文本文档</span>
-</div>
-</div>
-
-<!-- 开始菜单弹出层 -->
-<div id="start-menu-popup" class="fixed bottom-12 left-2 w-64 acrylic rounded-lg shadow-2xl border border-white/10 z-[9999]" style="display: none;">
-    <div class="p-2">
-        <div class="text-xs text-white/50 px-3 py-2">电源</div>
-        <div class="grid grid-cols-2 gap-1">
-            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="shutdown">
-                <span class="material-symbols-outlined text-xl">power_settings_new</span>
-                <span class="text-[10px] mt-1">关机</span>
-            </button>
-            <!--
-            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="restart">
-                <span class="material-symbols-outlined text-xl">restart_alt</span>
-                <span class="text-[10px] mt-1">重启</span>
-            </button>
-            <button class="start-menu-btn flex flex-col items-center justify-center py-3 px-2 rounded hover:bg-white/10 transition-colors" data-action="sleep">
-                <span class="material-symbols-outlined text-xl">bedtime</span>
-                <span class="text-[10px] mt-1">睡眠</span>
-            </button>
-            -->
-        </div>
-    </div>
-</div>
-
-<!-- Taskbar -->
 <footer class="fixed bottom-0 left-0 w-full h-14 acrylic flex items-center z-[10000]">
-<!-- 开始按钮 -->
-<div class="taskbar-item w-10 h-full flex items-center justify-center transition-colors hover:bg-white/10" id="start-menu">
-<span class="text-xl">🦝</span>
-</div>
-
-<!-- 搜索框 -->
-<div class="taskbar-item h-8 w-48 flex items-center justify-center mx-1 bg-white/5 rounded hover:bg-white/10 transition-colors">
-<span class="material-symbols-outlined text-sm text-white/50 mr-2">search</span>
-<span class="text-xs text-white/40">搜索</span>
-</div>
-
-<!-- 任务栏图标（居中） -->
-<div class="flex-1 flex items-center justify-center h-full gap-0.5">
-<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
-<span class="material-symbols-outlined text-gray-300 text-lg">folder</span>
-</div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
-<span class="material-symbols-outlined text-gray-300 text-lg">public</span>
-</div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
-<span class="material-symbols-outlined text-gray-300 text-lg">terminal</span>
-</div>
-<div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10">
-<span class="material-symbols-outlined text-gray-300 text-lg">settings</span>
-</div>
-</div>
-
-<!-- 系统托盘 -->
-<div class="flex items-center h-full">
-<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
-<span class="material-symbols-outlined text-[14px] opacity-60">expand_less</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
-<span class="material-symbols-outlined text-[14px] opacity-60">wifi</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
-<span class="material-symbols-outlined text-[14px] opacity-60">volume_up</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
-<span class="material-symbols-outlined text-[14px] opacity-60">brightness_6</span>
-</div>
-<div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10">
-<span class="material-symbols-outlined text-[14px] opacity-60">battery_full</span>
-</div>
-<div class="taskbar-item px-3 h-full flex flex-col items-end justify-center leading-none border-l border-white/5 ml-1 hover:bg-white/10">
-<span class="text-[10px] font-medium mb-0.5" id="current-time">17:29</span>
-<span class="text-[10px] opacity-50" id="current-date">2026/06/05</span>
-</div>
-</div>
+<div class="taskbar-item w-10 h-full flex items-center justify-center transition-colors hover:bg-white/10" id="start-menu"><span class="text-xl">🦝</span></div>
+<div class="taskbar-item h-8 w-48 flex items-center justify-center mx-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><span class="material-symbols-outlined text-sm text-white/50 mr-2">search</span><span class="text-xs text-white/40">搜索</span></div>
+<div class="flex-1 flex items-center justify-center h-full gap-0.5"><div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined text-gray-300 text-lg">folder</span></div><div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined text-gray-300 text-lg">public</span></div><div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined text-gray-300 text-lg">terminal</span></div><div class="taskbar-item w-10 h-full flex items-center justify-center hover:bg-white/10"><span class="material-symbols-outlined text-gray-300 text-lg">settings</span></div></div>
+<div class="flex items-center h-full"><div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10"><span class="material-symbols-outlined text-[14px] opacity-60">wifi</span></div><div class="taskbar-item px-2 h-full flex items-center hover:bg-white/10"><span class="material-symbols-outlined text-[14px] opacity-60">volume_up</span></div><div class="taskbar-item px-3 h-full flex flex-col items-end justify-center leading-none border-l border-white/5 ml-1 hover:bg-white/10"><span class="text-[10px] font-medium mb-0.5" id="current-time">--:--</span><span class="text-[10px] opacity-50" id="current-date">----/--/--</span></div></div>
 </footer>
 
 <script>
-// 增强版 RaccoonOS - 集成 OPFS 永久存储个性化设置
 class RaccoonOS {
     constructor() {
         this.settingsWindow = document.getElementById('settings-window');
         this.contextMenu = document.getElementById('context-menu');
+        this.iconContextMenu = document.getElementById('icon-context-menu');
         this.viewMenu = document.getElementById('view-menu');
         this.sortMenu = document.getElementById('sort-menu');
         this.newMenu = document.getElementById('new-menu');
+        this.activeSubmenu = null;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
-        this.currentView = 'large';
         this.desktopBackground = '#121212';
         this.isFullscreen = false;
         this.isSystemStarted = false;
-        // OPFS 相关
         this.opfsRoot = null;
         this.settingsFileHandle = null;
-        this.settings = {
-            nightMode: true,
-            animations: true,
-            autoUpdate: true,
-            backgroundColor: '#121212'
-        };
+        this.settings = { nightMode: true, animations: true, autoUpdate: true, backgroundColor: '#121212' };
         this.init();
     }
-
-    init() {
+    async init() {
         this.initEventListeners();
         this.initErrorDialogSystem();
-        this.initFullscreenShield();
         this.initKeyBlock();
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
-        // 注意：OPFS 初始化将在系统启动后（handleSystemStart）完成，因为需要用户确认后才可使用
     }
-    
-    // ---------- OPFS 核心读写 ----------
     async initOPFS() {
-        try {
-            if (!navigator.storage || !navigator.storage.getDirectory) {
-                console.warn('当前浏览器不支持 OPFS，将回退到内存存储');
-                return false;
-            }
-            this.opfsRoot = await navigator.storage.getDirectory();
-            // 获取 settings.json 文件句柄（自动创建）
-            this.settingsFileHandle = await this.opfsRoot.getFileHandle('settings.json', { create: true });
-            return true;
-        } catch (err) {
-            console.error('OPFS 初始化失败', err);
-            return false;
-        }
+        try { if (!navigator.storage?.getDirectory) return false; this.opfsRoot = await navigator.storage.getDirectory(); this.settingsFileHandle = await this.opfsRoot.getFileHandle('settings.json', { create: true }); return true; } catch(e) { return false; }
     }
-
     async loadSettingsFromOPFS() {
         if (!this.settingsFileHandle) return;
-        try {
-            const file = await this.settingsFileHandle.getFile();
-            const text = await file.text();
-            if (text) {
-                const saved = JSON.parse(text);
-                this.settings = { ...this.settings, ...saved };
-                console.log('从 OPFS 加载设置', this.settings);
-            }
-        } catch (err) {
-            console.warn('读取设置失败', err);
-        }
-        // 应用设置到 UI 和系统
+        try { const file = await this.settingsFileHandle.getFile(); const text = await file.text(); if(text) this.settings = { ...this.settings, ...JSON.parse(text) }; } catch(e) {}
         this.applySettingsToUI();
     }
-
     async saveSettingsToOPFS() {
         if (!this.settingsFileHandle) return;
-        try {
-            const writable = await this.settingsFileHandle.createWritable();
-            await writable.write(JSON.stringify(this.settings, null, 2));
-            await writable.close();
-            console.log('设置已保存到 OPFS', this.settings);
-        } catch (err) {
-            console.error('保存设置失败', err);
-        }
+        try { const w = await this.settingsFileHandle.createWritable(); await w.write(JSON.stringify(this.settings, null, 2)); await w.close(); } catch(e) {}
     }
-
-    // 将 settings 对象应用到各个 UI 组件和系统样式
+    async updateSetting(key, value) { this.settings[key] = value; await this.saveSettingsToOPFS(); }
     applySettingsToUI() {
-        // 夜间模式开关
-        const nightToggle = document.getElementById('night-mode-toggle');
-        if (nightToggle) {
-            if (this.settings.nightMode) nightToggle.classList.add('toggle-active');
-            else nightToggle.classList.remove('toggle-active');
-            this.toggleNightMode(); // 触发样式变更
-        }
-        // 动画效果开关
-        const animToggle = document.getElementById('animations-toggle');
-        if (animToggle) {
-            if (this.settings.animations) animToggle.classList.add('toggle-active');
-            else animToggle.classList.remove('toggle-active');
-            this.toggleAnimations();
-        }
-        // 自动更新开关
-        const autoToggle = document.getElementById('auto-update-toggle');
-        if (autoToggle) {
-            if (this.settings.autoUpdate) autoToggle.classList.add('toggle-active');
-            else autoToggle.classList.remove('toggle-active');
-        }
-        // 背景颜色
-        if (this.settings.backgroundColor) {
-            this.setBackgroundColor(this.settings.backgroundColor, false); // 不重复保存
-            // 高亮颜色选择器
-            const colorElem = document.querySelector(`[data-color="${this.settings.backgroundColor}"]`);
-            if (colorElem) this.updateColorSelection(colorElem);
-        }
+        const night = document.getElementById('night-mode-toggle');
+        if(night) { if(this.settings.nightMode) night.classList.add('toggle-active'); else night.classList.remove('toggle-active'); this.toggleNightMode(); }
+        const anim = document.getElementById('animations-toggle');
+        if(anim) { if(this.settings.animations) anim.classList.add('toggle-active'); else anim.classList.remove('toggle-active'); this.toggleAnimations(); }
+        const auto = document.getElementById('auto-update-toggle');
+        if(auto) { if(this.settings.autoUpdate) auto.classList.add('toggle-active'); else auto.classList.remove('toggle-active'); }
+        if(this.settings.backgroundColor) { this.setBackgroundColor(this.settings.backgroundColor, false); const col = document.querySelector(`[data-color="${this.settings.backgroundColor}"]`); if(col) this.updateColorSelection(col); }
     }
-
-    // 更新单个设置项并自动保存
-    async updateSetting(key, value) {
-        this.settings[key] = value;
-        await this.saveSettingsToOPFS();
-    }
-
-    // 屏蔽 Win 键和其他系统快捷键
-    initKeyBlock() {
-        // 使用 capture 阶段确保更早拦截
-        const keyHandler = (e) => {
-            // 屏蔽 ESC 键
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-            // 屏蔽 Win 键 (Meta 键)
-            if (e.key === 'Meta' || e.key === 'OS' || e.code === 'MetaLeft' || e.code === 'MetaRight') {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-            // 屏蔽 F11 键
-            if (e.key === 'F11') {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-            // 屏蔽 Alt 键（可能触发菜单）
-            if (e.key === 'Alt') {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-            // 屏蔽 Win + 其他键组合
-            if (e.metaKey || e.ctrlKey) {
-                const allowed = ['c', 'v', 'x', 'z', 'a', 's', 'f', 'w', 'n', 't', 'r', 'p', 'l', 'o'];
-                if (!allowed.includes(e.key.toLowerCase())) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-            }
-        };
-        document.addEventListener('keydown', keyHandler, true);
-        document.addEventListener('keypress', keyHandler, true);
-        document.addEventListener('keyup', keyHandler, true);
-        
-        // 阻止页面使用 history API 退出全屏
-        try {
-            history.pushState = function() {};
-            history.replaceState = function() {};
-            history.back = function() {};
-            history.forward = function() {};
-            window.onhashchange = function() {};
-        } catch(e) {}
-        
-        // 监听全屏退出尝试
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement && this.isFullscreen) {
-                setTimeout(() => this.enterFullscreen(), 100);
-            }
-        });
-    }
+    toggleNightMode() { const isNight = this.settings.nightMode; document.documentElement.style.setProperty('--charcoal-deep', isNight ? '#0a0a0a' : '#121212'); document.documentElement.style.setProperty('--charcoal-medium', isNight ? '#1a1a1a' : '#1e1e1e'); }
+    toggleAnimations() { const styleId = 'animation-toggle-style'; let style = document.getElementById(styleId); if(!style){ style=document.createElement('style'); style.id=styleId; document.head.appendChild(style); } style.textContent = this.settings.animations ? '* { transition: all 0.3s ease !important; }' : '* { transition: none !important; }'; }
+    toggleAutoUpdate() { console.log('Auto update:', this.settings.autoUpdate); }
+    setBackgroundColor(color, shouldSave=true) { this.desktopBackground = color; document.body.style.backgroundColor = color; document.querySelector(':root').style.setProperty('--charcoal-deep', color); if(shouldSave) this.updateSetting('backgroundColor', color); }
+    updateColorSelection(selected) { document.querySelectorAll('[data-color]').forEach(el=>{ el.classList.remove('border-white/80'); el.classList.add('border-white/10'); }); selected.classList.remove('border-white/10'); selected.classList.add('border-white/80'); }
 
     initEventListeners() {
-        // Desktop right-click context menu
         document.addEventListener('contextmenu', (e) => {
-            if (e.target.closest('.app-window, #settings-window')) return;
+            if(e.target.closest('.app-window, #settings-window')) return;
             e.preventDefault();
-            const desktopIcon = e.target.closest('.desktop-icon');
-            if (desktopIcon) {
-                this.showIconContextMenu(e.clientX, e.clientY, desktopIcon);
-            } else {
-                this.showContextMenu(e.clientX, e.clientY);
-            }
+            const icon = e.target.closest('.desktop-icon');
+            if(icon) this.showIconContextMenu(e.clientX, e.clientY, icon);
+            else this.showContextMenu(e.clientX, e.clientY);
         });
-
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#context-menu, #icon-context-menu, #view-menu, #sort-menu, #new-menu, #browser-context-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) {
-                this.hideAllMenus();
-            }
+            if(!e.target.closest('#context-menu, #icon-context-menu, #view-menu, #sort-menu, #new-menu, .settings-nav, #login-btn, .desktop-icon, #start-menu')) this.hideAllMenus();
         });
-
-        // Desktop icon click - 绑定所有桌面图标
+        // 桌面图标双击打开应用
         document.querySelectorAll('.desktop-icon').forEach(icon => {
-            const newIcon = icon.cloneNode(true);
-            icon.parentNode.replaceChild(newIcon, icon);
-            newIcon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('desktop-icon-active'));
-                newIcon.classList.add('desktop-icon-active');
-                setTimeout(() => newIcon.classList.remove('desktop-icon-active'), 200);
-            });
-            newIcon.addEventListener('dblclick', (e) => {
-                e.stopPropagation();
-                const type = newIcon.dataset.type;
-                this.openApplication(type, newIcon.querySelector('span:last-child').textContent);
-            });
+            icon.addEventListener('dblclick', (e) => { e.stopPropagation(); const type = icon.dataset.type; if(type==='file-manager') this.openApp('file-manager'); else if(type==='browser') this.openApp('browser'); });
         });
-
-        // Settings window controls
+        // 设置窗口控制
         document.getElementById('close-btn').addEventListener('click', () => this.hideSettings());
         document.getElementById('minimize-btn').addEventListener('click', () => this.hideSettings());
         document.getElementById('maximize-btn').addEventListener('click', () => this.toggleMaximize());
-
-        // Settings navigation
-        document.querySelectorAll('.settings-nav').forEach(nav => {
-            nav.addEventListener('click', (e) => {
-                const page = nav.dataset.page;
-                this.showSettingsPage(page);
-                this.updateActiveNav(nav);
-            });
-        });
-
-        // Login button
+        document.querySelectorAll('.settings-nav').forEach(nav => nav.addEventListener('click', (e) => { this.showSettingsPage(nav.dataset.page); this.updateActiveNav(nav); }));
         document.getElementById('login-btn').addEventListener('click', () => this.showSettings());
-
-        // 个性化开关事件（带 OPFS 保存）
+        // 个性化开关绑定（确保每次点击都触发保存）
         const nightToggle = document.getElementById('night-mode-toggle');
-        if (nightToggle) {
-            nightToggle.addEventListener('click', async (e) => {
-                e.target.classList.toggle('toggle-active');
-                const enabled = e.target.classList.contains('toggle-active');
-                await this.updateSetting('nightMode', enabled);
-                this.toggleNightMode();
-            });
-        }
+        if(nightToggle) nightToggle.addEventListener('click', async (e) => { e.stopPropagation(); const active = nightToggle.classList.toggle('toggle-active'); await this.updateSetting('nightMode', active); this.toggleNightMode(); });
         const animToggle = document.getElementById('animations-toggle');
-        if (animToggle) {
-            animToggle.addEventListener('click', async (e) => {
-                e.target.classList.toggle('toggle-active');
-                const enabled = e.target.classList.contains('toggle-active');
-                await this.updateSetting('animations', enabled);
-                this.toggleAnimations();
-            });
-        }
+        if(animToggle) animToggle.addEventListener('click', async (e) => { e.stopPropagation(); const active = animToggle.classList.toggle('toggle-active'); await this.updateSetting('animations', active); this.toggleAnimations(); });
         const autoToggle = document.getElementById('auto-update-toggle');
-        if (autoToggle) {
-            autoToggle.addEventListener('click', async (e) => {
-                e.target.classList.toggle('toggle-active');
-                const enabled = e.target.classList.contains('toggle-active');
-                await this.updateSetting('autoUpdate', enabled);
-                this.toggleAutoUpdate();
-            });
-        }
-
-        // Background color picker
-        document.querySelectorAll('[data-color]').forEach(color => {
-            color.addEventListener('click', async (e) => {
-                const bgColor = e.target.dataset.color;
-                await this.updateSetting('backgroundColor', bgColor);
-                this.setBackgroundColor(bgColor);
-                this.updateColorSelection(e.target);
-            });
-        });
-
-        // Context menu actions
-        document.querySelectorAll('[data-action]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const action = item.dataset.action;
-                this.handleContextAction(action, e);
-            });
-        });
-
-        // Submenu items
-        document.querySelectorAll('[data-view]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const view = e.target.dataset.view;
-                this.setView(view);
-                this.hideAllMenus();
-            });
-        });
-
-        document.querySelectorAll('[data-sort]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const sort = e.target.dataset.sort;
-                this.setSort(sort);
-                this.hideAllMenus();
-            });
-        });
-
-        document.querySelectorAll('[data-new]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const type = e.target.dataset.new;
-                this.createNew(type);
-                this.hideAllMenus();
-            });
-        });
-
-        // Window dragging
-        this.initDragging();
-        this.initFullscreen();
+        if(autoToggle) autoToggle.addEventListener('click', async (e) => { e.stopPropagation(); const active = autoToggle.classList.toggle('toggle-active'); await this.updateSetting('autoUpdate', active); this.toggleAutoUpdate(); });
+        document.querySelectorAll('[data-color]').forEach(c => c.addEventListener('click', async (e) => { const col = e.target.dataset.color; await this.updateSetting('backgroundColor', col); this.setBackgroundColor(col); this.updateColorSelection(e.target); }));
+        // 右键菜单项
+        document.querySelectorAll('#context-menu .menu-item').forEach(item => item.addEventListener('click', (e) => { e.stopPropagation(); const action = item.dataset.action; if(action==='view') this.showSubmenu('view', item); else if(action==='sort') this.showSubmenu('sort', item); else if(action==='new') this.showSubmenu('new', item); else if(action==='refresh') this.refreshDesktop(); else if(action==='settings') this.showSettings(); else if(action==='personalize') this.showSettings('personalization'); }));
+        document.querySelectorAll('#icon-context-menu .menu-item').forEach(item => item.addEventListener('click', (e) => { e.stopPropagation(); const act = item.dataset.action; if(act==='icon-open') { const icon = this.currentIcon; if(icon) { const type = icon.dataset.type; if(type==='file-manager') this.openApp('file-manager'); else if(type==='browser') this.openApp('browser'); } } else if(act==='icon-properties') this.showSettings('system'); else this.showNotification('功能开发中'); this.hideAllMenus(); }));
+        // 子菜单项目
+        document.querySelectorAll('[data-view]').forEach(i => i.addEventListener('click', (e) => { this.setView(e.target.dataset.view); this.hideAllMenus(); }));
+        document.querySelectorAll('[data-sort]').forEach(i => i.addEventListener('click', (e) => { this.setSort(e.target.dataset.sort); this.hideAllMenus(); }));
+        document.querySelectorAll('[data-new]').forEach(i => i.addEventListener('click', (e) => { this.createNew(e.target.dataset.new); this.hideAllMenus(); }));
+        // 拖拽设置窗口
+        const handle = document.querySelector('.drag-handle');
+        handle.addEventListener('mousedown', (e) => { if(e.target.closest('.win-control-btn')) return; this.isDragging=true; this.dragOffset={x:e.clientX-this.settingsWindow.offsetLeft, y:e.clientY-this.settingsWindow.offsetTop}; document.addEventListener('mousemove', this.handleDrag.bind(this)); document.addEventListener('mouseup', this.stopDrag.bind(this)); });
+        // 任务栏
+        document.getElementById('start-menu').addEventListener('click', () => this.toggleStartMenu());
+        document.querySelectorAll('.taskbar-item').forEach(t => t.addEventListener('click', (e) => { const span = t.querySelector('.material-symbols-outlined'); if(!span) return; const txt = span.textContent; if(txt==='folder') this.openApp('file-manager'); else if(txt==='public') this.openApp('browser'); else if(txt==='terminal') this.openApp('terminal'); else if(txt==='settings') this.showSettings(); else if(t.classList.contains('mx-1')) this.toggleSearchPanel(); }));
+        this.initBrowser(); this.initFileManager(); this.initAppWindows();
     }
-
-    initDragging() {
-        const dragHandle = document.querySelector('.drag-handle');
-        dragHandle.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
-            this.dragOffset = {
-                x: e.clientX - this.settingsWindow.offsetLeft,
-                y: e.clientY - this.settingsWindow.offsetTop
-            };
-            document.addEventListener('mousemove', this.handleDrag.bind(this));
-            document.addEventListener('mouseup', this.stopDrag.bind(this));
-        });
+    showContextMenu(x,y) { this.hideAllMenus(); this.contextMenu.style.left=x+'px'; this.contextMenu.style.top=y+'px'; this.contextMenu.style.display='block'; }
+    showIconContextMenu(x,y,icon) { this.currentIcon = icon; this.hideAllMenus(); this.iconContextMenu.style.left=x+'px'; this.iconContextMenu.style.top=y+'px'; this.iconContextMenu.style.display='block'; }
+    showSubmenu(type, triggerItem) {
+        this.hideAllSubmenus();
+        let menu = null; if(type==='view') menu=this.viewMenu; else if(type==='sort') menu=this.sortMenu; else if(type==='new') menu=this.newMenu;
+        if(!menu) return;
+        const rect = triggerItem.getBoundingClientRect();
+        let left = rect.right + 5, top = rect.top;
+        menu.style.display = 'block';
+        const menuRect = menu.getBoundingClientRect();
+        if(left + menuRect.width > window.innerWidth) left = rect.left - menuRect.width - 5;
+        if(top + menuRect.height > window.innerHeight) top = window.innerHeight - menuRect.height - 5;
+        if(top<5) top=5;
+        menu.style.left = left+'px'; menu.style.top = top+'px';
+        this.activeSubmenu = menu;
     }
-
-    handleDrag(e) {
-        if (!this.isDragging) return;
-        this.settingsWindow.style.left = (e.clientX - this.dragOffset.x) + 'px';
-        this.settingsWindow.style.top = (e.clientY - this.dragOffset.y) + 'px';
-        this.settingsWindow.style.transform = 'none';
+    hideAllSubmenus() { if(this.viewMenu) this.viewMenu.style.display='none'; if(this.sortMenu) this.sortMenu.style.display='none'; if(this.newMenu) this.newMenu.style.display='none'; this.activeSubmenu=null; }
+    hideAllMenus() { this.contextMenu.style.display='none'; this.iconContextMenu.style.display='none'; this.hideAllSubmenus(); }
+    handleDrag(e) { if(!this.isDragging) return; this.settingsWindow.style.left = (e.clientX - this.dragOffset.x)+'px'; this.settingsWindow.style.top = (e.clientY - this.dragOffset.y)+'px'; this.settingsWindow.style.transform = 'none'; }
+    stopDrag() { this.isDragging=false; document.removeEventListener('mousemove', this.handleDrag.bind(this)); document.removeEventListener('mouseup', this.stopDrag.bind(this)); }
+    showSettings(page='personalization') { this.settingsWindow.style.display='flex'; this.showSettingsPage(page); }
+    hideSettings() { this.settingsWindow.style.display='none'; }
+    toggleMaximize() { if(this.settingsWindow.style.width==='100%'){ this.settingsWindow.style.width='900px'; this.settingsWindow.style.height='600px'; this.settingsWindow.style.left='50%'; this.settingsWindow.style.top='50%'; this.settingsWindow.style.transform='translate(-50%,-50%)'; } else { this.settingsWindow.style.width='100%'; this.settingsWindow.style.height='calc(100vh - 40px)'; this.settingsWindow.style.left='0'; this.settingsWindow.style.top='0'; this.settingsWindow.style.transform='none'; } }
+    showSettingsPage(page) { document.querySelectorAll('.settings-page').forEach(p=>p.classList.remove('active')); const target=document.getElementById('page-'+page); if(target) target.classList.add('active'); }
+    updateActiveNav(active) { document.querySelectorAll('.settings-nav').forEach(n=>{ n.classList.remove('bg-white/[0.03]','border-l-[3px]','border-white/80'); }); active.classList.add('bg-white/[0.03]','border-l-[3px]','border-white/80'); }
+    setView(view) { this.showNotification(`视图切换为${view}`); }
+    setSort(sort) { this.showNotification(`按${sort}排序`); }
+    createNew(type) { this.showNotification(`创建新${type}`); }
+    refreshDesktop() { this.hideAllMenus(); document.querySelectorAll('.desktop-icon').forEach((ic,i)=>{ ic.classList.add('desktop-icon-refresh-hide'); setTimeout(()=>{ ic.classList.remove('desktop-icon-refresh-hide'); ic.classList.add('desktop-icon-refresh-show'); },120+i*40); setTimeout(()=>ic.classList.remove('desktop-icon-refresh-show'),120+i*40+280); }); }
+    showNotification(msg) { const n=document.createElement('div'); n.className='fixed bottom-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded shadow-lg z-[10001] pointer-events-none'; n.textContent=msg; document.body.appendChild(n); setTimeout(()=>n.remove(),2000); }
+    updateClock() { const d=new Date(); document.getElementById('current-time').innerText=d.toLocaleTimeString('zh-CN',{hour12:false}); document.getElementById('current-date').innerText=`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
+    initKeyBlock() {
+        document.addEventListener('keydown',(e)=>{ if(e.key==='Escape'||e.key==='F11'||e.key==='Meta'){ e.preventDefault(); e.stopPropagation(); } if(e.ctrlKey && ['w','r','f4','t'].includes(e.key.toLowerCase())){ e.preventDefault(); e.stopPropagation(); this.showNotification('快捷键已禁用'); } }, true);
+        document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement && this.isSystemStarted) this.enterFullscreen(); });
     }
-
-    stopDrag() {
-        this.isDragging = false;
-        document.removeEventListener('mousemove', this.handleDrag.bind(this));
-        document.removeEventListener('mouseup', this.stopDrag.bind(this));
-    }
-
-    showContextMenu(x, y) {
-        this.hideAllMenus();
-        this.contextMenu.style.left = x + 'px';
-        this.contextMenu.style.top = y + 'px';
-        this.contextMenu.style.display = 'block';
-    }
-    
-    showIconContextMenu(x, y, iconElement) {
-        this.hideAllMenus();
-        const iconMenu = document.getElementById('icon-context-menu');
-        iconMenu.style.left = x + 'px';
-        iconMenu.style.top = y + 'px';
-        iconMenu.style.display = 'block';
-        iconMenu.onclick = (e) => {
-            const action = e.target.closest('.menu-item')?.dataset.action;
-            if (action === 'icon-open') {
-                const type = iconElement.dataset.type;
-                this.openApplication(type, iconElement.querySelector('span:last-child').textContent);
-            } else if (action === 'icon-runas') {
-                this.showNotification('以管理员身份运行');
-            } else if (action === 'icon-properties') {
-                this.showSettings('system');
-            }
-            this.hideAllMenus();
-        };
-    }
-
-    hideAllMenus() {
-        this.contextMenu.style.display = 'none';
-        document.getElementById('icon-context-menu').style.display = 'none';
-        this.viewMenu.style.display = 'none';
-        this.sortMenu.style.display = 'none';
-        this.newMenu.style.display = 'none';
-        const browserMenu = document.getElementById('browser-context-menu');
-        if (browserMenu) browserMenu.style.display = 'none';
-    }
-
-    handleContextAction(action, e) {
-        switch(action) {
-            case 'view': e.stopPropagation(); this.showSubMenu('view', e); break;
-            case 'sort': e.stopPropagation(); this.showSubMenu('sort', e); break;
-            case 'refresh': this.refreshDesktop(); break;
-            case 'new': e.stopPropagation(); this.showSubMenu('new', e); break;
-            case 'settings': this.showSettings(); break;
-            case 'personalize': this.showSettings('personalization'); break;
-        }
-    }
-
-    showSubMenu(type, e) {
-        this.hideAllMenus();
-        const trigger = e.currentTarget || e.target;
-        const rect = trigger.getBoundingClientRect();
-        const submenu = document.getElementById(type + '-menu');
-        submenu.style.visibility = 'hidden';
-        submenu.style.display = 'block';
-        const subW = submenu.offsetWidth;
-        const subH = submenu.offsetHeight;
-        let left = rect.right + 5;
-        if (left + subW > window.innerWidth - 4) left = rect.left - subW - 5;
-        let top = rect.top;
-        if (top + subH > window.innerHeight - 4) top = window.innerHeight - subH - 4;
-        if (top < 4) top = 4;
-        submenu.style.left = left + 'px';
-        submenu.style.top = top + 'px';
-        submenu.style.visibility = 'visible';
-    }
-
-    showSettings(page = 'personalization') {
-        this.settingsWindow.style.display = 'flex';
-        this.showSettingsPage(page);
-    }
-
-    hideSettings() { this.settingsWindow.style.display = 'none'; }
-    toggleMaximize() {
-        if (this.settingsWindow.style.width === '100%') {
-            this.settingsWindow.style.width = '900px';
-            this.settingsWindow.style.height = '600px';
-            this.settingsWindow.style.left = '50%';
-            this.settingsWindow.style.top = '50%';
-            this.settingsWindow.style.transform = 'translate(-50%, -50%)';
-        } else {
-            this.settingsWindow.style.width = '100%';
-            this.settingsWindow.style.height = 'calc(100vh - 40px)';
-            this.settingsWindow.style.left = '0';
-            this.settingsWindow.style.top = '0';
-            this.settingsWindow.style.transform = 'none';
-        }
-    }
-    showSettingsPage(page) {
-        document.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active'));
-        const targetPage = document.getElementById('page-' + page);
-        if (targetPage) targetPage.classList.add('active');
-    }
-    updateActiveNav(activeNav) {
-        document.querySelectorAll('.settings-nav').forEach(nav => {
-            nav.classList.remove('bg-white/[0.03]', 'border-l-[3px]', 'border-white/80');
-        });
-        activeNav.classList.add('bg-white/[0.03]', 'border-l-[3px]', 'border-white/80');
-    }
-
-    toggleNightMode() {
-        const isNight = this.settings.nightMode;
-        if (isNight) {
-            document.documentElement.style.setProperty('--charcoal-deep', '#0a0a0a');
-            document.documentElement.style.setProperty('--charcoal-medium', '#1a1a1a');
-        } else {
-            document.documentElement.style.setProperty('--charcoal-deep', '#121212');
-            document.documentElement.style.setProperty('--charcoal-medium', '#1e1e1e');
-        }
-    }
-
-    toggleAnimations() {
-        const isEnabled = this.settings.animations;
-        const styleId = 'animation-toggle-style';
-        let style = document.getElementById(styleId);
-        if (!style) {
-            style = document.createElement('style');
-            style.id = styleId;
-            document.head.appendChild(style);
-        }
-        style.textContent = isEnabled ? `* { transition: all 0.3s ease !important; }` : `* { transition: none !important; }`;
-    }
-
-    toggleAutoUpdate() { console.log('Auto update:', this.settings.autoUpdate); }
-
-    setBackgroundColor(color, shouldSave = true) {
-        this.desktopBackground = color;
-        document.body.style.backgroundColor = color;
-        document.querySelector(':root').style.setProperty('--charcoal-deep', color);
-        if (shouldSave) this.updateSetting('backgroundColor', color);
-    }
-
-    updateColorSelection(selectedElement) {
-        document.querySelectorAll('[data-color]').forEach(el => {
-            el.classList.remove('border-white/80');
-            el.classList.add('border-white/10');
-        });
-        selectedElement.classList.remove('border-white/10');
-        selectedElement.classList.add('border-white/80');
-    }
-
-    setView(view) { this.currentView = view; console.log('View set to:', view); }
-    setSort(sort) { this.showNotification(`已按 ${sort} 排序`); }
-    createNew(type) {
-        this.showNotification(`已创建新的 ${type}`);
-        this.createDesktopIcon(type === 'folder' ? '文件夹' : (type === 'shortcut' ? '快捷方式' : '文本文档'), 
-                               type === 'folder' ? 'folder' : (type === 'shortcut' ? 'link' : 'description'), type);
-    }
-    createDesktopIcon(name, icon, type) {
-        const template = document.querySelector('.desktop-icon').cloneNode(true);
-        template.querySelector('.material-symbols-outlined').textContent = icon;
-        template.querySelector('span:last-child').textContent = name;
-        template.dataset.type = type;
-        document.querySelector('main').appendChild(template);
-        this.initDesktopIcon(template);
-    }
-    initDesktopIcon(icon) { /* 已实现绑定 */ }
-    openApplication(type, name) { if(type==='file-manager') this.openApp('file-manager'); else if(type==='browser') this.openApp('browser'); }
-    refreshDesktop() {
-        this.hideAllMenus();
-        const icons = document.querySelectorAll('.desktop-icon');
-        icons.forEach((icon, i) => {
-            icon.classList.add('desktop-icon-refresh-hide');
-            setTimeout(() => {
-                icon.classList.remove('desktop-icon-refresh-hide');
-                icon.classList.add('desktop-icon-refresh-show');
-            }, 120 + i * 40);
-            setTimeout(() => icon.classList.remove('desktop-icon-refresh-show'), 120 + i * 40 + 280);
-        });
-    }
-    clearAllNotifications() { document.querySelectorAll('.raccoon-toast').forEach(n => n.remove()); }
-    showNotification(message) {
-        this.clearAllNotifications();
-        const notification = document.createElement('div');
-        notification.className = 'raccoon-toast fixed bottom-20 left-1/2 -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded shadow-lg z-[10001] pointer-events-none';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
-        return notification;
-    }
-    updateClock() {
-        const now = new Date();
-        document.getElementById('current-time').textContent = now.toLocaleTimeString('zh-CN', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
-        document.getElementById('current-date').textContent = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
-    }
-
-    // 错误弹窗与系统启动
     initErrorDialogSystem() {
-        const confirmBtn = document.getElementById('confirm-btn');
-        if (confirmBtn) confirmBtn.addEventListener('click', (e) => { e.preventDefault(); this.handleSystemStart(); });
-        document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
-        this.blockBrowserShortcuts();
+        document.getElementById('confirm-btn').addEventListener('click', async ()=>{ await this.handleSystemStart(); });
     }
-
     async handleSystemStart() {
-        const confirmBtn = document.getElementById('confirm-btn');
-        confirmBtn.innerHTML = '<span class="material-symbols-outlined text-sm mr-1 animate-spin">refresh</span>正在启动...';
-        confirmBtn.disabled = true;
-        setTimeout(async () => {
-            const errorOverlay = document.getElementById('error-overlay');
-            errorOverlay.style.animation = 'fadeOut 0.5s ease-out forwards';
-            setTimeout(async () => {
-                this.clearAllNotifications();
-                errorOverlay.remove();
-                // 初始化 OPFS 并加载设置
-                await this.initOPFS();
-                await this.loadSettingsFromOPFS();
-                // 显示主界面
-                const desktop = document.getElementById('desktop');
-                desktop.classList.add('show');
-                await this.enterFullscreen();
-                this.isSystemStarted = true;
+        const btn=document.getElementById('confirm-btn'); btn.innerHTML='<span class="material-symbols-outlined text-sm mr-1 animate-spin">refresh</span>启动中...'; btn.disabled=true;
+        setTimeout(async()=>{
+            const overlay=document.getElementById('error-overlay'); overlay.style.animation='fadeOut 0.5s ease-out forwards';
+            setTimeout(async()=>{
+                await this.initOPFS(); await this.loadSettingsFromOPFS();
+                document.getElementById('desktop').classList.add('show'); await this.enterFullscreen(); this.isSystemStarted=true;
                 this.initDesktopFeatures();
-            }, 500);
-        }, 1500);
+            },500);
+        },1500);
     }
-
-    blockBrowserShortcuts() {
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'F11') { e.preventDefault(); e.stopPropagation(); this.showNotification('全屏模式已锁定'); return false; }
-            if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.showNotification('系统运行中，无法退出 RaccoonOS'); return false; }
-        }, true);
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && ['w', 'r', 'f4', 't'].includes(e.key.toLowerCase())) {
-                e.preventDefault(); e.stopPropagation(); this.showNotification('系统模式下禁用此快捷键'); return false;
-            }
-        }, true);
-        document.addEventListener('contextmenu', (e) => { if (this.isSystemStarted && !e.target.closest('#desktop')) e.preventDefault(); });
-    }
-
-    initDesktopFeatures() {
-        this.initEventListeners();
-        this.initDragging();
-        this.initFullscreen();
-        this.initDesktopIcons();
-        this.initLoginButton();
-        this.initStartMenu();
-        this.initTaskbarButtons();
-        this.initAppWindows();
-        this.initSearchPanel();
-    }
-
-    initAppWindows() {
-        document.querySelectorAll('.window-minimize').forEach(btn => btn.onclick = () => { document.getElementById(btn.dataset.window).style.display = 'none'; });
-        document.querySelectorAll('.window-maximize').forEach(btn => {
-            btn.onclick = () => {
-                const win = document.getElementById(btn.dataset.window);
-                if (win.style.width === '100%') {
-                    win.style.width = ''; win.style.height = ''; win.style.top = '50%'; win.style.left = '50%'; win.style.transform = 'translate(-50%, -50%)';
-                } else { win.style.width = '100%'; win.style.height = 'calc(100% - 40px)'; win.style.top = '0'; win.style.left = '0'; win.style.transform = 'none'; }
-            };
-        });
-        document.querySelectorAll('.window-close').forEach(btn => btn.onclick = () => { document.getElementById(btn.dataset.window).style.display = 'none'; });
-        this.initWindowDrag();
-        this.initBrowser();
-        this.initFileManager();
-    }
-
-    initWindowDrag() {
-        document.querySelectorAll('.app-window').forEach(win => {
-            const handle = win.querySelector('.drag-handle');
-            if (handle) handle.onmousedown = (e) => {
-                if (e.target.closest('.win-control-btn')) return;
-                const rect = win.getBoundingClientRect();
-                const offX = e.clientX - rect.left, offY = e.clientY - rect.top;
-                const move = (e) => { win.style.left = (e.clientX - offX) + 'px'; win.style.top = (e.clientY - offY) + 'px'; win.style.transform = 'none'; };
-                const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
-                document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
-            };
-        });
-        document.querySelectorAll('.app-window').forEach(win => {
-            const resizer = document.createElement('div');
-            resizer.style.cssText = 'position: absolute; right: 0; bottom: 0; width: 15px; height: 15px; cursor: se-resize; z-index: 10;';
-            win.appendChild(resizer);
-            resizer.onmousedown = (e) => {
-                e.stopPropagation();
-                const startX = e.clientX, startY = e.clientY, startW = win.offsetWidth, startH = win.offsetHeight;
-                const move = (e) => { win.style.width = Math.max(400, startW + (e.clientX - startX)) + 'px'; win.style.height = Math.max(300, startH + (e.clientY - startY)) + 'px'; };
-                const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
-                document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
-            };
-        });
-    }
-
-    initSearchPanel() {
-        const input = document.getElementById('search-input');
-        if (input) input.oninput = (e) => { const q = e.target.value.toLowerCase(); document.querySelectorAll('.search-result').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? 'flex' : 'none'; }); };
-        document.querySelectorAll('.search-result').forEach(r => r.onclick = () => { this.openApp(r.dataset.app); document.getElementById('search-panel').style.display = 'none'; });
-    }
-
-    openApp(appName) {
-        let winId = null;
-        if (appName === 'file-manager') winId = 'file-manager-window';
-        else if (appName === 'browser') winId = 'browser-window';
-        else if (appName === 'terminal') winId = 'terminal-window';
-        else if (appName === 'settings') { this.showSettings(); return; }
-        if (winId) {
-            const win = document.getElementById(winId);
-            win.style.display = 'flex';
-            win.style.left = '50%'; win.style.top = '50%'; win.style.transform = 'translate(-50%, -50%)';
-            if (appName === 'browser') setTimeout(() => { document.getElementById('browser-home').style.display = 'flex'; document.getElementById('browser-frame').style.display = 'none'; document.getElementById('browser-url').value = ''; }, 100);
-        }
-    }
-
-    initBrowser() { /* 保持原有完整逻辑，此处精简但原样保留功能 */ 
-        const urlInput = document.getElementById('browser-url');
-        if(urlInput) urlInput.addEventListener('keypress', e => { if(e.key === 'Enter') this.navigateToUrl(); });
-        document.getElementById('browser-go').addEventListener('click', () => this.navigateToUrl());
-        document.getElementById('browser-home-search').addEventListener('keypress', e => { if(e.key === 'Enter') { let url = e.target.value; if(!url.startsWith('http')) url='https://www.baidu.com/s?wd='+encodeURIComponent(url); document.getElementById('browser-url').value=url; document.getElementById('browser-frame').src=url; document.getElementById('browser-home').style.display='none'; document.getElementById('browser-frame').style.display='block'; } });
-        document.getElementById('browser-back').addEventListener('click', () => { try { document.getElementById('browser-frame').contentWindow.history.back(); } catch(e){} });
-        document.getElementById('browser-forward').addEventListener('click', () => { try { document.getElementById('browser-frame').contentWindow.history.forward(); } catch(e){} });
-        document.getElementById('browser-refresh').addEventListener('click', () => { try { document.getElementById('browser-frame').contentWindow.location.reload(); } catch(e){ const src=document.getElementById('browser-frame').src; if(src){ document.getElementById('browser-frame').src=''; setTimeout(()=>document.getElementById('browser-frame').src=src,0); } } });
-        document.getElementById('browser-frame').addEventListener('load', () => { try { const u = document.getElementById('browser-frame').contentWindow.location.href; if(u && u!=='about:blank') document.getElementById('browser-url').value = u; } catch(e){} });
-    }
-    navigateToUrl() { let url = document.getElementById('browser-url').value; if(!url) return; if(!url.startsWith('http')) url = 'https://www.baidu.com/s?wd=' + encodeURIComponent(url); document.getElementById('browser-frame').src = url; document.getElementById('browser-home').style.display = 'none'; document.getElementById('browser-frame').style.display = 'block'; }
-    initFileManager() {
-        document.querySelectorAll('.window-sidebar-item').forEach(item => item.addEventListener('click', () => this.navigateToFolder(item.dataset.path)));
-        document.querySelectorAll('.file-item').forEach(item => item.addEventListener('click', () => { if(item.dataset.type === 'folder') this.navigateToFolder(item.dataset.name); }));
-    }
-    navigateToFolder(folder) { document.getElementById('file-manager-path').textContent = folder; /* 简易内容生成 */ const list = document.getElementById('file-list'); let files=[]; if(folder==='此电脑'||folder==='desktop') files=['文档','下载','图片','音乐','视频','桌面'].map(n=>({name:n,icon:'folder',color:'text-yellow-400'})); else files=[{name:'示例文件.txt',icon:'description',color:'text-gray-300'}]; list.innerHTML = files.map(f=>`<div class="file-item flex flex-col items-center p-2 hover:bg-white/5 rounded cursor-pointer" data-type="folder" data-name="${f.name}"><span class="material-symbols-outlined text-4xl ${f.color}">${f.icon}</span><span class="text-xs mt-1 text-center">${f.name}</span></div>`).join(''); this.initFileManager(); }
-    initDesktopIcons() { /* 重新绑定图标 */ }
-    initLoginButton() { const btn = document.getElementById('login-btn'); btn.onclick = () => this.showSettings(); }
-    initStartMenu() { document.getElementById('start-menu').addEventListener('click', () => this.toggleStartMenu()); this.initStartMenuButtons(); }
-    initTaskbarButtons() {
-        document.querySelectorAll('.taskbar-item').forEach(item => {
-            item.onclick = (e) => {
-                const txt = item.querySelector('.material-symbols-outlined')?.textContent || '';
-                if(item.id === 'start-menu') this.toggleStartMenu();
-                else if(item.classList.contains('mx-1') && item.classList.contains('w-48')) this.toggleSearchPanel();
-                else if(txt === 'folder') this.openApp('file-manager');
-                else if(txt === 'public') this.openApp('browser');
-                else if(txt === 'terminal') this.openApp('terminal');
-                else if(txt === 'settings') this.showSettings();
-                else this.showNotification('功能开发中');
-            };
-        });
-    }
-    toggleSearchPanel() { const p = document.getElementById('search-panel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display === 'block') document.getElementById('search-input').focus(); }
-    toggleStartMenu() { const p = document.getElementById('start-menu-popup'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
-    initStartMenuButtons() { document.querySelectorAll('.start-menu-btn').forEach(btn => btn.onclick = () => { if(btn.dataset.action === 'shutdown') this.shutdownSystem(); document.getElementById('start-menu-popup').style.display = 'none'; }); }
-    shutdownSystem() {
-        document.getElementById('start-menu-popup').style.display = 'none';
-        const shutdownScreen = document.getElementById('shutdown-screen');
-        shutdownScreen.style.display = 'flex';
-        const progress = document.getElementById('shutdown-progress');
-        setTimeout(() => { progress.style.width = '100%'; }, 100);
-        setTimeout(() => { document.getElementById('desktop').classList.remove('show'); document.querySelectorAll('.app-window').forEach(w => w.style.display = 'none'); shutdownScreen.innerHTML = '<div class="bg-black w-full h-full"></div>'; }, 3200);
-        setTimeout(() => { try { window.close(); } catch(e){} try { if(document.exitFullscreen) document.exitFullscreen(); } catch(e){} setTimeout(() => { try { window.close(); } catch(e){} window.location.href = 'about:blank'; }, 500); }, 5000);
-    }
-    initFullscreen() {}
-    initFullscreenShield() {}
-    handleFullscreenChange() { if(!document.fullscreenElement && this.isSystemStarted) this.enterFullscreen(); }
-    async enterFullscreen() { try { if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); else if(document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen(); this.isFullscreen = true; if(navigator.keyboard && navigator.keyboard.lock) await navigator.keyboard.lock(); } catch(e){} }
+    async enterFullscreen() { try{ if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); else if(document.documentElement.webkitRequestFullscreen) await document.documentElement.webkitRequestFullscreen(); this.isFullscreen=true; if(navigator.keyboard?.lock) await navigator.keyboard.lock(); }catch(e){} }
+    initDesktopFeatures() { this.initEventListeners(); this.initBrowser(); this.initFileManager(); this.initAppWindows(); this.initTaskbarExtra(); }
+    initTaskbarExtra() { const searchArea=document.querySelector('.taskbar-item.mx-1'); if(searchArea) searchArea.addEventListener('click',()=>this.toggleSearchPanel()); this.initStartMenuButtons(); }
+    toggleSearchPanel() { const p=document.getElementById('search-panel'); if(!p){ const div=document.createElement('div'); div.id='search-panel'; div.className='fixed bottom-12 left-2 w-96 bg-[#1f1f1f] border border-white/10 rounded-lg shadow-2xl z-[9998]'; div.innerHTML='<div class="p-3 border-b border-white/10"><input type="text" class="w-full bg-[#2a2a2a] rounded px-3 py-2 text-sm outline-none" placeholder="搜索应用" id="search-input"></div><div class="p-2"><div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="file-manager"><span class="material-symbols-outlined text-lg">folder</span><span class="text-sm">文件管理器</span></div><div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="browser"><span class="material-symbols-outlined text-lg">public</span><span class="text-sm">浏览器</span></div><div class="search-result flex items-center gap-3 px-2 py-2 hover:bg-white/10 rounded cursor-pointer" data-app="terminal"><span class="material-symbols-outlined text-lg">terminal</span><span class="text-sm">终端</span></div></div>'; document.body.appendChild(div); div.querySelectorAll('.search-result').forEach(r=>r.addEventListener('click',()=>{ this.openApp(r.dataset.app); div.style.display='none'; })); document.getElementById('search-input')?.addEventListener('input',(e)=>{ const q=e.target.value.toLowerCase(); document.querySelectorAll('.search-result').forEach(r=>{ r.style.display=r.textContent.toLowerCase().includes(q)?'flex':'none'; }); }); } const pnl=document.getElementById('search-panel'); pnl.style.display=pnl.style.display==='none'?'block':'none'; if(pnl.style.display==='block') document.getElementById('search-input')?.focus(); }
+    toggleStartMenu() { const m=document.getElementById('start-menu-popup'); m.style.display=m.style.display==='none'?'block':'none'; }
+    initStartMenuButtons() { document.querySelectorAll('.start-menu-btn').forEach(b=>b.addEventListener('click',()=>{ if(b.dataset.action==='shutdown') this.shutdownSystem(); document.getElementById('start-menu-popup').style.display='none'; })); }
+    shutdownSystem() { document.getElementById('start-menu-popup').style.display='none'; const sc=document.getElementById('shutdown-screen'); sc.style.display='flex'; const prog=document.getElementById('shutdown-progress'); setTimeout(()=>prog.style.width='100%',100); setTimeout(()=>{ document.getElementById('desktop').classList.remove('show'); sc.innerHTML='<div class="bg-black w-full h-full"></div>'; },3200); setTimeout(()=>{ try{ window.close(); }catch(e){} try{ if(document.exitFullscreen) document.exitFullscreen(); }catch(e){} setTimeout(()=>{ try{ window.close(); }catch(e){} window.location.href='about:blank'; },500); },5000); }
+    openApp(name) { let win=null; if(name==='file-manager') win=document.getElementById('file-manager-window'); else if(name==='browser') win=document.getElementById('browser-window'); else if(name==='terminal') win=document.getElementById('terminal-window'); else if(name==='settings') { this.showSettings(); return; } if(win){ win.style.display='flex'; win.style.left='50%'; win.style.top='50%'; win.style.transform='translate(-50%,-50%)'; if(name==='browser'){ document.getElementById('browser-home').style.display='flex'; document.getElementById('browser-frame').style.display='none'; } } }
+    initAppWindows() { document.querySelectorAll('.window-minimize,.window-close').forEach(b=>b.addEventListener('click',()=>{ const w=document.getElementById(b.dataset.window); if(w) w.style.display='none'; })); document.querySelectorAll('.window-maximize').forEach(b=>b.addEventListener('click',()=>{ const w=document.getElementById(b.dataset.window); if(w.style.width==='100%'){ w.style.width=''; w.style.height=''; w.style.top='50%'; w.style.left='50%'; w.style.transform='translate(-50%,-50%)'; } else { w.style.width='100%'; w.style.height='calc(100% - 40px)'; w.style.top='0'; w.style.left='0'; w.style.transform='none'; } })); }
+    initBrowser() { const urlInput=document.getElementById('browser-url'); const go=document.getElementById('browser-go'); const homeSearch=document.getElementById('browser-home-search'); const frame=document.getElementById('browser-frame'); const back=document.getElementById('browser-back'); const fwd=document.getElementById('browser-forward'); const reload=document.getElementById('browser-refresh'); if(go) go.addEventListener('click',()=>this.navigateToUrl()); if(urlInput) urlInput.addEventListener('keypress',e=>{if(e.key==='Enter') this.navigateToUrl();}); if(homeSearch) homeSearch.addEventListener('keypress',e=>{if(e.key==='Enter'){ let url=homeSearch.value; if(!url.startsWith('http')) url='https://www.baidu.com/s?wd='+encodeURIComponent(url); urlInput.value=url; frame.src=url; document.getElementById('browser-home').style.display='none'; frame.style.display='block'; }}); if(back) back.addEventListener('click',()=>{try{ frame.contentWindow.history.back(); }catch(e){}}); if(fwd) fwd.addEventListener('click',()=>{try{ frame.contentWindow.history.forward(); }catch(e){}}); if(reload) reload.addEventListener('click',()=>{try{ frame.contentWindow.location.reload(); }catch(e){ const src=frame.src; if(src){ frame.src=''; setTimeout(()=>frame.src=src,0); } }}); frame.addEventListener('load',()=>{ try{ const u=frame.contentWindow.location.href; if(u && u!=='about:blank') urlInput.value=u; }catch(e){} }); }
+    navigateToUrl() { let url=document.getElementById('browser-url').value; if(!url) return; if(!url.startsWith('http')) url='https://www.baidu.com/s?wd='+encodeURIComponent(url); document.getElementById('browser-frame').src=url; document.getElementById('browser-home').style.display='none'; document.getElementById('browser-frame').style.display='block'; }
+    initFileManager() { document.querySelectorAll('.window-sidebar-item').forEach(i=>i.addEventListener('click',()=>{ const name=i.dataset.path; document.getElementById('file-manager-path').innerText=name; const list=document.getElementById('file-list'); if(name==='desktop') list.innerHTML='<div class="file-item flex flex-col items-center p-2"><span class="material-symbols-outlined text-4xl text-yellow-400">folder</span><span class="text-xs">示例文件夹</span></div>'; else list.innerHTML='<div class="file-item flex flex-col items-center p-2"><span class="material-symbols-outlined text-4xl text-blue-400">description</span><span class="text-xs">示例文件.txt</span></div>'; })); }
 }
-
-document.addEventListener('DOMContentLoaded', () => { window.os = new RaccoonOS(); });
+document.addEventListener('DOMContentLoaded',()=>{ window.raccoon = new RaccoonOS(); });
 </script>
 </body>
 </html>

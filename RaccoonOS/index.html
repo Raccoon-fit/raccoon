@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Raccoon OS - 真实操作系统体验版</title>
+    <title>Raccoon OS - 精简稳定版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
@@ -165,52 +165,15 @@
                 { name: "终端", icon: "terminal", app: "terminal" },
                 { name: "设置", icon: "settings", app: "settings" }
             ];
-            this.settings = { theme: "dark", wallpaper: "#0a0a0a", volume: 70 };
-            this.opfsRoot = null;
+            this.settings = { volume: 70 };
             this.init();
         }
 
-        async init() {
-            await this.initOPFS();
-            await this.loadSettings();
-            this.applySettings();
+        init() {
             this.renderDesktop();
             this.initEventListeners();
             this.startClock();
-            // 显示启动确认对话框（确保用户点击确定后才能操作）
             this.showBootDialog();
-        }
-
-        async initOPFS() {
-            try {
-                if (navigator.storage && navigator.storage.getDirectory) {
-                    this.opfsRoot = await navigator.storage.getDirectory();
-                    const settingsFile = await this.opfsRoot.getFileHandle('os_settings.json', { create: true });
-                    const file = await settingsFile.getFile();
-                    const text = await file.text();
-                    if (text) this.settings = { ...this.settings, ...JSON.parse(text) };
-                }
-            } catch(e) { console.warn('OPFS not supported', e); }
-        }
-
-        async saveSettings() {
-            if (!this.opfsRoot) return;
-            try {
-                const settingsFile = await this.opfsRoot.getFileHandle('os_settings.json', { create: true });
-                const writable = await settingsFile.createWritable();
-                await writable.write(JSON.stringify(this.settings));
-                await writable.close();
-            } catch(e) {}
-        }
-
-        applySettings() {
-            document.body.style.backgroundColor = this.settings.wallpaper;
-            const volume = this.settings.volume;
-            const slider = document.getElementById('volume-slider');
-            if (slider) slider.value = volume;
-            const valSpan = document.getElementById('volume-value');
-            if (valSpan) valSpan.innerText = volume;
-            document.querySelectorAll('audio, video').forEach(el => el.volume = volume / 100);
         }
 
         renderDesktop() {
@@ -495,19 +458,14 @@
             content.querySelectorAll('[data-wall]').forEach(el => {
                 el.addEventListener('click', async () => {
                     const wall = el.dataset.wall;
-                    this.settings.wallpaper = wall;
-                    await this.saveSettings();
-                    this.applySettings();
+                    document.body.style.backgroundColor = wall;
                 });
             });
             const themeToggle = content.querySelector('#theme-toggle');
-            themeToggle.addEventListener('click', async () => {
+            themeToggle.addEventListener('click', () => {
                 themeToggle.classList.toggle('toggle-active');
                 const isDark = themeToggle.classList.contains('toggle-active');
-                this.settings.theme = isDark ? 'dark' : 'light';
-                this.settings.wallpaper = isDark ? '#0a0a0a' : '#dddddd';
-                await this.saveSettings();
-                this.applySettings();
+                document.body.style.backgroundColor = isDark ? '#0a0a0a' : '#dddddd';
             });
             return win;
         }
@@ -534,12 +492,11 @@
             const volPopup = document.getElementById('volume-popup');
             volBtn.addEventListener('click', (e) => { e.stopPropagation(); volPopup.classList.toggle('hidden'); });
             const volSlider = document.getElementById('volume-slider');
-            volSlider.addEventListener('input', async (e) => {
+            volSlider.addEventListener('input', (e) => {
                 const val = e.target.value;
                 this.settings.volume = parseInt(val);
                 document.getElementById('volume-value').innerText = val;
-                await this.saveSettings();
-                this.applySettings();
+                document.querySelectorAll('audio, video').forEach(el => el.volume = val / 100);
             });
             document.addEventListener('click', () => volPopup.classList.add('hidden'));
 
@@ -627,10 +584,7 @@
             icons.forEach(ic => { ic.style.opacity = '0'; setTimeout(() => ic.style.opacity = '1', 150); });
         }
 
-        // 启动确认弹窗（确保按钮可点）
         showBootDialog() {
-            // 防止重复弹窗
-            if (document.querySelector('.boot-dialog')) return;
             const dialog = document.createElement('div');
             dialog.className = 'boot-dialog';
             dialog.innerHTML = `
@@ -639,24 +593,18 @@
                         <span class="material-symbols-outlined">stadia_controller</span>
                         <span class="font-semibold">RaccoonOS 启动</span>
                     </div>
-                    <p class="text-gray-300 text-sm mb-4">欢迎使用 Raccoon OS，点击“确定”进入桌面环境。</p>
+                    <p class="text-gray-300 text-sm mb-4">点击“确定”进入桌面环境。</p>
                     <button id="boot-confirm-btn" class="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded text-white w-full">确定</button>
                 </div>
             `;
             document.body.appendChild(dialog);
             const confirmBtn = dialog.querySelector('#boot-confirm-btn');
-            // 使用 addEventListener 确保可靠
             confirmBtn.addEventListener('click', () => {
-                console.log('确定按钮被点击');
                 dialog.remove();
-                // 延迟一下再尝试全屏，避免浏览器策略干扰
-                setTimeout(() => {
-                    try {
-                        if (document.documentElement.requestFullscreen) {
-                            document.documentElement.requestFullscreen().catch(e => console.log('全屏请求失败', e));
-                        }
-                    } catch(e) {}
-                }, 100);
+                // 可选全屏
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                }
             });
         }
 

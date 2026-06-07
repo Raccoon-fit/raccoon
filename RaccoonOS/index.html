@@ -177,7 +177,7 @@
             this.renderDesktop();
             this.initEventListeners();
             this.startClock();
-            // 显示启动确认对话框（模拟登录/启动）
+            // 显示启动确认对话框（确保用户点击确定后才能操作）
             this.showBootDialog();
         }
 
@@ -627,31 +627,37 @@
             icons.forEach(ic => { ic.style.opacity = '0'; setTimeout(() => ic.style.opacity = '1', 150); });
         }
 
+        // 启动确认弹窗（确保按钮可点）
         showBootDialog() {
+            // 防止重复弹窗
+            if (document.querySelector('.boot-dialog')) return;
             const dialog = document.createElement('div');
             dialog.className = 'boot-dialog';
             dialog.innerHTML = `
                 <div class="bg-gray-800 rounded-xl w-96 p-5 shadow-2xl border border-gray-700">
-                    <div class="flex items-center gap-2 text-red-400 mb-3">
-                        <span class="material-symbols-outlined">info</span>
-                        <span class="font-semibold">系统启动</span>
+                    <div class="flex items-center gap-2 text-blue-400 mb-3">
+                        <span class="material-symbols-outlined">stadia_controller</span>
+                        <span class="font-semibold">RaccoonOS 启动</span>
                     </div>
-                    <p class="text-gray-300 text-sm mb-4">RaccoonOS 需要您的确认以启动桌面环境。</p>
+                    <p class="text-gray-300 text-sm mb-4">欢迎使用 Raccoon OS，点击“确定”进入桌面环境。</p>
                     <button id="boot-confirm-btn" class="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded text-white w-full">确定</button>
                 </div>
             `;
             document.body.appendChild(dialog);
             const confirmBtn = dialog.querySelector('#boot-confirm-btn');
-            confirmBtn.onclick = () => {
+            // 使用 addEventListener 确保可靠
+            confirmBtn.addEventListener('click', () => {
+                console.log('确定按钮被点击');
                 dialog.remove();
-                this.enterFullscreen();
-            };
-        }
-
-        async enterFullscreen() {
-            try {
-                if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
-            } catch(e) { console.log('全屏请求被浏览器阻止'); }
+                // 延迟一下再尝试全屏，避免浏览器策略干扰
+                setTimeout(() => {
+                    try {
+                        if (document.documentElement.requestFullscreen) {
+                            document.documentElement.requestFullscreen().catch(e => console.log('全屏请求失败', e));
+                        }
+                    } catch(e) {}
+                }, 100);
+            });
         }
 
         startClock() {

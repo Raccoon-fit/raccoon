@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Raccoon OS - 第三版全面修复</title>
+    <title>Raccoon OS - 第四版（完整功能）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
@@ -139,6 +139,32 @@
             z-index: 20000; display: flex; align-items: center; justify-content: center;
             color: white;
         }
+        /* 浏览器首页样式 */
+        .browser-home {
+            position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10;
+        }
+        .browser-home .logo { font-size: 80px; margin-bottom: 20px; }
+        .browser-home .title { font-size: 32px; font-weight: 300; margin-bottom: 30px; color: rgba(255,255,255,0.9); }
+        .browser-home .search-box {
+            width: 500px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
+            border-radius: 50px; padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .browser-home .search-box input {
+            flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 16px;
+        }
+        .browser-home .search-box input::placeholder { color: rgba(255,255,255,0.6); }
+        .browser-home .quick-links {
+            display: flex; gap: 32px; margin-top: 48px;
+        }
+        .browser-home .quick-link {
+            text-align: center; cursor: pointer; transition: transform 0.2s;
+        }
+        .browser-home .quick-link:hover { transform: scale(1.05); }
+        .browser-home .quick-link span:first-child { font-size: 48px; }
+        .browser-home .quick-link span:last-child { display: block; font-size: 12px; margin-top: 8px; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -300,12 +326,10 @@
                 if (this.activeWindow === winObj) this.activeWindow = null;
             }
 
-            // 任务栏按钮右键菜单（向上弹出）
             showWindowContextMenu(x, y, winObj) {
                 this.removeAllContextMenus();
                 const menu = document.createElement('div');
                 menu.className = 'context-menu';
-                // 向上弹出：计算菜单高度，如果上方空间不足则向下
                 const menuHeight = 80;
                 let top = y - menuHeight;
                 if (top < 5) top = y + 5;
@@ -324,8 +348,8 @@
             createBaseWindow(id, icon, title) {
                 const win = document.createElement('div');
                 win.className = 'window';
-                win.style.width = '700px';
-                win.style.height = '450px';
+                win.style.width = '800px';
+                win.style.height = '550px';
                 win.innerHTML = `
                     <div class="window-header">
                         <div class="window-title"><span class="material-symbols-outlined text-sm">${icon}</span> ${title}</div>
@@ -370,8 +394,8 @@
                 });
                 win.querySelector('[data-action="maximize"]').addEventListener('click', () => {
                     if (win.style.width === '100%') {
-                        win.style.width = '700px';
-                        win.style.height = '450px';
+                        win.style.width = '800px';
+                        win.style.height = '550px';
                         win.style.left = '100px';
                         win.style.top = '100px';
                     } else {
@@ -388,12 +412,11 @@
                 return win;
             }
 
-            // 文件管理器 - 模拟真实目录结构
+            // 文件管理器 - 完整目录树和文件列表
             createFileManagerWindow(id) {
                 const win = this.createBaseWindow(id, 'folder', '文件管理器');
                 const content = win.querySelector('.window-content');
                 content.style.display = 'flex';
-                // 左侧目录树
                 const tree = document.createElement('div');
                 tree.className = 'file-tree';
                 const dirs = [
@@ -412,7 +435,6 @@
                     div.addEventListener('click', () => this.showFileList(dir.path, fileList));
                     tree.appendChild(div);
                 });
-                // 右侧文件列表
                 const fileList = document.createElement('div');
                 fileList.className = 'file-list';
                 this.showFileList('desktop', fileList);
@@ -422,29 +444,32 @@
             }
 
             showFileList(path, container) {
-                // 模拟不同目录下的文件
                 const filesMap = {
                     desktop: [
                         { name: '示例文件夹', icon: 'folder', type: 'dir' },
-                        { name: 'readme.txt', icon: 'description', type: 'file' }
+                        { name: 'readme.txt', icon: 'description', type: 'file' },
+                        { name: '壁纸.png', icon: 'image', type: 'file' }
                     ],
                     documents: [
                         { name: '工作文档.docx', icon: 'description', type: 'file' },
-                        { name: '报表.xlsx', icon: 'table_chart', type: 'file' }
+                        { name: '报表.xlsx', icon: 'table_chart', type: 'file' },
+                        { name: '演示文稿.pptx', icon: 'slideshow', type: 'file' }
                     ],
                     downloads: [
                         { name: '安装包.exe', icon: 'install_desktop', type: 'file' },
-                        { name: '图片.jpg', icon: 'image', type: 'file' }
+                        { name: '图片.zip', icon: 'folder_zip', type: 'file' }
                     ],
                     pictures: [
-                        { name: '壁纸.png', icon: 'image', type: 'file' },
+                        { name: '风景.jpg', icon: 'image', type: 'file' },
                         { name: '截图.png', icon: 'screenshot', type: 'file' }
                     ],
                     music: [
-                        { name: '歌曲.mp3', icon: 'music_note', type: 'file' }
+                        { name: '歌曲1.mp3', icon: 'music_note', type: 'file' },
+                        { name: '歌单.flac', icon: 'library_music', type: 'file' }
                     ],
                     videos: [
-                        { name: '电影.mp4', icon: 'video_library', type: 'file' }
+                        { name: '电影.mp4', icon: 'video_library', type: 'file' },
+                        { name: '教程.mkv', icon: 'play_circle', type: 'file' }
                     ]
                 };
                 const files = filesMap[path] || [];
@@ -455,43 +480,160 @@
                     div.innerHTML = `<span class="material-symbols-outlined">${file.icon}</span><div>${file.name}</div>`;
                     if (file.type === 'dir') {
                         div.addEventListener('dblclick', () => this.showFileList(file.name.toLowerCase(), container));
+                    } else {
+                        div.addEventListener('dblclick', () => this.openFile(file.name));
                     }
                     container.appendChild(div);
                 });
             }
 
-            // 浏览器窗口（包含正确的右键菜单）
+            openFile(fileName) {
+                alert(`打开文件: ${fileName}\n这是一个模拟的文件打开操作。`);
+            }
+
+            // 浏览器窗口 - 精美的首页
             createBrowserWindow(id) {
                 const win = this.createBaseWindow(id, 'public', 'Raccoon Browser');
                 const content = win.querySelector('.window-content');
+                content.style.position = 'relative';
                 content.innerHTML = `
-                    <div style="display: flex; padding: 8px; gap: 8px; background:#2a2a2a;">
-                        <input type="text" id="browser-url-${id}" class="flex-1 bg-[#333] rounded-full px-3 py-1 text-sm text-white border-none outline-none" placeholder="输入网址" value="https://www.baidu.com">
-                        <button id="browser-go-${id}" class="px-2 text-white">前往</button>
+                    <div style="display: flex; padding: 8px; gap: 8px; background:#2a2a2a; border-bottom: 1px solid #444;">
+                        <button class="browser-nav-back p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                        <button class="browser-nav-forward p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+                        <button class="browser-nav-reload p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">refresh</span></button>
+                        <div class="flex-1 bg-[#333] rounded-full px-3 py-1 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xs text-white/50">lock</span>
+                            <input type="text" id="browser-url-${id}" class="bg-transparent flex-1 outline-none text-sm text-white" placeholder="输入网址或搜索" value="">
+                        </div>
+                        <button class="browser-go p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
                     </div>
-                    <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+                    <div id="browser-home-${id}" class="browser-home">
+                        <div class="logo">🦝</div>
+                        <div class="title">Raccoon Browser</div>
+                        <div class="search-box">
+                            <span class="material-symbols-outlined">search</span>
+                            <input type="text" id="browser-home-search-${id}" placeholder="搜索或输入网址">
+                        </div>
+                        <div class="quick-links">
+                            <div class="quick-link" data-url="https://www.baidu.com">
+                                <span class="material-symbols-outlined text-blue-500">language</span>
+                                <span>百度</span>
+                            </div>
+                            <div class="quick-link" data-url="https://github.com">
+                                <span class="material-symbols-outlined text-gray-400">code</span>
+                                <span>GitHub</span>
+                            </div>
+                            <div class="quick-link" data-url="https://www.bilibili.com">
+                                <span class="material-symbols-outlined text-pink-500">smart_display</span>
+                                <span>B站</span>
+                            </div>
+                            <div class="quick-link" data-url="https://www.google.com">
+                                <span class="material-symbols-outlined text-green-500">travel_explore</span>
+                                <span>Google</span>
+                            </div>
+                        </div>
+                        <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
+                    </div>
+                    <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups" style="display: none;"></iframe>
                 `;
                 const urlInput = content.querySelector(`#browser-url-${id}`);
-                const goBtn = content.querySelector(`#browser-go-${id}`);
+                const goBtn = content.querySelector('.browser-go');
+                const backBtn = content.querySelector('.browser-nav-back');
+                const forwardBtn = content.querySelector('.browser-nav-forward');
+                const reloadBtn = content.querySelector('.browser-nav-reload');
                 const frame = content.querySelector(`#browser-frame-${id}`);
-                const navigate = () => { let url = urlInput.value; if (!url.startsWith('http')) url = 'https://' + url; frame.src = url; };
-                goBtn.onclick = navigate;
-                urlInput.onkeypress = (e) => { if(e.key === 'Enter') navigate(); };
-                navigate();
-
-                // 为浏览器内容区域添加右键菜单（仅针对非iframe区域，iframe内部无法拦截）
-                // 但我们可以监听整个窗口的contextmenu，排除iframe
-                win.addEventListener('contextmenu', (e) => {
-                    if (e.target.tagName === 'IFRAME') return; // iframe内部让其使用原生菜单
+                const homeDiv = content.querySelector(`#browser-home-${id}`);
+                const homeSearch = content.querySelector(`#browser-home-search-${id}`);
+                const quickLinks = content.querySelectorAll('.quick-link');
+                
+                const navigate = (url) => {
+                    if (!url.startsWith('http')) url = 'https://' + url;
+                    frame.src = url;
+                    urlInput.value = url;
+                    homeDiv.style.display = 'none';
+                    frame.style.display = 'block';
+                };
+                goBtn.onclick = () => navigate(urlInput.value);
+                urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') navigate(urlInput.value); });
+                backBtn.onclick = () => { try { frame.contentWindow.history.back(); } catch(e){} };
+                forwardBtn.onclick = () => { try { frame.contentWindow.history.forward(); } catch(e){} };
+                reloadBtn.onclick = () => { try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } };
+                homeSearch.addEventListener('keypress', (e) => {
+                    if(e.key === 'Enter') {
+                        let url = homeSearch.value;
+                        if (!url.startsWith('http')) url = 'https://www.baidu.com/s?wd=' + encodeURIComponent(url);
+                        navigate(url);
+                    }
+                });
+                quickLinks.forEach(link => {
+                    link.addEventListener('click', () => navigate(link.dataset.url));
+                });
+                // 地址栏右键菜单
+                urlInput.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.showBrowserContextMenu(e.clientX, e.clientY, frame);
+                    this.showAddressBarMenu(e.clientX, e.clientY, urlInput);
+                });
+                // 浏览器内容区域右键菜单（排除 iframe）
+                win.addEventListener('contextmenu', (e) => {
+                    if (e.target.tagName === 'IFRAME') return;
+                    if (e.target === urlInput || urlInput.contains(e.target)) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showBrowserContentMenu(e.clientX, e.clientY, frame);
                 });
                 return win;
             }
 
-            // 浏览器专用右键菜单
-            showBrowserContextMenu(x, y, frame) {
+            showAddressBarMenu(x, y, urlInput) {
+                this.removeAllContextMenus();
+                const menu = document.createElement('div');
+                menu.className = 'context-menu';
+                let top = y;
+                const menuHeight = 120;
+                if (top + menuHeight > window.innerHeight) top = y - menuHeight;
+                menu.style.left = x + 'px';
+                menu.style.top = top + 'px';
+                menu.innerHTML = `
+                    <div class="context-menu-item" data-action="cut">剪切</div>
+                    <div class="context-menu-item" data-action="copy">复制</div>
+                    <div class="context-menu-item" data-action="paste">粘贴</div>
+                `;
+                const hasSelection = () => urlInput.selectionStart !== urlInput.selectionEnd;
+                const cutItem = menu.querySelector('[data-action="cut"]');
+                const copyItem = menu.querySelector('[data-action="copy"]');
+                const updateState = () => {
+                    if (hasSelection()) {
+                        cutItem.classList.remove('menu-item-disabled');
+                        copyItem.classList.remove('menu-item-disabled');
+                    } else {
+                        cutItem.classList.add('menu-item-disabled');
+                        copyItem.classList.add('menu-item-disabled');
+                    }
+                };
+                updateState();
+                const performCut = () => { if (hasSelection()) document.execCommand('cut'); menu.remove(); };
+                const performCopy = () => { if (hasSelection()) document.execCommand('copy'); menu.remove(); };
+                const performPaste = async () => {
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        const start = urlInput.selectionStart;
+                        const end = urlInput.selectionEnd;
+                        const newValue = urlInput.value.substring(0, start) + text + urlInput.value.substring(end);
+                        urlInput.value = newValue;
+                        urlInput.setSelectionRange(start + text.length, start + text.length);
+                    } catch(e) { document.execCommand('paste'); }
+                    menu.remove();
+                };
+                cutItem.addEventListener('click', performCut);
+                copyItem.addEventListener('click', performCopy);
+                menu.querySelector('[data-action="paste"]').addEventListener('click', performPaste);
+                document.body.appendChild(menu);
+                const closeHandler = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', closeHandler); };
+                setTimeout(() => document.addEventListener('click', closeHandler), 0);
+            }
+
+            showBrowserContentMenu(x, y, frame) {
                 this.removeAllContextMenus();
                 const menu = document.createElement('div');
                 menu.className = 'context-menu';
@@ -524,11 +666,10 @@
                 const win = this.createBaseWindow(id, 'terminal', '终端');
                 const content = win.querySelector('.window-content');
                 content.style.background = '#0c0c0c';
-                content.innerHTML = `<div class="font-mono text-sm text-green-400 p-3">raccoon@raccoonos:~$ <span class="text-white">欢迎使用终端</span><br>raccoon@raccoonos:~$ <span class="animate-pulse">_</span></div>`;
+                content.innerHTML = `<div class="font-mono text-sm text-green-400 p-3">raccoon@raccoonos:~$ <span class="text-white">欢迎使用终端</span><br>raccoon@raccoonos:~$ <span class="animate-pulse">_</span><br><span class="text-white">输入 help 查看命令列表</span></div>`;
                 return win;
             }
 
-            // 设置窗口 - 丰富内容
             createSettingsWindow(id) {
                 const win = this.createBaseWindow(id, 'settings', '设置');
                 const content = win.querySelector('.window-content');
@@ -549,6 +690,7 @@
                                     <div class="wallpaper-preview bg-[#1e1e1e]" data-wall="#1e1e1e"></div>
                                     <div class="wallpaper-preview bg-[#2c3e50]" data-wall="#2c3e50"></div>
                                     <div class="wallpaper-preview bg-[#3d342f]" data-wall="#3d342f"></div>
+                                    <div class="wallpaper-preview bg-[#1a1a2e]" data-wall="#1a1a2e"></div>
                                 </div>
                                 <div class="flex justify-between items-center mt-4 text-white">
                                     <span>夜间模式</span>
@@ -557,9 +699,10 @@
                             </div>
                             <div id="settings-system" class="settings-page">
                                 <h3 class="text-lg mb-4 text-white">系统信息</h3>
-                                <p class="text-white">Raccoon OS 第三版</p>
-                                <p class="text-white">内核: OPFS 持久化存储</p>
+                                <p class="text-white">Raccoon OS 第四版（完整功能版）</p>
+                                <p class="text-white">内核: OPFS 持久化存储 + 模拟文件系统</p>
                                 <p class="text-white">构建日期: 2026年6月8日</p>
+                                <p class="text-white">版本号: 4.0.0</p>
                             </div>
                             <div id="settings-startup" class="settings-page">
                                 <h3 class="text-lg mb-4 text-white">启动项</h3>
@@ -567,12 +710,18 @@
                                     <span>开机自启桌面</span>
                                     <div class="toggle-switch toggle-active" id="autostart-toggle"></div>
                                 </div>
+                                <div class="mt-4 text-white text-sm">启动时自动打开的应用:</div>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-browser"> <label>浏览器</label></div>
+                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-terminal"> <label>终端</label></div>
+                                </div>
                             </div>
                             <div id="settings-about" class="settings-page">
                                 <h3 class="text-lg mb-4 text-white">关于 Raccoon OS</h3>
-                                <p class="text-white">版本: 2026.06 (第三版)</p>
+                                <p class="text-white">版本: 2026.06 (第四版)</p>
                                 <p class="text-white">作者: Raccoon Studio</p>
-                                <p class="text-white">一个模拟操作系统的网页应用</p>
+                                <p class="text-white">一个功能完整的模拟操作系统网页应用</p>
+                                <p class="text-white mt-4">© 2026 Raccoon OS. 保留所有权利。</p>
                             </div>
                         </div>
                     </div>
@@ -591,7 +740,7 @@
                         document.body.style.backgroundColor = el.dataset.wall;
                     });
                 });
-                // 夜间模式开关
+                // 主题切换
                 const themeToggle = content.querySelector('#theme-toggle');
                 themeToggle.addEventListener('click', () => {
                     themeToggle.classList.toggle('toggle-active');
@@ -638,10 +787,10 @@
                     this.removeAllContextMenus();
                     const menu = document.createElement('div');
                     menu.className = 'context-menu';
-                    menu.style.left = e.clientX + 'px';
                     let top = e.clientY;
                     const menuHeight = 100;
                     if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
+                    menu.style.left = e.clientX + 'px';
                     menu.style.top = top + 'px';
                     menu.innerHTML = `<div class="context-menu-item" data-action="refresh">刷新</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="settings">显示设置</div>`;
                     menu.querySelector('[data-action="refresh"]').addEventListener('click', () => {
@@ -665,10 +814,10 @@
                         this.removeAllContextMenus();
                         const menu = document.createElement('div');
                         menu.className = 'context-menu';
-                        menu.style.left = e.clientX + 'px';
                         let top = e.clientY;
                         const menuHeight = 80;
                         if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
+                        menu.style.left = e.clientX + 'px';
                         menu.style.top = top + 'px';
                         menu.innerHTML = `<div class="context-menu-item" data-action="open">打开</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="delete">删除</div>`;
                         menu.querySelector('[data-action="open"]').addEventListener('click', () => {

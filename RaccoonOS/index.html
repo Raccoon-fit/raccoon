@@ -3,210 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Raccoon OS - 第六版（最终修复）</title>
+    <title>Raccoon OS - 终极增强版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-        body {
-            background: #0a0a0a;
-            overflow: hidden;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            color: white;
-        }
-        #desktop-area {
-            position: relative;
-            height: calc(100vh - 44px);
-            padding: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            gap: 16px;
-        }
-        .desktop-icon {
-            width: 80px;
-            padding: 8px 4px;
-            border-radius: 8px;
-            text-align: center;
-            transition: background 0.1s;
-            cursor: pointer;
-            color: white;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: #0a0a0a; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
+        #desktop-area { height: calc(100vh - 44px); padding: 16px; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 16px; }
+        .desktop-icon { width: 80px; padding: 8px 4px; border-radius: 8px; text-align: center; transition: background 0.1s; cursor: pointer; }
         .desktop-icon:hover { background: rgba(255,255,255,0.1); }
         .desktop-icon.active { background: rgba(255,255,255,0.15); outline: 1px solid rgba(255,255,255,0.2); }
         .desktop-icon span:first-child { font-size: 36px; }
         .desktop-icon span:last-child { font-size: 11px; display: block; margin-top: 6px; }
-        .taskbar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 44px;
-            background: rgba(20,20,20,0.85); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; padding: 0 8px; z-index: 1000;
-            color: white;
-        }
-        .taskbar-item {
-            display: flex; align-items: center; justify-content: center;
-            height: 100%; padding: 0 12px; border-radius: 6px;
-            transition: background 0.1s;
-            cursor: pointer;
-            color: white;
-        }
+        .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 44px; background: rgba(20,20,20,0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; padding: 0 8px; z-index: 1000; }
+        .taskbar-item { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 12px; border-radius: 6px; transition: background 0.1s; cursor: pointer; }
         .taskbar-item:hover { background: rgba(255,255,255,0.1); }
-        .taskbar-app {
-            min-width: 48px;
-            position: relative;
-        }
-        .taskbar-app.active::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 2px;
-            background: white;
-            border-radius: 2px;
-        }
-        .start-menu {
-            position: fixed; bottom: 50px; left: 12px; width: 340px;
-            background: rgba(30,30,30,0.95); backdrop-filter: blur(16px);
-            border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 1100;
-            display: none; overflow: hidden;
-            color: white;
-        }
+        .taskbar-app { min-width: 48px; position: relative; }
+        .taskbar-app.active::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: white; border-radius: 2px; }
+        .start-menu { position: fixed; bottom: 50px; left: 12px; width: 340px; background: rgba(30,30,30,0.95); backdrop-filter: blur(16px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 1100; display: none; overflow: hidden; }
         .start-menu-header { padding: 20px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .start-menu-search {
-            background: rgba(0,0,0,0.5); border: none; border-radius: 30px;
-            padding: 8px 16px; width: 100%; color: white; outline: none; font-size: 13px;
-        }
+        .start-menu-search { background: rgba(0,0,0,0.5); border: none; border-radius: 30px; padding: 8px 16px; width: 100%; color: white; outline: none; font-size: 13px; }
         .start-menu-apps { max-height: 400px; overflow-y: auto; padding: 8px; }
-        .start-menu-app {
-            display: flex; align-items: center; gap: 12px; padding: 10px 12px;
-            border-radius: 8px; cursor: pointer; transition: background 0.1s;
-            color: white;
-        }
+        .start-menu-app { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.1s; }
         .start-menu-app:hover { background: rgba(255,255,255,0.1); }
         .start-menu-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; }
-        .window {
-            position: absolute; background: #1e1e1e; border-radius: 10px;
-            border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; overflow: hidden;
-            z-index: 100; min-width: 400px; min-height: 300px;
-            color: white;
-        }
+        .window { position: absolute; background: #1e1e1e; border-radius: 10px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; z-index: 100; min-width: 400px; min-height: 300px; }
         .window.active { z-index: 200; border-color: #555; }
-        .window-header {
-            background: #2d2d2d; height: 32px; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 12px; cursor: grab;
-        }
+        .window-header { background: #2d2d2d; height: 32px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; cursor: grab; }
         .window-header:active { cursor: grabbing; }
-        .window-title { font-size: 13px; display: flex; align-items: center; gap: 6px; color: white; }
+        .window-title { font-size: 13px; display: flex; align-items: center; gap: 6px; }
         .window-controls { display: flex; gap: 6px; }
-        .win-btn {
-            width: 28px; height: 28px; display: flex; align-items: center;
-            justify-content: center; border-radius: 6px; transition: background 0.1s;
-            cursor: pointer;
-            color: white;
-        }
+        .win-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.1s; cursor: pointer; }
         .win-btn:hover { background: rgba(255,255,255,0.15); }
         .win-close:hover { background: #e81123 !important; }
-        .window-content { flex: 1; overflow: auto; background: #1a1a1a; color: white; }
-        .file-tree { width: 220px; background: #252525; padding: 12px; overflow-y: auto; color: white; }
-        .tree-item { padding: 4px 8px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: white; }
+        .window-content { flex: 1; overflow: auto; background: #1a1a1a; }
+        .file-tree { width: 220px; background: #252525; padding: 12px; overflow-y: auto; }
+        .tree-item { padding: 4px 8px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
         .tree-item:hover { background: rgba(255,255,255,0.08); }
         .file-list { flex: 1; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; align-content: start; }
-        .file-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 4px; text-align: center; cursor: pointer; color: white; }
+        .file-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 4px; text-align: center; cursor: pointer; }
         .file-item:hover { background: rgba(255,255,255,0.1); }
-        .file-item .material-symbols-outlined { font-size: 48px; color: white; }
-        .context-menu {
-            position: fixed; background: #2c2c2c; border: 1px solid #4a4a4a;
-            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            z-index: 10000; min-width: 160px; padding: 6px 0;
-            color: white;
-        }
-        .context-menu-item { padding: 6px 16px; font-size: 13px; cursor: default; color: white; }
+        .file-item .material-symbols-outlined { font-size: 48px; }
+        .context-menu { position: fixed; background: #2c2c2c; border: 1px solid #4a4a4a; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 10000; min-width: 160px; padding: 6px 0; }
+        .context-menu-item { padding: 6px 16px; font-size: 13px; cursor: default; }
         .context-menu-item:hover { background: #3a3a3a; }
         .context-menu-divider { height: 1px; background: #4a4a4a; margin: 6px 0; }
-        .settings-page { display: none; color: white; }
-        .settings-page.active { display: block; }
-        .toggle-switch {
-            width: 40px; height: 20px; background: #444; border-radius: 20px;
-            border: 2px solid #666; position: relative; cursor: pointer;
-        }
-        .toggle-switch::after {
-            content: ''; width: 12px; height: 12px; background: #aaa;
-            border-radius: 50%; position: absolute; top: 2px; left: 2px;
-            transition: 0.1s;
-        }
+        .settings-nav-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background 0.15s; }
+        .settings-nav-item:hover { background: rgba(255,255,255,0.1); }
+        .settings-nav-item.active { background: rgba(0,120,212,0.3); border-left: 3px solid #0078d4; }
+        .toggle-switch { width: 40px; height: 20px; background: #444; border-radius: 20px; border: 2px solid #666; position: relative; cursor: pointer; }
+        .toggle-switch::after { content: ''; width: 12px; height: 12px; background: #aaa; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.1s; }
         .toggle-active { background: #555; border-color: #888; }
         .toggle-active::after { left: 22px; background: white; }
-        .wallpaper-preview { width: 100px; height: 60px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-        .boot-dialog {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 20000; display: flex; align-items: center; justify-content: center;
-            color: white;
-        }
-        .system-dialog {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #2b2b2b; border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,0.5);
-            width: 380px; z-index: 30000; border: 1px solid #555;
-        }
-        .system-dialog-header {
-            padding: 12px 16px; background: #1e1e1e; border-radius: 8px 8px 0 0;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #444;
-        }
+        .wallpaper-preview { width: 100px; height: 60px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.1s; }
+        .wallpaper-preview.selected { border-color: white; }
+        .boot-dialog { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; display: flex; align-items: center; justify-content: center; }
+        .system-dialog { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2b2b2b; border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,0.5); width: 380px; z-index: 30000; border: 1px solid #555; }
+        .system-dialog-header { padding: 12px 16px; background: #1e1e1e; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; }
         .system-dialog-title { font-weight: 500; font-size: 14px; }
-        .system-dialog-close {
-            cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center;
-            justify-content: center; border-radius: 4px;
-        }
+        .system-dialog-close { cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
         .system-dialog-close:hover { background: rgba(255,255,255,0.1); }
         .system-dialog-content { padding: 20px 16px; font-size: 14px; line-height: 1.5; }
-        .system-dialog-buttons {
-            padding: 12px 16px; display: flex; justify-content: flex-end; gap: 8px;
-            border-top: 1px solid #444;
-        }
-        .system-dialog-button {
-            padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;
-            background: #3a3a3a; border: 1px solid #555;
-        }
+        .system-dialog-input { width: 100%; background: #3a3a3a; border: 1px solid #555; border-radius: 4px; padding: 8px; color: white; margin-top: 8px; outline: none; }
+        .system-dialog-buttons { padding: 12px 16px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #444; }
+        .system-dialog-button { padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; background: #3a3a3a; border: 1px solid #555; }
         .system-dialog-button.primary { background: #0078d4; border-color: #0078d4; }
         .system-dialog-button:hover { filter: brightness(1.1); }
-        .browser-home {
-            position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10;
-        }
+        .browser-home { position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
         .browser-home .logo { font-size: 80px; margin-bottom: 20px; }
         .browser-home .title { font-size: 32px; font-weight: 300; margin-bottom: 30px; color: rgba(255,255,255,0.9); }
-        .browser-home .search-box {
-            width: 500px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);
-            border-radius: 50px; padding: 12px 20px; display: flex; align-items: center; gap: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .browser-home .search-box input {
-            flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 16px;
-        }
+        .browser-home .search-box { width: 500px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.2); }
+        .browser-home .search-box input { flex: 1; background: transparent; border: none; outline: none; color: white; font-size: 16px; }
         .browser-home .quick-links { display: flex; gap: 32px; margin-top: 48px; }
         .browser-home .quick-link { text-align: center; cursor: pointer; transition: transform 0.2s; }
         .browser-home .quick-link:hover { transform: scale(1.05); }
         .browser-home .quick-link span:first-child { font-size: 48px; }
         .browser-home .quick-link span:last-child { display: block; font-size: 12px; margin-top: 8px; opacity: 0.7; }
-        .terminal-body {
-            background: #0a2a1a; font-family: 'Fira Code', monospace; padding: 12px;
-            height: 100%; overflow-y: auto;
-        }
+        .terminal-body { background: #0a2a1a; font-family: 'Fira Code', monospace; padding: 12px; height: 100%; overflow-y: auto; }
         .terminal-line { margin-bottom: 4px; display: flex; flex-wrap: wrap; }
         .terminal-prompt { color: #2ecc71; margin-right: 8px; }
         .terminal-input { background: transparent; border: none; color: #ecf0f1; outline: none; flex: 1; font-family: monospace; }
-        .terminal-output { color: #bdc3c7; margin-left: 12px; }
+        .terminal-output { color: #bdc3c7; margin-left: 12px; white-space: pre-wrap; }
+        .bookmark-item, .history-item { padding: 6px 12px; cursor: pointer; border-radius: 6px; }
+        .bookmark-item:hover, .history-item:hover { background: rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
@@ -226,12 +105,13 @@
         <div class="start-menu-footer"><button id="shutdown-btn-start" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-sm flex items-center gap-2"><span class="material-symbols-outlined text-sm">power_settings_new</span> 关机</button></div>
     </div>
     <div id="volume-popup" class="fixed bottom-12 right-4 bg-[#2a2a2a] border border-white/20 rounded-lg p-3 w-48 hidden z-[1100]">
-        <div class="text-xs mb-2 text-white">系统音量</div>
+        <div class="text-xs mb-2">系统音量</div>
         <input type="range" id="volume-slider" min="0" max="100" value="70" class="w-full">
-        <div class="text-right text-xs mt-1 text-white"><span id="volume-value">70</span>%</div>
+        <div class="text-right text-xs mt-1"><span id="volume-value">70</span>%</div>
     </div>
 
     <script>
+        // ---------- Raccoon OS 终极增强版 ----------
         class RaccoonOS {
             constructor() {
                 this.windows = [];
@@ -243,22 +123,95 @@
                     { name: "终端", icon: "terminal", app: "terminal" },
                     { name: "设置", icon: "settings", app: "settings" }
                 ];
-                // 从 localStorage 加载设置
+                // 模拟文件系统
+                this.fileSystem = {
+                    desktop: [
+                        { name: "示例文件夹", type: "dir", path: "desktop_folder" },
+                        { name: "readme.txt", type: "file", content: "欢迎使用 Raccoon OS！" }
+                    ],
+                    documents: [
+                        { name: "工作文档.docx", type: "file" },
+                        { name: "报表.xlsx", type: "file" }
+                    ],
+                    downloads: [
+                        { name: "安装包.exe", type: "file" },
+                        { name: "图片.zip", type: "file" }
+                    ],
+                    pictures: [
+                        { name: "风景.jpg", type: "file" },
+                        { name: "截图.png", type: "file" }
+                    ],
+                    music: [
+                        { name: "歌曲1.mp3", type: "file" },
+                        { name: "歌单.flac", type: "file" }
+                    ],
+                    videos: [
+                        { name: "电影.mp4", type: "file" },
+                        { name: "教程.mkv", type: "file" }
+                    ],
+                    desktop_folder: [
+                        { name: "子文件.txt", type: "file", content: "这是子文件夹中的文件。" }
+                    ]
+                };
+                // 浏览器数据
+                this.bookmarks = this.loadBookmarks();
+                this.history = this.loadHistory();
+                // 系统设置
                 this.settings = this.loadSettings();
                 this.init();
             }
 
             loadSettings() {
-                const defaultSettings = { volume: 70, wallpaper: "#0a0a0a", theme: "dark" };
                 try {
                     const saved = localStorage.getItem('raccoonos_settings');
-                    if (saved) return { ...defaultSettings, ...JSON.parse(saved) };
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        return {
+                            volume: parsed.volume || 70,
+                            theme: parsed.theme || '#0a0a0a',
+                            autostartApps: parsed.autostartApps || [],
+                            showHiddenFiles: parsed.showHiddenFiles || false,
+                            desktopLayout: parsed.desktopLayout || 'grid'
+                        };
+                    }
                 } catch(e) {}
-                return defaultSettings;
+                return { volume: 70, theme: '#0a0a0a', autostartApps: [], showHiddenFiles: false, desktopLayout: 'grid' };
             }
 
             saveSettings() {
                 localStorage.setItem('raccoonos_settings', JSON.stringify(this.settings));
+            }
+
+            loadBookmarks() {
+                try {
+                    const saved = localStorage.getItem('raccoonos_bookmarks');
+                    return saved ? JSON.parse(saved) : [
+                        { title: "百度", url: "https://www.baidu.com" },
+                        { title: "GitHub", url: "https://github.com" },
+                        { title: "Bilibili", url: "https://www.bilibili.com" }
+                    ];
+                } catch(e) { return []; }
+            }
+
+            saveBookmarks() {
+                localStorage.setItem('raccoonos_bookmarks', JSON.stringify(this.bookmarks));
+            }
+
+            loadHistory() {
+                try {
+                    const saved = localStorage.getItem('raccoonos_history');
+                    return saved ? JSON.parse(saved) : [];
+                } catch(e) { return []; }
+            }
+
+            saveHistory() {
+                localStorage.setItem('raccoonos_history', JSON.stringify(this.history.slice(0, 50))); // 保留最近50条
+            }
+
+            addToHistory(url, title) {
+                this.history.unshift({ url, title, time: new Date().toISOString() });
+                if (this.history.length > 50) this.history.pop();
+                this.saveHistory();
             }
 
             init() {
@@ -267,15 +220,16 @@
                 this.startClock();
                 this.applySettings();
                 this.showBootDialog();
+                // 启动项
+                if (this.settings.autostartApps.includes('browser')) setTimeout(() => this.openApp('browser'), 500);
+                if (this.settings.autostartApps.includes('terminal')) setTimeout(() => this.openApp('terminal'), 800);
             }
 
             applySettings() {
-                document.body.style.backgroundColor = this.settings.wallpaper;
+                document.body.style.backgroundColor = this.settings.theme;
                 const volume = this.settings.volume;
-                const slider = document.getElementById('volume-slider');
-                if (slider) slider.value = volume;
-                const valSpan = document.getElementById('volume-value');
-                if (valSpan) valSpan.innerText = volume;
+                document.getElementById('volume-slider').value = volume;
+                document.getElementById('volume-value').innerText = volume;
                 document.querySelectorAll('audio, video').forEach(el => el.volume = volume / 100);
             }
 
@@ -363,7 +317,8 @@
             updateTaskbarActive() {
                 this.windows.forEach(win => {
                     if (win.taskbarButton) {
-                        if (!win.minimized && this.activeWindow === win) win.taskbarButton.classList.add('active');
+                        const shouldBeActive = !win.minimized && this.activeWindow === win;
+                        if (shouldBeActive) win.taskbarButton.classList.add('active');
                         else win.taskbarButton.classList.remove('active');
                     }
                 });
@@ -427,7 +382,6 @@
                     </div>
                     <div class="window-content"></div>
                 `;
-                let savedWidth = '800px', savedHeight = '550px', savedLeft = '100px', savedTop = '100px';
                 const header = win.querySelector('.window-header');
                 let offsetX, offsetY, isDragging = false;
                 const constrain = (left, top) => {
@@ -489,7 +443,7 @@
                         winObj.savedPosition.left = parseInt(win.style.left);
                         winObj.savedPosition.top = parseInt(win.style.top);
                         win.style.width = '100%';
-                        win.style.height = 'calc(100% - 44px)';
+                        win.style.height = 'calc(100vh - 44px)';
                         win.style.left = '0';
                         win.style.top = '0';
                         maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">fullscreen_exit</span>';
@@ -502,6 +456,7 @@
                 return win;
             }
 
+            // 文件管理器（完整功能）
             createFileManagerWindow(id) {
                 const win = this.createBaseWindow(id, 'folder', '文件管理器');
                 const content = win.querySelector('.window-content');
@@ -518,89 +473,170 @@
                 ];
                 const fileList = document.createElement('div');
                 fileList.className = 'file-list';
-                const updateFileList = (path) => {
-                    const filesMap = {
-                        desktop: [
-                            { name: '示例文件夹', icon: 'folder', type: 'dir', path: 'desktop_folder' },
-                            { name: 'readme.txt', icon: 'description', type: 'file' }
-                        ],
-                        documents: [
-                            { name: '工作文档.docx', icon: 'description', type: 'file' },
-                            { name: '报表.xlsx', icon: 'table_chart', type: 'file' }
-                        ],
-                        downloads: [
-                            { name: '安装包.exe', icon: 'install_desktop', type: 'file' },
-                            { name: '图片.zip', icon: 'folder_zip', type: 'file' }
-                        ],
-                        pictures: [
-                            { name: '风景.jpg', icon: 'image', type: 'file' },
-                            { name: '截图.png', icon: 'screenshot', type: 'file' }
-                        ],
-                        music: [
-                            { name: '歌曲1.mp3', icon: 'music_note', type: 'file' },
-                            { name: '歌单.flac', icon: 'library_music', type: 'file' }
-                        ],
-                        videos: [
-                            { name: '电影.mp4', icon: 'video_library', type: 'file' },
-                            { name: '教程.mkv', icon: 'play_circle', type: 'file' }
-                        ],
-                        desktop_folder: [
-                            { name: '子文件.txt', icon: 'description', type: 'file' }
-                        ]
-                    };
-                    const files = filesMap[path] || [];
+                let currentPath = 'desktop';
+
+                const refreshFileList = () => {
+                    const files = this.fileSystem[currentPath] || [];
                     fileList.innerHTML = '';
                     files.forEach(file => {
                         const div = document.createElement('div');
                         div.className = 'file-item';
-                        div.innerHTML = `<span class="material-symbols-outlined">${file.icon}</span><div>${file.name}</div>`;
-                        if (file.type === 'dir') {
-                            div.addEventListener('dblclick', () => updateFileList(file.path));
-                        } else {
-                            div.addEventListener('dblclick', () => this.showSystemDialog('打开文件', `您正在打开“${file.name}”。\n这是一个模拟的文件操作。`, null));
-                        }
-                        // 文件/文件夹右键菜单
+                        div.innerHTML = `<span class="material-symbols-outlined">${file.type === 'dir' ? 'folder' : 'description'}</span><div>${file.name}</div>`;
+                        div.addEventListener('dblclick', () => {
+                            if (file.type === 'dir') {
+                                currentPath = file.path;
+                                refreshFileList();
+                            } else {
+                                this.showSystemDialog('打开文件', `正在打开文件 "${file.name}"，内容：${file.content || '无内容'}`);
+                            }
+                        });
                         div.addEventListener('contextmenu', (e) => {
                             e.preventDefault();
-                            e.stopPropagation();
-                            this.removeAllContextMenus();
-                            const menu = document.createElement('div');
-                            menu.className = 'context-menu';
-                            let top = e.clientY;
-                            const menuHeight = 80;
-                            if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
-                            menu.style.left = e.clientX + 'px';
-                            menu.style.top = top + 'px';
-                            menu.innerHTML = `<div class="context-menu-item" data-action="open">打开</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="delete">删除</div>`;
-                            menu.querySelector('[data-action="open"]').addEventListener('click', () => {
-                                if (file.type === 'dir') updateFileList(file.path);
-                                else this.showSystemDialog('打开文件', `正在打开 ${file.name}`, null);
-                                menu.remove();
-                            });
-                            menu.querySelector('[data-action="delete"]').addEventListener('click', () => {
-                                this.showSystemDialog('删除文件', `确定要删除“${file.name}”吗？`, () => { div.remove(); });
-                                menu.remove();
-                            });
-                            document.body.appendChild(menu);
-                            const close = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', close); };
-                            setTimeout(() => document.addEventListener('click', close), 0);
+                            this.showFileContextMenu(e.clientX, e.clientY, file, () => refreshFileList());
                         });
                         fileList.appendChild(div);
                     });
                 };
+
                 dirs.forEach(dir => {
                     const div = document.createElement('div');
                     div.className = 'tree-item';
                     div.innerHTML = `<span class="material-symbols-outlined">${dir.icon}</span><span>${dir.name}</span>`;
-                    div.addEventListener('click', () => updateFileList(dir.path));
+                    div.addEventListener('click', () => {
+                        currentPath = dir.path;
+                        refreshFileList();
+                    });
                     tree.appendChild(div);
                 });
-                updateFileList('desktop');
+                refreshFileList();
+
+                // 空白区域右键
+                fileList.addEventListener('contextmenu', (e) => {
+                    if (e.target === fileList || e.target.classList.contains('file-list')) {
+                        e.preventDefault();
+                        this.showFolderContextMenu(e.clientX, e.clientY, () => refreshFileList());
+                    }
+                });
+
                 content.appendChild(tree);
                 content.appendChild(fileList);
                 return win;
             }
 
+            showFileContextMenu(x, y, file, onRefresh) {
+                this.removeAllContextMenus();
+                const menu = document.createElement('div');
+                menu.className = 'context-menu';
+                let top = y;
+                const menuHeight = 150;
+                if (top + menuHeight > window.innerHeight) top = y - menuHeight;
+                menu.style.left = x + 'px';
+                menu.style.top = top + 'px';
+                menu.innerHTML = `
+                    <div class="context-menu-item" data-action="open">打开</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="rename">重命名</div>
+                    <div class="context-menu-item" data-action="copy">复制</div>
+                    <div class="context-menu-item" data-action="cut">剪切</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="delete">删除</div>
+                `;
+                menu.querySelector('[data-action="open"]').addEventListener('click', () => {
+                    if (file.type === 'dir') {
+                        // 跳转目录逻辑已由外部处理，这里简单提示
+                        this.showSystemDialog('打开文件夹', `打开文件夹 "${file.name}"`);
+                    } else {
+                        this.showSystemDialog('打开文件', `正在打开文件 "${file.name}"，内容：${file.content || '无内容'}`);
+                    }
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="rename"]').addEventListener('click', () => {
+                    this.showSystemDialog('重命名', '输入新名称:', (newName) => {
+                        if (newName) {
+                            file.name = newName;
+                            onRefresh();
+                        }
+                    }, true);
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="copy"]').addEventListener('click', () => {
+                    this.copyFile = file;
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="cut"]').addEventListener('click', () => {
+                    this.cutFile = file;
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="delete"]').addEventListener('click', () => {
+                    this.showSystemDialog('删除文件', `确定要删除 "${file.name}" 吗？此操作不可撤销。`, () => {
+                        const index = this.fileSystem[this.currentPath].indexOf(file);
+                        if (index !== -1) this.fileSystem[this.currentPath].splice(index, 1);
+                        onRefresh();
+                    });
+                    menu.remove();
+                });
+                document.body.appendChild(menu);
+                const closeHandler = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', closeHandler); };
+                setTimeout(() => document.addEventListener('click', closeHandler), 0);
+            }
+
+            showFolderContextMenu(x, y, onRefresh) {
+                this.removeAllContextMenus();
+                const menu = document.createElement('div');
+                menu.className = 'context-menu';
+                let top = y;
+                const menuHeight = 120;
+                if (top + menuHeight > window.innerHeight) top = y - menuHeight;
+                menu.style.left = x + 'px';
+                menu.style.top = top + 'px';
+                menu.innerHTML = `
+                    <div class="context-menu-item" data-action="newfolder">新建文件夹</div>
+                    <div class="context-menu-item" data-action="newfile">新建文本文档</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="paste">粘贴</div>
+                    <div class="context-menu-item" data-action="refresh">刷新</div>
+                `;
+                menu.querySelector('[data-action="newfolder"]').addEventListener('click', () => {
+                    this.showSystemDialog('新建文件夹', '请输入文件夹名称:', (name) => {
+                        if (name) {
+                            this.fileSystem[this.currentPath].push({ name, type: 'dir', path: `${this.currentPath}_${Date.now()}` });
+                            onRefresh();
+                        }
+                    }, true);
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="newfile"]').addEventListener('click', () => {
+                    this.showSystemDialog('新建文件', '请输入文件名:', (name) => {
+                        if (name) {
+                            this.fileSystem[this.currentPath].push({ name, type: 'file', content: '' });
+                            onRefresh();
+                        }
+                    }, true);
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="paste"]').addEventListener('click', () => {
+                    if (this.copyFile) {
+                        const newFile = { ...this.copyFile, name: `副本 - ${this.copyFile.name}` };
+                        this.fileSystem[this.currentPath].push(newFile);
+                        this.copyFile = null;
+                        onRefresh();
+                    } else if (this.cutFile) {
+                        // 移动文件需要知道原路径，简化处理
+                        this.showSystemDialog('粘贴', '移动文件功能暂未实现');
+                        this.cutFile = null;
+                    }
+                    menu.remove();
+                });
+                menu.querySelector('[data-action="refresh"]').addEventListener('click', () => {
+                    onRefresh();
+                    menu.remove();
+                });
+                document.body.appendChild(menu);
+                const closeHandler = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', closeHandler); };
+                setTimeout(() => document.addEventListener('click', closeHandler), 0);
+            }
+
+            // 浏览器窗口（增强书签和历史）
             createBrowserWindow(id) {
                 const win = this.createBaseWindow(id, 'public', 'Raccoon Browser');
                 const content = win.querySelector('.window-content');
@@ -615,6 +651,8 @@
                             <input type="text" id="browser-url-${id}" class="bg-transparent flex-1 outline-none text-sm text-white" placeholder="输入网址或搜索" value="">
                         </div>
                         <button class="browser-go p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+                        <button class="browser-bookmark p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">bookmark</span></button>
+                        <button class="browser-history p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">history</span></button>
                     </div>
                     <div id="browser-home-${id}" class="browser-home">
                         <div class="logo">🦝</div>
@@ -624,9 +662,11 @@
                             <input type="text" id="browser-home-search-${id}" placeholder="搜索或输入网址">
                         </div>
                         <div class="quick-links">
-                            <div class="quick-link" data-url="https://www.baidu.com"><span class="material-symbols-outlined text-blue-500">language</span><span>百度</span></div>
-                            <div class="quick-link" data-url="https://github.com"><span class="material-symbols-outlined text-gray-400">code</span><span>GitHub</span></div>
-                            <div class="quick-link" data-url="https://www.bilibili.com"><span class="material-symbols-outlined text-pink-500">smart_display</span><span>B站</span></div>
+                            ${this.bookmarks.map(b => `<div class="quick-link" data-url="${b.url}"><span class="material-symbols-outlined text-blue-500">language</span><span>${b.title}</span></div>`).join('')}
+                        </div>
+                        <div style="margin-top: 24px; width: 500px;">
+                            <div class="text-sm opacity-70 mb-2">最近访问</div>
+                            <div id="recent-history-${id}" class="flex flex-wrap gap-2"></div>
                         </div>
                         <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
                     </div>
@@ -637,16 +677,31 @@
                 const backBtn = content.querySelector('.browser-nav-back');
                 const forwardBtn = content.querySelector('.browser-nav-forward');
                 const reloadBtn = content.querySelector('.browser-nav-reload');
+                const bookmarkBtn = content.querySelector('.browser-bookmark');
+                const historyBtn = content.querySelector('.browser-history');
                 const frame = content.querySelector(`#browser-frame-${id}`);
                 const homeDiv = content.querySelector(`#browser-home-${id}`);
                 const homeSearch = content.querySelector(`#browser-home-search-${id}`);
                 const quickLinks = content.querySelectorAll('.quick-link');
+                const recentDiv = content.querySelector(`#recent-history-${id}`);
+                
+                const updateRecentHistory = () => {
+                    recentDiv.innerHTML = this.history.slice(0, 5).map(h => `
+                        <div class="text-xs bg-white/10 px-2 py-1 rounded-full cursor-pointer hover:bg-white/20" data-url="${h.url}">${h.title || h.url}</div>
+                    `).join('');
+                    recentDiv.querySelectorAll('[data-url]').forEach(el => {
+                        el.addEventListener('click', () => navigate(el.dataset.url));
+                    });
+                };
+                updateRecentHistory();
+
                 const navigate = (url) => {
                     if (!url.startsWith('http')) url = 'https://' + url;
                     frame.src = url;
                     urlInput.value = url;
                     homeDiv.style.display = 'none';
                     frame.style.display = 'block';
+                    this.addToHistory(url, url);
                 };
                 goBtn.onclick = () => navigate(urlInput.value);
                 urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') navigate(urlInput.value); });
@@ -663,18 +718,30 @@
                 quickLinks.forEach(link => {
                     link.addEventListener('click', () => navigate(link.dataset.url));
                 });
-                // 地址栏自定义右键菜单（避免原生菜单）
-                urlInput.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.showAddressBarMenu(e.clientX, e.clientY, urlInput);
+                bookmarkBtn.addEventListener('click', () => {
+                    this.showSystemDialog('添加书签', '输入书签名称:', (title) => {
+                        if (title) {
+                            this.bookmarks.push({ title, url: urlInput.value });
+                            this.saveBookmarks();
+                            this.showSystemDialog('成功', '书签已添加');
+                        }
+                    }, true);
                 });
-                // 浏览器内容区域右键菜单（不含源代码）
+                historyBtn.addEventListener('click', () => {
+                    let historyHtml = this.history.map(h => `<div class="history-item">${h.title || h.url} - ${new Date(h.time).toLocaleString()}</div>`).join('');
+                    this.showSystemDialog('历史记录', `<div style="max-height:300px; overflow-y:auto;">${historyHtml || '无历史记录'}</div>`);
+                });
+                frame.addEventListener('load', () => {
+                    try { urlInput.value = frame.contentWindow.location.href; } catch(e) {}
+                });
                 win.addEventListener('contextmenu', (e) => {
                     if (e.target.tagName === 'IFRAME') return;
-                    if (e.target === urlInput || urlInput.contains(e.target)) return;
+                    if (e.target === urlInput || urlInput.contains(e.target)) {
+                        e.preventDefault();
+                        this.showAddressBarMenu(e.clientX, e.clientY, urlInput);
+                        return;
+                    }
                     e.preventDefault();
-                    e.stopPropagation();
                     this.showBrowserContentMenu(e.clientX, e.clientY, frame);
                 });
                 return win;
@@ -731,6 +798,7 @@
                 setTimeout(() => document.addEventListener('click', closeHandler), 0);
             }
 
+            // 终端（增强命令）
             createTerminalWindow(id) {
                 const win = this.createBaseWindow(id, 'terminal', 'Raccoon Terminal');
                 const content = win.querySelector('.window-content');
@@ -739,14 +807,19 @@
                 const terminalDiv = document.createElement('div');
                 terminalDiv.className = 'terminal-body';
                 terminalDiv.style.height = '100%';
-                terminalDiv.style.overflowY = 'auto';
-                terminalDiv.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">🦝></span><span class="terminal-output">Raccoon Terminal v1.0</span></div>
-                                         <div class="terminal-line"><span class="terminal-prompt">🦝></span><span class="terminal-output">输入 help 查看命令列表</span></div>`;
+                terminalDiv.innerHTML = `<div class="terminal-line"><span class="terminal-prompt">🦝></span><span class="terminal-output">Raccoon Terminal v2.0 - 增强版</span></div>
+                                         <div class="terminal-line"><span class="terminal-prompt">🦝></span><span class="terminal-output">输入 help 查看所有命令</span></div>`;
                 const inputLine = document.createElement('div');
                 inputLine.className = 'terminal-line';
                 inputLine.innerHTML = `<span class="terminal-prompt">🦝></span><input type="text" class="terminal-input" autofocus>`;
                 terminalDiv.appendChild(inputLine);
                 const inputField = inputLine.querySelector('input');
+                let currentDir = '/home/raccoon';
+                const fs = {
+                    '/home/raccoon': { type: 'dir', children: ['Documents', 'Downloads', 'Pictures'] },
+                    '/home/raccoon/Documents': { type: 'dir', children: ['readme.txt'] },
+                    '/home/raccoon/Documents/readme.txt': { type: 'file', content: 'Welcome to Raccoon OS!' }
+                };
                 const history = [];
                 let historyIndex = -1;
                 const executeCommand = (cmd) => {
@@ -760,14 +833,93 @@
                     const args = cmd.trim().split(/\s+/);
                     const command = args[0].toLowerCase();
                     switch(command) {
-                        case 'help': output = '可用命令: help, clear, date, echo, hello, version, exit'; break;
-                        case 'clear': terminalDiv.innerHTML = ''; terminalDiv.appendChild(inputLine); inputField.value = ''; inputField.focus(); return;
-                        case 'date': output = new Date().toString(); break;
-                        case 'echo': output = args.slice(1).join(' '); break;
-                        case 'hello': output = 'Hello, Raccoon User!'; break;
-                        case 'version': output = 'Raccoon OS Terminal v1.0 (2026.06)'; break;
-                        case 'exit': this.closeWindow(this.windows.find(w => w.id === id)); return;
-                        default: output = `未知命令: ${cmd}. 输入 help 查看帮助。`;
+                        case 'help':
+                            output = '可用命令: help, clear, ls, cd, pwd, mkdir, touch, cat, rm, echo, date, hello, version, exit';
+                            break;
+                        case 'clear':
+                            terminalDiv.innerHTML = '';
+                            terminalDiv.appendChild(inputLine);
+                            inputField.value = '';
+                            inputField.focus();
+                            return;
+                        case 'ls':
+                            const parts = currentDir.split('/');
+                            const current = fs[currentDir];
+                            if (current && current.type === 'dir') output = current.children.join('  ');
+                            else output = '目录不存在';
+                            break;
+                        case 'cd':
+                            if (args[1]) {
+                                let newPath = args[1];
+                                if (newPath === '..') {
+                                    const newDir = currentDir.substring(0, currentDir.lastIndexOf('/'));
+                                    if (newDir) currentDir = newDir;
+                                } else if (newPath === '/') {
+                                    currentDir = '/home/raccoon';
+                                } else {
+                                    const target = `${currentDir}/${newPath}`;
+                                    if (fs[target] && fs[target].type === 'dir') currentDir = target;
+                                    else output = `cd: ${newPath}: 不是目录`;
+                                }
+                            }
+                            break;
+                        case 'pwd':
+                            output = currentDir;
+                            break;
+                        case 'mkdir':
+                            if (args[1]) {
+                                const newDir = `${currentDir}/${args[1]}`;
+                                if (!fs[newDir]) {
+                                    fs[newDir] = { type: 'dir', children: [] };
+                                    fs[currentDir].children.push(args[1]);
+                                    output = `目录 ${args[1]} 已创建`;
+                                } else output = `目录已存在`;
+                            }
+                            break;
+                        case 'touch':
+                            if (args[1]) {
+                                const newFile = `${currentDir}/${args[1]}`;
+                                if (!fs[newFile]) {
+                                    fs[newFile] = { type: 'file', content: '' };
+                                    fs[currentDir].children.push(args[1]);
+                                    output = `文件 ${args[1]} 已创建`;
+                                } else output = `文件已存在`;
+                            }
+                            break;
+                        case 'cat':
+                            if (args[1]) {
+                                const filePath = `${currentDir}/${args[1]}`;
+                                if (fs[filePath] && fs[filePath].type === 'file') output = fs[filePath].content || '(空文件)';
+                                else output = `cat: ${args[1]}: 文件不存在`;
+                            }
+                            break;
+                        case 'rm':
+                            if (args[1]) {
+                                const target = `${currentDir}/${args[1]}`;
+                                if (fs[target]) {
+                                    delete fs[target];
+                                    fs[currentDir].children = fs[currentDir].children.filter(c => c !== args[1]);
+                                    output = `已删除 ${args[1]}`;
+                                } else output = `rm: ${args[1]}: 不存在`;
+                            }
+                            break;
+                        case 'echo':
+                            output = args.slice(1).join(' ');
+                            break;
+                        case 'date':
+                            output = new Date().toString();
+                            break;
+                        case 'hello':
+                            output = 'Hello, Raccoon User! Welcome to Raccoon OS.';
+                            break;
+                        case 'version':
+                            output = 'Raccoon OS Terminal v2.0 (2026.06)';
+                            break;
+                        case 'exit':
+                            this.closeWindow(this.windows.find(w => w.id === id));
+                            return;
+                        default:
+                            output = `未知命令: ${cmd}. 输入 help 查看帮助。`;
                     }
                     resultLine.innerHTML = `<span class="terminal-prompt"></span><span class="terminal-output">${output}</span>`;
                     terminalDiv.insertBefore(resultLine, inputLine);
@@ -792,110 +944,167 @@
                 return win;
             }
 
+            // 设置窗口（完整设置）
             createSettingsWindow(id) {
                 const win = this.createBaseWindow(id, 'settings', '设置');
                 const content = win.querySelector('.window-content');
                 content.innerHTML = `
                     <div style="display: flex; height: 100%;">
                         <div class="w-48 bg-[#252525] p-3">
-                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="personalization">个性化</div>
-                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="system">系统</div>
-                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="startup">启动项</div>
-                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="about">关于</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="personalization">个性化</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="system">系统</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="startup">启动项</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="about">关于</div>
                         </div>
                         <div class="flex-1 p-4 overflow-auto">
                             <div id="settings-personalization" class="settings-page active">
-                                <h3 class="text-lg mb-4 text-white">个性化</h3>
-                                <div class="mb-4 text-white">背景颜色</div>
+                                <h3 class="text-lg mb-4">个性化</h3>
+                                <div class="mb-4">背景颜色</div>
                                 <div class="grid grid-cols-4 gap-2 mb-4">
                                     <div class="wallpaper-preview bg-[#0a0a0a]" data-wall="#0a0a0a"></div>
                                     <div class="wallpaper-preview bg-[#1e1e1e]" data-wall="#1e1e1e"></div>
                                     <div class="wallpaper-preview bg-[#2c3e50]" data-wall="#2c3e50"></div>
                                     <div class="wallpaper-preview bg-[#3d342f]" data-wall="#3d342f"></div>
                                 </div>
-                                <div class="flex justify-between items-center mt-4 text-white">
+                                <div class="flex justify-between items-center mt-4">
                                     <span>夜间模式</span>
                                     <div class="toggle-switch toggle-active" id="theme-toggle"></div>
                                 </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>显示隐藏文件</span>
+                                    <div class="toggle-switch ${this.settings.showHiddenFiles ? 'toggle-active' : ''}" id="hidden-toggle"></div>
+                                </div>
                             </div>
                             <div id="settings-system" class="settings-page">
-                                <h3 class="text-lg mb-4 text-white">系统信息</h3>
-                                <p class="text-white">Raccoon OS 第六版（最终修复版）</p>
-                                <p class="text-white">内核: localStorage + 模拟文件系统</p>
-                                <p class="text-white">构建日期: 2026年6月8日</p>
-                                <p class="text-white">版本: 6.0.0</p>
+                                <h3 class="text-lg mb-4">系统信息</h3>
+                                <p>Raccoon OS 终极增强版</p>
+                                <p>内核: 模拟文件系统 + localStorage</p>
+                                <p>构建日期: 2026年6月8日</p>
+                                <p>版本: 6.0.0</p>
                             </div>
                             <div id="settings-startup" class="settings-page">
-                                <h3 class="text-lg mb-4 text-white">启动项</h3>
-                                <div class="flex justify-between items-center mt-2 text-white">
+                                <h3 class="text-lg mb-4">启动项</h3>
+                                <div class="flex justify-between items-center mt-2">
                                     <span>开机自启桌面</span>
-                                    <div class="toggle-switch toggle-active" id="autostart-toggle"></div>
+                                    <div class="toggle-switch toggle-active" id="autostart-desktop"></div>
                                 </div>
-                                <div class="mt-4 text-white text-sm">启动时自动打开的应用:</div>
+                                <div class="mt-4 text-sm">启动时自动打开的应用:</div>
                                 <div class="mt-2 space-y-2">
-                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-browser"> <label>浏览器</label></div>
-                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-terminal"> <label>终端</label></div>
+                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-browser" ${this.settings.autostartApps.includes('browser') ? 'checked' : ''}> <label>浏览器</label></div>
+                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-terminal" ${this.settings.autostartApps.includes('terminal') ? 'checked' : ''}> <label>终端</label></div>
                                 </div>
                             </div>
                             <div id="settings-about" class="settings-page">
-                                <h3 class="text-lg mb-4 text-white">关于 Raccoon OS</h3>
-                                <p class="text-white">版本: 2026.06 (第六版)</p>
-                                <p class="text-white">作者: Raccoon Studio</p>
-                                <p class="text-white">一个功能完整的模拟操作系统网页应用</p>
-                                <p class="text-white mt-4">© 2026 Raccoon OS. 保留所有权利。</p>
+                                <h3 class="text-lg mb-4">关于 Raccoon OS</h3>
+                                <p>版本: 2026.06 (终极增强版)</p>
+                                <p>作者: Raccoon Studio</p>
+                                <p>一个功能完整、极具细节的操作系统模拟器</p>
+                                <p class="mt-4">© 2026 Raccoon OS. 保留所有权利。</p>
                             </div>
                         </div>
                     </div>
                 `;
-                content.querySelectorAll('.settings-nav-item').forEach(nav => {
+                // 导航激活
+                const navItems = content.querySelectorAll('.settings-nav-item');
+                navItems.forEach((nav, idx) => {
                     nav.addEventListener('click', () => {
+                        navItems.forEach(n => n.classList.remove('active'));
+                        nav.classList.add('active');
                         const page = nav.dataset.page;
                         content.querySelectorAll('.settings-page').forEach(p => p.classList.remove('active'));
                         content.getElementById(`settings-${page}`).classList.add('active');
                     });
                 });
+                navItems[0].classList.add('active');
+                // 壁纸
                 content.querySelectorAll('[data-wall]').forEach(el => {
                     el.addEventListener('click', () => {
-                        this.settings.wallpaper = el.dataset.wall;
+                        const color = el.dataset.wall;
+                        this.settings.theme = color;
                         this.saveSettings();
-                        document.body.style.backgroundColor = this.settings.wallpaper;
+                        document.body.style.backgroundColor = color;
+                        content.querySelectorAll('[data-wall]').forEach(w => w.classList.remove('selected'));
+                        el.classList.add('selected');
                     });
                 });
+                // 夜间模式
                 const themeToggle = content.querySelector('#theme-toggle');
+                if (this.settings.theme !== '#0a0a0a') themeToggle.classList.remove('toggle-active');
                 themeToggle.addEventListener('click', () => {
                     themeToggle.classList.toggle('toggle-active');
                     const isDark = themeToggle.classList.contains('toggle-active');
-                    this.settings.wallpaper = isDark ? '#0a0a0a' : '#dddddd';
+                    this.settings.theme = isDark ? '#0a0a0a' : '#dddddd';
                     this.saveSettings();
-                    document.body.style.backgroundColor = this.settings.wallpaper;
+                    document.body.style.backgroundColor = this.settings.theme;
+                });
+                // 显示隐藏文件
+                const hiddenToggle = content.querySelector('#hidden-toggle');
+                hiddenToggle.addEventListener('click', () => {
+                    hiddenToggle.classList.toggle('toggle-active');
+                    this.settings.showHiddenFiles = hiddenToggle.classList.contains('toggle-active');
+                    this.saveSettings();
+                });
+                // 启动项
+                const autostartDesktop = content.querySelector('#autostart-desktop');
+                const autostartBrowser = content.querySelector('#autostart-browser');
+                const autostartTerminal = content.querySelector('#autostart-terminal');
+                autostartBrowser.addEventListener('change', () => {
+                    if (autostartBrowser.checked) {
+                        if (!this.settings.autostartApps.includes('browser')) this.settings.autostartApps.push('browser');
+                    } else {
+                        this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'browser');
+                    }
+                    this.saveSettings();
+                });
+                autostartTerminal.addEventListener('change', () => {
+                    if (autostartTerminal.checked) {
+                        if (!this.settings.autostartApps.includes('terminal')) this.settings.autostartApps.push('terminal');
+                    } else {
+                        this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'terminal');
+                    }
+                    this.saveSettings();
                 });
                 return win;
             }
 
-            showSystemDialog(title, message, onConfirm) {
+            // 系统弹窗（支持输入框）
+            showSystemDialog(title, message, onConfirm, withInput = false) {
                 const existing = document.querySelector('.system-dialog');
                 if (existing) existing.remove();
                 const dialog = document.createElement('div');
                 dialog.className = 'system-dialog';
+                let inputHtml = '';
+                if (withInput) {
+                    inputHtml = `<input type="text" id="dialog-input" class="system-dialog-input" placeholder="请输入...">`;
+                }
                 dialog.innerHTML = `
                     <div class="system-dialog-header">
                         <span class="system-dialog-title">${title}</span>
                         <div class="system-dialog-close"><span class="material-symbols-outlined text-sm">close</span></div>
                     </div>
-                    <div class="system-dialog-content">${message}</div>
+                    <div class="system-dialog-content">
+                        ${message}
+                        ${inputHtml}
+                    </div>
                     <div class="system-dialog-buttons">
+                        <button class="system-dialog-button" id="dialog-cancel">取消</button>
                         <button class="system-dialog-button primary" id="dialog-ok">确定</button>
                     </div>
                 `;
                 document.body.appendChild(dialog);
                 const closeBtn = dialog.querySelector('.system-dialog-close');
+                const cancelBtn = dialog.querySelector('#dialog-cancel');
                 const okBtn = dialog.querySelector('#dialog-ok');
+                const input = dialog.querySelector('#dialog-input');
                 const remove = () => dialog.remove();
                 closeBtn.addEventListener('click', remove);
+                cancelBtn.addEventListener('click', remove);
                 okBtn.addEventListener('click', () => {
-                    if (onConfirm) onConfirm();
+                    const value = input ? input.value : null;
+                    if (onConfirm) onConfirm(value);
                     remove();
                 });
+                if (input) input.focus();
             }
 
             removeAllContextMenus() {
@@ -920,6 +1129,7 @@
                 const volPopup = document.getElementById('volume-popup');
                 volBtn.addEventListener('click', (e) => { e.stopPropagation(); volPopup.classList.toggle('hidden'); });
                 const volSlider = document.getElementById('volume-slider');
+                volSlider.value = this.settings.volume;
                 volSlider.addEventListener('input', (e) => {
                     const val = e.target.value;
                     this.settings.volume = parseInt(val);
@@ -929,7 +1139,7 @@
                 });
                 document.addEventListener('click', () => volPopup.classList.add('hidden'));
 
-                // 桌面右键菜单（空白区域）
+                // 桌面右键菜单（增强）
                 document.getElementById('desktop-area').addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     if (e.target.closest('.desktop-icon')) return;
@@ -937,11 +1147,20 @@
                     const menu = document.createElement('div');
                     menu.className = 'context-menu';
                     let top = e.clientY;
-                    const menuHeight = 100;
+                    const menuHeight = 180;
                     if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
                     menu.style.left = e.clientX + 'px';
                     menu.style.top = top + 'px';
-                    menu.innerHTML = `<div class="context-menu-item" data-action="refresh">刷新</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="settings">显示设置</div>`;
+                    menu.innerHTML = `
+                        <div class="context-menu-item" data-action="view">查看</div>
+                        <div class="context-menu-item" data-action="sortby">排序方式</div>
+                        <div class="context-menu-divider"></div>
+                        <div class="context-menu-item" data-action="new">新建</div>
+                        <div class="context-menu-divider"></div>
+                        <div class="context-menu-item" data-action="refresh">刷新</div>
+                        <div class="context-menu-divider"></div>
+                        <div class="context-menu-item" data-action="settings">显示设置</div>
+                    `;
                     menu.querySelector('[data-action="refresh"]').addEventListener('click', () => {
                         this.refreshDesktop();
                         menu.remove();
@@ -950,6 +1169,14 @@
                         this.openApp('settings');
                         menu.remove();
                     });
+                    menu.querySelector('[data-action="new"]').addEventListener('click', () => {
+                        this.showSystemDialog('新建', '选择新建类型:', (type) => {
+                            // 简化为弹窗，实际可扩展
+                        });
+                        menu.remove();
+                    });
+                    menu.querySelector('[data-action="view"]').addEventListener('click', () => menu.remove());
+                    menu.querySelector('[data-action="sortby"]').addEventListener('click', () => menu.remove());
                     document.body.appendChild(menu);
                     const close = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', close); };
                     setTimeout(() => document.addEventListener('click', close), 0);
@@ -1053,13 +1280,14 @@
             }
 
             shutdown() {
+                const shutdownTime = 3000;
                 const shutdownScreen = document.createElement('div');
                 shutdownScreen.className = 'fixed inset-0 bg-black z-[20000] flex flex-col items-center justify-center';
-                shutdownScreen.innerHTML = `<div class="text-2xl mb-6 text-white">正在关闭 RaccoonOS...</div><div class="w-64 h-1 bg-gray-700 rounded overflow-hidden"><div class="h-full bg-white w-0 transition-all duration-5000" id="shutdown-bar"></div></div>`;
+                shutdownScreen.innerHTML = `<div class="text-2xl mb-6 text-white">正在关闭 RaccoonOS...</div><div class="w-64 h-1 bg-gray-700 rounded overflow-hidden"><div class="h-full bg-white w-0 transition-all" id="shutdown-bar" style="transition-duration: ${shutdownTime}ms"></div></div>`;
                 document.body.appendChild(shutdownScreen);
                 const bar = shutdownScreen.querySelector('#shutdown-bar');
-                setTimeout(() => bar.style.width = '100%', 100);
-                setTimeout(() => { window.close(); location.href = 'about:blank'; }, 5100);
+                setTimeout(() => bar.style.width = '100%', 50);
+                setTimeout(() => { window.close(); location.href = 'about:blank'; }, shutdownTime + 100);
             }
         }
 

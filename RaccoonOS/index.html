@@ -3,16 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Raccoon OS - 完全修复版</title>
+    <title>Raccoon OS - 第三版全面修复</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: #0a0a0a; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; }
-        /* 桌面图标 */
+        body { background: #0a0a0a; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
+        /* 桌面图标容器 - 顶部对齐 */
+        #desktop-area {
+            position: relative;
+            height: calc(100vh - 44px);
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 16px;
+        }
         .desktop-icon {
-            width: 80px; padding: 8px 4px; border-radius: 8px; text-align: center;
-            transition: background 0.1s; cursor: pointer; position: absolute;
+            width: 80px;
+            padding: 8px 4px;
+            border-radius: 8px;
+            text-align: center;
+            transition: background 0.1s;
+            cursor: pointer;
+            color: white;
         }
         .desktop-icon:hover { background: rgba(255,255,255,0.1); }
         .desktop-icon.active { background: rgba(255,255,255,0.15); outline: 1px solid rgba(255,255,255,0.2); }
@@ -24,17 +39,19 @@
             background: rgba(20,20,20,0.85); backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255,255,255,0.1);
             display: flex; align-items: center; padding: 0 8px; z-index: 1000;
+            color: white;
         }
         .taskbar-item {
             display: flex; align-items: center; justify-content: center;
             height: 100%; padding: 0 12px; border-radius: 6px;
             transition: background 0.1s; cursor: pointer;
+            color: white;
         }
         .taskbar-item:hover { background: rgba(255,255,255,0.1); }
         .taskbar-app { min-width: 48px; position: relative; }
         .taskbar-app.active::after {
             content: ''; position: absolute; bottom: 4px; left: 50%;
-            transform: translateX(-50%); width: 20px; height: 2px; background: #fff;
+            transform: translateX(-50%); width: 20px; height: 2px; background: white;
             border-radius: 2px;
         }
         /* 开始菜单 */
@@ -44,6 +61,7 @@
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 1100;
             display: none; overflow: hidden;
+            color: white;
         }
         .start-menu-header { padding: 20px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .start-menu-search {
@@ -54,6 +72,7 @@
         .start-menu-app {
             display: flex; align-items: center; gap: 12px; padding: 10px 12px;
             border-radius: 8px; cursor: pointer; transition: background 0.1s;
+            color: white;
         }
         .start-menu-app:hover { background: rgba(255,255,255,0.1); }
         .start-menu-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; }
@@ -63,6 +82,7 @@
             border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex; flex-direction: column; overflow: hidden;
             z-index: 100; min-width: 400px; min-height: 300px;
+            color: white;
         }
         .window.active { z-index: 200; border-color: #555; }
         .window-header {
@@ -70,35 +90,37 @@
             justify-content: space-between; padding: 0 12px; cursor: grab;
         }
         .window-header:active { cursor: grabbing; }
-        .window-title { font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .window-title { font-size: 13px; display: flex; align-items: center; gap: 6px; color: white; }
         .window-controls { display: flex; gap: 6px; }
         .win-btn {
             width: 28px; height: 28px; display: flex; align-items: center;
             justify-content: center; border-radius: 6px; transition: background 0.1s;
             cursor: pointer;
+            color: white;
         }
         .win-btn:hover { background: rgba(255,255,255,0.15); }
         .win-close:hover { background: #e81123 !important; }
-        .window-content { flex: 1; overflow: auto; background: #1a1a1a; }
+        .window-content { flex: 1; overflow: auto; background: #1a1a1a; color: white; }
         /* 文件管理器 */
-        .file-tree { width: 220px; background: #252525; padding: 12px; overflow-y: auto; }
-        .tree-item { padding: 4px 8px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .file-tree { width: 220px; background: #252525; padding: 12px; overflow-y: auto; color: white; }
+        .tree-item { padding: 4px 8px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: white; }
         .tree-item:hover { background: rgba(255,255,255,0.08); }
         .file-list { flex: 1; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; align-content: start; }
-        .file-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 4px; text-align: center; cursor: pointer; }
+        .file-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 4px; text-align: center; cursor: pointer; color: white; }
         .file-item:hover { background: rgba(255,255,255,0.1); }
-        .file-item .material-symbols-outlined { font-size: 48px; }
+        .file-item .material-symbols-outlined { font-size: 48px; color: white; }
         /* 右键菜单 */
         .context-menu {
             position: fixed; background: #2c2c2c; border: 1px solid #4a4a4a;
             border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             z-index: 10000; min-width: 160px; padding: 6px 0;
+            color: white;
         }
-        .context-menu-item { padding: 6px 16px; font-size: 13px; cursor: default; }
+        .context-menu-item { padding: 6px 16px; font-size: 13px; cursor: default; color: white; }
         .context-menu-item:hover { background: #3a3a3a; }
         .context-menu-divider { height: 1px; background: #4a4a4a; margin: 6px 0; }
         /* 设置页面 */
-        .settings-page { display: none; }
+        .settings-page { display: none; color: white; }
         .settings-page.active { display: block; }
         .toggle-switch {
             width: 40px; height: 20px; background: #444; border-radius: 20px;
@@ -112,20 +134,20 @@
         .toggle-active { background: #555; border-color: #888; }
         .toggle-active::after { left: 22px; background: white; }
         .wallpaper-preview { width: 100px; height: 60px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-        /* 启动弹窗 */
         .boot-dialog {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 20000; display: flex; align-items: center; justify-content: center;
+            color: white;
         }
     </style>
 </head>
 <body>
     <!-- 桌面容器 -->
-    <div id="desktop-area" style="position: relative; height: 100vh; padding-bottom: 44px; overflow: hidden;"></div>
+    <div id="desktop-area"></div>
 
     <!-- 任务栏 -->
     <div class="taskbar" id="taskbar">
-        <div class="taskbar-item" id="start-btn"><span class="material-symbols-outlined">stadia_controller</span><span class="ml-1 text-sm">开始</span></div>
+        <div class="taskbar-item" id="start-btn"><span class="text-xl">🦝</span><span class="ml-1 text-sm">开始</span></div>
         <div id="taskbar-apps" class="flex-1 flex gap-1 ml-2"></div>
         <div class="taskbar-item" id="volume-btn"><span class="material-symbols-outlined">volume_up</span></div>
         <div class="taskbar-item flex flex-col items-end leading-tight px-2">
@@ -143,9 +165,9 @@
 
     <!-- 音量滑块 -->
     <div id="volume-popup" class="fixed bottom-12 right-4 bg-[#2a2a2a] border border-white/20 rounded-lg p-3 w-48 hidden z-[1100]">
-        <div class="text-xs mb-2">系统音量</div>
+        <div class="text-xs mb-2 text-white">系统音量</div>
         <input type="range" id="volume-slider" min="0" max="100" value="70" class="w-full">
-        <div class="text-right text-xs mt-1"><span id="volume-value">70</span>%</div>
+        <div class="text-right text-xs mt-1 text-white"><span id="volume-value">70</span>%</div>
     </div>
 
     <script>
@@ -177,8 +199,6 @@
                 this.desktopIcons.forEach((icon, idx) => {
                     const div = document.createElement('div');
                     div.className = 'desktop-icon';
-                    div.style.left = (20 + (idx % 3) * 100) + 'px';
-                    div.style.top = (20 + Math.floor(idx / 3) * 100) + 'px';
                     div.setAttribute('data-app', icon.app);
                     div.innerHTML = `<span class="material-symbols-outlined">${icon.icon}</span><span>${icon.name}</span>`;
                     div.addEventListener('dblclick', () => this.openApp(icon.app));
@@ -280,12 +300,17 @@
                 if (this.activeWindow === winObj) this.activeWindow = null;
             }
 
+            // 任务栏按钮右键菜单（向上弹出）
             showWindowContextMenu(x, y, winObj) {
                 this.removeAllContextMenus();
                 const menu = document.createElement('div');
                 menu.className = 'context-menu';
+                // 向上弹出：计算菜单高度，如果上方空间不足则向下
+                const menuHeight = 80;
+                let top = y - menuHeight;
+                if (top < 5) top = y + 5;
                 menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
+                menu.style.top = top + 'px';
                 menu.innerHTML = `<div class="context-menu-item" data-action="close">关闭窗口</div>`;
                 menu.querySelector('[data-action="close"]').addEventListener('click', () => {
                     this.closeWindow(winObj);
@@ -363,30 +388,86 @@
                 return win;
             }
 
+            // 文件管理器 - 模拟真实目录结构
             createFileManagerWindow(id) {
                 const win = this.createBaseWindow(id, 'folder', '文件管理器');
                 const content = win.querySelector('.window-content');
                 content.style.display = 'flex';
+                // 左侧目录树
                 const tree = document.createElement('div');
                 tree.className = 'file-tree';
-                tree.innerHTML = `<div class="tree-item"><span class="material-symbols-outlined">computer</span> 此电脑</div>
-                                  <div class="tree-item"><span class="material-symbols-outlined">desktop_windows</span> 桌面</div>
-                                  <div class="tree-item"><span class="material-symbols-outlined">description</span> 文档</div>`;
+                const dirs = [
+                    { name: '桌面', path: 'desktop', icon: 'desktop_windows' },
+                    { name: '文档', path: 'documents', icon: 'description' },
+                    { name: '下载', path: 'downloads', icon: 'download' },
+                    { name: '图片', path: 'pictures', icon: 'image' },
+                    { name: '音乐', path: 'music', icon: 'music_note' },
+                    { name: '视频', path: 'videos', icon: 'video_library' }
+                ];
+                dirs.forEach(dir => {
+                    const div = document.createElement('div');
+                    div.className = 'tree-item';
+                    div.setAttribute('data-path', dir.path);
+                    div.innerHTML = `<span class="material-symbols-outlined">${dir.icon}</span><span>${dir.name}</span>`;
+                    div.addEventListener('click', () => this.showFileList(dir.path, fileList));
+                    tree.appendChild(div);
+                });
+                // 右侧文件列表
                 const fileList = document.createElement('div');
                 fileList.className = 'file-list';
-                fileList.innerHTML = '<div class="file-item"><span class="material-symbols-outlined">folder</span><div>示例文件夹</div></div>';
+                this.showFileList('desktop', fileList);
                 content.appendChild(tree);
                 content.appendChild(fileList);
                 return win;
             }
 
+            showFileList(path, container) {
+                // 模拟不同目录下的文件
+                const filesMap = {
+                    desktop: [
+                        { name: '示例文件夹', icon: 'folder', type: 'dir' },
+                        { name: 'readme.txt', icon: 'description', type: 'file' }
+                    ],
+                    documents: [
+                        { name: '工作文档.docx', icon: 'description', type: 'file' },
+                        { name: '报表.xlsx', icon: 'table_chart', type: 'file' }
+                    ],
+                    downloads: [
+                        { name: '安装包.exe', icon: 'install_desktop', type: 'file' },
+                        { name: '图片.jpg', icon: 'image', type: 'file' }
+                    ],
+                    pictures: [
+                        { name: '壁纸.png', icon: 'image', type: 'file' },
+                        { name: '截图.png', icon: 'screenshot', type: 'file' }
+                    ],
+                    music: [
+                        { name: '歌曲.mp3', icon: 'music_note', type: 'file' }
+                    ],
+                    videos: [
+                        { name: '电影.mp4', icon: 'video_library', type: 'file' }
+                    ]
+                };
+                const files = filesMap[path] || [];
+                container.innerHTML = '';
+                files.forEach(file => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `<span class="material-symbols-outlined">${file.icon}</span><div>${file.name}</div>`;
+                    if (file.type === 'dir') {
+                        div.addEventListener('dblclick', () => this.showFileList(file.name.toLowerCase(), container));
+                    }
+                    container.appendChild(div);
+                });
+            }
+
+            // 浏览器窗口（包含正确的右键菜单）
             createBrowserWindow(id) {
                 const win = this.createBaseWindow(id, 'public', 'Raccoon Browser');
                 const content = win.querySelector('.window-content');
                 content.innerHTML = `
                     <div style="display: flex; padding: 8px; gap: 8px; background:#2a2a2a;">
                         <input type="text" id="browser-url-${id}" class="flex-1 bg-[#333] rounded-full px-3 py-1 text-sm text-white border-none outline-none" placeholder="输入网址" value="https://www.baidu.com">
-                        <button id="browser-go-${id}" class="px-2">前往</button>
+                        <button id="browser-go-${id}" class="px-2 text-white">前往</button>
                     </div>
                     <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
                 `;
@@ -397,7 +478,46 @@
                 goBtn.onclick = navigate;
                 urlInput.onkeypress = (e) => { if(e.key === 'Enter') navigate(); };
                 navigate();
+
+                // 为浏览器内容区域添加右键菜单（仅针对非iframe区域，iframe内部无法拦截）
+                // 但我们可以监听整个窗口的contextmenu，排除iframe
+                win.addEventListener('contextmenu', (e) => {
+                    if (e.target.tagName === 'IFRAME') return; // iframe内部让其使用原生菜单
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showBrowserContextMenu(e.clientX, e.clientY, frame);
+                });
                 return win;
+            }
+
+            // 浏览器专用右键菜单
+            showBrowserContextMenu(x, y, frame) {
+                this.removeAllContextMenus();
+                const menu = document.createElement('div');
+                menu.className = 'context-menu';
+                let top = y;
+                const menuHeight = 150;
+                if (top + menuHeight > window.innerHeight) top = y - menuHeight;
+                menu.style.left = x + 'px';
+                menu.style.top = top + 'px';
+                menu.innerHTML = `
+                    <div class="context-menu-item" data-action="back">返回</div>
+                    <div class="context-menu-item" data-action="forward">前进</div>
+                    <div class="context-menu-item" data-action="reload">重新加载</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item" data-action="source">查看源代码</div>
+                `;
+                const handleBack = () => { try { frame.contentWindow.history.back(); } catch(e){} menu.remove(); };
+                const handleForward = () => { try { frame.contentWindow.history.forward(); } catch(e){} menu.remove(); };
+                const handleReload = () => { try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } menu.remove(); };
+                const handleSource = () => { try { window.open('view-source:' + frame.contentWindow.location.href); } catch(e){ alert('无法查看跨域页面源代码'); } menu.remove(); };
+                menu.querySelector('[data-action="back"]').addEventListener('click', handleBack);
+                menu.querySelector('[data-action="forward"]').addEventListener('click', handleForward);
+                menu.querySelector('[data-action="reload"]').addEventListener('click', handleReload);
+                menu.querySelector('[data-action="source"]').addEventListener('click', handleSource);
+                document.body.appendChild(menu);
+                const closeHandler = (e) => { if (!menu.contains(e.target)) menu.remove(); document.removeEventListener('click', closeHandler); };
+                setTimeout(() => document.addEventListener('click', closeHandler), 0);
             }
 
             createTerminalWindow(id) {
@@ -408,37 +528,56 @@
                 return win;
             }
 
+            // 设置窗口 - 丰富内容
             createSettingsWindow(id) {
                 const win = this.createBaseWindow(id, 'settings', '设置');
                 const content = win.querySelector('.window-content');
                 content.innerHTML = `
                     <div style="display: flex; height: 100%;">
                         <div class="w-48 bg-[#252525] p-3">
-                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="personalization">个性化</div>
-                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="system">系统</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="personalization">个性化</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="system">系统</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="startup">启动项</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer text-white" data-page="about">关于</div>
                         </div>
                         <div class="flex-1 p-4 overflow-auto">
                             <div id="settings-personalization" class="settings-page active">
-                                <h3 class="text-lg mb-4">个性化</h3>
-                                <div class="mb-4">背景颜色</div>
+                                <h3 class="text-lg mb-4 text-white">个性化</h3>
+                                <div class="mb-4 text-white">背景颜色</div>
                                 <div class="grid grid-cols-4 gap-2 mb-4">
                                     <div class="wallpaper-preview bg-[#0a0a0a]" data-wall="#0a0a0a"></div>
                                     <div class="wallpaper-preview bg-[#1e1e1e]" data-wall="#1e1e1e"></div>
                                     <div class="wallpaper-preview bg-[#2c3e50]" data-wall="#2c3e50"></div>
                                     <div class="wallpaper-preview bg-[#3d342f]" data-wall="#3d342f"></div>
                                 </div>
-                                <div class="flex justify-between items-center mt-4">
+                                <div class="flex justify-between items-center mt-4 text-white">
                                     <span>夜间模式</span>
                                     <div class="toggle-switch toggle-active" id="theme-toggle"></div>
                                 </div>
                             </div>
                             <div id="settings-system" class="settings-page">
-                                <h3 class="text-lg mb-4">系统信息</h3>
-                                <p>Raccoon OS 2026.06</p>
+                                <h3 class="text-lg mb-4 text-white">系统信息</h3>
+                                <p class="text-white">Raccoon OS 第三版</p>
+                                <p class="text-white">内核: OPFS 持久化存储</p>
+                                <p class="text-white">构建日期: 2026年6月8日</p>
+                            </div>
+                            <div id="settings-startup" class="settings-page">
+                                <h3 class="text-lg mb-4 text-white">启动项</h3>
+                                <div class="flex justify-between items-center mt-2 text-white">
+                                    <span>开机自启桌面</span>
+                                    <div class="toggle-switch toggle-active" id="autostart-toggle"></div>
+                                </div>
+                            </div>
+                            <div id="settings-about" class="settings-page">
+                                <h3 class="text-lg mb-4 text-white">关于 Raccoon OS</h3>
+                                <p class="text-white">版本: 2026.06 (第三版)</p>
+                                <p class="text-white">作者: Raccoon Studio</p>
+                                <p class="text-white">一个模拟操作系统的网页应用</p>
                             </div>
                         </div>
                     </div>
                 `;
+                // 导航切换
                 content.querySelectorAll('.settings-nav-item').forEach(nav => {
                     nav.addEventListener('click', () => {
                         const page = nav.dataset.page;
@@ -446,11 +585,13 @@
                         content.getElementById(`settings-${page}`).classList.add('active');
                     });
                 });
+                // 壁纸
                 content.querySelectorAll('[data-wall]').forEach(el => {
                     el.addEventListener('click', () => {
                         document.body.style.backgroundColor = el.dataset.wall;
                     });
                 });
+                // 夜间模式开关
                 const themeToggle = content.querySelector('#theme-toggle');
                 themeToggle.addEventListener('click', () => {
                     themeToggle.classList.toggle('toggle-active');
@@ -498,7 +639,10 @@
                     const menu = document.createElement('div');
                     menu.className = 'context-menu';
                     menu.style.left = e.clientX + 'px';
-                    menu.style.top = e.clientY + 'px';
+                    let top = e.clientY;
+                    const menuHeight = 100;
+                    if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
+                    menu.style.top = top + 'px';
                     menu.innerHTML = `<div class="context-menu-item" data-action="refresh">刷新</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="settings">显示设置</div>`;
                     menu.querySelector('[data-action="refresh"]').addEventListener('click', () => {
                         this.refreshDesktop();
@@ -522,7 +666,10 @@
                         const menu = document.createElement('div');
                         menu.className = 'context-menu';
                         menu.style.left = e.clientX + 'px';
-                        menu.style.top = e.clientY + 'px';
+                        let top = e.clientY;
+                        const menuHeight = 80;
+                        if (top + menuHeight > window.innerHeight) top = e.clientY - menuHeight;
+                        menu.style.top = top + 'px';
                         menu.innerHTML = `<div class="context-menu-item" data-action="open">打开</div><div class="context-menu-divider"></div><div class="context-menu-item" data-action="delete">删除</div>`;
                         menu.querySelector('[data-action="open"]').addEventListener('click', () => {
                             const app = icon.getAttribute('data-app');
@@ -580,7 +727,7 @@
                 dialog.innerHTML = `
                     <div class="bg-gray-800 rounded-xl w-96 p-5 shadow-2xl border border-gray-700">
                         <div class="flex items-center gap-2 text-blue-400 mb-3">
-                            <span class="material-symbols-outlined">stadia_controller</span>
+                            <span class="text-2xl">🦝</span>
                             <span class="font-semibold">RaccoonOS 启动</span>
                         </div>
                         <p class="text-gray-300 text-sm mb-4">点击“确定”进入桌面环境。</p>

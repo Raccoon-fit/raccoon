@@ -42,7 +42,7 @@
         .win-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: background 0.1s; cursor: pointer; }
         .win-btn:hover { background: rgba(255,255,255,0.15); }
         .win-close:hover { background: #e81123 !important; }
-        .window-content { flex: 1; overflow: auto; background: #1a1a1a; }
+        .window-content { flex: 1; overflow: auto; background: #1a1a1a; height: 100%; box-sizing: border-box; }
         .file-tree { width: 220px; background: #252525; padding: 12px; overflow-y: auto; }
         .tree-item { padding: 4px 8px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
         .tree-item:hover { background: rgba(255,255,255,0.08); }
@@ -448,6 +448,12 @@
                         win.style.left = winObj.savedPosition.left + 'px';
                         win.style.top = winObj.savedPosition.top + 'px';
                         win.style.borderRadius = '10px';
+                        win.style.boxSizing = '';
+                        const winContent = win.querySelector('.window-content');
+                        if (winContent) {
+                            winContent.style.borderRadius = '';
+                            winContent.style.overflow = '';
+                        }
                         maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">crop_square</span>';
                     } else {
                         winObj.savedPosition.width = win.style.width;
@@ -455,11 +461,16 @@
                         winObj.savedPosition.left = parseInt(win.style.left);
                         winObj.savedPosition.top = parseInt(win.style.top);
                         win.style.width = '100%';
-                        win.style.height = '100vh';
+                        win.style.height = 'calc(100vh - 44px)';
                         win.style.left = '0';
                         win.style.top = '0';
-                        win.style.marginTop = '0';
                         win.style.borderRadius = '0 0 10px 10px';
+                        win.style.boxSizing = 'border-box';
+                        const winContent = win.querySelector('.window-content');
+                        if (winContent) {
+                            winContent.style.borderRadius = '0 0 10px 10px';
+                            winContent.style.overflow = 'hidden';
+                        }
                         maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">fullscreen_exit</span>';
                     }
                 });
@@ -660,9 +671,11 @@
                 const win = this.createBaseWindow(id, 'public', 'Raccoon Browser');
                 const content = win.querySelector('.window-content');
                 content.style.position = 'relative';
+                content.style.display = 'flex';
+                content.style.flexDirection = 'column';
                 content.style.overflow = 'hidden';
                 content.innerHTML = `
-                    <div style="display: flex; padding: 8px; gap: 8px; background:#2a2a2a; border-bottom: 1px solid #444;">
+                    <div style="flex-shrink: 0; display: flex; padding: 8px; gap: 8px; background:#2a2a2a; border-bottom: 1px solid #444; box-sizing: border-box; height: 44px; align-items: center;">
                         <button class="browser-nav-back p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
                         <button class="browser-nav-forward p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
                         <button class="browser-nav-reload p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">refresh</span></button>
@@ -674,7 +687,7 @@
                         <button class="browser-bookmark p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">bookmark</span></button>
                         <button class="browser-history p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">history</span></button>
                     </div>
-                    <div id="browser-home-${id}" class="browser-home">
+                    <div id="browser-home-${id}" class="browser-home" style="flex:1;overflow-y:auto;box-sizing:border-box;">
                         <div class="logo">🦝</div>
                         <div class="title">Raccoon Browser</div>
                         <div class="search-box">
@@ -690,7 +703,7 @@
                         </div>
                         <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
                     </div>
-                    <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" style="display: none;"></iframe>
+                    <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
                 `;
                 const urlInput = content.querySelector(`#browser-url-${id}`);
                 const goBtn = content.querySelector('.browser-go');

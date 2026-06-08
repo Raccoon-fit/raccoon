@@ -723,7 +723,7 @@
                         </div>
                         <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
                     </div>
-                    <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+                    <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups"></iframe>
                 `;
                 const urlInput = content.querySelector(`#browser-url-${id}`);
                 const goBtn = content.querySelector('.browser-go');
@@ -791,47 +791,55 @@
                         const script = doc.createElement('script');
                         script.textContent = `
                             window.open = function(url, name, specs) {
-                                window.parent.postMessage({ type: 'browser-popup', url: url, name: name }, '*');
                                 if (url) {
-                                    window.parent.location.href = url;
+                                    window.parent.postMessage({ type: 'browser-navigate', url: url }, '*');
                                 }
                                 return null;
                             };
+                            window.close = function() {};
+                            document.addEventListener('click', function(e) {
+                                var target = e.target.closest ? e.target.closest('a, button, [role="button"]') : e.target;
+                                if (!target) return;
+                                var href = target.href || target.dataset.href || target.form?.action || target.getAttribute('data-url');
+                                var isDownload = target.hasAttribute('download') || target.dataset.download || (href && (/download|\\.(pdf|zip|rar|doc|xls|ppt|jpg|png|gif|mp3|mp4|exe|docx|xlsx|apk|iso)$/i.test(href) || href.includes('download')));
+                                if (isDownload && href) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    window.parent.postMessage({ type: 'browser-download', url: href, filename: target.download || target.dataset.download || href.split('/').pop() }, '*');
+                                    return;
+                                }
+                                if (target.tagName === 'A' && href && !href.startsWith('javascript') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    window.parent.postMessage({ type: 'browser-navigate', url: href }, '*');
+                                }
+                            }, true);
+                            document.addEventListener('submit', function(e) {
+                                var action = e.target.action;
+                                if (action && !action.startsWith('javascript')) {
+                                    e.preventDefault();
+                                    var formData = new FormData(e.target);
+                                    var params = new URLSearchParams(formData).toString();
+                                    var url = action + (params ? '?' + params : '');
+                                    window.parent.postMessage({ type: 'browser-navigate', url: url }, '*');
+                                }
+                            }, true);
+                            document.addEventListener('mousedown', function(e) {
+                                if (e.button === 1) {
+                                    var target = e.target.closest ? e.target.closest('a') : e.target;
+                                    if (target && target.href) {
+                                        window.parent.postMessage({ type: 'browser-navigate', url: target.href }, '*');
+                                    }
+                                }
+                            }, true);
                         `;
                         doc.head.appendChild(script);
-                        doc.addEventListener('click', function(e) {
-                            var target = e.target;
-                            while (target && target !== doc.body) {
-                                var href = target.href || target.getAttribute('data-href');
-                                if (target.tagName === 'A' || target.tagName === 'BUTTON') {
-                                    if (target.download || (href && (href.match(/download/i) || href.match(/\\.(pdf|zip|rar|doc|xls|ppt|jpg|png|gif|mp3|mp4|exe|docx|xlsx)$/i)))) {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        window.parent.postMessage({ type: 'browser-download', url: href, filename: target.download || href.split('/').pop() }, '*');
-                                        return;
-                                    }
-                                    var onclick = target.getAttribute('onclick') || '';
-                                    if (onclick.match(/download/i)) {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        window.parent.postMessage({ type: 'browser-download-click', target: target.outerHTML }, '*');
-                                        return;
-                                    }
-                                }
-                                target = target.parentElement;
-                            }
-                        }, true);
-                        doc.addEventListener('mousedown', function(e) {
-                            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
-                                var href = e.target.href || e.target.getAttribute('data-href');
-                                if (href && (e.target.download || href.match(/download/i) || href.match(/\\.(pdf|zip|rar|doc|xls|ppt|jpg|png|gif|mp3|mp4|exe|docx|xlsx)$/i))) {
-                                    window.parent.postMessage({ type: 'browser-download', url: href, filename: e.target.download || href.split('/').pop() }, '*');
-                                }
-                            }
-                        }, true);
                     } catch(e) { console.log('Browser frame load error:', e); }
                 });
                 window.addEventListener('message', (e) => {
+                    if (e.data && e.data.type === 'browser-navigate') {
+                        navigate(e.data.url);
+                    }
                     if (e.data && e.data.type === 'browser-popup' && e.data.url) {
                         navigate(e.data.url);
                     }
@@ -841,7 +849,6 @@
                             link.href = e.data.url;
                             link.download = e.data.filename || '';
                             link.target = '_blank';
-                            link.rel = 'noopener noreferrer';
                             document.body.appendChild(link);
                             link.click();
                             setTimeout(() => document.body.removeChild(link), 100);
@@ -1145,7 +1152,7 @@
                                 <h3 class="text-lg mb-4">系统信息</h3>
                                 <div class="space-y-2 text-sm">
                                     <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                                    <p><strong>版本:</strong> 6.0.1</p>
+                                    <p><strong>版本:</strong> 6.0.3</p>
                                     <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
                                     <p><strong>构建日期:</strong> 2026年6月8日</p>
                                     <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
@@ -1205,7 +1212,7 @@
                                     <p class="text-gray-400">终极增强版</p>
                                 </div>
                                 <div class="space-y-2 text-sm">
-                                    <p>版本: 6.0.1</p>
+                                    <p>版本: 6.0.3</p>
                                     <p>作者: Raccoon Studio</p>
                                     <p>一个功能完整、极具细节的操作系统模拟器</p>
                                     <p class="mt-4 text-gray-400">特性:</p>

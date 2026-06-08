@@ -1470,6 +1470,15 @@
                 // 桌面右键菜单（增强）
                 document.getElementById('desktop-area').addEventListener('contextmenu', (e) => {
                     e.preventDefault();
+                    // 检查是否点击在窗口内
+                    const windows = document.querySelectorAll('.window');
+                    for (const win of windows) {
+                        const rect = win.getBoundingClientRect();
+                        if (e.clientX >= rect.left && e.clientX <= rect.right && 
+                            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                            return;
+                        }
+                    }
                     if (e.target.closest('.desktop-icon')) return;
                     this.removeAllContextMenus();
                     const menu = document.createElement('div');

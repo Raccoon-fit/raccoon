@@ -24,8 +24,9 @@
         .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 44px; background: rgba(20,20,20,0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; padding: 0 8px; z-index: 1000; }
         .taskbar-item { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 12px; border-radius: 6px; transition: background 0.1s; cursor: pointer; }
         .taskbar-item:hover { background: rgba(255,255,255,0.1); }
-        .taskbar-app { min-width: 48px; position: relative; }
-        .taskbar-app.active::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: white; border-radius: 2px; }
+        .taskbar-app { min-width: 48px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 8px; }
+        .taskbar-app.active::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; background: white; border-radius: 2px; }
+        .taskbar-app .app-name { font-size: 9px; margin-top: 2px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 48px; }
         .start-menu { position: fixed; bottom: 50px; left: 12px; width: 340px; background: rgba(30,30,30,0.95); backdrop-filter: blur(16px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 1100; display: none; overflow: hidden; }
         .start-menu-header { padding: 20px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .start-menu-search { background: rgba(0,0,0,0.5); border: none; border-radius: 30px; padding: 8px 16px; width: 100%; color: white; outline: none; font-size: 13px; }
@@ -177,11 +178,29 @@
                             theme: parsed.theme || '#0a0a0a',
                             autostartApps: parsed.autostartApps || [],
                             showHiddenFiles: parsed.showHiddenFiles || false,
-                            desktopLayout: parsed.desktopLayout || 'grid'
+                            desktopLayout: parsed.desktopLayout || 'grid',
+                            systemSound: parsed.systemSound !== undefined ? parsed.systemSound : true,
+                            notificationSound: parsed.notificationSound !== undefined ? parsed.notificationSound : true,
+                            displayScale: parsed.displayScale || '100',
+                            windowAnimation: parsed.windowAnimation !== undefined ? parsed.windowAnimation : true,
+                            taskbarTransparent: parsed.taskbarTransparent !== undefined ? parsed.taskbarTransparent : true,
+                            showSeconds: parsed.showSeconds || false
                         };
                     }
                 } catch(e) {}
-                return { volume: 70, theme: '#0a0a0a', autostartApps: [], showHiddenFiles: false, desktopLayout: 'grid' };
+                return {
+                    volume: 70,
+                    theme: '#0a0a0a',
+                    autostartApps: [],
+                    showHiddenFiles: false,
+                    desktopLayout: 'grid',
+                    systemSound: true,
+                    notificationSound: true,
+                    displayScale: '100',
+                    windowAnimation: true,
+                    taskbarTransparent: true,
+                    showSeconds: false
+                };
             }
 
             saveSettings() {
@@ -293,13 +312,14 @@
                 const btn = document.createElement('div');
                 btn.className = 'taskbar-item taskbar-app';
                 let icon = '';
+                let appName = '';
                 switch(winObj.appName) {
-                    case 'filemanager': icon = 'folder'; break;
-                    case 'browser': icon = 'public'; break;
-                    case 'terminal': icon = 'terminal'; break;
-                    case 'settings': icon = 'settings'; break;
+                    case 'filemanager': icon = 'folder'; appName = '文件管理器'; break;
+                    case 'browser': icon = 'public'; appName = '浏览器'; break;
+                    case 'terminal': icon = 'terminal'; appName = '终端'; break;
+                    case 'settings': icon = 'settings'; appName = '设置'; break;
                 }
-                btn.innerHTML = `<span class="material-symbols-outlined">${icon}</span>`;
+                btn.innerHTML = `<span class="material-symbols-outlined">${icon}</span><span class="app-name">${appName}</span>`;
                 btn.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMinimizeWindow(winObj); });
                 btn.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
@@ -1008,8 +1028,11 @@
                     <div style="display: flex; height: 100%;">
                         <div class="w-48 bg-[#252525] p-3">
                             <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="personalization">个性化</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="sound">声音</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="display">显示</div>
                             <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="system">系统</div>
                             <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="startup">启动项</div>
+                            <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="storage">存储</div>
                             <div class="settings-nav-item p-2 rounded cursor-pointer" data-page="about">关于</div>
                         </div>
                         <div class="flex-1 p-4 overflow-auto">
@@ -1031,12 +1054,68 @@
                                     <div class="toggle-switch ${this.settings.showHiddenFiles ? 'toggle-active' : ''}" id="hidden-toggle"></div>
                                 </div>
                             </div>
+                            <div id="settings-sound" class="settings-page">
+                                <h3 class="text-lg mb-4">声音设置</h3>
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span>主音量</span>
+                                        <span id="volume-display">${this.settings.volume}%</span>
+                                    </div>
+                                    <input type="range" id="volume-slider" min="0" max="100" value="${this.settings.volume}" class="w-full">
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>系统声音</span>
+                                    <div class="toggle-switch toggle-active" id="system-sound-toggle"></div>
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>通知声音</span>
+                                    <div class="toggle-switch toggle-active" id="notification-sound-toggle"></div>
+                                </div>
+                            </div>
+                            <div id="settings-display" class="settings-page">
+                                <h3 class="text-lg mb-4">显示设置</h3>
+                                <div class="mb-4">
+                                    <div class="mb-2">缩放级别</div>
+                                    <select id="display-scale" class="bg-[#333] text-white border border-[#555] rounded px-3 py-2 w-full">
+                                        <option value="100">100% (默认)</option>
+                                        <option value="125">125%</option>
+                                        <option value="150">150%</option>
+                                        <option value="175">175%</option>
+                                    </select>
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>窗口动画</span>
+                                    <div class="toggle-switch toggle-active" id="window-animation-toggle"></div>
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>任务栏透明</span>
+                                    <div class="toggle-switch toggle-active" id="taskbar-transparent-toggle"></div>
+                                </div>
+                                <div class="flex justify-between items-center mt-4">
+                                    <span>显示秒数</span>
+                                    <div class="toggle-switch" id="show-seconds-toggle"></div>
+                                </div>
+                            </div>
                             <div id="settings-system" class="settings-page">
                                 <h3 class="text-lg mb-4">系统信息</h3>
-                                <p>Raccoon OS 终极增强版</p>
-                                <p>内核: 模拟文件系统 + localStorage</p>
-                                <p>构建日期: 2026年6月8日</p>
-                                <p>版本: 6.0.0</p>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
+                                    <p><strong>版本:</strong> 6.0.1</p>
+                                    <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
+                                    <p><strong>构建日期:</strong> 2026年6月8日</p>
+                                    <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
+                                    <p><strong>屏幕分辨率:</strong> ${window.screen.width} x ${window.screen.height}</p>
+                                    <p><strong>语言:</strong> ${navigator.language}</p>
+                                    <p><strong>在线状态:</strong> ${navigator.onLine ? '在线' : '离线'}</p>
+                                </div>
+                                <div class="mt-6">
+                                    <h4 class="text-md mb-2">硬件信息</h4>
+                                    <div class="space-y-1 text-sm text-gray-400">
+                                        <p>CPU: 模拟 x64 处理器</p>
+                                        <p>内存: ${Math.round(navigator.deviceMemory || 4)} GB (估算)</p>
+                                        <p>平台: ${navigator.platform}</p>
+                                    </div>
+                                </div>
                             </div>
                             <div id="settings-startup" class="settings-page">
                                 <h3 class="text-lg mb-4">启动项</h3>
@@ -1048,14 +1127,51 @@
                                 <div class="mt-2 space-y-2">
                                     <div class="flex items-center gap-2"><input type="checkbox" id="autostart-browser" ${this.settings.autostartApps.includes('browser') ? 'checked' : ''}> <label>浏览器</label></div>
                                     <div class="flex items-center gap-2"><input type="checkbox" id="autostart-terminal" ${this.settings.autostartApps.includes('terminal') ? 'checked' : ''}> <label>终端</label></div>
+                                    <div class="flex items-center gap-2"><input type="checkbox" id="autostart-settings" ${this.settings.autostartApps.includes('settings') ? 'checked' : ''}> <label>设置</label></div>
                                 </div>
+                            </div>
+                            <div id="settings-storage" class="settings-page">
+                                <h3 class="text-lg mb-4">存储设置</h3>
+                                <div class="mb-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span>本地存储使用:</span>
+                                        <span id="storage-usage">计算中...</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-[#333] rounded overflow-hidden">
+                                        <div id="storage-bar" class="h-full bg-blue-500 transition-all" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <button id="export-settings" class="px-3 py-1 bg-[#333] rounded hover:bg-[#444] text-sm">导出配置</button>
+                                        <button id="import-settings" class="px-3 py-1 bg-[#333] rounded hover:bg-[#444] text-sm">导入配置</button>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <button id="clear-storage" class="px-3 py-1 bg-[#e81123] rounded hover:bg-[#f02030] text-sm">清除所有数据</button>
+                                    </div>
+                                </div>
+                                <input type="file" id="import-file" accept=".json" style="display: none;">
                             </div>
                             <div id="settings-about" class="settings-page">
                                 <h3 class="text-lg mb-4">关于 Raccoon OS</h3>
-                                <p>版本: 2026.06 (终极增强版)</p>
-                                <p>作者: Raccoon Studio</p>
-                                <p>一个功能完整、极具细节的操作系统模拟器</p>
-                                <p class="mt-4">© 2026 Raccoon OS. 保留所有权利。</p>
+                                <div class="text-center mb-6">
+                                    <div class="text-6xl mb-2">🦝</div>
+                                    <h4 class="text-xl font-bold">Raccoon OS</h4>
+                                    <p class="text-gray-400">终极增强版</p>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <p>版本: 6.0.1</p>
+                                    <p>作者: Raccoon Studio</p>
+                                    <p>一个功能完整、极具细节的操作系统模拟器</p>
+                                    <p class="mt-4 text-gray-400">特性:</p>
+                                    <ul class="list-disc list-inside text-gray-400">
+                                        <li>模拟桌面操作系统</li>
+                                        <li>内置浏览器、文件管理器、终端</li>
+                                        <li>可自定义主题和设置</li>
+                                        <li>数据本地存储</li>
+                                    </ul>
+                                </div>
+                                <p class="mt-6 text-center text-gray-500 text-sm">© 2026 Raccoon OS. 保留所有权利。</p>
                             </div>
                         </div>
                     </div>
@@ -1120,6 +1236,162 @@
                     }
                     this.saveSettings();
                 });
+                const autostartSettings = content.querySelector('#autostart-settings');
+                if (autostartSettings) {
+                    autostartSettings.addEventListener('change', () => {
+                        if (autostartSettings.checked) {
+                            if (!this.settings.autostartApps.includes('settings')) this.settings.autostartApps.push('settings');
+                        } else {
+                            this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'settings');
+                        }
+                        this.saveSettings();
+                    });
+                }
+                // 声音设置
+                const volumeSlider = content.querySelector('#volume-slider');
+                const volumeDisplay = content.querySelector('#volume-display');
+                if (volumeSlider) {
+                    volumeSlider.addEventListener('input', () => {
+                        const vol = parseInt(volumeSlider.value);
+                        volumeDisplay.textContent = vol + '%';
+                        this.settings.volume = vol;
+                        this.saveSettings();
+                        document.querySelectorAll('audio, video').forEach(el => el.volume = vol / 100);
+                    });
+                }
+                const systemSoundToggle = content.querySelector('#system-sound-toggle');
+                if (systemSoundToggle) {
+                    systemSoundToggle.addEventListener('click', () => {
+                        systemSoundToggle.classList.toggle('toggle-active');
+                        this.settings.systemSound = systemSoundToggle.classList.contains('toggle-active');
+                        this.saveSettings();
+                    });
+                }
+                const notificationSoundToggle = content.querySelector('#notification-sound-toggle');
+                if (notificationSoundToggle) {
+                    notificationSoundToggle.addEventListener('click', () => {
+                        notificationSoundToggle.classList.toggle('toggle-active');
+                        this.settings.notificationSound = notificationSoundToggle.classList.contains('toggle-active');
+                        this.saveSettings();
+                    });
+                }
+                // 显示设置
+                const displayScale = content.querySelector('#display-scale');
+                if (displayScale) {
+                    displayScale.value = this.settings.displayScale || '100';
+                    displayScale.addEventListener('change', () => {
+                        this.settings.displayScale = displayScale.value;
+                        this.saveSettings();
+                        document.body.style.zoom = displayScale.value + '%';
+                    });
+                }
+                const windowAnimationToggle = content.querySelector('#window-animation-toggle');
+                if (windowAnimationToggle) {
+                    windowAnimationToggle.addEventListener('click', () => {
+                        windowAnimationToggle.classList.toggle('toggle-active');
+                        this.settings.windowAnimation = windowAnimationToggle.classList.contains('toggle-active');
+                        this.saveSettings();
+                    });
+                }
+                const taskbarTransparentToggle = content.querySelector('#taskbar-transparent-toggle');
+                if (taskbarTransparentToggle) {
+                    taskbarTransparentToggle.addEventListener('click', () => {
+                        taskbarTransparentToggle.classList.toggle('toggle-active');
+                        this.settings.taskbarTransparent = taskbarTransparentToggle.classList.contains('toggle-active');
+                        this.saveSettings();
+                    });
+                }
+                const showSecondsToggle = content.querySelector('#show-seconds-toggle');
+                if (showSecondsToggle) {
+                    if (this.settings.showSeconds) showSecondsToggle.classList.add('toggle-active');
+                    showSecondsToggle.addEventListener('click', () => {
+                        showSecondsToggle.classList.toggle('toggle-active');
+                        this.settings.showSeconds = showSecondsToggle.classList.contains('toggle-active');
+                        this.saveSettings();
+                        this.updateClock();
+                    });
+                }
+                // 存储设置
+                const storageUsage = content.querySelector('#storage-usage');
+                const storageBar = content.querySelector('#storage-bar');
+                const updateStorageInfo = () => {
+                    let total = 0;
+                    for (let key in localStorage) {
+                        if (localStorage.hasOwnProperty(key)) {
+                            total += localStorage[key].length * 2;
+                        }
+                    }
+                    const usedKB = (total / 1024).toFixed(2);
+                    const maxKB = 5 * 1024;
+                    const percent = Math.min((total / maxKB) * 100, 100);
+                    if (storageUsage) storageUsage.textContent = usedKB + ' KB / ' + maxKB + ' KB';
+                    if (storageBar) storageBar.style.width = percent + '%';
+                };
+                updateStorageInfo();
+                const exportBtn = content.querySelector('#export-settings');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => {
+                        const data = {
+                            settings: this.settings,
+                            history: this.history,
+                            bookmarks: this.bookmarks,
+                            fileSystem: this.fileSystem
+                        };
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'raccoonos-backup.json';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                }
+                const importBtn = content.querySelector('#import-settings');
+                const importFile = content.querySelector('#import-file');
+                if (importBtn && importFile) {
+                    importBtn.addEventListener('click', () => importFile.click());
+                    importFile.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                try {
+                                    const data = JSON.parse(event.target.result);
+                                    if (data.settings) {
+                                        this.settings = { ...this.settings, ...data.settings };
+                                        this.saveSettings();
+                                    }
+                                    if (data.history) {
+                                        this.history = data.history;
+                                        this.saveHistory();
+                                    }
+                                    if (data.bookmarks) {
+                                        this.bookmarks = data.bookmarks;
+                                        this.saveBookmarks();
+                                    }
+                                    if (data.fileSystem) {
+                                        this.fileSystem = data.fileSystem;
+                                        this.saveFileSystem();
+                                    }
+                                    this.showSystemDialog('导入成功', '配置已成功导入，部分设置需要刷新页面生效');
+                                    updateStorageInfo();
+                                } catch (err) {
+                                    this.showSystemDialog('导入失败', '文件格式不正确');
+                                }
+                            };
+                            reader.readAsText(file);
+                        }
+                    });
+                }
+                const clearStorageBtn = content.querySelector('#clear-storage');
+                if (clearStorageBtn) {
+                    clearStorageBtn.addEventListener('click', () => {
+                        this.showSystemDialog('警告', '确定要清除所有数据吗？此操作不可撤销。', () => {
+                            localStorage.clear();
+                            location.reload();
+                        });
+                    });
+                }
                 return win;
             }
 

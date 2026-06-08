@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -7,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: #0a0a0a; overflow: hidden; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
+        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        body { background: #0a0a0a; font-family: 'Segoe UI', system-ui, sans-serif; color: white; }
         #desktop-area { height: calc(100vh - 44px); padding: 16px; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 16px; }
         .desktop-icon { width: 80px; padding: 8px 4px; border-radius: 8px; text-align: center; transition: background 0.1s; cursor: pointer; }
         .desktop-icon:hover { background: rgba(255,255,255,0.1); }
@@ -670,7 +671,7 @@
                         </div>
                         <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
                     </div>
-                    <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups" style="display: none;"></iframe>
+                    <iframe id="browser-frame-${id}" class="w-full h-full" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" style="display: none;"></iframe>
                 `;
                 const urlInput = content.querySelector(`#browser-url-${id}`);
                 const goBtn = content.querySelector('.browser-go');
@@ -732,7 +733,26 @@
                     this.showSystemDialog('历史记录', `<div style="max-height:300px; overflow-y:auto;">${historyHtml || '无历史记录'}</div>`);
                 });
                 frame.addEventListener('load', () => {
-                    try { urlInput.value = frame.contentWindow.location.href; } catch(e) {}
+                    try {
+                        urlInput.value = frame.contentWindow.location.href;
+                        const doc = frame.contentDocument || frame.contentWindow.document;
+                        const script = doc.createElement('script');
+                        script.textContent = `
+                            window.open = function(url, name, specs) {
+                                window.parent.postMessage({ type: 'browser-popup', url: url, name: name }, '*');
+                                if (url) {
+                                    window.parent.location.href = url;
+                                }
+                                return null;
+                            };
+                        `;
+                        doc.head.appendChild(script);
+                    } catch(e) {}
+                });
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.type === 'browser-popup' && e.data.url) {
+                        navigate(e.data.url);
+                    }
                 });
                 win.addEventListener('contextmenu', (e) => {
                     if (e.target.tagName === 'IFRAME') return;

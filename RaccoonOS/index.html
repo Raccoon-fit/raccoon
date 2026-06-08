@@ -215,6 +215,7 @@
             }
 
             addToHistory(url, title) {
+                this.history = this.history.filter(h => h.url !== url);
                 this.history.unshift({ url, title, time: new Date().toISOString() });
                 if (this.history.length > 50) this.history.pop();
                 this.saveHistory();
@@ -446,6 +447,7 @@
                         win.style.height = winObj.savedPosition.height || '550px';
                         win.style.left = winObj.savedPosition.left + 'px';
                         win.style.top = winObj.savedPosition.top + 'px';
+                        win.style.borderRadius = '10px';
                         maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">crop_square</span>';
                     } else {
                         winObj.savedPosition.width = win.style.width;
@@ -453,9 +455,11 @@
                         winObj.savedPosition.left = parseInt(win.style.left);
                         winObj.savedPosition.top = parseInt(win.style.top);
                         win.style.width = '100%';
-                        win.style.height = 'calc(100vh - 44px)';
+                        win.style.height = '100vh';
                         win.style.left = '0';
                         win.style.top = '0';
+                        win.style.marginTop = '0';
+                        win.style.borderRadius = '0 0 10px 10px';
                         maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">fullscreen_exit</span>';
                     }
                 });

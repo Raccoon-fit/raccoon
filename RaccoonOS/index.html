@@ -797,6 +797,25 @@
                                 }
                                 return null;
                             };
+                            document.addEventListener('click', function(e) {
+                                var target = e.target;
+                                while (target) {
+                                    if (target.tagName === 'A' && (target.download || target.href.match(/\\.(pdf|zip|rar|doc|xls|ppt|jpg|png|gif|mp3|mp4|exe)$/i))) {
+                                        e.preventDefault();
+                                        window.parent.postMessage({ type: 'browser-download', url: target.href, filename: target.download || target.href.split('/').pop() }, '*');
+                                        return;
+                                    }
+                                    if (target.tagName === 'BUTTON' || (target.tagName === 'A' && target.href)) {
+                                        var downloadAttr = target.getAttribute('download') || target.getAttribute('data-download');
+                                        if (downloadAttr || (target.tagName === 'A' && target.href.match(/download/i))) {
+                                            e.preventDefault();
+                                            window.parent.postMessage({ type: 'browser-download', url: target.href, filename: downloadAttr || target.href.split('/').pop() }, '*');
+                                            return;
+                                        }
+                                    }
+                                    target = target.parentElement;
+                                }
+                            }, true);
                         `;
                         doc.head.appendChild(script);
                     } catch(e) {}
@@ -804,6 +823,16 @@
                 window.addEventListener('message', (e) => {
                     if (e.data && e.data.type === 'browser-popup' && e.data.url) {
                         navigate(e.data.url);
+                    }
+                    if (e.data && e.data.type === 'browser-download' && e.data.url) {
+                        const a = document.createElement('a');
+                        a.href = e.data.url;
+                        a.download = e.data.filename || '';
+                        a.target = '_blank';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        this.showSystemDialog('下载', '开始下载: ' + (e.data.filename || e.data.url));
                     }
                 });
                 win.addEventListener('contextmenu', (e) => {

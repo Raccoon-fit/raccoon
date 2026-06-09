@@ -1685,13 +1685,13 @@
 
             openTaskMgr() {
                 try {
-                    window.open('taskmgr:', '_blank');
+                    const link = document.createElement('a');
+                    link.href = 'raccoonos://taskmgr';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 } catch(e) {
-                    try {
-                        window.location.href = 'taskmgr:';
-                    } catch(e2) {
-                        this.showSystemDialog('错误', '无法直接打开任务管理器。请按 Ctrl+Shift+Esc 手动打开。');
-                    }
+                    this.showSystemDialog('错误', '无法打开任务管理器。请按 Ctrl+Shift+Esc 手动打开。');
                 }
             }
 

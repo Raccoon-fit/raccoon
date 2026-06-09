@@ -803,56 +803,17 @@
                         urlInput.value = frame.contentWindow.location.href;
                         const doc = frame.contentDocument || frame.contentWindow.document;
                         const win = frame.contentWindow;
-                        win.open = function(url, name, specs) {
-                            if (url) {
-                                window.parent.postMessage({ type: 'browser-navigate', url: url }, '*');
-                            }
-                            return null;
-                        };
-                        win.close = function() {};
+                        const self = this;
                         doc.addEventListener('click', function(e) {
-                            var target = e.target.closest ? e.target.closest('a, button, [role="button"]') : e.target;
-                            if (!target) return;
-                            var href = target.href || target.dataset.href || target.form?.action || target.getAttribute('data-url');
-                            var isDownload = target.hasAttribute('download') || target.dataset.download || (href && (/download|\\.(pdf|zip|rar|doc|xls|ppt|jpg|png|gif|mp3|mp4|exe|docx|xlsx|apk|iso)$/i.test(href) || href.includes('download')));
-                            if (isDownload && href) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                window.parent.postMessage({ type: 'browser-download', url: href, filename: target.download || target.dataset.download || href.split('/').pop() }, '*');
-                                return;
-                            }
-                            if (target.tagName === 'A' && href && !href.startsWith('javascript') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                window.parent.postMessage({ type: 'browser-navigate', url: href }, '*');
-                            }
-                        }, true);
-                        doc.addEventListener('submit', function(e) {
+                            var target = e.target.closest ? e.target.closest('a') : e.target;
+                            if (!target || target.tagName !== 'A') return;
+                            var href = target.href;
+                            if (!href) return;
+                            if (href.startsWith('javascript') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+                            if (target.target === '_blank') return;
                             e.preventDefault();
-                            var form = e.target;
-                            var action = form.action || window.location.href;
-                            var method = form.method || 'get';
-                            if (method.toLowerCase() === 'post') {
-                                var formData = new FormData(form);
-                                var xhr = new XMLHttpRequest();
-                                xhr.open('POST', action, true);
-                                xhr.onload = function() {
-                                    window.parent.postMessage({ type: 'browser-navigate', url: action }, '*');
-                                };
-                                xhr.send(formData);
-                            } else {
-                                var params = new URLSearchParams(new FormData(form)).toString();
-                                var url = action + (action.includes('?') ? '&' : '?') + params;
-                                window.parent.postMessage({ type: 'browser-navigate', url: url }, '*');
-                            }
-                        }, true);
-                        doc.addEventListener('mousedown', function(e) {
-                            if (e.button === 1) {
-                                var target = e.target.closest ? e.target.closest('a') : e.target;
-                                if (target && target.href) {
-                                    window.parent.postMessage({ type: 'browser-navigate', url: target.href }, '*');
-                                }
-                            }
+                            e.stopPropagation();
+                            self.navigate(href);
                         }, true);
                     } catch(e) { console.log('Browser frame load error:', e); }
                 });
@@ -1185,7 +1146,7 @@
                                 <h3 class="text-lg mb-4">系统信息</h3>
                                 <div class="space-y-2 text-sm">
                                     <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                                    <p><strong>版本:</strong> 6.0.9</p>
+                                    <p><strong>版本:</strong> 6.1.0</p>
                                     <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
                                     <p><strong>构建日期:</strong> 2026年6月8日</p>
                                     <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
@@ -1245,7 +1206,7 @@
                                     <p class="text-gray-400">终极增强版</p>
                                 </div>
                                 <div class="space-y-2 text-sm">
-                                    <p>版本: 6.0.9</p>
+                                    <p>版本: 6.1.0</p>
                                     <p>作者: Raccoon Studio</p>
                                     <p>一个功能完整、极具细节的操作系统模拟器</p>
                                     <p class="mt-4 text-gray-400">特性:</p>

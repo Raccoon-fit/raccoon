@@ -101,7 +101,7 @@
     <div class="taskbar" id="taskbar">
         <div class="taskbar-item" id="start-btn"><span class="text-xl">🦝</span><span class="ml-1 text-sm">开始</span></div>
         <div id="taskbar-apps" class="flex-1 flex gap-1 ml-2"></div>
-        <div class="taskbar-item" id="run-btn" title="运行"><img src="https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico" style="width:20px;height:20px;object-fit:contain;"></div>
+        <div class="taskbar-item" id="taskmgr-btn" title="任务管理器"><img src="https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico" style="width:20px;height:20px;object-fit:contain;"></div>
         <div class="taskbar-item" id="volume-btn"><span class="material-symbols-outlined">volume_up</span></div>
         <div class="taskbar-item flex flex-col items-end leading-tight px-2">
             <span id="clock-time" class="text-xs font-medium"></span>
@@ -131,7 +131,7 @@
                     { name: "浏览器", icon: "public", app: "browser" },
                     { name: "终端", icon: "terminal", app: "terminal" },
                     { name: "设置", icon: "settings", app: "settings" },
-                    { name: "运行", icon: "https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico", app: "run" },
+                    { name: "任务管理器", icon: "https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico", app: "taskmgr" },
                     { name: "微信", icon: "chat", app: "wechat" }
                 ];
                 // 模拟文件系统
@@ -301,6 +301,7 @@
                     case 'terminal': winElement = this.createTerminalWindow(id); break;
                     case 'settings': winElement = this.createSettingsWindow(id); break;
                     case 'run': this.runProgram(); return;
+                    case 'taskmgr': this.openTaskMgr(); return;
                     case 'wechat': this.openWechat(); return;
                     default: return;
                 }
@@ -331,6 +332,7 @@
                     case 'terminal': icon = 'terminal'; appName = '终端'; break;
                     case 'settings': icon = 'settings'; appName = '设置'; break;
                     case 'run': icon = 'play_arrow'; appName = '运行'; break;
+                    case 'taskmgr': icon = 'play_arrow'; appName = '任务管理器'; break;
                     case 'wechat': icon = 'chat'; appName = '微信'; break;
                 }
                 btn.innerHTML = `<span class="material-symbols-outlined">${icon}</span><span class="app-name">${appName}</span>`;
@@ -1514,8 +1516,8 @@
                 document.addEventListener('click', () => volPopup.classList.add('hidden'));
 
                 // 运行按钮
-                document.getElementById('run-btn').addEventListener('click', () => {
-                    this.runProgram();
+                document.getElementById('taskmgr-btn').addEventListener('click', () => {
+                    this.openTaskMgr();
                 });
 
                 // 桌面右键菜单（增强）
@@ -1678,6 +1680,18 @@
                     document.body.removeChild(link);
                 } catch(e) {
                     this.showSystemDialog('提示', '协议未注册。请双击运行 run-protocol.reg 后再试。');
+                }
+            }
+
+            openTaskMgr() {
+                try {
+                    window.open('taskmgr:', '_blank');
+                } catch(e) {
+                    try {
+                        window.location.href = 'taskmgr:';
+                    } catch(e2) {
+                        this.showSystemDialog('错误', '无法直接打开任务管理器。请按 Ctrl+Shift+Esc 手动打开。');
+                    }
                 }
             }
 

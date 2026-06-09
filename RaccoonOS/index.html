@@ -1515,23 +1515,7 @@
 
                 // 运行按钮
                 document.getElementById('run-btn').addEventListener('click', () => {
-                    const opened = window.open('raccoonos://run', '_blank');
-                    if (opened) {
-                        this.showSystemDialog('运行', '已尝试打开运行对话框');
-                    } else {
-                        const vbsCode = `Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "rundll32.exe shell32.dll,SHRunDLL", 1, False`;
-                        const blob = new Blob([vbsCode], { type: 'text/vbscript' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'run.vbs';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        this.showSystemDialog('运行', '协议未注册，已下载备用脚本。双击运行脚本可打开系统运行对话框。');
-                    }
+                    this.runProgram();
                 });
 
                 // 桌面右键菜单（增强）
@@ -1686,8 +1670,13 @@ WshShell.Run "rundll32.exe shell32.dll,SHRunDLL", 1, False`;
             }
 
             runProgram() {
-                const opened = window.open('raccoonos://run', '_blank');
-                if (!opened) {
+                try {
+                    const link = document.createElement('a');
+                    link.href = 'raccoonos://run';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } catch(e) {
                     this.showSystemDialog('提示', '协议未注册。请双击运行 run-protocol.reg 后再试。');
                 }
             }

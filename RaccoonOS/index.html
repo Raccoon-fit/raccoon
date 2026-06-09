@@ -16,11 +16,12 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
         #desktop-area { height: calc(100vh - 44px); padding: 16px; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 16px; }
-        .desktop-icon { width: 80px; padding: 8px 4px; border-radius: 8px; text-align: center; transition: background 0.1s; cursor: pointer; }
+        .desktop-icon { width: 80px; padding: 8px 4px; border-radius: 8px; text-align: center; transition: background 0.1s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .desktop-icon:hover { background: rgba(255,255,255,0.1); }
         .desktop-icon.active { background: rgba(255,255,255,0.15); outline: 1px solid rgba(255,255,255,0.2); }
-        .desktop-icon span:first-child { font-size: 36px; }
-        .desktop-icon span:last-child { font-size: 11px; display: block; margin-top: 6px; }
+        .desktop-icon span:first-child, .desktop-icon > img:first-child { font-size: 36px; line-height: 1; }
+        .desktop-icon span:last-child, .desktop-icon > img:last-child + span { font-size: 11px; display: block; margin-top: 6px; text-align: center; }
+        .desktop-icon img { width: 36px; height: 36px; object-fit: contain; }
         .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 44px; background: rgba(20,20,20,0.85); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; padding: 0 8px; z-index: 1000; }
         .taskbar-item { display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 12px; border-radius: 6px; transition: background 0.1s; cursor: pointer; }
         .taskbar-item:hover { background: rgba(255,255,255,0.1); }
@@ -100,6 +101,7 @@
     <div class="taskbar" id="taskbar">
         <div class="taskbar-item" id="start-btn"><span class="text-xl">🦝</span><span class="ml-1 text-sm">开始</span></div>
         <div id="taskbar-apps" class="flex-1 flex gap-1 ml-2"></div>
+        <div class="taskbar-item" id="run-btn" title="运行"><img src="https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico" style="width:20px;height:20px;object-fit:contain;"></div>
         <div class="taskbar-item" id="volume-btn"><span class="material-symbols-outlined">volume_up</span></div>
         <div class="taskbar-item flex flex-col items-end leading-tight px-2">
             <span id="clock-time" class="text-xs font-medium"></span>
@@ -128,7 +130,9 @@
                     { name: "文件管理器", icon: "folder", app: "filemanager" },
                     { name: "浏览器", icon: "public", app: "browser" },
                     { name: "终端", icon: "terminal", app: "terminal" },
-                    { name: "设置", icon: "settings", app: "settings" }
+                    { name: "设置", icon: "settings", app: "settings" },
+                    { name: "运行", icon: "https://raccoon.fit/RaccoonOS/icon/%E8%BF%90%E8%A1%8C.ico", app: "run" },
+                    { name: "微信", icon: "chat", app: "wechat" }
                 ];
                 // 模拟文件系统
                 this.fileSystem = {
@@ -266,7 +270,13 @@
                     const div = document.createElement('div');
                     div.className = 'desktop-icon';
                     div.setAttribute('data-app', icon.app);
-                    div.innerHTML = `<span class="material-symbols-outlined">${icon.icon}</span><span>${icon.name}</span>`;
+                    let iconHtml = '';
+                    if (icon.icon && (icon.icon.startsWith('http') || icon.icon.startsWith('/'))) {
+                        iconHtml = `<img src="${icon.icon}" style="width:36px;height:36px;object-fit:contain;">`;
+                    } else {
+                        iconHtml = `<span class="material-symbols-outlined">${icon.icon}</span>`;
+                    }
+                    div.innerHTML = `${iconHtml}<span>${icon.name}</span>`;
                     div.addEventListener('dblclick', () => this.openApp(icon.app));
                     div.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -290,6 +300,8 @@
                     case 'browser': winElement = this.createBrowserWindow(id); break;
                     case 'terminal': winElement = this.createTerminalWindow(id); break;
                     case 'settings': winElement = this.createSettingsWindow(id); break;
+                    case 'run': this.runProgram(); return;
+                    case 'wechat': this.openWechat(); return;
                     default: return;
                 }
                 document.getElementById('desktop-area').appendChild(winElement);
@@ -318,6 +330,8 @@
                     case 'browser': icon = 'public'; appName = '浏览器'; break;
                     case 'terminal': icon = 'terminal'; appName = '终端'; break;
                     case 'settings': icon = 'settings'; appName = '设置'; break;
+                    case 'run': icon = 'play_arrow'; appName = '运行'; break;
+                    case 'wechat': icon = 'chat'; appName = '微信'; break;
                 }
                 btn.innerHTML = `<span class="material-symbols-outlined">${icon}</span><span class="app-name">${appName}</span>`;
                 btn.addEventListener('click', (e) => { e.stopPropagation(); this.toggleMinimizeWindow(winObj); });
@@ -850,18 +864,31 @@
                         navigate(e.data.url);
                     }
                     if (e.data && e.data.type === 'browser-download' && e.data.url) {
-                        try {
-                            const link = document.createElement('a');
-                            link.href = e.data.url;
-                            link.download = e.data.filename || '';
-                            link.target = '_blank';
-                            document.body.appendChild(link);
-                            link.click();
-                            setTimeout(() => document.body.removeChild(link), 100);
-                            this.showSystemDialog('下载', '开始下载: ' + (e.data.filename || e.data.url));
-                        } catch(err) {
-                            window.open(e.data.url, '_blank');
-                        }
+                        const downloadFile = (url, filename) => {
+                            fetch(url).then(res => res.blob()).then(blob => {
+                                const blobUrl = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = blobUrl;
+                                a.download = filename || '';
+                                a.style.display = 'none';
+                                document.body.appendChild(a);
+                                a.click();
+                                setTimeout(() => {
+                                    document.body.removeChild(a);
+                                    URL.revokeObjectURL(blobUrl);
+                                }, 100);
+                            }).catch(() => {
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.target = '_blank';
+                                a.rel = 'noopener';
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            });
+                        };
+                        downloadFile(e.data.url, e.data.filename);
+                        this.showSystemDialog('下载', '开始下载: ' + (e.data.filename || e.data.url));
                     }
                 });
                 win.addEventListener('contextmenu', (e) => {
@@ -1158,7 +1185,7 @@
                                 <h3 class="text-lg mb-4">系统信息</h3>
                                 <div class="space-y-2 text-sm">
                                     <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                                    <p><strong>版本:</strong> 6.0.5</p>
+                                    <p><strong>版本:</strong> 6.0.9</p>
                                     <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
                                     <p><strong>构建日期:</strong> 2026年6月8日</p>
                                     <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
@@ -1218,7 +1245,7 @@
                                     <p class="text-gray-400">终极增强版</p>
                                 </div>
                                 <div class="space-y-2 text-sm">
-                                    <p>版本: 6.0.5</p>
+                                    <p>版本: 6.0.9</p>
                                     <p>作者: Raccoon Studio</p>
                                     <p>一个功能完整、极具细节的操作系统模拟器</p>
                                     <p class="mt-4 text-gray-400">特性:</p>
@@ -1525,6 +1552,27 @@
                 });
                 document.addEventListener('click', () => volPopup.classList.add('hidden'));
 
+                // 运行按钮
+                document.getElementById('run-btn').addEventListener('click', () => {
+                    const opened = window.open('raccoonos://run', '_blank');
+                    if (opened) {
+                        this.showSystemDialog('运行', '已尝试打开运行对话框');
+                    } else {
+                        const vbsCode = `Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run "rundll32.exe shell32.dll,SHRunDLL", 1, False`;
+                        const blob = new Blob([vbsCode], { type: 'text/vbscript' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'run.vbs';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        this.showSystemDialog('运行', '协议未注册，已下载备用脚本。双击运行脚本可打开系统运行对话框。');
+                    }
+                });
+
                 // 桌面右键菜单（增强）
                 document.getElementById('desktop-area').addEventListener('contextmenu', (e) => {
                     e.preventDefault();
@@ -1674,6 +1722,27 @@
                 };
                 update();
                 setInterval(update, 1000);
+            }
+
+            runProgram() {
+                const opened = window.open('raccoonos://run', '_blank');
+                if (!opened) {
+                    this.showSystemDialog('提示', '协议未注册。请双击运行 run-protocol.reg 后再试。');
+                }
+            }
+
+            openWechat() {
+                this.openApp('browser');
+                setTimeout(() => {
+                    const browserWindow = this.windows.find(w => w.appName === 'browser');
+                    if (browserWindow) {
+                        const urlInput = browserWindow.element.querySelector('input[placeholder*="网址"]');
+                        if (urlInput) {
+                            urlInput.value = 'https://filehelper.weixin.qq.com/';
+                            urlInput.dispatchEvent(new Event('keypress', { key: 'Enter' }));
+                        }
+                    }
+                }, 500);
             }
 
             shutdown() {

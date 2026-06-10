@@ -506,14 +506,19 @@
                 
                 if (page === 'sound') {
                     // 音量滑块
-                    const volumeSlider = mainContent.querySelector('input[type="range"]');
+                    const volumeSlider = mainContent.querySelector('#settings-volume-slider');
                     if (volumeSlider) {
                         volumeSlider.addEventListener('input', (e) => {
                             const vol = parseInt(e.target.value);
                             this.settings.volume = vol;
-                            // 更新显示的数值
-                            const span = mainContent.querySelector('.flex.justify-between span:last-child');
-                            if (span) span.textContent = vol + '%';
+                            // 更新设置页面显示的数值
+                            const displaySpan = document.getElementById('settings-volume-display');
+                            if (displaySpan) displaySpan.textContent = vol + '%';
+                            // 同步更新任务栏的音量滑块
+                            const taskbarSlider = document.getElementById('volume-slider');
+                            if (taskbarSlider) taskbarSlider.value = vol;
+                            const taskbarValue = document.getElementById('volume-value');
+                            if (taskbarValue) taskbarValue.textContent = vol;
                             this.saveSettings();
                         });
                     }
@@ -703,17 +708,17 @@
                     <div class="mb-6">
                         <div class="flex justify-between items-center mb-2">
                             <span>主音量</span>
-                            <span>${this.settings.volume}%</span>
+                            <span id="settings-volume-display">${this.settings.volume}%</span>
                         </div>
-                        <input type="range" min="0" max="100" value="${this.settings.volume}" class="w-full">
+                        <input type="range" id="settings-volume-slider" min="0" max="100" value="${this.settings.volume}" class="w-full">
                     </div>
                     <div class="flex justify-between items-center py-3 border-b border-white/10">
                         <span>系统声音</span>
-                        <div class="toggle-switch toggle-active"></div>
+                        <div class="toggle-switch toggle-active" id="settings-system-sound-toggle"></div>
                     </div>
                     <div class="flex justify-between items-center py-3 border-b border-white/10">
                         <span>通知声音</span>
-                        <div class="toggle-switch toggle-active"></div>
+                        <div class="toggle-switch toggle-active" id="settings-notification-sound-toggle"></div>
                     </div>
                 `;
             }
@@ -749,14 +754,13 @@
                 return `
                     <h3 class="text-xl mb-6">系统信息</h3>
                     <div class="space-y-3 text-sm">
-                        <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                        <p><strong>版本:</strong> 6.2.0</p>
-                        <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
-                        <p><strong>构建日期:</strong> 2026年6月8日</p>
-                        <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
-                        <p><strong>屏幕分辨率:</strong> ${window.screen.width} x ${window.screen.height}</p>
-                        <p><strong>语言:</strong> ${navigator.language}</p>
-                        <p><strong>在线状态:</strong> ${navigator.onLine ? '在线' : '离线'}</p>
+                        <p><strong>操作系统:</strong> RaccoonOS</p>
+                        <p><strong>版本:</strong> 6.3.0</p>
+                        <p><strong>处理器:</strong> Intel(R) Atom(TM) x5-Z8500 CPU @ 1.44GHz</p>
+                        <p><strong>系统类型:</strong> 64位操作系统</p>
+                        <p><strong>内存:</strong> 2.00 GB</p>
+                        <p><strong>存储:</strong> 64.00 GB</p>
+                        <p><strong>触摸支持:</strong> 10 点触控</p>
                     </div>
                 `;
             }
@@ -804,15 +808,7 @@
                     <div class="text-center py-8">
                         <div class="text-4xl mb-4">🦝</div>
                         <h4 class="text-xl mb-2">Raccoon OS</h4>
-                        <p class="text-gray-400 mb-4">终极增强版</p>
-                        <p class="text-sm text-gray-500 mb-4">版本 6.2.0 | 构建于 2026年6月8日</p>
-                        <p class="text-sm text-gray-400">一款有趣的网页端操作系统模拟器</p>
-                        <ul class="text-left text-sm text-gray-400 mt-6 space-y-1">
-                            <li>模拟桌面环境</li>
-                            <li>文件管理系统</li>
-                            <li>多窗口支持</li>
-                            <li>可自定义主题和设置</li>
-                        </ul>
+                        <p class="text-sm text-gray-500 mb-4">版本 6.3.0</p>
                     </div>
                 `;
             }
@@ -1642,9 +1638,9 @@
                                 <div class="mb-4">
                                     <div class="flex justify-between items-center mb-2">
                                         <span>主音量</span>
-                                        <span id="volume-display">${this.settings.volume}%</span>
+                                        <span id="settings-volume-display">${this.settings.volume}%</span>
                                     </div>
-                                    <input type="range" id="volume-slider" min="0" max="100" value="${this.settings.volume}" class="w-full">
+                                    <input type="range" id="settings-volume-slider" min="0" max="100" value="${this.settings.volume}" class="w-full">
                                 </div>
                                 <div class="flex justify-between items-center mt-4">
                                     <span>系统声音</span>
@@ -1683,7 +1679,7 @@
                                 <h3 class="text-lg mb-4">系统信息</h3>
                                 <div class="space-y-2 text-sm">
                                     <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                                    <p><strong>版本:</strong> 6.2.0</p>
+                                    <p><strong>版本:</strong> 6.3.0</p>
                                     <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
                                     <p><strong>构建日期:</strong> 2026年6月8日</p>
                                     <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
@@ -1743,7 +1739,7 @@
                                     <p class="text-gray-400">终极增强版</p>
                                 </div>
                                 <div class="space-y-2 text-sm">
-                                    <p>版本: 6.2.0</p>
+                                    <p>版本: 6.3.0</p>
                                     <p>作者: Raccoon Studio</p>
                                     <p>一个功能完整、极具细节的操作系统模拟器</p>
                                     <p class="mt-4 text-gray-400">特性:</p>
@@ -2046,6 +2042,11 @@
                     this.settings.volume = parseInt(val);
                     this.saveSettings();
                     document.getElementById('volume-value').innerText = val;
+                    // 同步更新设置页面的音量显示
+                    const settingsVolDisplay = document.getElementById('settings-volume-display');
+                    if (settingsVolDisplay) settingsVolDisplay.textContent = val + '%';
+                    const settingsVolSlider = document.getElementById('settings-volume-slider');
+                    if (settingsVolSlider) settingsVolSlider.value = val;
                     document.querySelectorAll('audio, video').forEach(el => el.volume = val / 100);
                 });
                 document.addEventListener('click', () => volPopup.classList.add('hidden'));

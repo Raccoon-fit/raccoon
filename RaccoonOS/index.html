@@ -448,17 +448,188 @@
                 document.getElementById('fullscreen-page').classList.add('active');
                 
                 // 绑定导航点击事件
-                pageContent.querySelectorAll('.settings-page-nav-item').forEach(item => {
+                const navItems = pageContent.querySelectorAll('.settings-page-nav-item');
+                navItems.forEach(item => {
                     item.addEventListener('click', () => {
-                        pageContent.querySelectorAll('.settings-page-nav-item').forEach(i => i.classList.remove('active'));
+                        navItems.forEach(i => i.classList.remove('active'));
                         item.classList.add('active');
                         const page = item.dataset.page;
                         document.getElementById('settings-main-content').innerHTML = this.getSettingsContent(page);
+                        // 重新绑定当前页面的事件
+                        this.bindSettingsEvents(page);
                     });
                 });
                 
                 // 绑定返回按钮
                 document.getElementById('back-to-desktop').addEventListener('click', () => this.closePage());
+                
+                // 绑定当前页面事件
+                this.bindSettingsEvents('personalization');
+            }
+
+            // 绑定设置页面事件
+            bindSettingsEvents(page) {
+                const mainContent = document.getElementById('settings-main-content');
+                if (!mainContent) return;
+                
+                if (page === 'personalization') {
+                    // 背景颜色选择
+                    mainContent.querySelectorAll('.wallpaper-preview').forEach(el => {
+                        el.addEventListener('click', () => {
+                            const color = el.dataset.wall;
+                            this.settings.theme = color;
+                            document.body.style.backgroundColor = color;
+                            this.saveSettings();
+                        });
+                    });
+                    
+                    // 夜间模式开关
+                    const nightToggle = mainContent.querySelectorAll('.toggle-switch');
+                    if (nightToggle[0]) {
+                        nightToggle[0].addEventListener('click', () => {
+                            nightToggle[0].classList.toggle('toggle-active');
+                            this.settings.theme = nightToggle[0].classList.contains('toggle-active') ? '#0a0a0a' : '#dddddd';
+                            document.body.style.backgroundColor = this.settings.theme;
+                            this.saveSettings();
+                        });
+                    }
+                    
+                    // 显示隐藏文件开关
+                    if (nightToggle[1]) {
+                        nightToggle[1].addEventListener('click', () => {
+                            nightToggle[1].classList.toggle('toggle-active');
+                            this.settings.showHiddenFiles = nightToggle[1].classList.contains('toggle-active');
+                            this.saveSettings();
+                        });
+                    }
+                }
+                
+                if (page === 'sound') {
+                    // 音量滑块
+                    const volumeSlider = mainContent.querySelector('input[type="range"]');
+                    if (volumeSlider) {
+                        volumeSlider.addEventListener('input', (e) => {
+                            const vol = parseInt(e.target.value);
+                            this.settings.volume = vol;
+                            // 更新显示的数值
+                            const span = mainContent.querySelector('.flex.justify-between span:last-child');
+                            if (span) span.textContent = vol + '%';
+                            this.saveSettings();
+                        });
+                    }
+                    
+                    // 系统声音和通知声音开关
+                    const soundToggles = mainContent.querySelectorAll('.toggle-switch');
+                    if (soundToggles[0]) {
+                        soundToggles[0].addEventListener('click', () => {
+                            soundToggles[0].classList.toggle('toggle-active');
+                            this.settings.systemSound = soundToggles[0].classList.contains('toggle-active');
+                            this.saveSettings();
+                        });
+                    }
+                    if (soundToggles[1]) {
+                        soundToggles[1].addEventListener('click', () => {
+                            soundToggles[1].classList.toggle('toggle-active');
+                            this.settings.notificationSound = soundToggles[1].classList.contains('toggle-active');
+                            this.saveSettings();
+                        });
+                    }
+                }
+                
+                if (page === 'display') {
+                    const displayToggles = mainContent.querySelectorAll('.toggle-switch');
+                    // 窗口动画
+                    if (displayToggles[0]) {
+                        displayToggles[0].addEventListener('click', () => {
+                            displayToggles[0].classList.toggle('toggle-active');
+                            this.settings.windowAnimation = displayToggles[0].classList.contains('toggle-active');
+                            this.saveSettings();
+                        });
+                    }
+                    // 任务栏透明
+                    if (displayToggles[1]) {
+                        displayToggles[1].addEventListener('click', () => {
+                            displayToggles[1].classList.toggle('toggle-active');
+                            this.settings.taskbarTransparent = displayToggles[1].classList.contains('toggle-active');
+                            this.saveSettings();
+                        });
+                    }
+                    // 显示秒数
+                    if (displayToggles[2]) {
+                        displayToggles[2].addEventListener('click', () => {
+                            displayToggles[2].classList.toggle('toggle-active');
+                            this.settings.showSeconds = displayToggles[2].classList.contains('toggle-active');
+                            this.updateClock();
+                            this.saveSettings();
+                        });
+                    }
+                    
+                    // 缩放级别
+                    const scaleSelect = mainContent.querySelector('select');
+                    if (scaleSelect) {
+                        scaleSelect.addEventListener('change', (e) => {
+                            this.settings.displayScale = e.target.value;
+                            document.body.style.fontSize = (parseInt(e.target.value) / 100) * 16 + 'px';
+                            this.saveSettings();
+                        });
+                    }
+                }
+                
+                if (page === 'startup') {
+                    // 启动项复选框
+                    const browserCheck = mainContent.querySelector('#autostart-browser');
+                    if (browserCheck) {
+                        browserCheck.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                if (!this.settings.autostartApps.includes('browser')) this.settings.autostartApps.push('browser');
+                            } else {
+                                this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'browser');
+                            }
+                            this.saveSettings();
+                        });
+                    }
+                    
+                    const terminalCheck = mainContent.querySelector('#autostart-terminal');
+                    if (terminalCheck) {
+                        terminalCheck.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                if (!this.settings.autostartApps.includes('terminal')) this.settings.autostartApps.push('terminal');
+                            } else {
+                                this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'terminal');
+                            }
+                            this.saveSettings();
+                        });
+                    }
+                    
+                    const settingsCheck = mainContent.querySelector('#autostart-settings');
+                    if (settingsCheck) {
+                        settingsCheck.addEventListener('change', (e) => {
+                            if (e.target.checked) {
+                                if (!this.settings.autostartApps.includes('settings')) this.settings.autostartApps.push('settings');
+                            } else {
+                                this.settings.autostartApps = this.settings.autostartApps.filter(a => a !== 'settings');
+                            }
+                            this.saveSettings();
+                        });
+                    }
+                }
+            }
+
+            // 更新时钟显示
+            updateClock() {
+                const now = new Date();
+                const timeEl = document.getElementById('clock-time');
+                const dateEl = document.getElementById('clock-date');
+                if (timeEl) {
+                    if (this.settings.showSeconds) {
+                        timeEl.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    } else {
+                        timeEl.textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+                if (dateEl) {
+                    dateEl.textContent = now.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+                }
             }
 
             // 添加页面到任务栏

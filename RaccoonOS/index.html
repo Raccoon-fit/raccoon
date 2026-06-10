@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -95,10 +96,33 @@
         .terminal-output { color: #bdc3c7; margin-left: 12px; white-space: pre-wrap; }
         .bookmark-item, .history-item { padding: 6px 12px; cursor: pointer; border-radius: 6px; }
         .bookmark-item:hover, .history-item:hover { background: rgba(255,255,255,0.1); }
+        
+        /* 全屏页面模式 */
+        .fullscreen-page { position: fixed; top: 0; left: 0; right: 0; bottom: 50px; background: #1a1a1a; z-index: 500; display: none; overflow: auto; }
+        .fullscreen-page.active { display: block; }
+        .fullscreen-page-header { position: sticky; top: 0; background: #252525; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .fullscreen-page-header h2 { margin: 0; font-size: 18px; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .fullscreen-page-back { background: #3a3a3a; border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        .fullscreen-page-back:hover { background: #4a4a4a; }
+        .fullscreen-page-content { padding: 20px; }
+        
+        .settings-page-grid { display: grid; grid-template-columns: 200px 1fr; gap: 20px; height: calc(100vh - 120px); }
+        .settings-page-nav { background: #252525; border-radius: 12px; padding: 10px; }
+        .settings-page-nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; color: #ccc; transition: all 0.2s; }
+        .settings-page-nav-item:hover { background: rgba(255,255,255,0.1); }
+        .settings-page-nav-item.active { background: #0a84ff; color: #fff; }
+        .settings-page-main { background: #252525; border-radius: 12px; padding: 24px; overflow: auto; }
     </style>
 </head>
 <body>
     <div id="desktop-area"></div>
+    <div id="fullscreen-page" class="fullscreen-page">
+        <div class="fullscreen-page-header">
+            <h2><span class="material-symbols-outlined">settings</span> <span id="page-title">设置</span></h2>
+            <button class="fullscreen-page-back" id="back-to-desktop"><span class="material-symbols-outlined">arrow_back</span> 返回桌面</button>
+        </div>
+        <div class="fullscreen-page-content" id="fullscreen-page-content"></div>
+    </div>
     <div class="taskbar" id="taskbar">
         <div class="taskbar-item" id="start-btn"><span class="text-xl">🦝</span><span class="ml-1 text-sm">开始</span></div>
         <div id="taskbar-apps" class="flex-1 flex gap-1 ml-2"></div>
@@ -127,6 +151,7 @@
                 this.windows = [];
                 this.nextWindowId = 1;
                 this.activeWindow = null;
+                this.currentPage = null; // 当前全屏页面
                 this.desktopIcons = [
                     { name: "文件管理器", icon: "folder", app: "filemanager" },
                     { name: "浏览器", icon: "public", app: "browser" },
@@ -289,6 +314,11 @@
             }
 
             openApp(appName) {
+                // 设置以全屏页面模式打开
+                if (appName === 'settings') {
+                    this.openSettingsPage();
+                    return;
+                }
                 const existing = this.windows.find(w => w.appName === appName && !w.minimized);
                 if (existing) {
                     this.activateWindow(existing);
@@ -300,7 +330,6 @@
                     case 'filemanager': winElement = this.createFileManagerWindow(id); break;
                     case 'browser': winElement = this.createBrowserWindow(id); break;
                     case 'terminal': winElement = this.createTerminalWindow(id); break;
-                    case 'settings': winElement = this.createSettingsWindow(id); break;
                     case 'run': this.runProgram(); return;
                     case 'taskmgr': this.openTaskMgr(); return;
                     case 'wechat': this.openWechat(); return;
@@ -389,6 +418,232 @@
                 const index = this.windows.indexOf(winObj);
                 if (index !== -1) this.windows.splice(index, 1);
                 if (this.activeWindow === winObj) this.activeWindow = null;
+            }
+
+            // 全屏设置页面
+            openSettingsPage() {
+                this.currentPage = 'settings';
+                document.getElementById('start-menu').style.display = 'none';
+                
+                // 添加到任务栏
+                this.addPageToTaskbar('settings', '设置');
+                
+                const pageContent = document.getElementById('fullscreen-page-content');
+                pageContent.innerHTML = `
+                    <div class="settings-page-grid">
+                        <div class="settings-page-nav">
+                            <div class="settings-page-nav-item active" data-page="personalization"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">palette</span>个性化</div>
+                            <div class="settings-page-nav-item" data-page="sound"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">volume_up</span>声音</div>
+                            <div class="settings-page-nav-item" data-page="display"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">monitor</span>显示</div>
+                            <div class="settings-page-nav-item" data-page="system"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">computer</span>系统</div>
+                            <div class="settings-page-nav-item" data-page="startup"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">rocket_launch</span>启动项</div>
+                            <div class="settings-page-nav-item" data-page="storage"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">storage</span>存储</div>
+                            <div class="settings-page-nav-item" data-page="about"><span class="material-symbols-outlined" style="vertical-align:middle;margin-right:8px;">info</span>关于</div>
+                        </div>
+                        <div class="settings-page-main" id="settings-main-content">
+                            ${this.getSettingsPersonalization()}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('fullscreen-page').classList.add('active');
+                
+                // 绑定导航点击事件
+                pageContent.querySelectorAll('.settings-page-nav-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        pageContent.querySelectorAll('.settings-page-nav-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        const page = item.dataset.page;
+                        document.getElementById('settings-main-content').innerHTML = this.getSettingsContent(page);
+                    });
+                });
+                
+                // 绑定返回按钮
+                document.getElementById('back-to-desktop').addEventListener('click', () => this.closePage());
+            }
+
+            // 添加页面到任务栏
+            addPageToTaskbar(appName, appLabel) {
+                const taskbarDiv = document.getElementById('taskbar-apps');
+                const btn = document.createElement('div');
+                btn.className = 'taskbar-item taskbar-app active';
+                btn.id = 'taskbar-page-' + appName;
+                let icon = 'settings';
+                if (appName === 'settings') icon = 'settings';
+                btn.innerHTML = `<span class="material-symbols-outlined">${icon}</span><span class="app-name">${appLabel}</span>`;
+                btn.addEventListener('click', () => {
+                    if (appName === 'settings') {
+                        // 已经在打开状态
+                    }
+                });
+                taskbarDiv.appendChild(btn);
+            }
+
+            // 从任务栏移除页面
+            removePageFromTaskbar(appName) {
+                const btn = document.getElementById('taskbar-page-' + appName);
+                if (btn) btn.remove();
+            }
+
+            closePage() {
+                document.getElementById('fullscreen-page').classList.remove('active');
+                this.removePageFromTaskbar('settings');
+                this.currentPage = null;
+            }
+
+            getSettingsContent(page) {
+                switch(page) {
+                    case 'personalization': return this.getSettingsPersonalization();
+                    case 'sound': return this.getSettingsSound();
+                    case 'display': return this.getSettingsDisplay();
+                    case 'system': return this.getSettingsSystem();
+                    case 'startup': return this.getSettingsStartup();
+                    case 'storage': return this.getSettingsStorage();
+                    case 'about': return this.getSettingsAbout();
+                    default: return '';
+                }
+            }
+
+            getSettingsPersonalization() {
+                return `
+                    <h3 class="text-xl mb-6">个性化</h3>
+                    <div class="mb-6">
+                        <div class="mb-3 text-sm text-gray-400">背景颜色</div>
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="wallpaper-preview bg-[#0a0a0a] cursor-pointer rounded-lg h-16 border-2 border-transparent hover:border-white" data-wall="#0a0a0a"></div>
+                            <div class="wallpaper-preview bg-[#1e1e1e] cursor-pointer rounded-lg h-16 border-2 border-transparent hover:border-white" data-wall="#1e1e1e"></div>
+                            <div class="wallpaper-preview bg-[#2c3e50] cursor-pointer rounded-lg h-16 border-2 border-transparent hover:border-white" data-wall="#2c3e50"></div>
+                            <div class="wallpaper-preview bg-[#3d342f] cursor-pointer rounded-lg h-16 border-2 border-transparent hover:border-white" data-wall="#3d342f"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>夜间模式</span>
+                        <div class="toggle-switch toggle-active"></div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>显示隐藏文件</span>
+                        <div class="toggle-switch ${this.settings.showHiddenFiles ? 'toggle-active' : ''}"></div>
+                    </div>
+                `;
+            }
+
+            getSettingsSound() {
+                return `
+                    <h3 class="text-xl mb-6">声音设置</h3>
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span>主音量</span>
+                            <span>${this.settings.volume}%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="${this.settings.volume}" class="w-full">
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>系统声音</span>
+                        <div class="toggle-switch toggle-active"></div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>通知声音</span>
+                        <div class="toggle-switch toggle-active"></div>
+                    </div>
+                `;
+            }
+
+            getSettingsDisplay() {
+                return `
+                    <h3 class="text-xl mb-6">显示设置</h3>
+                    <div class="mb-6">
+                        <div class="mb-2 text-sm text-gray-400">缩放级别</div>
+                        <select class="bg-[#333] text-white border border-[#555] rounded px-3 py-2 w-full">
+                            <option value="100">100% (默认)</option>
+                            <option value="125">125%</option>
+                            <option value="150">150%</option>
+                            <option value="175">175%</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>窗口动画</span>
+                        <div class="toggle-switch toggle-active"></div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>任务栏透明</span>
+                        <div class="toggle-switch toggle-active"></div>
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>显示秒数</span>
+                        <div class="toggle-switch"></div>
+                    </div>
+                `;
+            }
+
+            getSettingsSystem() {
+                return `
+                    <h3 class="text-xl mb-6">系统信息</h3>
+                    <div class="space-y-3 text-sm">
+                        <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
+                        <p><strong>版本:</strong> 6.2.0</p>
+                        <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
+                        <p><strong>构建日期:</strong> 2026年6月8日</p>
+                        <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
+                        <p><strong>屏幕分辨率:</strong> ${window.screen.width} x ${window.screen.height}</p>
+                        <p><strong>语言:</strong> ${navigator.language}</p>
+                        <p><strong>在线状态:</strong> ${navigator.onLine ? '在线' : '离线'}</p>
+                    </div>
+                `;
+            }
+
+            getSettingsStartup() {
+                return `
+                    <h3 class="text-xl mb-6">启动项</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 py-2">
+                            <input type="checkbox" id="autostart-browser" ${this.settings.autostartApps.includes('browser') ? 'checked' : ''}>
+                            <label>浏览器</label>
+                        </div>
+                        <div class="flex items-center gap-3 py-2">
+                            <input type="checkbox" id="autostart-terminal" ${this.settings.autostartApps.includes('terminal') ? 'checked' : ''}>
+                            <label>终端</label>
+                        </div>
+                        <div class="flex items-center gap-3 py-2">
+                            <input type="checkbox" id="autostart-settings" ${this.settings.autostartApps.includes('settings') ? 'checked' : ''}>
+                            <label>设置</label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            getSettingsStorage() {
+                return `
+                    <h3 class="text-xl mb-6">存储设置</h3>
+                    <div class="mb-6">
+                        <div class="text-sm text-gray-400 mb-2">存储空间</div>
+                        <div class="bg-[#333] rounded-full h-4 overflow-hidden">
+                            <div class="bg-blue-500 h-full" style="width: 35%"></div>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-1">已使用 350 MB / 1 GB</div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="px-4 py-2 bg-[#333] rounded hover:bg-[#444] text-sm">导出配置</button>
+                        <button class="px-4 py-2 bg-[#333] rounded hover:bg-[#444] text-sm">导入配置</button>
+                    </div>
+                `;
+            }
+
+            getSettingsAbout() {
+                return `
+                    <h3 class="text-xl mb-6">关于</h3>
+                    <div class="text-center py-8">
+                        <div class="text-4xl mb-4">🦝</div>
+                        <h4 class="text-xl mb-2">Raccoon OS</h4>
+                        <p class="text-gray-400 mb-4">终极增强版</p>
+                        <p class="text-sm text-gray-500 mb-4">版本 6.2.0 | 构建于 2026年6月8日</p>
+                        <p class="text-sm text-gray-400">一款有趣的网页端操作系统模拟器</p>
+                        <ul class="text-left text-sm text-gray-400 mt-6 space-y-1">
+                            <li>模拟桌面环境</li>
+                            <li>文件管理系统</li>
+                            <li>多窗口支持</li>
+                            <li>可自定义主题和设置</li>
+                        </ul>
+                    </div>
+                `;
             }
 
             showWindowContextMenu(x, y, winObj) {

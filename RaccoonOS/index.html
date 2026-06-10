@@ -11,6 +11,7 @@
         html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
         body { background: #0a0a0a; font-family: 'Segoe UI', system-ui, sans-serif; color: white; user-select: none; -webkit-user-select: none; }
         * { user-select: none; -webkit-user-select: none; }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-smoothing: antialiased; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
@@ -742,6 +743,7 @@
                     <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;" name="browser-frame-${id}" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups"></iframe>
                 `;
                 const urlInput = content.querySelector(`#browser-url-${id}`);
+                const toolbar = content.querySelector('div[style*="flex-shrink: 0"]');
                 const goBtn = content.querySelector('.browser-go');
                 const backBtn = content.querySelector('.browser-nav-back');
                 const forwardBtn = content.querySelector('.browser-nav-forward');
@@ -774,6 +776,34 @@
                 };
                 goBtn.onclick = () => navigate(urlInput.value);
                 urlInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') navigate(urlInput.value); });
+
+                urlInput.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                });
+
+                urlInput.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    const url = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
+                    if (url) {
+                        navigate(url);
+                    }
+                });
+
+                if (toolbar) {
+                    toolbar.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'copy';
+                    });
+
+                    toolbar.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        const url = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
+                        if (url) {
+                            navigate(url);
+                        }
+                    });
+                }
                 backBtn.onclick = () => { try { frame.contentWindow.history.back(); } catch(e){} };
                 forwardBtn.onclick = () => { try { frame.contentWindow.history.forward(); } catch(e){} };
                 reloadBtn.onclick = () => { try { frame.contentWindow.location.reload(); } catch(e){ frame.src = frame.src; } };
@@ -806,6 +836,85 @@
                         const doc = frame.contentDocument || frame.contentWindow.document;
                         const win = frame.contentWindow;
                         const self = this;
+
+                        const script = doc.createElement('script');
+                        script.textContent = `
+(function() {
+    console.log('[RaccoonOS Browser Injection] Loaded');
+    
+    const originalOpen = window.open;
+    window.open = function(url, target, features) {
+        console.log('[RaccoonOS] Intercepted window.open:', url, target);
+        window.parent.postMessage({ type: 'browser-navigate', url }, '*');
+        return null;
+    };
+
+    const originalAssign = window.location.assign;
+    window.location.assign = function(url) {
+        console.log('[RaccoonOS] Intercepted location.assign:', url);
+        window.parent.postMessage({ type: 'browser-navigate', url }, '*');
+    };
+
+    const originalReplace = window.location.replace;
+    window.location.replace = function(url) {
+        console.log('[RaccoonOS] Intercepted location.replace:', url);
+        window.parent.postMessage({ type: 'browser-navigate', url }, '*');
+    };
+
+    let locationSetterCalled = false;
+    Object.defineProperty(window.location, 'href', {
+        set: function(url) {
+            if (!locationSetterCalled) {
+                locationSetterCalled = true;
+                console.log('[RaccoonOS] Intercepted location.href setter:', url);
+                window.parent.postMessage({ type: 'browser-navigate', url }, '*');
+                locationSetterCalled = false;
+            }
+        }
+    });
+
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+        console.log('[RaccoonOS] Intercepted fetch:', url, options);
+        return originalFetch(url, options);
+    };
+
+    console.log('[RaccoonOS Browser Injection] All interceptors installed');
+})();
+`;
+                        doc.head.appendChild(script);
+
+                        const makeLinksDraggable = () => {
+                            const links = doc.querySelectorAll('a[href], button[onclick], [onclick]');
+                            links.forEach(link => {
+                                let url = '';
+                                if (link.tagName === 'A' && link.href) {
+                                    url = link.href;
+                                } else if (link.getAttribute('onclick')) {
+                                    const onclick = link.getAttribute('onclick');
+                                    const match = onclick.match(/location\.href\s*=\s*['"]([^'"]+)['"]/) ||
+                                                  onclick.match(/window\.open\s*\(\s*['"]([^'"]+)['"]/) ||
+                                                  onclick.match(/\.assign\s*\(\s*['"]([^'"]+)['"]/);
+                                    if (match && match[1]) {
+                                        url = match[1];
+                                    }
+                                }
+                                if (url && !url.startsWith('javascript') && !url.startsWith('mailto:')) {
+                                    link.setAttribute('draggable', 'true');
+                                    link.addEventListener('dragstart', function(e) {
+                                        e.dataTransfer.setData('text/plain', url);
+                                        e.dataTransfer.setData('text/uri-list', url);
+                                        e.dataTransfer.effectAllowed = 'copy';
+                                    });
+                                }
+                            });
+                        };
+
+                        makeLinksDraggable();
+
+                        const observer = new MutationObserver(() => makeLinksDraggable());
+                        observer.observe(doc.body, { childList: true, subtree: true });
+
                         doc.addEventListener('click', function(e) {
                             var target = e.target.closest ? e.target.closest('a') : e.target;
                             if (!target || target.tagName !== 'A') return;
@@ -1148,7 +1257,7 @@
                                 <h3 class="text-lg mb-4">系统信息</h3>
                                 <div class="space-y-2 text-sm">
                                     <p><strong>操作系统:</strong> Raccoon OS 终极增强版</p>
-                                    <p><strong>版本:</strong> 6.1.0</p>
+                                    <p><strong>版本:</strong> 6.2.0</p>
                                     <p><strong>内核:</strong> 模拟文件系统 + localStorage + FileStorage</p>
                                     <p><strong>构建日期:</strong> 2026年6月8日</p>
                                     <p><strong>浏览器:</strong> ${navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Browser'}</p>
@@ -1208,7 +1317,7 @@
                                     <p class="text-gray-400">终极增强版</p>
                                 </div>
                                 <div class="space-y-2 text-sm">
-                                    <p>版本: 6.1.0</p>
+                                    <p>版本: 6.2.0</p>
                                     <p>作者: Raccoon Studio</p>
                                     <p>一个功能完整、极具细节的操作系统模拟器</p>
                                     <p class="mt-4 text-gray-400">特性:</p>

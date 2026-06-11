@@ -97,6 +97,23 @@
         .bookmark-item, .history-item { padding: 6px 12px; cursor: pointer; border-radius: 6px; }
         .bookmark-item:hover, .history-item:hover { background: rgba(255,255,255,0.1); }
         
+        /* TV模式样式（安卓7/电视/投影仪适配） */
+        body.tv-mode .desktop-icon { padding: 20px; width: 120px; }
+        body.tv-mode .desktop-icon .text-xs { font-size: 18px; }
+        body.tv-mode .desktop-icon .material-symbols-outlined { font-size: 48px; }
+        body.tv-mode .taskbar { height: 70px; }
+        body.tv-mode .taskbar-item { padding: 8px 16px; }
+        body.tv-mode #start-btn { padding: 8px 20px; }
+        body.tv-mode .start-menu { width: 500px; }
+        body.tv-mode .start-menu-app { padding: 16px 20px; }
+        body.tv-mode .window { min-width: 800px; min-height: 500px; }
+        body.tv-mode #desktop-area { padding: 40px; }
+        
+        /* TV模式下的开始菜单更大 */
+        body.tv-mode .start-menu-search { padding: 12px 20px; font-size: 16px; }
+        body.tv-mode .start-menu-app .material-symbols-outlined { font-size: 28px; }
+        body.tv-mode .start-menu-app span:not(.material-symbols-outlined) { font-size: 18px; }
+        
         /* 全屏页面模式 */
         .fullscreen-page { position: fixed; top: 0; left: 0; right: 0; bottom: 50px; background: #1a1a1a; z-index: 500; display: none; overflow: auto; }
         .fullscreen-page.active { display: block; }
@@ -214,7 +231,8 @@
                             displayScale: parsed.displayScale || '100',
                             windowAnimation: parsed.windowAnimation !== undefined ? parsed.windowAnimation : true,
                             taskbarTransparent: parsed.taskbarTransparent !== undefined ? parsed.taskbarTransparent : true,
-                            showSeconds: parsed.showSeconds || false
+                            showSeconds: parsed.showSeconds || false,
+                            tvMode: parsed.tvMode || false
                         };
                     }
                 } catch(e) {}
@@ -229,7 +247,8 @@
                     displayScale: '100',
                     windowAnimation: true,
                     taskbarTransparent: true,
-                    showSeconds: false
+                    showSeconds: false,
+                    tvMode: false
                 };
             }
 
@@ -287,6 +306,7 @@
                 document.getElementById('volume-slider').value = volume;
                 document.getElementById('volume-value').innerText = volume;
                 document.querySelectorAll('audio, video').forEach(el => el.volume = volume / 100);
+                this.applyTvMode();
             }
 
             renderDesktop() {
@@ -569,6 +589,16 @@
                         });
                     }
                     
+                    // TV模式
+                    if (displayToggles[3]) {
+                        displayToggles[3].addEventListener('click', () => {
+                            displayToggles[3].classList.toggle('toggle-active');
+                            this.settings.tvMode = displayToggles[3].classList.contains('toggle-active');
+                            this.applyTvMode();
+                            this.saveSettings();
+                        });
+                    }
+                    
                     // 缩放级别
                     const scaleSelect = mainContent.querySelector('select');
                     if (scaleSelect) {
@@ -634,6 +664,75 @@
                 }
                 if (dateEl) {
                     dateEl.textContent = now.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+                }
+            }
+
+            // TV模式适配（安卓7/电视/投影仪）
+            applyTvMode() {
+                const isTvMode = this.settings.tvMode;
+                
+                // 添加/移除 TV 模式 class
+                if (isTvMode) {
+                    document.body.classList.add('tv-mode');
+                } else {
+                    document.body.classList.remove('tv-mode');
+                }
+                
+                // 放大桌面图标
+                document.querySelectorAll('.desktop-icon').forEach(icon => {
+                    icon.style.padding = isTvMode ? '20px' : '10px';
+                    icon.style.width = isTvMode ? '120px' : '80px';
+                });
+                document.querySelectorAll('.desktop-icon .text-xs').forEach(text => {
+                    text.style.fontSize = isTvMode ? '18px' : '12px';
+                });
+                document.querySelectorAll('.desktop-icon .material-symbols-outlined').forEach(icon => {
+                    icon.style.fontSize = isTvMode ? '48px' : '32px';
+                });
+                
+                // 放大任务栏
+                const taskbar = document.getElementById('taskbar');
+                if (taskbar) {
+                    taskbar.style.height = isTvMode ? '70px' : '44px';
+                }
+                document.querySelectorAll('.taskbar-item').forEach(item => {
+                    item.style.padding = isTvMode ? '8px 16px' : '4px 12px';
+                });
+                
+                // 放大开始按钮
+                const startBtn = document.getElementById('start-btn');
+                if (startBtn) {
+                    startBtn.style.padding = isTvMode ? '8px 20px' : '4px 12px';
+                }
+                
+                // 放大窗口
+                document.querySelectorAll('.window').forEach(win => {
+                    if (isTvMode) {
+                        win.style.minWidth = '800px';
+                        win.style.minHeight = '500px';
+                    } else {
+                        win.style.minWidth = '400px';
+                        win.style.minHeight = '300px';
+                    }
+                });
+                
+                // 放大开始菜单
+                const startMenu = document.getElementById('start-menu');
+                if (startMenu) {
+                    startMenu.style.width = isTvMode ? '500px' : '340px';
+                }
+                document.querySelectorAll('.start-menu-app').forEach(app => {
+                    app.style.padding = isTvMode ? '16px 20px' : '10px 12px';
+                });
+                
+                // 放大桌面图标网格
+                const desktopArea = document.getElementById('desktop-area');
+                if (desktopArea) {
+                    if (isTvMode) {
+                        desktopArea.style.padding = '40px';
+                    } else {
+                        desktopArea.style.padding = '20px';
+                    }
                 }
             }
 
@@ -747,6 +846,11 @@
                         <span>显示秒数</span>
                         <div class="toggle-switch"></div>
                     </div>
+                    <div class="flex justify-between items-center py-3 border-b border-white/10">
+                        <span>TV/投影仪模式 (安卓7适配)</span>
+                        <div class="toggle-switch ${this.settings.tvMode ? 'toggle-active' : ''}" id="tv-mode-toggle"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">开启后界面更大，适配遥控器操作</p>
                 `;
             }
 

@@ -2253,7 +2253,13 @@
                 document.body.appendChild(shutdownScreen);
                 const bar = shutdownScreen.querySelector('#shutdown-bar');
                 setTimeout(() => bar.style.width = '100%', 50);
-                setTimeout(() => { window.close(); location.href = 'about:blank'; }, shutdownTime + 100);
+                setTimeout(() => { 
+                    if (typeof webapp !== 'undefined' && webapp.关闭应用退出) {
+                        webapp.关闭应用退出();
+                    }
+                    window.close(); 
+                    location.href = 'about:blank'; 
+                }, shutdownTime + 100);
             }
         }
 

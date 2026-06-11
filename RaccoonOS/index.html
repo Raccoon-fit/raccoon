@@ -97,22 +97,43 @@
         .bookmark-item, .history-item { padding: 6px 12px; cursor: pointer; border-radius: 6px; }
         .bookmark-item:hover, .history-item:hover { background: rgba(255,255,255,0.1); }
         
-        /* TV模式样式（安卓7/电视/投影仪适配） */
-        body.tv-mode .desktop-icon { padding: 20px; width: 120px; }
-        body.tv-mode .desktop-icon .text-xs { font-size: 18px; }
-        body.tv-mode .desktop-icon .material-symbols-outlined { font-size: 48px; }
-        body.tv-mode .taskbar { height: 70px; }
-        body.tv-mode .taskbar-item { padding: 8px 16px; }
-        body.tv-mode #start-btn { padding: 8px 20px; }
-        body.tv-mode .start-menu { width: 500px; }
-        body.tv-mode .start-menu-app { padding: 16px 20px; }
-        body.tv-mode .window { min-width: 800px; min-height: 500px; }
-        body.tv-mode #desktop-area { padding: 40px; }
+        /* 桌面图标 - 默认大图标，TV模式关闭后变小 */
+        .desktop-icon { padding: 16px; width: 100px; text-align: center; cursor: pointer; }
+        .desktop-icon .text-xs { display: block; font-size: 16px; color: #fff; margin-top: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .desktop-icon .material-symbols-outlined { font-size: 42px; color: #fff; }
         
-        /* TV模式下的开始菜单更大 */
-        body.tv-mode .start-menu-search { padding: 12px 20px; font-size: 16px; }
-        body.tv-mode .start-menu-app .material-symbols-outlined { font-size: 28px; }
-        body.tv-mode .start-menu-app span:not(.material-symbols-outlined) { font-size: 18px; }
+        /* 任务栏 */
+        .taskbar { height: 60px; display: flex; align-items: center; padding: 0 10px; background: rgba(30,30,30,0.9); position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; }
+        .taskbar-item { padding: 6px 14px; cursor: pointer; display: flex; align-items: center; gap: 4px; color: #fff; }
+        #start-btn { padding: 6px 16px; cursor: pointer; display: flex; align-items: center; gap: 4px; color: #fff; }
+        
+        /* 开始菜单 */
+        .start-menu { width: 420px; }
+        .start-menu-app { padding: 14px 18px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #fff; }
+        .start-menu-app .material-symbols-outlined { font-size: 26px; }
+        .start-menu-app span { font-size: 16px; }
+        .start-menu-search { padding: 10px 18px; font-size: 15px; }
+        
+        /* 窗口 */
+        .window { min-width: 700px; min-height: 450px; }
+        
+        /* 桌面区域 */
+        #desktop-area { padding: 30px; }
+        
+        /* 非TV模式的小图标样式 */
+        body:not(.tv-mode) .desktop-icon { padding: 8px; width: 80px; }
+        body:not(.tv-mode) .desktop-icon .text-xs { font-size: 12px; margin-top: 4px; }
+        body:not(.tv-mode) .desktop-icon .material-symbols-outlined { font-size: 32px; }
+        body:not(.tv-mode) .taskbar { height: 44px; }
+        body:not(.tv-mode) .taskbar-item { padding: 4px 10px; font-size: 12px; }
+        body:not(.tv-mode) #start-btn { padding: 4px 10px; font-size: 12px; }
+        body:not(.tv-mode) .start-menu { width: 280px; }
+        body:not(.tv-mode) .start-menu-app { padding: 8px 12px; }
+        body:not(.tv-mode) .start-menu-app .material-symbols-outlined { font-size: 20px; }
+        body:not(.tv-mode) .start-menu-app span { font-size: 13px; }
+        body:not(.tv-mode) .start-menu-search { padding: 6px 12px; font-size: 13px; }
+        body:not(.tv-mode) .window { min-width: 400px; min-height: 300px; }
+        body:not(.tv-mode) #desktop-area { padding: 15px; }
         
         /* 全屏页面模式 */
         .fullscreen-page { position: fixed; top: 0; left: 0; right: 0; bottom: 50px; background: #1a1a1a; z-index: 500; display: none; overflow: auto; }
@@ -232,7 +253,8 @@
                             windowAnimation: parsed.windowAnimation !== undefined ? parsed.windowAnimation : true,
                             taskbarTransparent: parsed.taskbarTransparent !== undefined ? parsed.taskbarTransparent : true,
                             showSeconds: parsed.showSeconds || false,
-                            tvMode: parsed.tvMode || false
+                            // 电视/投影仪默认开启TV模式
+                            tvMode: parsed.tvMode !== undefined ? parsed.tvMode : true
                         };
                     }
                 } catch(e) {}
@@ -248,7 +270,8 @@
                     windowAnimation: true,
                     taskbarTransparent: true,
                     showSeconds: false,
-                    tvMode: false
+                    // 电视/投影仪默认开启TV模式
+                    tvMode: true
                 };
             }
 
@@ -290,6 +313,8 @@
             }
 
             init() {
+                // 自动检测是否为TV/安卓7设备并应用TV模式
+                this.autoDetectTvMode();
                 this.renderDesktop();
                 this.initEventListeners();
                 this.startClock();
@@ -298,6 +323,22 @@
                 // 启动项
                 if (this.settings.autostartApps.includes('browser')) setTimeout(() => this.openApp('browser'), 500);
                 if (this.settings.autostartApps.includes('terminal')) setTimeout(() => this.openApp('terminal'), 800);
+            }
+
+            // 自动检测TV/安卓设备
+            autoDetectTvMode() {
+                var ua = navigator.userAgent;
+                // 检测安卓设备
+                var isAndroid = ua.indexOf('Android') > -1 || ua.indexOf('Adr') > -1;
+                // 检测电视/投影仪关键词
+                var isTV = ua.indexOf('TV') > -1 || ua.indexOf('SmartTV') > -1 || ua.indexOf('Smart TV') > -1 || ua.indexOf(' projector') > -1 || ua.indexOf('Projector') > -1;
+                // 检测屏幕宽度大于1000px（可能是大屏设备）
+                var isLargeScreen = window.screen.width > 1000;
+                
+                // 如果是安卓设备或电视或大屏幕，默认开启TV模式
+                if (isAndroid || isTV || isLargeScreen) {
+                    this.settings.tvMode = true;
+                }
             }
 
             applySettings() {

@@ -1,4 +1,5 @@
 
+
 <!doctype html>
 <html class="scroll-smooth" lang="zh-CN">
 <head>
@@ -49,7 +50,7 @@ tailwind.config = {
                     gold: '#D4A054', blush: '#F2E0D5', surface: '#FFFBF7',
                     card: 'rgba(255,248,240,0.85)', glow: 'rgba(193,127,89,0.35)'
                 },
-                newyear: { red: '#C94A3A', gold: '#D4A054', goldLight: '#E8C97A' }
+                 newyear: { red: '#D4695A', gold: '#D4A054', goldLight: '#E8C97A' }
             },
             fontFamily: {
                 sans: ['Inter', 'Noto Sans SC', 'system-ui', 'sans-serif'],
@@ -162,7 +163,7 @@ tailwind.config = {
     --sand: #4A3528;
     --bg: #1a1410;
     --bg-elevated: rgba(40,30,22,0.72);
-    --border-soft: rgba(212,160,84,0.2);
+    --border-soft: rgba(212,160,84,0.32);
     --text-primary: #F5E6D8;
     --text-soft: #D4C2A8;
 }
@@ -271,8 +272,8 @@ body {
 .glass-card-modern:hover {
     border-color: var(--copper-50);
     background: rgba(255,252,247,0.9);
-    transform: translateY(-7px) scale(1.012);
-    box-shadow: 0 22px 40px -10px rgba(60,36,21,0.13), 0 0 0 1px rgba(193,127,89,0.2);
+    transform: translateY(-12px) scale(1.012);
+    box-shadow: 0 22px 40px -10px rgba(60,36,21,0.1), 0 0 0 1px rgba(193,127,89,0.12);
 }
 .glass-card-modern:hover::after { opacity: 1; }
 
@@ -465,9 +466,9 @@ body {
 }
 .quick-menu-btn:hover { background: rgba(255,252,247,0.95); border-color: var(--copper); transform: scale(1.08); }
 .quick-menu-panel {
-    background: rgba(255,248,240,0.85);
+    background: rgba(255,248,240,0.7);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(193,127,89,0.4);
+    border: 1px solid rgba(193,127,89,0.35);
     border-radius: 24px;
     box-shadow: 0 16px 40px rgba(60,36,21,0.15);
     padding: 12px;
@@ -587,6 +588,20 @@ body {
 .z-banner { z-index: var(--z-banner); }
 .z-modal { z-index: var(--z-modal); }
 .z-toast { z-index: var(--z-toast); }
+
+.lang-select {
+    background: var(--bg-elevated);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-soft);
+    color: var(--text-primary);
+    transition: all var(--duration-base) var(--ease-soft);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+}
+.lang-select:hover { border-color: var(--copper-50); }
+.lang-select:focus { border-color: var(--copper); box-shadow: 0 0 0 2px var(--copper-15); }
+.lang-select option { background: var(--bg); color: var(--text-primary); }
 </style>
 <script>
 window.__threeCdnReady = (async () => {
@@ -614,22 +629,39 @@ window.__threeCdnReady = (async () => {
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
 <a class="skip-link" href="#home" data-i18n="a11y.skip">跳到主要内容</a>
-<div class="fixed top-[68px] right-4 z-banner flex items-center gap-2">
-    <button id="i18nToggle" type="button" class="theme-toggle" aria-label="切换语言" title="切换语言">
-        <span data-i18n="lang.label">中</span>
-    </button>
-    <button id="themeToggle" type="button" class="theme-toggle" aria-label="切换主题" title="切换主题">
-        <span class="theme-icon-light">☀</span>
-        <span class="theme-icon-dark">☾</span>
-    </button>
-</div>
-<div class="ie-banner">
+<nav class="fixed top-0 left-0 right-0 z-modal glass-modern rounded-none border-t-0 border-l-0 border-r-0 px-6 py-3 flex items-center justify-between" role="navigation" aria-label="主导航">
+    <a href="#home" class="text-brand-espresso font-bold text-lg font-display tracking-wide no-underline">Raccoon.Fit</a>
+    <div class="flex items-center gap-6">
+        <a href="#home" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">首页</a>
+        <a href="#projects" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">项目</a>
+        <a href="#lab" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">实验室</a>
+        <a href="#about" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">关于</a>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-brand-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke-width="1.5"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10M12 2a15.3 15.3 0 00-4 10 15.3 15.3 0 004 10" stroke-width="1.5"/></svg>
+            <select id="i18nSelect" class="lang-select pl-3 pr-7 py-2 rounded-full text-xs font-semibold appearance-none cursor-pointer" aria-label="选择语言/地区">
+                <option value="zh-CN">中文（简体）</option>
+                <option value="zh-TW">中文（繁体）</option>
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="ja">日本語</option>
+            </select>
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-brand-copper/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <button id="themeToggle" type="button" class="theme-toggle" aria-label="切换主题" title="切换主题">
+            <span class="theme-icon-light">☀</span>
+            <span class="theme-icon-dark">☾</span>
+        </button>
+    </div>
+</nav>
+<div class="ie-banner" style="top:52px">
     <div class="ie-row">
         <a href="index-ie.html" class="group">
             <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
             <span data-i18n="ie.link">IE兼容版入口</span>
         </a>
-        <span class="ie-subtitle"><span class="animate-pulse">🐴</span> <span data-i18n="ie.subtitle">丙午新禧 · 马到功成</span> <span class="hidden sm:inline">✨</span></span>
+        <span class="ie-subtitle"><span class="animate-pulse">✨</span> <span data-i18n="ie.subtitle">创意不息 · 灵感绽放</span> <span class="hidden sm:inline">✨</span></span>
     </div>
 </div>
 
@@ -640,30 +672,29 @@ window.__threeCdnReady = (async () => {
     <div class="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-gradient-to-br from-yellow-100/18 via-transparent to-transparent blur-[100px] rounded-full animate-drift" style="animation-delay: 1s"></div>
 </div>
 
-<div class="fixed bottom-6 left-6 z-fab flex flex-col items-start gap-2">
-    <button id="quickMenuToggle" class="quick-menu-btn" aria-label="快速入口" title="反馈 / 称号 / 客服中心">
-        <span class="transition-transform duration-300" id="menuIcon">☰</span>
-    </button>
-    <div id="quickMenuPanel" class="quick-menu-panel hidden">
-        <a href="http://raccoon.fit/反馈/" target="_blank" class="quick-menu-item">🐞 反馈建议</a>
-        <a href="http://raccoon.fit/称号" target="_blank" class="quick-menu-item">🏅 称号</a>
-        <a href="http://raccoon.fit/客服中心" target="_blank" class="quick-menu-item">💬 客服中心</a>
-    </div>
+<div class="fixed bottom-6 left-6 z-fab flex flex-col gap-1 glass-modern px-4 py-3 rounded-2xl text-xs">
+    <a href="http://raccoon.fit/反馈/" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">反馈建议</a>
+    <a href="http://raccoon.fit/称号" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">称号</a>
+    <a href="https://raccoon.fit" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">友情链接</a>
 </div>
 <span id="navBrandTrigger" class="fixed top-1/2 right-0 z-base w-8 h-20 cursor-pointer opacity-0 hover:opacity-10 transition-opacity" title="开发者入口"></span>
 
-<main>
-    <section id="home" class="@container min-h-screen flex flex-col items-center justify-center pt-8 px-6 relative overflow-hidden hero-warm-bg">
+<button id="backToTop" class="fixed bottom-6 right-6 z-fab w-12 h-12 rounded-full glass-modern flex items-center justify-center text-lg opacity-0 pointer-events-none transition-all duration-300 shadow-md hover:border-brand-copper/50 hover:scale-110" aria-label="回到顶部" title="回到顶部">↑</button>
+
+<div class="fixed inset-0 z-modal bg-brand-espresso pointer-events-none opacity-0 transition-opacity duration-500" id="themeOverlay" aria-hidden="true"></div>
+
+<main id="main-content" role="main">
+    <section id="home" class="@container min-h-[90vh] flex flex-col items-center justify-center pt-8 px-4 relative overflow-hidden hero-warm-bg" role="banner" aria-label="首页 Hero">
         <div class="@container-sm relative z-10 text-center max-w-5xl mx-auto w-full animate-fade-in flex flex-col items-center">
             <div class="inline-flex items-center gap-3 mb-4 animate-slide-in px-5 py-2 rounded-full">
                 <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-newyear-red/70"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-newyear-red"></span></span>
-                <span class="text-sm font-medium text-brand-espresso" data-i18n="hero.year">🐎 丙午马年 · 灵感奔腾</span>
+                <span class="text-sm font-medium text-brand-espresso" data-i18n="hero.year">✨ 创意不息 · 灵感奔腾</span>
             </div>
             <h1 class="text-4xl md:text-7xl font-black mb-4 leading-[1.1] tracking-tighter font-display">
                 <span class="bg-gradient-to-r from-brand-espresso to-brand-mocha bg-clip-text text-transparent" data-i18n="hero.title1">探索代码的</span><br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-copper via-brand-caramel to-brand-gold" data-i18n="hero.title2">无限可能</span>
             </h1>
-            <p class="text-brand-mocha text-base md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed font-light text-balance" data-i18n="hero.desc">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
+            <p class="text-brand-mocha text-base md:text-xl max-w-2xl mx-auto mb-6 leading-normal font-light text-balance" data-i18n="hero.desc">这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。</p>
 
             <button id="load3DBtn" type="button" class="mb-6 inline-flex items-center gap-3 px-7 py-3.5 rounded-full glass-modern border border-brand-sand/60 hover:border-brand-copper/40 transition-all group">
                 <span class="text-xl">🎊</span>
@@ -679,7 +710,7 @@ window.__threeCdnReady = (async () => {
             </div>
 
             <div class="mb-6 inline-block px-6 py-3 rounded-full glass-modern border border-brand-sand/60 bg-white/60">
-                <p class="text-brand-copperDark text-sm font-medium tracking-wide flex items-center gap-2"><span>✨</span><span data-i18n="hero.greeting">丙午新春 · 代码无bug · 创意绽放</span><span>✨</span></p>
+                <p class="text-brand-copperDark text-sm font-medium tracking-wide flex items-center gap-2"><span>✨</span><span data-i18n="hero.greeting">保持好奇 · 永远优雅地解决问题</span><span>✨</span></p>
             </div>
             <div class="flex flex-col sm:flex-row gap-5 justify-center">
                 <a class="btn-primary px-10 py-4 rounded-2xl" href="#projects" data-i18n="hero.cta1">探索项目</a>
@@ -688,65 +719,75 @@ window.__threeCdnReady = (async () => {
         </div>
     </section>
 
-    <section id="projects" class="@container py-32 px-6 container mx-auto max-w-7xl">
+    <section id="projects" class="@container py-32 px-6 container mx-auto max-w-7xl" role="region" aria-label="精选作品">
         <div class="@container-sm flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
             <div>
-                <h2 class="text-5xl font-black tracking-tight mb-3 title-decoration text-brand-espresso font-display" data-i18n="projects.title">精选作品</h2>
+                <h2 class="text-5xl font-black tracking-tight mb-3 text-brand-espresso font-display" data-i18n="projects.title">精选作品</h2>
                 <p class="text-brand-mocha text-lg" data-i18n="projects.subtitle">匠心独运 · 每一行代码皆有灵魂</p>
             </div>
             <div class="h-px flex-1 bg-gradient-to-r from-transparent via-brand-copper/50 to-transparent hidden md:block"></div>
-            <span class="text-brand-copper font-mono text-sm tracking-widest" data-i18n="projects.year">PORTFOLIO · 2025</span>
+            <span class="text-brand-copper font-mono text-sm tracking-widest" data-i18n="projects.year">PORTFOLIO · 2026</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay:.1s">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+             <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in tracking-wide" style="animation-delay:.1s">
                 <div class="text-5xl mb-5 opacity-80">💻</div>
                 <div class="flex gap-2 mb-5"><span class="tag-modern">在线IDE</span><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">PRO</span></div>
                 <h3 class="text-2xl font-bold mb-3 text-brand-espresso">Ride</h3>
-                <p class="text-brand-mocha text-sm mb-8">高性能云端开发环境，极速部署。</p>
+                 <p class="text-brand-mocha text-base mb-8">高性能云端开发环境，极速部署。</p>
                 <a href="https://raccoon.fit/Ride" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.try">立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
             </div>
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay:.2s">
+             <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in tracking-wide" style="animation-delay:.2s">
                 <div class="text-5xl mb-5">📺</div>
                 <div class="flex gap-2 mb-5"><span class="tag-modern bg-brand-copper/15 text-brand-copperDark">直播工具</span></div>
                 <h3 class="text-2xl font-bold mb-3 text-brand-espresso">B站直播流获取</h3>
-                <p class="text-brand-mocha text-sm mb-8">开发者专属 · 一键获取直播源。</p>
+                 <p class="text-brand-mocha text-base mb-8">开发者专属 · 一键获取直播源。</p>
                 <a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.try">立即体验</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
             </div>
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in card-discontinued" style="animation-delay:.3s">
-                <div class="text-5xl mb-5 opacity-70">📱</div>
-                <div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-500">已停运</span><span class="tag-modern bg-gray-100 text-gray-500">归档库</span></div>
-                <h3 class="text-2xl font-bold mb-3 text-gray-600">MULU</h3>
-                <p class="text-gray-500 text-sm mb-8">移动应用探索史 · React Native实践。</p>
-                <a href="https://raccoon.fit/停运公告/MULU停运公告.html" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl bg-gray-100/80 border border-gray-200 text-gray-600 font-bold group hover:bg-gray-200/80 transition-all"><span data-i18n="card.cta.eol">查看停运公告</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-            </div>
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in card-discontinued" style="animation-delay:.4s">
-                <div class="text-5xl mb-5 opacity-70">🐻</div>
-                <div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-500">已停运</span><span class="tag-modern bg-gray-100 text-gray-500">工具</span></div>
-                <h3 class="text-2xl font-bold mb-3 text-gray-600">灵熊小记</h3>
-                <p class="text-gray-500 text-sm mb-8">你的神奇笔记助手（服务已停止）。</p>
-                <a href="https://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/%E5%81%9C%E8%BF%90%E5%85%AC%E5%91%8A.html" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl bg-gray-100/80 border border-gray-200 text-gray-600 font-bold group hover:bg-gray-200/80 transition-all"><span data-i18n="card.cta.eol">查看停运公告</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
-            </div>
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay:.5s">
+            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in tracking-wide" style="animation-delay:.3s">
                 <div class="text-5xl mb-5">🎮</div>
                 <div class="flex gap-2 mb-5"><span class="tag-modern bg-purple-100 text-purple-700">HTML5</span></div>
                 <h3 class="text-2xl font-bold mb-3 text-brand-espresso">小游戏库</h3>
-                <p class="text-brand-mocha text-sm mb-8">趣味创意轻量互动。</p>
+                 <p class="text-brand-mocha text-base mb-8">趣味创意轻量互动。</p>
                 <a href="https://raccoon.fit/game" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.play">试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
             </div>
-            <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in" style="animation-delay:.6s">
+              <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in tracking-wide" style="animation-delay:.4s">
                 <div class="text-5xl mb-5">🤖</div>
                 <div class="flex gap-2 mb-5"><span class="tag-modern bg-amber-100 text-amber-700">AI 先锋</span></div>
                 <h3 class="text-2xl font-bold mb-3 text-brand-espresso">RACCOON AI</h3>
-                <p class="text-brand-mocha text-sm mb-8">对话大模型探索。</p>
+                 <p class="text-brand-mocha text-base mb-8">对话大模型探索。</p>
                 <a href="https://raccoon.fit/ai" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.ai">体验AI</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+            </div>
+        </div>
+
+        <div class="mt-12 text-center">
+            <button id="archiveToggle" onclick="var p=document.getElementById('archivePanel');var a=this.querySelector('span:last-child');if(p.style.display==='none'||p.style.display===''){p.style.display='grid';if(a)a.style.transform='rotate(180deg)';}else{p.style.display='none';if(a)a.style.transform='rotate(0deg)';}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-modern border border-brand-sand/60 hover:border-brand-copper/40 transition-all group text-brand-mocha font-medium cursor-pointer">
+                <span>📦</span>
+                <span>归档项目</span>
+                <span class="text-brand-copper group-hover:rotate-180 transition-transform duration-300">▼</span>
+            </button>
+            <div id="archivePanel" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto" style="display:none">
+                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full card-discontinued">
+                    <div class="text-5xl mb-5 opacity-70">📱</div>
+                    <div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-500">已停运</span><span class="tag-modern bg-gray-100 text-gray-500">归档库</span></div>
+                    <h3 class="text-2xl font-bold mb-3 text-gray-600">MULU</h3>
+                    <p class="text-gray-500 text-base mb-8">移动应用探索史 · React Native实践。</p>
+                    <a href="https://raccoon.fit/停运公告/MULU停运公告.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl bg-gray-100/80 border border-gray-200 text-gray-600 font-bold group hover:bg-gray-200/80 transition-all"><span data-i18n="card.cta.eol">查看停运公告</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+                </div>
+                <div class="glass-card-modern rounded-3xl p-8 flex flex-col h-full card-discontinued">
+                    <div class="text-5xl mb-5 opacity-70">🐻</div>
+                    <div class="flex gap-2 mb-5"><span class="tag-modern bg-gray-200/70 text-gray-500">已停运</span><span class="tag-modern bg-gray-100 text-gray-500">工具</span></div>
+                    <h3 class="text-2xl font-bold mb-3 text-gray-600">灵熊小记</h3>
+                    <p class="text-gray-500 text-base mb-8">你的神奇笔记助手（服务已停止）。</p>
+                    <a href="https://raccoon.fit/APP/com.xiaohuanxiong.hauntedhive/%E5%81%9C%E8%BF%90%E5%85%AC%E5%91%8A.html" target="_blank" class="mt-auto flex items-center justify-between w-full p-4 rounded-xl bg-gray-100/80 border border-gray-200 text-gray-600 font-bold group hover:bg-gray-200/80 transition-all"><span data-i18n="card.cta.eol">查看停运公告</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-brand-warm/25 to-transparent">
+    <section id="lab" class="py-32 bg-gradient-to-b from-transparent via-brand-warm/25 to-transparent" role="region" aria-label="创意实验室">
         <div class="container mx-auto px-6 max-w-7xl">
             <div class="text-center mb-20">
-                <h2 class="text-5xl font-black mb-5 title-decoration inline-block relative font-display text-brand-espresso" data-i18n="lab.title">✨ 创意实验室</h2>
+                <h2 class="text-5xl font-black mb-5 inline-block relative font-display text-brand-espresso" data-i18n="lab.title">✨ 创意实验室</h2>
                 <p class="text-brand-mocha mt-4" data-i18n="lab.subtitle">原型 · 跨界 · 未来感</p>
             </div>
             <div class="grid md:grid-cols-3 gap-8">
@@ -757,10 +798,21 @@ window.__threeCdnReady = (async () => {
         </div>
     </section>
 
-    <section id="about" class="@container py-32 px-6 container mx-auto max-w-7xl">
+    <section id="about" class="@container py-32 px-6 container mx-auto max-w-7xl" role="region" aria-label="关于">
         <div class="@container-sm grid lg:grid-cols-2 gap-16">
+            <div>
+                <h4 class="text-2xl font-black flex items-center gap-3 mb-10 text-brand-espresso"><span class="w-10 h-[2px] bg-brand-copper"></span><span data-i18n="skills.title">核心能力</span></h4>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tag-modern text-sm px-4 py-2">前端架构</span>
+                    <span class="tag-modern text-sm px-4 py-2">UI/UX设计</span>
+                    <span class="tag-modern text-sm px-4 py-2">产品思维</span>
+                    <span class="tag-modern text-sm px-4 py-2">Three.js/WebGL</span>
+                    <span class="tag-modern text-sm px-4 py-2">Node.js</span>
+                    <span class="tag-modern text-sm px-4 py-2">DevOps</span>
+                </div>
+            </div>
             <div class="glass-card-modern p-12 rounded-3xl">
-                <h3 class="text-4xl font-black mb-6 title-decoration relative font-display text-brand-espresso" data-i18n="about.title">关于软软</h3>
+                <h3 class="text-4xl font-black mb-6 relative font-display text-brand-espresso" data-i18n="about.title">关于软软</h3>
                 <div class="space-y-5 text-brand-mocha">
                     <p data-i18n="about.p1">技术与设计的狂热信徒，信奉「简洁即力量」。</p>
                     <p data-i18n="about.p2">Raccoon.Fit 代表着适应、创造、打破边界的工程美学。</p>
@@ -773,19 +825,11 @@ window.__threeCdnReady = (async () => {
                     </a>
                 </div>
             </div>
-            <div>
-                <h4 class="text-2xl font-black flex items-center gap-3 mb-10 text-brand-espresso"><span class="w-10 h-[2px] bg-brand-copper"></span><span data-i18n="skills.title">核心能力</span></h4>
-                <div class="space-y-7">
-                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium" data-i18n="skills.frontend">前端架构</span><span class="text-brand-copper font-bold">90%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:90%"></div></div></div>
-                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium" data-i18n="skills.uiux">UI/UX设计</span><span class="text-brand-copper font-bold">82%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:82%"></div></div></div>
-                    <div><div class="flex justify-between mb-3"><span class="text-brand-mocha font-medium" data-i18n="skills.product">产品思维</span><span class="text-brand-copper font-bold">85%</span></div><div class="skill-bar"><div class="skill-progress-modern" style="width:85%"></div></div></div>
-                </div>
-            </div>
         </div>
     </section>
 </main>
 
-<footer class="pb-20 pt-28 px-6">
+<footer class="pb-28 pt-36 px-6" role="contentinfo">
         <!--
         TODO: 添加图片时使用 <picture> 标签实现响应式图片优化
         <picture>
@@ -809,8 +853,8 @@ window.__threeCdnReady = (async () => {
                     <p class="text-brand-mocha text-xs" data-i18n="footer.copyright">© 2025-2026 软软 · 浣熊设计哲学</p>
                     <p class="text-[10px] font-mono text-brand-copper/70 mt-1">STAY CURIOUS · STAY CREATIVE</p>
                 </div>
-                <div class="mt-6"><p class="text-brand-copperDark text-sm font-medium" data-i18n="footer.year">🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊</p></div>
-                <div class="mt-4 pt-4 border-t border-brand-sand/40"><p class="text-xs text-brand-mocha/70 tracking-wider">本站最后更新于 2026年6月3日</p></div>
+                <div class="mt-6"><p class="text-brand-copperDark text-sm font-medium" data-i18n="footer.year">✨ 保持好奇 · 永远创造 ✨</p></div>
+                <div class="mt-4 pt-4 border-t border-brand-sand/40"><p class="text-xs text-brand-mocha/70 tracking-wider">本站最后更新于 2026年6月24日</p></div>
             </div>
         </div>
     </div>
@@ -941,7 +985,7 @@ function init3DModel(THREE, OrbitControls, GLTFLoader) {
     pointLight.position.set(0, 2.5, 2);
     scene.add(pointLight);
 
-    const PARTICLES = 160;
+    const PARTICLES = 80;
     const pGeo = new THREE.BufferGeometry();
     const pPos = new Float32Array(PARTICLES * 3);
     const pBaseY = new Float32Array(PARTICLES);
@@ -1065,22 +1109,48 @@ function init3DModel(THREE, OrbitControls, GLTFLoader) {
 
 <script>
 (function() {
-    const menuToggle = document.getElementById('quickMenuToggle');
-    const menuPanel = document.getElementById('quickMenuPanel');
-    const menuIcon = document.getElementById('menuIcon');
-    if (menuToggle && menuPanel && menuIcon) {
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const hidden = menuPanel.classList.toggle('hidden');
-            menuIcon.textContent = hidden ? '☰' : '✕';
-        });
-        document.addEventListener('click', (e) => {
-            if (!menuToggle.contains(e.target) && !menuPanel.contains(e.target)) {
-                menuPanel.classList.add('hidden');
-                menuIcon.textContent = '☰';
+
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backToTop.classList.remove('opacity-0', 'pointer-events-none');
+            } else {
+                backToTop.classList.add('opacity-0', 'pointer-events-none');
             }
+        }, { passive: true });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+
+    const scrollReveal = () => {
+        if (!('IntersectionObserver' in window)) return;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.glass-card-modern, .glass-modern').forEach(el => {
+            if (el.closest('#loadingOverlay') || el.closest('#themeOverlay') || el.closest('nav')) return;
+            const style = getComputedStyle(el);
+            if (style.opacity === '0' || el.classList.contains('dynamic-island-toast')) return;
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(24px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scrollReveal);
+    } else {
+        scrollReveal();
+    }
+})();
 
     const trigger = document.getElementById('navBrandTrigger');
     const pwdModal = document.getElementById('passwordModal');
@@ -1131,7 +1201,6 @@ function init3DModel(THREE, OrbitControls, GLTFLoader) {
         } catch {}
     }
     window.addEventListener('load', submitStatistics);
-})();
 
 (function() {
     function showTip(browserType) {
@@ -1199,17 +1268,17 @@ const I18N = {
         'a11y.skip': '跳到主要内容',
         'lang.label': '中',
         'ie.link': 'IE兼容版入口',
-        'ie.subtitle': '丙午新禧 · 马到功成',
-        'hero.year': '🐎 丙午马年 · 灵感奔腾',
+        'ie.subtitle': '创意不息 · 灵感绽放',
+        'hero.year': '✨ 创意不息 · 灵感奔腾',
         'hero.title1': '探索代码的',
         'hero.title2': '无限可能',
         'hero.desc': '这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。',
-        'hero.greeting': '丙午新春 · 代码无bug · 创意绽放',
+        'hero.greeting': '保持好奇 · 永远优雅地解决问题',
         'hero.cta1': '探索项目',
         'hero.cta2': 'GitHub 星系',
         'projects.title': '精选作品',
         'projects.subtitle': '匠心独运 · 每一行代码皆有灵魂',
-        'projects.year': 'PORTFOLIO · 2025',
+        'projects.year': 'PORTFOLIO · 2026',
         'lab.title': '✨ 创意实验室',
         'lab.subtitle': '原型 · 跨界 · 未来感',
         'lab.ai': 'AI 辅助设计',
@@ -1236,7 +1305,7 @@ const I18N = {
         'footer.github': '🐙 GitHub',
         'footer.website': '🌐 官网',
         'footer.copyright': '© 2025-2026 软软 · 浣熊设计哲学',
-        'footer.year': '🐎 丙午马年 · 万事顺遂 · 灵感奔腾 🎊',
+        'footer.year': '✨ 保持好奇 · 永远创造 ✨',
         '3d.btn': '点我查看 3D 模型',
         '3d.loading': '🎊 加载新年模型中...',
         '3d.hint': '🖱 拖拽旋转 · 滚轮缩放',
@@ -1247,6 +1316,60 @@ const I18N = {
         'modal.cancel': '取消',
         'modal.confirm': '确认',
         'modal.error': '密码错误，再试试看~',
+        'quickMenu.title': '快速入口'
+    },
+    'zh-TW': {
+        'a11y.skip': '跳到主要內容',
+        'lang.label': '中',
+        'ie.link': 'IE相容版入口',
+        'ie.subtitle': '創意不息 · 靈感綻放',
+        'hero.year': '✨ 創意不息 · 靈感奔騰',
+        'hero.title1': '探索代碼的',
+        'hero.title2': '無限可能',
+        'hero.desc': '這裡是軟軟的數位棲所 —— 融合創造力、前沿技術與設計哲學，構建有溫度的工具與藝術。',
+        'hero.greeting': '保持好奇 · 永遠優雅地解決問題',
+        'hero.cta1': '探索項目',
+        'hero.cta2': 'GitHub 星系',
+        'projects.title': '精選作品',
+        'projects.subtitle': '匠心獨運 · 每一行程式碼皆有靈魂',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ 創意實驗室',
+        'lab.subtitle': '原型 · 跨界 · 未來感',
+        'lab.ai': 'AI 輔助設計',
+        'lab.ai.desc': '生成式UI探索。',
+        'lab.proto': '互動原型',
+        'lab.proto.desc': '高級微動效。',
+        'lab.data': '資料視覺化',
+        'lab.data.desc': '動態敘事。',
+        'about.title': '關於軟軟',
+        'about.p1': '技術與設計的狂熱信徒，信奉「簡潔即力量」。',
+        'about.p2': 'Raccoon.Fit 代表著適應、創造、打破邊界的工程美學。',
+        'about.p3': '保持好奇 · 永遠優雅地解決問題',
+        'about.cta': '探索個人主頁',
+        'skills.title': '核心能力',
+        'skills.frontend': '前端架構',
+        'skills.uiux': 'UI/UX設計',
+        'skills.product': '產品思維',
+        'card.cta.try': '立即體驗',
+        'card.cta.play': '試玩',
+        'card.cta.ai': '體驗AI',
+        'card.cta.eol': '查看停運公告',
+        'footer.tagline': '探索 · 創造 · 成長 — 期待與你共鳴。',
+        'footer.email': '✉️ 郵箱',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 官網',
+        'footer.copyright': '© 2025-2026 軟軟 · 浣熊設計哲學',
+        'footer.year': '✨ 保持好奇 · 永遠創造 ✨',
+        '3d.btn': '點我查看 3D 模型',
+        '3d.loading': '🎊 載入新年模型中...',
+        '3d.hint': '🖱 拖曳旋轉 · 滾輪縮放',
+        'island.wechat': '您正在使用微信瀏覽',
+        'island.qq': '您正在使用QQ瀏覽',
+        'modal.title': '開發者驗證',
+        'modal.subtitle': '輸入除錯密碼',
+        'modal.cancel': '取消',
+        'modal.confirm': '確認',
+        'modal.error': '密碼錯誤，再試試看~',
         'quickMenu.title': '快速入口'
     },
     en: {
@@ -1263,7 +1386,7 @@ const I18N = {
         'hero.cta2': 'GitHub Galaxy',
         'projects.title': 'Featured Work',
         'projects.subtitle': 'Crafted with Soul · Every Line of Code',
-        'projects.year': 'PORTFOLIO · 2025',
+        'projects.year': 'PORTFOLIO · 2026',
         'lab.title': '✨ Creative Lab',
         'lab.subtitle': 'Prototype · Crossover · Future',
         'lab.ai': 'AI-assisted Design',
@@ -1302,13 +1425,83 @@ const I18N = {
         'modal.confirm': 'Confirm',
         'modal.error': 'Wrong password, try again~',
         'quickMenu.title': 'Quick Menu'
+    },
+    ja: {
+        'a11y.skip': 'メインコンテンツへ',
+        'lang.label': '日',
+        'ie.link': 'IE互換版入口',
+        'ie.subtitle': '創造は止まない · インスピレーション開花',
+        'hero.year': '✨ 創造は止まない · インスピレーションの奔流',
+        'hero.title1': 'コードの',
+        'hero.title2': '無限の可能性',
+        'hero.desc': 'RuanRuanのデジタルの巣 —— 創造性、先端技術、デザイン哲学を融合し、温もりのあるツールとアートを構築。',
+        'hero.greeting': '好奇心を持ち続け · 常にエレガントに解決',
+        'hero.cta1': 'プロジェクトへ',
+        'hero.cta2': 'GitHub ギャラクシー',
+        'projects.title': '選りすぐりの作品',
+        'projects.subtitle': '魂を込めた一行一一行',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ クリエイティブラボ',
+        'lab.subtitle': 'プロトタイプ · クロスオーバー · 未来感',
+        'lab.ai': 'AI 支援デザイン',
+        'lab.ai.desc': '生成的UIの探求。',
+        'lab.proto': 'インタラクションプロト',
+        'lab.proto.desc': '高度なマイクロアニメーション。',
+        'lab.data': 'データ可視化',
+        'lab.data.desc': '動的な物語。',
+        'about.title': 'RuanRuanについて',
+        'about.p1': '技術とデザインの熱狂的信者、「シンプルこそ力」を信条とする。',
+        'about.p2': 'Raccoon.Fit は適応、創造、境界を打ち破るエンジニアリング美学を表す。',
+        'about.p3': '好奇心を持ち続け · 常にエレガントに問題を解決',
+        'about.cta': '個人ページへ',
+        'skills.title': 'コアコンピタンス',
+        'skills.frontend': 'フロントエンド設計',
+        'skills.uiux': 'UI/UXデザイン',
+        'skills.product': 'プロダクト思考',
+        'card.cta.try': '今すぐ体験',
+        'card.cta.play': 'プレイ',
+        'card.cta.ai': 'AIを体験',
+        'card.cta.eol': 'サンセット公告を見る',
+        'footer.tagline': '探求 · 創造 · 成長 — 共鳴を楽しみに。',
+        'footer.email': '✉️ メール',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 ウェブサイト',
+        'footer.copyright': '© 2025-2026 RuanRuan · ラクーンデザイン哲学',
+        'footer.year': '✨ 好奇心を持ち続け · 永遠に創造 ✨',
+        '3d.btn': '3Dモデルを見る',
+        '3d.loading': '🎊 新年モデル読み込み中...',
+        '3d.hint': '🖱 ドラッグ回転 · スクロールズーム',
+        'island.wechat': 'WeChatで閲覧中',
+        'island.qq': 'QQで閲覧中',
+        'modal.title': '開発者認証',
+        'modal.subtitle': 'デバッグパスワード入力',
+        'modal.cancel': 'キャンセル',
+        'modal.confirm': '確認',
+        'modal.error': 'パスワードが違います〜',
+        'quickMenu.title': 'クイックメニュー'
     }
 };
 
 const state = {
     theme: localStorage.getItem('theme') || 'light',
-    lang: localStorage.getItem('lang') || 'zh'
+    lang: localStorage.getItem('lang') || detectLang()
 };
+
+function detectLang() {
+    const l = (navigator.language || '').toLowerCase();
+    if (l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.startsWith('zh-mo')) return 'zh-TW';
+    if (l.startsWith('zh')) return 'zh-CN';
+    if (l.startsWith('ja')) return 'ja';
+    if (l.startsWith('en-gb')) return 'en-GB';
+    if (l.startsWith('en')) return 'en-US';
+    return 'zh-CN';
+}
+
+function langToDict(l) {
+    if (l === 'zh-TW' || l === 'ja') return l;
+    if (l.startsWith('zh')) return 'zh';
+    return 'en';
+}
 
 function applyTheme(t) {
     state.theme = t;
@@ -1318,23 +1511,36 @@ function applyTheme(t) {
 
 function applyLang(l) {
     state.lang = l;
-    const dict = I18N[l] || I18N.zh;
+    const dict = I18N[langToDict(l)] || I18N.zh;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (dict[key] != null) el.textContent = dict[key];
     });
-    document.documentElement.setAttribute('lang', l === 'zh' ? 'zh-CN' : 'en');
+    document.documentElement.setAttribute('lang', l.startsWith('zh') ? 'zh' : 'en');
     localStorage.setItem('lang', l);
+    const sel = document.getElementById('i18nSelect');
+    if (sel) sel.value = l;
 }
 
 applyTheme(state.theme);
 applyLang(state.lang);
 
 const themeBtn = document.getElementById('themeToggle');
-if (themeBtn) themeBtn.addEventListener('click', () => applyTheme(state.theme === 'light' ? 'dark' : 'light'));
+if (themeBtn) themeBtn.addEventListener('click', () => {
+    const overlay = document.getElementById('themeOverlay');
+    if (overlay) {
+        overlay.style.opacity = '1';
+        setTimeout(() => {
+            applyTheme(state.theme === 'light' ? 'dark' : 'light');
+            setTimeout(() => { overlay.style.opacity = '0'; }, 100);
+        }, 250);
+    } else {
+        applyTheme(state.theme === 'light' ? 'dark' : 'light');
+    }
+});
 
-const i18nBtn = document.getElementById('i18nToggle');
-if (i18nBtn) i18nBtn.addEventListener('click', () => applyLang(state.lang === 'zh' ? 'en' : 'zh'));
+const i18nSel = document.getElementById('i18nSelect');
+if (i18nSel) i18nSel.addEventListener('change', () => applyLang(i18nSel.value));
 </script>
 <script>
     if ('serviceWorker' in navigator) {

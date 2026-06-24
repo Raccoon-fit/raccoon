@@ -1,5 +1,6 @@
 
 
+
 <!doctype html>
 <html class="scroll-smooth" lang="zh-CN">
 <head>
@@ -32,11 +33,11 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebPage","name":"软软的小窝 - 首页","url":"https://raccoon.fit","isPartOf":{"@type":"WebSite","name":"软软的小窝","url":"https://raccoon.fit"},"inLanguage":"zh-CN"}
 </script>
-<link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdn.bootcdn.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
 tailwind.config = {
@@ -606,8 +607,8 @@ body {
 <script>
 window.__threeCdnReady = (async () => {
     const CDNs = [
-        { name: 'jsdelivr', base: 'https://cdn.jsdelivr.net/npm/three@0.169.0/' },
-        { name: 'bootcdn', base: 'https://cdn.bootcdn.net/ajax/libs/three.js/0.169.0/' }
+        { name: 'bootcdn', base: 'https://cdn.bootcdn.net/ajax/libs/three.js/0.169.0/' },
+        { name: 'jsdelivr', base: 'https://cdn.jsdelivr.net/npm/three@0.169.0/' }
     ];
     const ping = (base) => fetch(base + 'build/three.module.js', { method: 'HEAD', mode: 'cors' })
         .then(r => r.ok ? base : Promise.reject())
@@ -632,23 +633,12 @@ window.__threeCdnReady = (async () => {
 <nav class="fixed top-0 left-0 right-0 z-modal glass-modern rounded-none border-t-0 border-l-0 border-r-0 px-6 py-3 flex items-center justify-between" role="navigation" aria-label="主导航">
     <a href="#home" class="text-brand-espresso font-bold text-lg font-display tracking-wide no-underline">Raccoon.Fit</a>
     <div class="flex items-center gap-6">
-        <a href="#home" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">首页</a>
-        <a href="#projects" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">项目</a>
-        <a href="#lab" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">实验室</a>
-        <a href="#about" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors">关于</a>
+        <a href="#home" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors" data-i18n="nav.home">首页</a>
+        <a href="#projects" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors" data-i18n="nav.projects">项目</a>
+        <a href="#lab" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors" data-i18n="nav.lab">实验室</a>
+        <a href="#about" class="text-sm font-medium text-brand-mocha hover:text-brand-copper transition-colors" data-i18n="nav.about">关于</a>
     </div>
     <div class="flex items-center gap-2">
-        <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-brand-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="10" stroke-width="1.5"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10M12 2a15.3 15.3 0 00-4 10 15.3 15.3 0 004 10" stroke-width="1.5"/></svg>
-            <select id="i18nSelect" class="lang-select pl-3 pr-7 py-2 rounded-full text-xs font-semibold appearance-none cursor-pointer" aria-label="选择语言/地区">
-                <option value="zh-CN">中文（简体）</option>
-                <option value="zh-TW">中文（繁体）</option>
-                <option value="en-US">English (US)</option>
-                <option value="en-GB">English (UK)</option>
-                <option value="ja">日本語</option>
-            </select>
-            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-brand-copper/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
         <button id="themeToggle" type="button" class="theme-toggle" aria-label="切换主题" title="切换主题">
             <span class="theme-icon-light">☀</span>
             <span class="theme-icon-dark">☾</span>
@@ -672,10 +662,53 @@ window.__threeCdnReady = (async () => {
     <div class="absolute top-1/2 left-1/2 w-[350px] h-[350px] bg-gradient-to-br from-yellow-100/18 via-transparent to-transparent blur-[100px] rounded-full animate-drift" style="animation-delay: 1s"></div>
 </div>
 
-<div class="fixed bottom-6 left-6 z-fab flex flex-col gap-1 glass-modern px-4 py-3 rounded-2xl text-xs">
-    <a href="http://raccoon.fit/反馈/" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">反馈建议</a>
-    <a href="http://raccoon.fit/称号" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">称号</a>
-    <a href="https://raccoon.fit" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium">友情链接</a>
+<div class="fixed bottom-6 left-6 z-fab flex flex-col gap-2 glass-modern px-4 py-3 rounded-2xl text-xs">
+    <div class="flex items-center gap-2">
+        <span id="langIndicator" class="text-xs font-bold text-brand-copper">中</span>
+        <select id="i18nSelect" class="bg-transparent text-xs font-medium text-brand-mocha cursor-pointer outline-none border-none appearance-none pr-1" aria-label="选择语言">
+            <option value="zh-CN">中文（简体）</option>
+            <option value="zh-TW">中文（繁体）</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+            <option value="fr">Français</option>
+            <option value="sa">संस्कृतम्</option>
+            <option value="ar">العربية</option>
+            <option value="egy">𓂋𓏺𓈖𓆎𓅓𓏏𓊖</option>
+            <option value="anubis">𓇋𓈖𓊪𓅱𓃣</option>
+            <option value="eo">Esperanto</option>
+                <option value="ru">Русский</option>
+                <option value="tok">toki pona</option>
+                <option value="jbo">la .lojban.</option>
+                <option value="tlh">tlhIngan Hol</option>
+                <option value="qya">Quenya</option>
+                <option value="dot">Dothraki</option>
+                <option value="nvi">Na'vi</option>
+                <option value="eu">Euskara</option>
+                <option value="cy">Cymraeg</option>
+                <option value="haw">ʻŌlelo Hawaiʻi</option>
+                <option value="nv">Diné Bizaad</option>
+                <option value="yi">ייִדיש</option>
+                <option value="mi">Te Reo Māori</option>
+                <option value="bo">བོད་སྐད།</option>
+                <option value="ug">ئۇيغۇرچە</option>
+                <option value="la">Latina</option>
+                <option value="grc">Ἑλληνική</option>
+                <option value="non">Norrœnt</option>
+                 <option value="ang">Ænglisc</option>
+                 <option value="hili">丘丘语</option>
+                 <option value="is">Íslenska</option>
+                <option value="ca">Català</option>
+                <option value="mt">Malti</option>
+                <option value="fy">Frysk</option>
+                <option value="lb">Lëtzebuergesch</option>
+        </select>
+    </div>
+    <div class="h-px bg-brand-sand/40"></div>
+    <a href="http://raccoon.fit/反馈/" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium" data-i18n="quick.feedback">反馈建议</a>
+    <a href="http://raccoon.fit/称号" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium" data-i18n="quick.badge">称号</a>
+    <a href="https://raccoon.fit" target="_blank" class="text-xs text-brand-mocha/70 hover:text-brand-copper transition-colors font-medium" data-i18n="quick.friendlink">友情链接</a>
 </div>
 <span id="navBrandTrigger" class="fixed top-1/2 right-0 z-base w-8 h-20 cursor-pointer opacity-0 hover:opacity-10 transition-opacity" title="开发者入口"></span>
 
@@ -748,7 +781,7 @@ window.__threeCdnReady = (async () => {
                 <div class="flex gap-2 mb-5"><span class="tag-modern bg-purple-100 text-purple-700">HTML5</span></div>
                 <h3 class="text-2xl font-bold mb-3 text-brand-espresso">小游戏库</h3>
                  <p class="text-brand-mocha text-base mb-8">趣味创意轻量互动。</p>
-                <a href="https://game.raccoon.fit/" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.play">试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
+                <a href="https://raccoon.fit/game" target="_blank" class="card-link mt-auto flex items-center justify-between w-full p-4 rounded-xl btn-secondary font-bold group"><span data-i18n="card.cta.play">试玩</span><span class="group-hover:translate-x-2 transition-transform">→</span></a>
             </div>
               <div class="@container-card glass-card-modern rounded-3xl p-8 flex flex-col h-full animate-slide-in tracking-wide" style="animation-delay:.4s">
                 <div class="text-5xl mb-5">🤖</div>
@@ -803,12 +836,12 @@ window.__threeCdnReady = (async () => {
             <div>
                 <h4 class="text-2xl font-black flex items-center gap-3 mb-10 text-brand-espresso"><span class="w-10 h-[2px] bg-brand-copper"></span><span data-i18n="skills.title">核心能力</span></h4>
                 <div class="flex flex-wrap gap-2">
-                    <span class="tag-modern text-sm px-4 py-2">前端架构</span>
-                    <span class="tag-modern text-sm px-4 py-2">UI/UX设计</span>
-                    <span class="tag-modern text-sm px-4 py-2">产品思维</span>
-                    <span class="tag-modern text-sm px-4 py-2">Three.js/WebGL</span>
-                    <span class="tag-modern text-sm px-4 py-2">Node.js</span>
-                    <span class="tag-modern text-sm px-4 py-2">DevOps</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.frontend">前端架构</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.uiux">UI/UX设计</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.product">产品思维</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.threejs">Three.js/WebGL</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.nodejs">Node.js</span>
+                    <span class="tag-modern text-sm px-4 py-2" data-i18n="skills.devops">DevOps</span>
                 </div>
             </div>
             <div class="glass-card-modern p-12 rounded-3xl">
@@ -1266,6 +1299,10 @@ function init3DModel(THREE, OrbitControls, GLTFLoader) {
 const I18N = {
     zh: {
         'a11y.skip': '跳到主要内容',
+        'nav.home': '首页',
+        'nav.projects': '项目',
+        'nav.lab': '实验室',
+        'nav.about': '关于',
         'lang.label': '中',
         'ie.link': 'IE兼容版入口',
         'ie.subtitle': '创意不息 · 灵感绽放',
@@ -1296,6 +1333,9 @@ const I18N = {
         'skills.frontend': '前端架构',
         'skills.uiux': 'UI/UX设计',
         'skills.product': '产品思维',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
         'card.cta.try': '立即体验',
         'card.cta.play': '试玩',
         'card.cta.ai': '体验AI',
@@ -1316,10 +1356,17 @@ const I18N = {
         'modal.cancel': '取消',
         'modal.confirm': '确认',
         'modal.error': '密码错误，再试试看~',
-        'quickMenu.title': '快速入口'
+        'quickMenu.title': '快速入口',
+        'quick.feedback': '反馈建议',
+        'quick.badge': '称号',
+        'quick.friendlink': '友情链接'
     },
     'zh-TW': {
         'a11y.skip': '跳到主要內容',
+        'nav.home': '首頁',
+        'nav.projects': '項目',
+        'nav.lab': '實驗室',
+        'nav.about': '關於',
         'lang.label': '中',
         'ie.link': 'IE相容版入口',
         'ie.subtitle': '創意不息 · 靈感綻放',
@@ -1350,6 +1397,9 @@ const I18N = {
         'skills.frontend': '前端架構',
         'skills.uiux': 'UI/UX設計',
         'skills.product': '產品思維',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
         'card.cta.try': '立即體驗',
         'card.cta.play': '試玩',
         'card.cta.ai': '體驗AI',
@@ -1370,10 +1420,17 @@ const I18N = {
         'modal.cancel': '取消',
         'modal.confirm': '確認',
         'modal.error': '密碼錯誤，再試試看~',
-        'quickMenu.title': '快速入口'
+        'quickMenu.title': '快速入口',
+        'quick.feedback': '回饋建議',
+        'quick.badge': '稱號',
+        'quick.friendlink': '友情連結'
     },
     en: {
         'a11y.skip': 'Skip to main content',
+        'nav.home': 'Home',
+        'nav.projects': 'Projects',
+        'nav.lab': 'Lab',
+        'nav.about': 'About',
         'lang.label': 'EN',
         'ie.link': 'IE-compatible version',
         'ie.subtitle': 'Year of the Horse · Triumph Ahead',
@@ -1404,6 +1461,9 @@ const I18N = {
         'skills.frontend': 'Frontend Architecture',
         'skills.uiux': 'UI/UX Design',
         'skills.product': 'Product Thinking',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
         'card.cta.try': 'Try Now',
         'card.cta.play': 'Play',
         'card.cta.ai': 'Try AI',
@@ -1424,10 +1484,17 @@ const I18N = {
         'modal.cancel': 'Cancel',
         'modal.confirm': 'Confirm',
         'modal.error': 'Wrong password, try again~',
-        'quickMenu.title': 'Quick Menu'
+        'quickMenu.title': 'Quick Menu',
+        'quick.feedback': 'Feedback',
+        'quick.badge': 'Badges',
+        'quick.friendlink': 'Links'
     },
     ja: {
         'a11y.skip': 'メインコンテンツへ',
+        'nav.home': 'ホーム',
+        'nav.projects': 'プロジェクト',
+        'nav.lab': 'ラボ',
+        'nav.about': '概要',
         'lang.label': '日',
         'ie.link': 'IE互換版入口',
         'ie.subtitle': '創造は止まない · インスピレーション開花',
@@ -1458,6 +1525,9 @@ const I18N = {
         'skills.frontend': 'フロントエンド設計',
         'skills.uiux': 'UI/UXデザイン',
         'skills.product': 'プロダクト思考',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
         'card.cta.try': '今すぐ体験',
         'card.cta.play': 'プレイ',
         'card.cta.ai': 'AIを体験',
@@ -1478,8 +1548,548 @@ const I18N = {
         'modal.cancel': 'キャンセル',
         'modal.confirm': '確認',
         'modal.error': 'パスワードが違います〜',
-        'quickMenu.title': 'クイックメニュー'
-    }
+        'quickMenu.title': 'クイックメニュー',
+        'quick.feedback': 'フィードバック',
+        'quick.badge': '称号',
+        'quick.friendlink': 'リンク'
+    },
+    ko: {
+        'a11y.skip': '주요 콘텐츠로 건너뛰기',
+        'nav.home': '홈',
+        'nav.projects': '프로젝트',
+        'nav.lab': '연구실',
+        'nav.about': '소개',
+        'lang.label': '한',
+        'ie.link': 'IE 호환 버전',
+        'ie.subtitle': '창의는 멈추지 않는다 · 영감이 피어나다',
+        'hero.year': '✨ 창의는 멈추지 않는다 · 영감의 질주',
+        'hero.title1': '코드의',
+        'hero.title2': '무한한 가능성',
+        'hero.desc': 'RuanRuan의 디지털 보금자리 — 창의성, 첨단 기술, 디자인 철학을 융합하여 따뜻한 도구와 예술을 만듭니다.',
+        'hero.greeting': '호기심을 유지하고 · 항상 우아하게 문제를 해결하세요',
+        'hero.cta1': '프로젝트 탐색',
+        'hero.cta2': 'GitHub 갤럭시',
+        'projects.title': '주요 작품',
+        'projects.subtitle': '한 줄 한 줄 영혼을 담아',
+        'projects.year': '포트폴리오 · 2026',
+        'lab.title': '✨ 크리에이티브 랩',
+        'lab.subtitle': '프로토타입 · 크로스오버 · 미래',
+        'lab.ai': 'AI 보조 디자인',
+        'lab.ai.desc': '생성형 UI 탐구.',
+        'lab.proto': '인터랙션 프로토타입',
+        'lab.proto.desc': '고급 마이크로 애니메이션.',
+        'lab.data': '데이터 시각화',
+        'lab.data.desc': '동적 스토리텔링.',
+        'about.title': 'RuanRuan 소개',
+        'about.p1': '기술과 디자인의 열렬한 신봉자, 「단순함이 곧 힘」을 믿습니다.',
+        'about.p2': 'Raccoon.Fit은 적응, 창조, 경계를 허무는 엔지니어링 미학을 대표합니다.',
+        'about.p3': '호기심을 유지하고 · 항상 우아하게 문제를 해결하세요',
+        'about.cta': '개인 페이지',
+        'skills.title': '핵심 역량',
+        'skills.frontend': '프론트엔드 아키텍처',
+        'skills.uiux': 'UI/UX 디자인',
+        'skills.product': '제품 사고',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': '체험하기',
+        'card.cta.play': '플레이',
+        'card.cta.ai': 'AI 체험',
+        'card.cta.eol': '종료 공지 보기',
+        'footer.tagline': '탐색 · 창조 · 성장 — 공명을 기대하며.',
+        'footer.email': '✉️ 이메일',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 웹사이트',
+        'footer.copyright': '© 2025-2026 RuanRuan · 라쿤 디자인 철학',
+        'footer.year': '✨ 호기심을 유지하고 · 영원히 창조하세요 ✨',
+        '3d.btn': '3D 모델 보기',
+        '3d.loading': '🎊 새해 모델 로딩 중...',
+        '3d.hint': '🖱 드래그 회전 · 스크롤 확대',
+        'island.wechat': 'WeChat에서 보고 계십니다',
+        'island.qq': 'QQ에서 보고 계십니다',
+        'modal.title': '개발자 인증',
+        'modal.subtitle': '디버그 비밀번호 입력',
+        'modal.cancel': '취소',
+        'modal.confirm': '확인',
+        'modal.error': '비밀번호가 틀렸습니다~',
+        'quickMenu.title': '빠른 메뉴',
+        'quick.feedback': '피드백',
+        'quick.badge': '칭호',
+        'quick.friendlink': '링크'
+    },
+    fr: {
+        'a11y.skip': 'Aller au contenu principal',
+        'nav.home': 'Accueil',
+        'nav.projects': 'Projets',
+        'nav.lab': 'Labo',
+        'nav.about': 'À propos',
+        'lang.label': 'FR',
+        'ie.link': 'Version compatible IE',
+        'ie.subtitle': 'La créativité ne s\'arrête jamais · L\'inspiration fleurit',
+        'hero.year': '✨ La créativité ne s\'arrête jamais · L\'inspiration galope',
+        'hero.title1': 'Découvrez les',
+        'hero.title2': 'Possibilités infinies du code',
+        'hero.desc': 'Le refuge numérique de RuanRuan — fusionnant créativité, technologies de pointe et philosophie du design pour construire des outils et de l\'art chaleureux.',
+        'hero.greeting': 'Restez curieux · Résolvez toujours les problèmes avec élégance',
+        'hero.cta1': 'Explorer les projets',
+        'hero.cta2': 'Galaxie GitHub',
+        'projects.title': 'Travaux choisis',
+        'projects.subtitle': 'De l\'âme dans chaque ligne de code',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ Labo créatif',
+        'lab.subtitle': 'Prototype · Crossover · Futur',
+        'lab.ai': 'Design assisté par IA',
+        'lab.ai.desc': 'Exploration de l\'UI générative.',
+        'lab.proto': 'Prototypes d\'interaction',
+        'lab.proto.desc': 'Micro-animations avancées.',
+        'lab.data': 'Visualisation de données',
+        'lab.data.desc': 'Narration dynamique.',
+        'about.title': 'À propos de RuanRuan',
+        'about.p1': 'Passionné de technologie et de design, prêchant que la simplicité est le pouvoir.',
+        'about.p2': 'Raccoon.Fit représente une esthétique d\'ingénierie d\'adaptation, de création et de rupture des frontières.',
+        'about.p3': 'Restez curieux · Résolvez toujours les problèmes avec élégance',
+        'about.cta': 'Page personnelle',
+        'skills.title': 'Compétences clés',
+        'skills.frontend': 'Architecture frontend',
+        'skills.uiux': 'Design UI/UX',
+        'skills.product': 'Vision produit',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Essayer',
+        'card.cta.play': 'Jouer',
+        'card.cta.ai': 'Essayer l\'IA',
+        'card.cta.eol': 'Voir l\'avis d\'arrêt',
+        'footer.tagline': 'Explorer · Créer · Grandir — Hâte de résonner avec vous.',
+        'footer.email': '✉️ Email',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Site web',
+        'footer.copyright': '© 2025-2026 RuanRuan · Philosophie du design Raccoon',
+        'footer.year': '✨ Restez curieux · Créez pour toujours ✨',
+        '3d.btn': 'Voir le modèle 3D',
+        '3d.loading': '🎊 Chargement du modèle du Nouvel An...',
+        '3d.hint': '🖱 Glisser pour tourner · Molette pour zoomer',
+        'island.wechat': 'Vous naviguez dans WeChat',
+        'island.qq': 'Vous naviguez dans QQ',
+        'modal.title': 'Vérification développeur',
+        'modal.subtitle': 'Entrez le mot de passe de débogage',
+        'modal.cancel': 'Annuler',
+        'modal.confirm': 'Confirmer',
+        'modal.error': 'Mot de passe incorrect, réessayez~',
+        'quickMenu.title': 'Menu rapide',
+        'quick.feedback': 'Commentaires',
+        'quick.badge': 'Badges',
+        'quick.friendlink': 'Liens'
+    },
+    sa: {
+        'a11y.skip': 'मुख्यविषयवस्तुम् प्रति गच्छतु',
+        'nav.home': 'गृहम्',
+        'nav.projects': 'परियोजनाः',
+        'nav.lab': 'प्रयोगशाला',
+        'nav.about': 'परिचयः',
+        'lang.label': 'स',
+        'ie.link': 'IE-अनुकूलसंस्करणम्',
+        'ie.subtitle': 'सर्जनशीलता न रुद्ध्यते · प्रेरणा प्रस्फुटति',
+        'hero.year': '✨ सर्जनशीलता न रुद्ध्यते · प्रेरणायाः धावनम्',
+        'hero.title1': 'सङ्केतस्य',
+        'hero.title2': 'अनन्तसम्भावनाः',
+        'hero.desc': 'रुआनरुआनस्य डिजिटलनिवासः — सर्जनशीलतायाः, अत्याधुनिकप्रौद्योगिक्याः, अभिकल्पदर्शनस्य च सङ्गमेन उष्णानि उपकरणानि कलां च निर्माति।',
+        'hero.greeting': 'जिज्ञासां रक्षतु · सर्वदा मार्जिततया समस्याः समाधत्त',
+        'hero.cta1': 'परियोजनाः अन्वेष्टुम्',
+        'hero.cta2': 'GitHub तारापुञ्जः',
+        'projects.title': 'चितानि कार्याणि',
+        'projects.subtitle': 'प्रतिपङ्क्तिः आत्मना सह',
+        'projects.year': 'परियोजनासूची · २०२६',
+        'lab.title': '✨ सर्जनात्मकप्रयोगशाला',
+        'lab.subtitle': 'प्रारूपम् · सङ्क्रमणम् · भविष्यम्',
+        'lab.ai': 'AI-सहायितम् अभिकल्पनम्',
+        'lab.ai.desc': 'जनक-UI अन्वेषणम्।',
+        'lab.proto': 'अन्तरक्रियाप्रारूपाणि',
+        'lab.proto.desc': 'उन्नतसूक्ष्म-चालनानि।',
+        'lab.data': 'दत्तांशदृश्यीकरणम्',
+        'lab.data.desc': 'गतिककथानकम्।',
+        'about.title': 'रुआनरुआनविषये',
+        'about.p1': 'प्रौद्योगिक्याः अभिकल्पस्य च उत्साही, "सरलता एव शक्तिः" इति विश्वसिति।',
+        'about.p2': 'Raccoon.Fit अनुकूलनस्य, सर्जनस्य, सीमाभेदस्य च अभियान्त्रिकीसौन्दर्यं प्रतिनिधत्ते।',
+        'about.p3': 'जिज्ञासां रक्षतु · सर्वदा मार्जिततया समस्याः समाधत्त',
+        'about.cta': 'वैयक्तिकपृष्ठम्',
+        'skills.title': 'प्रमुखदक्षताः',
+        'skills.frontend': 'अग्रभागवास्तुकला',
+        'skills.uiux': 'UI/UX अभिकल्पनम्',
+        'skills.product': 'उत्पादचिन्तनम्',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'प्रयोगताम्',
+        'card.cta.play': 'क्रीडतु',
+        'card.cta.ai': 'AI प्रयोगताम्',
+        'card.cta.eol': 'स्थगनसूचना द्रष्टुम्',
+        'footer.tagline': 'अन्वेषणम् · सर्जनम् · वृद्धिः — अनुनादाय प्रतीक्षते।',
+        'footer.email': '✉️ विपत्रम्',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 जालस्थानम्',
+        'footer.copyright': '© 2025-2026 रुआनरुआन · रैकून-अभिकल्पदर्शनम्',
+        'footer.year': '✨ जिज्ञासां रक्षतु · शाश्वतं सृजतु ✨',
+        '3d.btn': '3D-प्रतिरूपं द्रष्टुम्',
+        '3d.loading': '🎊 नववर्षप्रतिरूपं भारयन्...',
+        '3d.hint': '🖱 कर्षणेन भ्रमणम् · चक्रेण आवर्धनम्',
+        'island.wechat': 'भवान् WeChat-मध्ये पश्यति',
+        'island.qq': 'भवान् QQ-मध्ये पश्यति',
+        'modal.title': 'विकासकप्रमाणीकरणम्',
+        'modal.subtitle': 'दोषहरणसङ्केतशब्दं प्रवेशयतु',
+        'modal.cancel': 'निरस्यताम्',
+        'modal.confirm': 'पुष्टीकरोतु',
+        'modal.error': 'अशुद्धः सङ्केतशब्दः, पुनः प्रयत्नं करोतु~',
+        'quickMenu.title': 'शीघ्रसूची',
+        'quick.feedback': 'प्रतिपुष्टिः',
+        'quick.badge': 'उपाधयः',
+        'quick.friendlink': 'सम्पर्कसूत्राणि'
+    },
+    ar: {
+        'a11y.skip': 'انتقل إلى المحتوى الرئيسي',
+        'nav.home': 'الرئيسية',
+        'nav.projects': 'المشاريع',
+        'nav.lab': 'المختبر',
+        'nav.about': 'حول',
+        'lang.label': 'ع',
+        'ie.link': 'نسخة متوافقة مع IE',
+        'ie.subtitle': 'الإبداع لا يتوقف · الإلهام يزدهر',
+        'hero.year': '✨ الإبداع لا يتوقف · الإلهام ينطلق',
+        'hero.title1': 'اكتشف',
+        'hero.title2': 'إمكانيات لا نهائية للكود',
+        'hero.desc': 'المأوى الرقمي لـ RuanRuan — يدمج الإبداع والتقنيات المتطورة وفلسفة التصميم لبناء أدوات وفن دافئ.',
+        'hero.greeting': 'ابق فضولياً · حل المشكلات بأناقة دائمة',
+        'hero.cta1': 'استكشاف المشاريع',
+        'hero.cta2': 'مجرّة GitHub',
+        'projects.title': 'أعمال مختارة',
+        'projects.subtitle': 'روح في كل سطر من الكود',
+        'projects.year': 'ملف الأعمال · 2026',
+        'lab.title': '✨ مختبر إبداعي',
+        'lab.subtitle': 'نموذج أولي · تكامل · مستقبل',
+        'lab.ai': 'تصميم بمساعدة الذكاء الاصطناعي',
+        'lab.ai.desc': 'استكشاف واجهة المستخدم التوليدية.',
+        'lab.proto': 'نماذج تفاعلية',
+        'lab.proto.desc': 'حركات دقيقة متقدمة.',
+        'lab.data': 'تصوير البيانات',
+        'lab.data.desc': 'سرد قصصي ديناميكي.',
+        'about.title': 'حول RuanRuan',
+        'about.p1': 'متعصب للتكنولوجيا والتصميم، يؤمن بأن البساطة هي القوة.',
+        'about.p2': 'تمثل Raccoon.Fit جمالية هندسية للتكيف والإبداع وكسر الحدود.',
+        'about.p3': 'ابق فضولياً · حل المشكلات بأناقة دائمة',
+        'about.cta': 'الصفحة الشخصية',
+        'skills.title': 'الكفاءات الأساسية',
+        'skills.frontend': 'هندسة الواجهة الأمامية',
+        'skills.uiux': 'تصميم UI/UX',
+        'skills.product': 'تفكير المنتج',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'جرّب الآن',
+        'card.cta.play': 'العب',
+        'card.cta.ai': 'جرّب AI',
+        'card.cta.eol': 'عرض إشعار التوقف',
+        'footer.tagline': 'استكشاف · إبداع · نمو — نتطلع للتآلف معك.',
+        'footer.email': '✉️ البريد',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 الموقع',
+        'footer.copyright': '© 2025-2026 RuanRuan · فلسفة تصميم الراكون',
+        'footer.year': '✨ ابق فضولياً · أبدع إلى الأبد ✨',
+        '3d.btn': 'عرض النموذج ثلاثي الأبعاد',
+        '3d.loading': '🎊 جارٍ تحميل نموذج العام الجديد...',
+        '3d.hint': '🖱 اسحب للتدوير · عجلة للتكبير',
+        'island.wechat': 'أنت تتصفح في WeChat',
+        'island.qq': 'أنت تتصفح في QQ',
+        'modal.title': 'تحقق المطور',
+        'modal.subtitle': 'أدخل كلمة مرور التصحيح',
+        'modal.cancel': 'إلغاء',
+        'modal.confirm': 'تأكيد',
+        'modal.error': 'كلمة مرور خاطئة، حاول مرة أخرى~',
+        'quickMenu.title': 'قائمة سريعة',
+        'quick.feedback': 'ملاحظات',
+        'quick.badge': 'ألقاب',
+        'quick.friendlink': 'روابط'
+    },
+    egy: {
+        'a11y.skip': 'šm r ḥr-ỉb',
+        'nav.home': 'pr',
+        'nav.projects': 'mnw',
+        'nav.lab': 'pr-ꜥnḫ',
+        'nav.about': 'r nty',
+        'lang.label': '𓂀',
+        'ie.link': 'sḫr n pḥ',
+        'ie.subtitle': 'sḫr nn grg · kꜣ nfr',
+        'hero.year': '✨ rnpt nfr · kꜣ nḫt',
+        'hero.title1': 'gmḥ',
+        'hero.title2': 'sštꜣ n mdw-nṯr',
+        'hero.desc': 'pr n RuanRuan — smꜣ sḫr, sštꜣ, mꜣꜥt n qdt r ỉr ḫt nfrt.',
+        'hero.greeting': 'sḏm m ḥr · ỉr ḫt m mꜣꜥt',
+        'hero.cta1': 'gmḥ mnw',
+        'hero.cta2': 'pr mḏꜣt n GitHub',
+        'projects.title': 'mnw stp',
+        'projects.subtitle': 'kꜣ m sš nb',
+        'projects.year': 'sẖꜣw · 2026',
+        'lab.title': '✨ pr-ꜥnḫ',
+        'lab.subtitle': 'sḫr · smꜣ · ḫpr',
+        'lab.ai': 'sštꜣ n Ḏḥwty',
+        'lab.ai.desc': 'gmḥ sšm n sḫr.',
+        'lab.proto': 'twt n sḫr',
+        'lab.proto.desc': 'nḏnḏ nfr.',
+        'lab.data': 'ssm n rḫ',
+        'lab.data.desc': 'sḏd n ḫprw.',
+        'about.title': 'r nty RuanRuan',
+        'about.p1': 'mr rḫ n sḫr, ḥr sḏm "nḏs pw nḫt".',
+        'about.p2': 'Raccoon.Fit wꜣt n sḫr nfr, ỉr ḫt, sbn tꜣš.',
+        'about.p3': 'sḏm m ḥr · ỉr ḫt m mꜣꜥt',
+        'about.cta': 'pr-ḥr nty.k',
+        'skills.title': 'ḥkꜣw n ỉb',
+        'skills.frontend': 'qdt n ḥꜣt',
+        'skills.uiux': 'sḫr n mꜣꜣ',
+        'skills.product': 'sḫr n ḫt',
+        'skills.threejs': 'sḫr n ḏt',
+        'skills.nodejs': 'ỉr n ḫt',
+        'skills.devops': 'ḥmwt n kꜣt',
+        'card.cta.try': 'ỉr mꜣꜣ',
+        'card.cta.play': 'ḥb',
+        'card.cta.ai': 'sḏm Ḏḥwty',
+        'card.cta.eol': 'mꜣꜣ sš n ỉmꜣḫ',
+        'footer.tagline': 'gmḥ · qd · rwḏ — ỉw ỉb.k ḥr ỉꜣw.',
+        'footer.email': '✉️ sẖꜣw',
+        'footer.github': '🐙 pr-mḏꜣt',
+        'footer.website': '🌐 pr-ḥr',
+        'footer.copyright': '© 2025-2026 RuanRuan · sḫr n Raccoon',
+        'footer.year': '✨ sḏm m ḥr · qd ḏt ✨',
+        '3d.btn': 'mꜣꜣ twt',
+        '3d.loading': '🎊 ꜥq twt n rnpt...',
+        '3d.hint': '🖱 sṯꜣ · pḥr r ꜥꜣ',
+        'island.wechat': 'tw.k m WeChat',
+        'island.qq': 'tw.k m QQ',
+        'modal.title': 'ꜥq n qd',
+        'modal.subtitle': 'ḏd rn n sštꜣ',
+        'modal.cancel': 'ḫsf',
+        'modal.confirm': 'sḏm',
+        'modal.error': 'rn ꜥḏꜣ, ỉr m kỉ sp~',
+        'quickMenu.title': 'sẖꜣw ꜥšꜣ',
+        'quick.feedback': 'sḏd-ỉb',
+        'quick.badge': 'ḥkꜣw',
+        'quick.friendlink': 'mḥwt'
+    },
+    anubis: {
+        'a11y.skip': 'šm r dwꜣt',
+        'nav.home': 'ỉmnt',
+        'nav.projects': 'mnw',
+        'nav.lab': 'wꜥbt',
+        'nav.about': 'r ỉnpw',
+        'lang.label': '𓃣',
+        'ie.link': 'sḫr n pḥ',
+        'ie.subtitle': 'nn sk · kꜣ nfr m dwꜣt',
+        'hero.year': '✨ ỉnpw ḥr sꜣ · kꜣ nḫt',
+        'hero.title1': 'gmḥ',
+        'hero.title2': 'sštꜣ n mdw-nṯr',
+        'hero.desc': 'bꜣ n RuanRuan m dwꜣt — smꜣ sḫr, sštꜣ, ỉb n mꜣꜥt r ỉr ḫt nfrt.',
+        'hero.greeting': 'ỉb.k m mḫꜣt · ỉr ḫt m mꜣꜥt',
+        'hero.cta1': 'gmḥ mnw m dwꜣt',
+        'hero.cta2': 'pr-mḏꜣt n wsỉr',
+        'projects.title': 'mnw n ḏt',
+        'projects.subtitle': 'bꜣ m sš nb',
+        'projects.year': 'rnpt-sp · 2026',
+        'lab.title': '✨ wꜥbt n sḫr',
+        'lab.subtitle': 'sštꜣ · wt · ḫpr',
+        'lab.ai': 'sštꜣ n Ḏḥwty m dwꜣt',
+        'lab.ai.desc': 'gmḥ sšm n sḫr m ỉmnt.',
+        'lab.proto': 'šwt n sḫr',
+        'lab.proto.desc': 'nḏnḏ nfr m ḥtp.',
+        'lab.data': 'ssm n rḫ',
+        'lab.data.desc': 'sḏd n ḫprw m dwꜣt.',
+        'about.title': 'r nty ỉnpw',
+        'about.p1': 'mr rḫ n sḫr m dwꜣt, ḥr wḏꜥ-mdw "nḏs pw nḫt m mꜣꜥt".',
+        'about.p2': 'ỉnpw ḥr sꜣ Raccoon.Fit — wꜣt n sḫr nfr, ỉr ḫt, sbn tꜣš m ẖrt-nṯr.',
+        'about.p3': 'ỉb.k m mḫꜣt · ỉr ḫt m mꜣꜥt',
+        'about.cta': 'pr-ḥr nty.k m dwꜣt',
+        'skills.title': 'ḥkꜣw n ỉb',
+        'skills.frontend': 'qdt n ḥꜣt m ỉmnt',
+        'skills.uiux': 'sḫr n mꜣꜣ',
+        'skills.product': 'sḫr n ḫt',
+        'skills.threejs': 'sḫr n ḏt',
+        'skills.nodejs': 'ỉr n ḫt m dwꜣt',
+        'skills.devops': 'ḥmwt n wt',
+        'card.cta.try': 'ḥtp mꜣꜣ',
+        'card.cta.play': 'ḥb m dwꜣt',
+        'card.cta.ai': 'wḏꜥ-mdw Ḏḥwty',
+        'card.cta.eol': 'mꜣꜣ sš n ỉmꜣḫ',
+        'footer.tagline': 'gmḥ · qd · rwḏ — ỉnpw ḥr sꜣ.k.',
+        'footer.email': '✉️ sẖꜣw n bꜣ',
+        'footer.github': '🐙 pr-mḏꜣt n wsỉr',
+        'footer.website': '🌐 pr-ḥr m ẖrt-nṯr',
+        'footer.copyright': '© 2025-2026 RuanRuan · sꜣ ỉnpw',
+        'footer.year': '✨ ỉb.k m mḫꜣt · qd ḏt ✨',
+        '3d.btn': 'mꜣꜣ twt n ḏt',
+        '3d.loading': '𓃣 wt twt n rnpt...',
+        '3d.hint': '🖱 sṯꜣ n ỉnpw · pḥr r ꜥꜣ',
+        'island.wechat': 'tw.k m WeChat m dwꜣt',
+        'island.qq': 'tw.k m QQ m dwꜣt',
+        'modal.title': 'ꜥq n wt',
+        'modal.subtitle': 'ḏd rn n sštꜣ n ỉnpw',
+        'modal.cancel': 'ḫsf m dwꜣt',
+        'modal.confirm': 'wḏꜥ-mdw',
+        'modal.error': 'ỉb.k ḏꜣr m mḫꜣt, ỉr m kỉ sp~',
+        'quickMenu.title': 'sẖꜣw n ỉnpw',
+        'quick.feedback': 'sḏd-ỉb n wsỉr',
+        'quick.badge': 'ḥkꜣw n ỉnpw',
+        'quick.friendlink': 'mḥwt m dwꜣt'
+    },
+    eo: {
+        'a11y.skip': 'Salti al ĉefa enhavo',
+        'nav.home': 'Hejmo',
+        'nav.projects': 'Projektoj',
+        'nav.lab': 'Laboratorio',
+        'nav.about': 'Pri',
+        'lang.label': 'EO',
+        'ie.link': 'IE-kongrua versio',
+        'ie.subtitle': 'Kreemo ne ĉesas · Inspiro floras',
+        'hero.year': '✨ Kreemo ne ĉesas · Inspiro galopas',
+        'hero.title1': 'Malkovru la',
+        'hero.title2': 'Senfinajn eblojn de kodo',
+        'hero.desc': 'La cifereca nesto de RuanRuan — kunfandante kreemon, plejaltnivelan teknologion kaj dezajnan filozofion por konstrui varmajn ilojn kaj arton.',
+        'hero.greeting': 'Restu scivolema · Ĉiam solvu problemojn elegante',
+        'hero.cta1': 'Esplori projektojn',
+        'hero.cta2': 'GitHub Galaksio',
+        'projects.title': 'Elektitaj verkoj',
+        'projects.subtitle': 'Animo en ĉiu linio de kodo',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ Krea Laboratorio',
+        'lab.subtitle': 'Prototipo · Transiro · Estonteco',
+        'lab.ai': 'AI-helpata dezajno',
+        'lab.ai.desc': 'Esplorado de genera UI.',
+        'lab.proto': 'Interagaj prototipoj',
+        'lab.proto.desc': 'Altnivelaj mikro-animacioj.',
+        'lab.data': 'Datumvidigo',
+        'lab.data.desc': 'Dinamika rakontado.',
+        'about.title': 'Pri RuanRuan',
+        'about.p1': 'Fervorulo pri teknologio kaj dezajno, predikante ke simpleco estas potenco.',
+        'about.p2': 'Raccoon.Fit reprezentas inĝenieran estetikon de adaptiĝo, kreado kaj rompo de limoj.',
+        'about.p3': 'Restu scivolema · Ĉiam solvu problemojn elegante',
+        'about.cta': 'Persona paĝo',
+        'skills.title': 'Kernaj kompetentoj',
+        'skills.frontend': 'Frontenda arkitekturo',
+        'skills.uiux': 'UI/UX dezajno',
+        'skills.product': 'Produkta pensado',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Provu nun',
+        'card.cta.play': 'Ludu',
+        'card.cta.ai': 'Provu AI',
+        'card.cta.eol': 'Vidi ĉesigan avizon',
+        'footer.tagline': 'Esploru · Kreu · Kresku — Antaŭĝojas resonanci kun vi.',
+        'footer.email': '✉️ Retpoŝto',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Retejo',
+        'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Dezajna Filozofio',
+        'footer.year': '✨ Restu scivolema · Kreu eterne ✨',
+        '3d.btn': 'Vidi 3D-modelon',
+        '3d.loading': '🎊 Ŝarĝante novjaran modelon...',
+        '3d.hint': '🖱 Trenu por turni · Rulumu por zomi',
+        'island.wechat': 'Vi foliumas en WeChat',
+        'island.qq': 'Vi foliumas en QQ',
+        'modal.title': 'Programista kontrolo',
+        'modal.subtitle': 'Enigu sencimigan pasvorton',
+        'modal.cancel': 'Nuligi',
+        'modal.confirm': 'Konfirmi',
+        'modal.error': 'Malĝusta pasvorto, provu denove~',
+        'quickMenu.title': 'Rapida menuo',
+        'quick.feedback': 'Rekomendoj',
+        'quick.badge': 'Insignoj',
+        'quick.friendlink': 'Ligiloj'
+    },
+    ru: {
+        'a11y.skip': 'Перейти к содержимому',
+        'nav.home': 'Главная',
+        'nav.projects': 'Проекты',
+        'nav.lab': 'Лаб',
+        'nav.about': 'О себе',
+        'lang.label': 'RU',
+        'ie.link': 'IE-совместимая версия',
+        'ie.subtitle': 'Творчество не угасает · Вдохновение цветёт',
+        'hero.year': '✨ Творчество не угасает · Вдохновение мчится',
+        'hero.title1': 'Откройте безграничные',
+        'hero.title2': 'Возможности кода',
+        'hero.desc': 'Цифровое убежище RuanRuan — сплав творчества, передовых технологий и философии дизайна для создания тёплых инструментов и искусства.',
+        'hero.greeting': 'Будьте любопытны · Всегда решайте задачи элегантно',
+        'hero.cta1': 'Исследовать проекты',
+        'hero.cta2': 'GitHub Галактика',
+        'projects.title': 'Избранные работы',
+        'projects.subtitle': 'Мастерство в каждой строке кода',
+        'projects.year': 'ПОРТФОЛИО · 2026',
+        'lab.title': '✨ Творческая лаборатория',
+        'lab.subtitle': 'Прототип · Кроссовер · Будущее',
+        'lab.ai': 'AI-дизайн',
+        'lab.ai.desc': 'Исследование генеративного UI.',
+        'lab.proto': 'Интерактивные прототипы',
+        'lab.proto.desc': 'Продвинутые микро-анимации.',
+        'lab.data': 'Визуализация данных',
+        'lab.data.desc': 'Динамическое повествование.',
+        'about.title': 'О RuanRuan',
+        'about.p1': 'Фанатик технологий и дизайна, проповедующий, что простота — это сила.',
+        'about.p2': 'Raccoon.Fit воплощает эстетику инженерии: адаптация, созидание, разрушение границ.',
+        'about.p3': 'Будьте любопытны · Всегда решайте задачи элегантно',
+        'about.cta': 'Личная страница',
+        'skills.title': 'Ключевые компетенции',
+        'skills.frontend': 'Фронтенд-архитектура',
+        'skills.uiux': 'UI/UX дизайн',
+        'skills.product': 'Продуктовое мышление',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Попробовать',
+        'card.cta.play': 'Играть',
+        'card.cta.ai': 'Попробовать AI',
+        'card.cta.eol': 'Уведомление о закрытии',
+        'footer.tagline': 'Исследуй · Создавай · Расти — Ждём отклика.',
+        'footer.email': '✉️ Почта',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Сайт',
+        'footer.copyright': '© 2025-2026 RuanRuan · Философия дизайна Raccoon',
+        'footer.year': '✨ Будьте любопытны · Творите вечно ✨',
+        '3d.btn': 'Посмотреть 3D модель',
+        '3d.loading': '🎊 Загрузка новогодней модели...',
+        '3d.hint': '🖱 Вращайте · Колесо для масштаба',
+        'island.wechat': 'Вы просматриваете в WeChat',
+        'island.qq': 'Вы просматриваете в QQ',
+        'modal.title': 'Проверка разработчика',
+        'modal.subtitle': 'Введите пароль отладки',
+        'modal.cancel': 'Отмена',
+        'modal.confirm': 'Подтвердить',
+        'modal.error': 'Неверный пароль, попробуйте ещё раз~',
+        'quickMenu.title': 'Быстрое меню',
+        'quick.feedback': 'Отзыв',
+        'quick.badge': 'Значки',
+        'quick.friendlink': 'Ссылки'
+    },
+    tok: { 'a11y.skip': "tawa tomo sona", 'nav.home': "tomo", 'nav.projects': "pali", 'nav.lab': "tomo pali", 'nav.about': "jan", 'lang.label': "toki", 'ie.link': "nasin sin", 'ie.subtitle': "o lukin kepeken ilo sin", 'hero.year': "sike suno sin", 'hero.title1': "o pali e", 'hero.title2': "ijo sin ale", 'hero.desc': "tomo pi jan RuanRuan — wan e sona, e nasin pali, e nasin lukin tawa pali e ilo pona e ijo pona.", 'hero.greeting': "o awen wile sona · o pona e ale", 'hero.cta1': "o lukin e pali", 'hero.cta2': "tomo sona GitHub", 'projects.title': "pali pona", 'projects.subtitle': "kon lon lipu ale", 'projects.year': "lipu pali · 2026", 'lab.title': "tomo pali sin", 'lab.subtitle': "open · kama · tenpo kama", 'lab.ai': "ilo sona", 'lab.ai.desc': "lukin e nasin lukin kama.", 'lab.proto': "pali lili", 'lab.proto.desc': "tawa lili pona.", 'lab.data': "sitelen sona", 'lab.data.desc': "toki kepeken tawa.", 'about.title': "jan RuanRuan", 'about.p1': "jan pi sona pali en nasin lukin, 'lili li wawa'.", 'about.p2': "Raccoon.Fit li nasin pali pona pi kama, pali, pakala e poka.", 'about.p3': "o awen wile sona · o pona e ale", 'about.cta': "lipu jan", 'skills.title': "sona wawa", 'skills.frontend': "nasin sinpin", 'skills.uiux': "nasin lukin pona", 'skills.product': "nasin pali", 'skills.threejs': "ilo 3D", 'skills.nodejs': "ilo lawa", 'skills.devops': "pali ilo", 'card.cta.try': "o lukin", 'card.cta.play': "o musi", 'card.cta.ai': "o sona", 'card.cta.eol': "lukin e lipu pini", 'footer.tagline': "alasa · pali · kama suli — awen e sina.", 'footer.email': "lipu tawa", 'footer.github': "tomo lipu suli", 'footer.website': "lipu", 'footer.copyright': "© 2025-2026 jan RuanRuan · nasin pi jan Raccoon", 'footer.year': "o awen wile sona · o pali lon tenpo ale", '3d.btn': "lukin e sijelo 3D", '3d.loading': "kama jo e sijelo sin...", '3d.hint': "o tawa e ilo · o sike lili", 'island.wechat': "sina lon WeChat", 'island.qq': "sina lon QQ", 'modal.title': "sona jan pali", 'modal.subtitle': "o pana e nimi wawa", 'modal.cancel': "o pini", 'modal.confirm': "o lon", 'modal.error': "nimi pakala, o sin~", 'quickMenu.title': "nasin wawa", 'quick.feedback': "toki sin", 'quick.badge': "sitelen pona", 'quick.friendlink': "jan pona" },
+    jbo: { 'a11y.skip': ".i ko ba'orgau lo se cusku", 'nav.home': "zdani", 'nav.projects': "se gunka", 'nav.lab': "cikre dinju", 'nav.about': "mi", 'lang.label': "bau", 'ie.link': "cabna samtcise'u", 'ie.subtitle': ".i ko catlu fi'o se pilno lo cabna samtcise'u", 'hero.year': ".i lo cabna nanca", 'hero.title1': "facki lo ka ce'u", 'hero.title2': "se cimni be lo samselpla", 'hero.desc': ".i lo zdani be la RuanRuan — ku'i lo ka finti je lo ka satci je lo ka pijyske cu jorne lo nu zbasu lo glare tutci je lo larcu.", 'hero.greeting': ".i ko curmi lo ka kucli .i ko ro roi gasnu lo ka xamgu", 'hero.cta1': "catlu lo se gunka", 'hero.cta2': "GitHub tarci bo girzu", 'projects.title': "se cuxna se gunka", 'projects.subtitle': ".i ro linji be lo samselpla cu ralju", 'projects.year': "se gunka liste · 2026", 'lab.title': ".i finti cikre dinju", 'lab.subtitle': "fapro · runta · balvi", 'lab.ai': "rutni menli sidbo", 'lab.ai.desc': "smuci lo ka finti lo vidni.", 'lab.proto': "cunso jorne", 'lab.proto.desc': "banli mikri muvgau.", 'lab.data': "datni vidni", 'lab.data.desc': "runta lisri.", 'about.title': "la RuanRuan", 'about.p1': ".i ko'a se sinma lo skami je lo dizyjd .i ko'a krici lo du'u lo sampu cu tsali.", 'about.p2': ".i la Raccoon.Fit cu se smuni lo dizyjd bo ka cmavyma'i je ka finti je ka gasnu lo nu lo jimte cu na fanta.", 'about.p3': ".i ko curmi lo ka kucli .i ko ro roi gasnu lo ka xamgu", 'about.cta': "se zdani papri", 'skills.title': "ralseljibri", 'skills.frontend': "crane dinju larcyzbe", 'skills.uiux': "UI/UX dizyjd", 'skills.product': "pruce sidbo", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "troci", 'card.cta.play': "kelci", 'card.cta.ai': "troci lo rutni menli", 'card.cta.eol': "catlu lo se tcita be lo nu sisti", 'footer.tagline': "sisku · finti · banro — mi pacna lo nu do se cinri.", 'footer.email': "samymri", 'footer.github': "gitcau be lo sampla", 'footer.website': "judri", 'footer.copyright': "© 2025-2026 la RuanRuan · la Raccoon dizyjd pijyske", 'footer.year': ".i ko curmi lo ka kucli .i ko finti ze'a lo temci", '3d.btn': "catlu lo 3D tarmi", '3d.loading': "samymri lo 3D tarmi...", '3d.hint': "jenca lo nu carna · bidju lo nu zgana", 'island.wechat': ".i do ca catlu fi'o se pilno la WeChat", 'island.qq': ".i do ca catlu fi'o se pilno la QQ", 'modal.title': "samgi'e cipra", 'modal.subtitle': "cusku lo ciksi vlacku", 'modal.cancel': "sisti", 'modal.confirm': "birti", 'modal.error': ".i lo vlacku cu srera .i ko troci ri'ufa~", 'quickMenu.title': "sutra liste", 'quick.feedback': "xruti", 'quick.badge': "sinma", 'quick.friendlink': "pendo" },
+    tlh: { 'a11y.skip': 'naDev yIqIm', 'nav.home': 'juH', 'nav.projects': 'Qu\'mey', 'nav.lab': 'yaH', 'nav.about': 'jIHvaD', 'lang.label': 'TLH', 'ie.link': "IE-muv QaQ", 'ie.subtitle': "QaQbe' 'ach Qapla'!", 'hero.year': "DIS chu' · yIghoSDo'!", 'hero.title1': 'De\'wI\' rur', 'hero.title2': "Hoch'e' yIlegh", 'hero.desc': "RuanRuan juH'e' — De'wI' Sov je 'ej chenmoHwI' tIgh je mIwvam'e'.", 'hero.greeting': 'bIval · reH bIQaplaH!', 'hero.cta1': "Qu'mey yIlegh", 'hero.cta2': "GitHub qa''a'", 'projects.title': "Qu'mey'e' wIvlu'", 'projects.subtitle': "Qu'mey'e' bIvalbej", 'projects.year': "Qu' · 2026", 'lab.title': 'yaHwIj', 'lab.subtitle': "chen · 'oH · pIq", 'lab.ai': 'De\'wI\' Sov', 'lab.ai.desc': "chenmoHwI' ghot.", 'lab.proto': "mutlhwI' ghot", 'lab.proto.desc': "Qapla' mIw.", 'lab.data': "De' 'angwI'", 'lab.data.desc': "qechmey'e' lut.", 'about.title': 'RuanRuan jIH', 'about.p1': "De'wI' Sov je vIHar, 'IHbe'chugh vaj Qapla'be'.", 'about.p2': "Raccoon.Fit 'oHlaw' Hoch, chenmoH, je 'ej law' tlhoy.", 'about.p3': 'bIval · reH bIQaplaH!', 'about.cta': "jIH ghom", 'skills.title': 'pIn', 'skills.frontend': "DungDaq Duj", 'skills.uiux': "leghmeH 'IH", 'skills.product': "chenmoHmeH qech", 'skills.threejs': "wejlogh nagh", 'skills.nodejs': "De'wI' Qu'", 'skills.devops': "Qu' chenmoHwI'", 'card.cta.try': "yIlegh'egh", 'card.cta.play': "yIQuj", 'card.cta.ai': "De'wI' Sov yIlegh", 'card.cta.eol': "mev 'e' yIlegh", 'footer.tagline': "legh · chenmoH · tInmoH — bIQaplaHjaj.", 'footer.email': "QIn 'angwI'", 'footer.github': "ghom'a'", 'footer.website': "juH 'angwI'", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon QIch", 'footer.year': "bIval · reH yIchenmoH!", '3d.btn': "wejlogh yIlegh", '3d.loading': "wejlogh vIchenmoH...", '3d.hint': "yI'uch 'ej yIghang · yIghangQo'", 'island.wechat': "WeChat qaStaHvIS bIlegh'egh", 'island.qq': "QQ qaStaHvIS bIlegh'egh", 'modal.title': "chenmoHwI' chov", 'modal.subtitle': "pegh mu' yItu'", 'modal.cancel': "yImev", 'modal.confirm': "HIja'", 'modal.error': "pegh mu' Qagh, yInIDqa'~", 'quickMenu.title': "ghuHwI' Hov", 'quick.feedback': 'Hoy\'', 'quick.badge': "Qapla' mIw", 'quick.friendlink': "juppu' wIlo'" },
+    qya: { 'a11y.skip': 'Á lesta i quetta', 'nav.home': 'Már', 'nav.projects': 'Cardar', 'nav.lab': 'Sangië', 'nav.about': 'Inyë', 'lang.label': 'QY', 'ie.link': "IE-yúyo nómë", 'ie.subtitle': "Órenya ú pusta · Alcarinqua", 'hero.year': "Loa · Alcarinqua", 'hero.title1': "Á cenë i", 'hero.title2': "Únótimë cardar", 'hero.desc': "Sini RuanRuanva mar — órenyava, laitë yaivë ar sanaweva, care vórima úcarë ar alyala lindalë.", 'hero.greeting': "Á manya i órelya · Illumë finda", 'hero.cta1': "Á tulya i cardassen", 'hero.cta2': "GitHub yénórë", 'projects.title': "Alcarinquë cardar", 'projects.subtitle': "Írima quetta cardanna", 'projects.year': "Quentelë · 2026", 'lab.title': "Sangië", 'lab.subtitle': "Esta · Tencia · Apa", 'lab.ai': "Valaróma Sáma", 'lab.ai.desc': "Onna cenwa yestanna.", 'lab.proto': "Tengwacardar", 'lab.proto.desc': "Arata vaháya.", 'lab.data': "Istarë", 'lab.data.desc': "Lintië quenta.", 'about.title': "RuanRuan", 'about.p1': "Lómëasta yaivesse ar cáravesse, savin 'i pitya ná i túre'.", 'about.p2': "Raccoon.Fit tencala turyanwa, caranwa, ar pusta tyelpeva, arta estelë.", 'about.p3': "Á manya i órelya · Illumë finda", 'about.cta': "Ilyë quetta inyen", 'skills.title': "Túriontari", 'skills.frontend': "Cendelë carma", 'skills.uiux': "UI/UX tévië", 'skills.product': "Carma sanya", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Á yesta", 'card.cta.play': "Á tyalë", 'card.cta.ai': "Á cenë i Sáma", 'card.cta.eol': "Á cenë i hehtanna", 'footer.tagline': "Tulya · Carya · Lanya — Estelyë lélinwa.", 'footer.email': "Tengwa", 'footer.github': "Parmalambë", 'footer.website': "Nómion", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Sanawe", 'footer.year': "Á manya i órelya · Oiale carya", '3d.btn': "Á cenë i 3D cáma", '3d.loading': "Laitë loa cáma tulëa...", '3d.hint': "Á nirë ar pus · Á nicë tanna", 'island.wechat': "WeChat-ssë elyë", 'island.qq': "QQ-ssë elyë", 'modal.title': "Táranya estelë", 'modal.subtitle': "Á tencë i hún", 'modal.cancel': "Áva", 'modal.confirm': "Nai", 'modal.error': "Hún raicë, á enyala~", 'quickMenu.title': "Lintië mentië", 'quick.feedback': "Quentien", 'quick.badge': "Túrion tani", 'quick.friendlink': "Meldonya" },
+    dot: { 'a11y.skip': 'Ethe athvilajerar', 'nav.home': 'Rhaesh', 'nav.projects': 'Tikh', 'nav.lab': 'Vaes Athvillar', 'nav.about': 'Anha', 'lang.label': 'DT', 'ie.link': "IE athhrazhakar", 'ie.subtitle': "Athvillar vos akko · Qoy qoyi", 'hero.year': "Athvillar vos akko · Hrazef anni", 'hero.title1': "Achrakh h'anhaan", 'hero.title2': "Voj qisi tikh", 'hero.desc': "Rhaesh RuanRuan — athvilajerar mae, athvillar ma zhor, ma qisi tikh ma drivoe k'athjilari.", 'hero.greeting': "Azzhok ven · Akka k'athvillar", 'hero.cta1': "Achrakh tikh", 'hero.cta2': "GitHub Khalasar", 'projects.title': "Tikh Zhilake", 'projects.subtitle': "Qoy anna vekha tikh", 'projects.year': "Tikh Vichomer · 2026", 'lab.title': "Vaes Athvillar", 'lab.subtitle': "At · Sajo · Rhel", 'lab.ai': "Ma Athvillar Zhavvorsa", 'lab.ai.desc': "Tikh qisi ma athvillar.", 'lab.proto': "Tikh Mori", 'lab.proto.desc': "Ma zhor assokh.", 'lab.data': "Assokh Vojjor", 'lab.data.desc': "Rhel ma hrazefoon.", 'about.title': "Hash RuanRuan", 'about.p1': "Mori assokh ma athvillar, anha azhok 'vezh akka qisi'.", 'about.p2': "Raccoon.Fit ma qisi rhel, at, ma drivo k'athvilajerari.", 'about.p3': "Azzhok ven · Akka k'athvillar", 'about.cta': "Vojjor Anha", 'skills.title': "Qisi Mori", 'skills.frontend': "Ostir Vojjor", 'skills.uiux': "UI/UX Jif", 'skills.product': "Tikh Qisi", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Ethe", 'card.cta.play': "Ajjalan", 'card.cta.ai': "Char Ma Athvillar", 'card.cta.eol': "Vichomer Voj Rhel", 'footer.tagline': "Achrakh · At · Jadat — Anha azhok mae.", 'footer.email': "Voj Qisi", 'footer.github': "Khalasar Vojjor", 'footer.website': "Rhaesh Vojjor", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Tikh Qisi", 'footer.year': "Azzhok ven · Akka at!", '3d.btn': "Voj 3D Tikh", '3d.loading': "Jadat 3D anni...", '3d.hint': "Fonas che · Gradakh", 'island.wechat': "WeChat asshekhqoyi", 'island.qq': "QQ asshekhqoyi", 'modal.title': "Athvillar Voj Qisi", 'modal.subtitle': "Ast Voj Hrazef", 'modal.cancel': "Vos", 'modal.confirm': "Sek", 'modal.error': "Hrazef qoy, fonas che~", 'quickMenu.title': "Voj Qisi Sorf", 'quick.feedback': "Astilat", 'quick.badge': "Qisi Voj", 'quick.friendlink': "Yalli" },
+    nvi: { 'a11y.skip': 'Ftang tsayvur', 'nav.home': 'Kelku', 'nav.projects': 'Tìkangkem', 'nav.lab': 'Tsray Sìlpey', 'nav.about': 'Oeri', 'lang.label': "Lì'fya", 'ie.link': "IE-fya'o a'ewan", 'ie.subtitle': "Tìrusol nìltsan · Tìrey lefpom", 'hero.year': "Zìsìt Amip · Ayoe zera'u!", 'hero.title1': "Rutxe tse'a", 'hero.title2': "Ayut alor", 'hero.desc': "Kelku RuanRuanä — tìrey, sìlronsem sì tìhawl, ngop ayuti lefpom sì rel arusikx.", 'hero.greeting': "Nume nulnew · Tìkangkem sivi nìltsan", 'hero.cta1': "Tìkangkemìri tse'a", 'hero.cta2': "GitHub Tsawke", 'projects.title': "Tìkangkem Apxa", 'projects.subtitle': "Tirea hu frael pukpxi", 'projects.year': "Tìkangkemvi · 2026", 'lab.title': "Tsray Sìlpey", 'lab.subtitle': "Sngum · 'Awsiteng · Zusawkrr", 'lab.ai': "Ronsrelngop Aytìkangkem", 'lab.ai.desc': "Nga'prrte' rel a'ewan.", 'lab.proto': "Tìngop Apxa", 'lab.proto.desc': "Tì'efu atxan.", 'lab.data': "Ayfamrel", 'lab.data.desc': "Vur lehrrap.", 'about.title': "Teri RuanRuan", 'about.p1': "Lu poru tìnew sì tìtstunwi, 'lìng lu txur'.", 'about.p2': "Raccoon.Fit lu tìhawl ayoengä, ngop, 'ia tìftxavang.", 'about.p3': "Nume nulnew · Tìkangkem sivi nìltsan", 'about.cta': "Teri oe", 'skills.title': "Tìtxula Txo", 'skills.frontend': "Ftxey Tìhawl", 'skills.uiux': "UI/UX Ngop", 'skills.product': "Tìkangkem Tìhawl", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Tìngop", 'card.cta.play': "Uvan", 'card.cta.ai': "Tìngop Ronsrelngop", 'card.cta.eol': "Tse'a Stum", 'footer.tagline': "Tse'a · Ngop · Tsawl slu — Sìlpey tsnì nga new.", 'footer.email': "Pamrel", 'footer.github': "Fìtsengmì Tstu", 'footer.website': "Fìtsenge", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Tìhawl", 'footer.year': "Nume nulnew · Ngop nìtut!", '3d.btn': "Tse'a 3D Rel", '3d.loading': "Zong 3D...", '3d.hint': "'Ärìp · 'Awve tse'a", 'island.wechat': "WeChat lu nga", 'island.qq': "QQ lu nga", 'modal.title': "Tsamsiyu Tìfyawìntxu", 'modal.subtitle': "Pänutìng lì'u", 'modal.cancel': "Kehe", 'modal.confirm': "Srane", 'modal.error': "Lì'u keye'ung, nga' nìmun~", 'quickMenu.title': "Win Ftxey", 'quick.feedback': "Tìpawm", 'quick.badge': "Tìfnu", 'quick.friendlink': "'Eylan" },
+    eu: { 'a11y.skip': 'Saltatu edukira', 'nav.home': 'Hasiera', 'nav.projects': 'Proiektuak', 'nav.lab': 'Laborategia', 'nav.about': 'Niri buruz', 'lang.label': 'Hizkuntza', 'ie.link': "Internet Explorer bertsioa", 'ie.subtitle': "Arakatzaile zaharrago bat erabiltzen ari zara", 'hero.year': 'Urtea', 'hero.title1': 'Sortzailea', 'hero.title2': 'Garatzailea', 'hero.desc': 'Esperientzia digitalak diseinatzen eta eraikitzen ditut', 'hero.greeting': 'Kaixo', 'hero.cta1': 'Nire lana ikusi', 'hero.cta2': 'Harremanetan jarri', 'projects.title': 'Proiektuak', 'projects.subtitle': 'Nire azken lanak', 'projects.year': 'Urtea', 'lab.title': 'Laborategia', 'lab.subtitle': 'Esperimentuak eta prototipoak', 'lab.ai': 'Adimen Artifiziala', 'lab.ai.desc': 'AA bidezko esperientzia interaktiboak', 'lab.proto': 'Prototipoak', 'lab.proto.desc': 'Ideia berrien proba azkarrak', 'lab.data': 'Datuak', 'lab.data.desc': 'Datuen bistaratze eta analisia', 'about.title': 'Niri buruz', 'about.p1': 'Sormena eta teknologia uztartzen dituen garatzailea naiz', 'about.p2': 'Erabiltzaile esperientzia aberatsak sortzea dut helburu', 'about.p3': 'Web teknologia modernoekin lan egiten dut', 'about.cta': 'Gehiago jakin', 'skills.title': 'Trebetasunak', 'skills.frontend': 'Frontend garapena', 'skills.uiux': 'UI/UX diseinua', 'skills.product': 'Produktu kudeaketa', 'skills.threejs': 'Three.js', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Probatu', 'card.cta.play': 'Jolastu', 'card.cta.ai': 'AA probatu', 'card.cta.eol': 'Amaituta', 'footer.tagline': 'Ideiak errealitate bihurtzen', 'footer.email': 'Posta elektronikoa', 'footer.github': 'GitHub', 'footer.website': 'Webgunea', 'footer.copyright': 'Eskubide guztiak erreserbatuta', 'footer.year': 'Urtea', '3d.btn': '3D ikusi', '3d.loading': 'Kargatzen...', '3d.hint': 'Egin klik interakzionatzeko', 'island.wechat': 'WeChat', 'island.qq': 'QQ', 'modal.title': 'Oharra', 'modal.subtitle': 'Ziur zaude?', 'modal.cancel': 'Utzi', 'modal.confirm': 'Berretsi', 'modal.error': 'Errorea gertatu da', 'quickMenu.title': 'Menu azkarra', 'quick.feedback': 'Iritzia', 'quick.badge': 'Bereizgarria',         'quick.friendlink': 'Loturak'
+    },
+    cy: { 'a11y.skip': "Neidio i'r cynnwys", 'nav.home': 'Hafan', 'nav.projects': 'Prosiectau', 'nav.lab': 'Labordy', 'nav.about': 'Amdanaf', 'lang.label': 'Iaith', 'ie.link': "Fersiwn Internet Explorer", 'ie.subtitle': "Rydych yn defnyddio porwr hŷn", 'hero.year': 'Blwyddyn', 'hero.title1': 'Crëwr', 'hero.title2': 'Datblygwr', 'hero.desc': "Dylunio ac adeiladu profiadau digidol — cyfuno creadigrwydd, technoleg flaengar a dylunio i adeiladu offer a chelf gynnes.", 'hero.greeting': 'Arhoswch yn chwilfrydig · Datryswch broblemau\'n gain bob amser', 'hero.cta1': 'Archwilio prosiectau', 'hero.cta2': 'Galaeth GitHub', 'projects.title': 'Gwaith Dethol', 'projects.subtitle': 'Enaid ym mhob llinell o god', 'projects.year': 'PORTFFOLIO · 2026', 'lab.title': 'Lab Creadigol', 'lab.subtitle': 'Prototeip · Croesi · Dyfodol', 'lab.ai': 'Dylunio â Chymorth AI', 'lab.ai.desc': 'Archwilio UI cynhyrchiol.', 'lab.proto': 'Prototeipiau rhyngweithio', 'lab.proto.desc': 'Micro-animeiddiadau uwch.', 'lab.data': 'Delweddu data', 'lab.data.desc': 'Adrodd straeon deinamig.', 'about.title': 'Am RuanRuan', 'about.p1': 'Selog technoleg a dylunio, yn pregethu mai symlrwydd yw grym.', 'about.p2': 'Mae Raccoon.Fit yn cynrychioli estheteg beirianneg o addasu, creu a thorri ffiniau.', 'about.p3': 'Arhoswch yn chwilfrydig · Datryswch broblemau\'n gain bob amser', 'about.cta': 'Tudalen bersonol', 'skills.title': 'Cymwyseddau craidd', 'skills.frontend': 'Pensaernïaeth frontend', 'skills.uiux': 'Dylunio UI/UX', 'skills.product': 'Meddwl cynnyrch', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Rhoi cynnig', 'card.cta.play': 'Chwarae', 'card.cta.ai': 'Rhoi cynnig ar AI', 'card.cta.eol': 'Gweld hysbysiad dirwyn i ben', 'footer.tagline': 'Archwilio · Creu · Tyfu — Edrych ymlaen at atseinio gyda chi.', 'footer.email': 'E-bost', 'footer.github': 'GitHub', 'footer.website': 'Gwefan', 'footer.copyright': '© 2025-2026 RuanRuan · Athroniaeth Dylunio Raccoon', 'footer.year': 'Arhoswch yn chwilfrydig · Crewch am byth', '3d.btn': 'Gweld model 3D', '3d.loading': 'Llwytho model y flwyddyn newydd...', '3d.hint': 'Llusgwch i gylchdroi · Sgroliwch i chwyddo', 'island.wechat': 'Rydych yn pori yn WeChat', 'island.qq': 'Rydych yn pori yn QQ', 'modal.title': 'Dilysu datblygwr', 'modal.subtitle': 'Rhowch gyfrinair dadfygio', 'modal.cancel': 'Canslo', 'modal.confirm': 'Cadarnhau', 'modal.error': 'Cyfrinair anghywir, ceisiwch eto~', 'quickMenu.title': 'Dewislen gyflym', 'quick.feedback': 'Adborth', 'quick.badge': 'Bathodynnau', 'quick.friendlink': 'Dolenni' },
+    is: { 'a11y.skip': 'Fara beint í efni', 'nav.home': 'Heim', 'nav.projects': 'Verkefni', 'nav.lab': 'Tilraunastofa', 'nav.about': 'Um mig', 'lang.label': 'Tungumál', 'ie.link': "Internet Explorer útgáfa", 'ie.subtitle': 'Þú ert að nota eldri vafra', 'hero.year': 'Ár', 'hero.title1': 'Höfundur', 'hero.title2': 'Forritari', 'hero.desc': 'Stafrænt athvarf RuanRuan — samruni sköpunar, framúrskarandi tækni og hönnunarheimspeki.', 'hero.greeting': 'Vertu forvitinn · Leystu vandamál með glæsibrag', 'hero.cta1': 'Skoða verkefni', 'hero.cta2': 'GitHub Stjörnuþokan', 'projects.title': 'Valin verk', 'projects.subtitle': 'Sál í hverri línu kóða', 'projects.year': 'VERKEFNA SAFN · 2026', 'lab.title': 'Skapandi tilraunastofa', 'lab.subtitle': 'Frumgerð · Þverfaglegt · Framtíð', 'lab.ai': 'AI-aðstoðuð hönnun', 'lab.ai.desc': 'Könnun á generative UI.', 'lab.proto': 'Gagnvirkar frumgerðir', 'lab.proto.desc': 'Háþróuð ör-hreyfing.', 'lab.data': 'Gagnasýn', 'lab.data.desc': 'Kvik frásögn.', 'about.title': 'Um RuanRuan', 'about.p1': 'Ástríðufullur tækni- og hönnunarunnandi, boðar að einfaldleiki sé máttur.', 'about.p2': 'Raccoon.Fit táknar verkfræðilega fagurfræði aðlögunar, sköpunar og landamærabrots.', 'about.p3': 'Vertu forvitinn · Leystu vandamál með glæsibrag', 'about.cta': 'Persónuleg síða', 'skills.title': 'Kjarnahæfni', 'skills.frontend': 'Framendahönnun', 'skills.uiux': 'UI/UX hönnun', 'skills.product': 'Vöruhugsun', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Prófa', 'card.cta.play': 'Spila', 'card.cta.ai': 'Prófa AI', 'card.cta.eol': 'Sjá lokunartilkynningu', 'footer.tagline': 'Kanna · Skapa · Vaxa — Hlakka til að hljóma með þér.', 'footer.email': 'Tölvupóstur', 'footer.github': 'GitHub', 'footer.website': 'Vefsíða', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon hönnunarheimspeki', 'footer.year': 'Vertu forvitinn · Skapaðu að eilífu', '3d.btn': 'Skoða 3D líkan', '3d.loading': 'Hleður nýárs líkani...', '3d.hint': 'Dragðu til að snúa · Skrunaðu til að stækka', 'island.wechat': 'Þú ert að vafra í WeChat', 'island.qq': 'Þú ert að vafra í QQ', 'modal.title': 'Staðfesting þróunaraðila', 'modal.subtitle': 'Sláðu inn kembilykilorð', 'modal.cancel': 'Hætta við', 'modal.confirm': 'Staðfesta', 'modal.error': 'Rangt lykilorð, reyndu aftur~', 'quickMenu.title': 'Flýtivalmynd', 'quick.feedback': 'Endurgjöf', 'quick.badge': 'Merki', 'quick.friendlink': 'Tenglar' },
+    ca: { 'a11y.skip': 'Saltar al contingut', 'nav.home': 'Inici', 'nav.projects': 'Projectes', 'nav.lab': 'Laboratori', 'nav.about': 'Sobre mi', 'lang.label': 'Idioma', 'ie.link': "Versió Internet Explorer", 'ie.subtitle': "Esteu utilitzant un navegador antic", 'hero.year': 'Any', 'hero.title1': 'Creador', 'hero.title2': 'Desenvolupador', 'hero.desc': "Refugi digital de RuanRuan — fusionant creativitat, tecnologia puntera i filosofia de disseny per construir eines i art càlids.", 'hero.greeting': 'Mantingueu la curiositat · Resoleu problemes amb elegància', 'hero.cta1': 'Explorar projectes', 'hero.cta2': 'Galàxia GitHub', 'projects.title': 'Obres seleccionades', 'projects.subtitle': 'Ànima en cada línia de codi', 'projects.year': 'CARTERA · 2026', 'lab.title': 'Laboratori creatiu', 'lab.subtitle': 'Prototip · Creuament · Futur', 'lab.ai': 'Disseny assistit per IA', 'lab.ai.desc': "Exploració d'UI generativa.", 'lab.proto': 'Prototips interactius', 'lab.proto.desc': 'Micro-animacions avançades.', 'lab.data': 'Visualització de dades', 'lab.data.desc': 'Narració dinàmica.', 'about.title': 'Sobre RuanRuan', 'about.p1': 'Fanàtic de la tecnologia i el disseny, predicant que la simplicitat és poder.', 'about.p2': "Raccoon.Fit representa una estètica d'enginyeria d'adaptació, creació i ruptura de fronteres.", 'about.p3': 'Mantingueu la curiositat · Resoleu problemes amb elegància', 'about.cta': 'Pàgina personal', 'skills.title': 'Competències clau', 'skills.frontend': 'Arquitectura frontend', 'skills.uiux': 'Disseny UI/UX', 'skills.product': 'Pensament de producte', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Provar', 'card.cta.play': 'Jugar', 'card.cta.ai': 'Provar IA', 'card.cta.eol': "Veure avís de tancament", 'footer.tagline': 'Explorar · Crear · Créixer — Esperant ressonar amb tu.', 'footer.email': 'Correu electrònic', 'footer.github': 'GitHub', 'footer.website': 'Lloc web', 'footer.copyright': '© 2025-2026 RuanRuan · Filosofia de disseny Raccoon', 'footer.year': 'Mantingueu la curiositat · Creeu per sempre', '3d.btn': 'Veure model 3D', '3d.loading': "Carregant model d'any nou...", '3d.hint': 'Arrossegueu per girar · Roda per ampliar', 'island.wechat': 'Esteu navegant en WeChat', 'island.qq': 'Esteu navegant en QQ', 'modal.title': 'Verificació de desenvolupador', 'modal.subtitle': 'Introduïu la contrasenya de depuració', 'modal.cancel': 'Cancel·lar', 'modal.confirm': 'Confirmar', 'modal.error': 'Contrasenya incorrecta, torneu a provar~', 'quickMenu.title': 'Menú ràpid', 'quick.feedback': 'Comentaris', 'quick.badge': 'Insígnies', 'quick.friendlink': 'Enllaços' },
+    mt: { 'a11y.skip': 'Aqbeż għall-kontenut', 'nav.home': 'Dar', 'nav.projects': 'Proġetti', 'nav.lab': 'Laboratorju', 'nav.about': 'Dwar', 'lang.label': 'Lingwa', 'ie.link': "Verżjoni Internet Explorer", 'ie.subtitle': 'Qed tuża browser antik', 'hero.year': 'Sena', 'hero.title1': 'Kreatur', 'hero.title2': 'Żviluppatur', 'hero.desc': "Kenn diġitali ta' RuanRuan — tgħaqqad il-kreattività, it-teknoloġija avvanzata u l-filosofija tad-disinn biex tibni għodda u arti sħuna.", 'hero.greeting': 'Ibqa\' kurjuż · Dejjem issolvi l-problemi b\'mod eleganti', 'hero.cta1': 'Esplora proġetti', 'hero.cta2': 'Galassja GitHub', 'projects.title': 'Xogħlijiet magħżula', 'projects.subtitle': "Ruħ f'kull linja ta' kodiċi", 'projects.year': 'PORTFOLIO · 2026', 'lab.title': 'Laboratorju kreattiv', 'lab.subtitle': 'Prototip · Inkroċju · Futur', 'lab.ai': 'Disinn assistit mill-AI', 'lab.ai.desc': "Esplorazzjoni ta' UI ġenerattiva.", 'lab.proto': 'Prototipi interattivi', 'lab.proto.desc': 'Mikro-animazzjonijiet avvanzati.', 'lab.data': 'Viżwalizzazzjoni tad-data', 'lab.data.desc': 'Rakkont dinamiku.', 'about.title': 'Dwar RuanRuan', 'about.p1': 'Fanatiku tat-teknoloġija u d-disinn, jipprietka li s-sempliċità hija poter.', 'about.p2': "Raccoon.Fit tirrappreżenta estetika tal-inġinerija ta' adattament, ħolqien u tkissir tal-fruntieri.", 'about.p3': 'Ibqa\' kurjuż · Dejjem issolvi l-problemi b\'mod eleganti', 'about.cta': 'Paġna personali', 'skills.title': 'Kompetenzi ewlenin', 'skills.frontend': 'Arkitettura frontend', 'skills.uiux': 'Disinn UI/UX', 'skills.product': 'Ħsieb tal-prodott', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Ipprova', 'card.cta.play': 'Ilgħab', 'card.cta.ai': 'Ipprova AI', 'card.cta.eol': 'Ara avviż ta\' għeluq', 'footer.tagline': 'Esplora · Oħloq · Kabbar — Nistenna li nirresona miegħek.', 'footer.email': 'Email', 'footer.github': 'GitHub', 'footer.website': 'Sit web', 'footer.copyright': '© 2025-2026 RuanRuan · Filosofija tad-disinn Raccoon', 'footer.year': 'Ibqa\' kurjuż · Oħloq għal dejjem', '3d.btn': 'Ara mudell 3D', '3d.loading': "Tagħbija tal-mudell tas-sena l-ġdida...", '3d.hint': 'Iddreggja biex iddawwar · Skrollja biex iżżumja', 'island.wechat': 'Qed tibbrawżja f\'WeChat', 'island.qq': 'Qed tibbrawżja f\'QQ', 'modal.title': 'Verifika tal-iżviluppatur', 'modal.subtitle': 'Daħħal il-password tad-debugging', 'modal.cancel': 'Ikkanċella', 'modal.confirm': 'Ikkonferma', 'modal.error': 'Password ħażina, erġa\' pprova~', 'quickMenu.title': 'Menù rapidu', 'quick.feedback': 'Feedback', 'quick.badge': 'Badges', 'quick.friendlink': 'Ħoloq' },
+    fy: { 'a11y.skip': 'Nei ynhâld gean', 'nav.home': 'Thús', 'nav.projects': 'Projekten', 'nav.lab': 'Laboratoarium', 'nav.about': 'Oer my', 'lang.label': 'Taal', 'ie.link': "Internet Explorer ferzje", 'ie.subtitle': 'Jo brûke in âldere browser', 'hero.year': 'Jier', 'hero.title1': 'Makker', 'hero.title2': 'Untwikkeler', 'hero.desc': "Digitale ûnderkommen fan RuanRuan — gearfoegjen fan kreativiteit, nijsgjirrige technology en ûntwerpfilosofy om waarme ark en keunst te bouwen.", 'hero.greeting': 'Bliuw nijsgjirrich · Los problemen altyd elegant op', 'hero.cta1': 'Projekten ferkenne', 'hero.cta2': 'GitHub Galaxy', 'projects.title': 'Selektearre wurk', 'projects.subtitle': 'Siel yn elke rigel koade', 'projects.year': 'PORTEFEUILLE · 2026', 'lab.title': 'Kreatyf laboratoarium', 'lab.subtitle': 'Prototype · Krusing · Takomst', 'lab.ai': 'AI-stipe ûntwerp', 'lab.ai.desc': 'Ferkenning fan generative UI.', 'lab.proto': 'Ynteraktive prototypen', 'lab.proto.desc': 'Avansearre mikro-animaasjes.', 'lab.data': 'Datafisualisaasje', 'lab.data.desc': 'Dynamyske fertelling.', 'about.title': 'Oer RuanRuan', 'about.p1': 'Fanaat fan technology en ûntwerp, preket dat ienfâld krêft is.', 'about.p2': 'Raccoon.Fit fertsjintwurdiget in technyske estetyk fan oanpassing, skepping en grinzen trochbrekke.', 'about.p3': 'Bliuw nijsgjirrich · Los problemen altyd elegant op', 'about.cta': 'Persoanlike side', 'skills.title': 'Kearnkompetinsjes', 'skills.frontend': 'Frontend-arsjitektuer', 'skills.uiux': 'UI/UX ûntwerp', 'skills.product': 'Produkt tinken', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Besykje', 'card.cta.play': 'Spylje', 'card.cta.ai': 'AI besykje', 'card.cta.eol': 'Besjoch stopsetten meidieling', 'footer.tagline': 'Ferkenne · Skeppe · Groeie — Sjoch út nei resoneearje mei dy.', 'footer.email': 'E-mail', 'footer.github': 'GitHub', 'footer.website': 'Webside', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon ûntwerpfilosofy', 'footer.year': 'Bliuw nijsgjirrich · Skeppe foar altyd', '3d.btn': 'Besjoch 3D-model', '3d.loading': 'Nijjiersmodel laden...', '3d.hint': 'Sleep om te draaien · Skowe om yn te zoomen', 'island.wechat': 'Jo blêdzje yn WeChat', 'island.qq': 'Jo blêdzje yn QQ', 'modal.title': 'Untwikkelderferifikaasje', 'modal.subtitle': 'Fier debugwachtwurd yn', 'modal.cancel': 'Annulearje', 'modal.confirm': 'Befêstigje', 'modal.error': 'Ferkeard wachtwurd, besykje nochris~', 'quickMenu.title': 'Fluchmenu', 'quick.feedback': 'Weromkeppeling', 'quick.badge': 'Badges', 'quick.friendlink': 'Keppelingen' },
+    lb: { 'a11y.skip': 'Zum Inhalt sprangen', 'nav.home': 'Heem', 'nav.projects': 'Projeten', 'nav.lab': 'Laboratoire', 'nav.about': 'Iwwert mech', 'lang.label': 'Sprooch', 'ie.link': "Internet Explorer Versioun", 'ie.subtitle': 'Dir benotzt en eelere Browser', 'hero.year': 'Joer', 'hero.title1': 'Creatrice', 'hero.title2': 'Entwéckler', 'hero.desc': "Digitalt Doheem vum RuanRuan — fusionéiert Kreativitéit, modernste Technologie an Designphilosophie fir waarm Geschier a Konscht ze bauen.", 'hero.greeting': 'Bleiwt virwëtzeg · Léist Problemer ëmmer elegant', 'hero.cta1': 'Projeten entdecken', 'hero.cta2': 'GitHub Galaxis', 'projects.title': 'Ausgewielt Wierker', 'projects.subtitle': 'Séil an all Zeil Code', 'projects.year': 'PORTFOLIO · 2026', 'lab.title': 'Kreativlaboratoire', 'lab.subtitle': 'Prototyp · Crossover · Zukunft', 'lab.ai': 'AI-ënnerstëtzt Design', 'lab.ai.desc': 'Generativ UI Exploratioun.', 'lab.proto': 'Interaktiv Prototyppen', 'lab.proto.desc': 'Fortgeschratt Mikro-Animatiounen.', 'lab.data': 'Datenvisualiséierung', 'lab.data.desc': 'Dynamesch Erzielung.', 'about.title': 'Iwwert RuanRuan', 'about.p1': "Fanatiker vun Technologie an Design, priedegt datt Einfachheet Kraaft ass.", 'about.p2': "Raccoon.Fit representéiert eng Ingenieursesthetik vun Adaptatioun, Kreatioun an Iwwerschreidung vu Grenzen.", 'about.p3': 'Bleiwt virwëtzeg · Léist Problemer ëmmer elegant', 'about.cta': 'Perséinlech Säit', 'skills.title': 'Kärkompetenzen', 'skills.frontend': 'Frontend-Architektur', 'skills.uiux': 'UI/UX Design', 'skills.product': 'Produktdenken', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Probéieren', 'card.cta.play': 'Spillen', 'card.cta.ai': 'AI probéieren', 'card.cta.eol': 'Astellungen ukucken', 'footer.tagline': 'Entdecken · Kreéieren · Wuessen — Freeë mech mat dir ze resonéieren.', 'footer.email': 'E-Mail', 'footer.github': 'GitHub', 'footer.website': 'Websäit', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Designphilosophie', 'footer.year': 'Bleiwt virwëtzeg · Kreéiert fir ëmmer', '3d.btn': '3D-Modell ukucken', '3d.loading': 'Neijoersmodell lued...', '3d.hint': 'Zéien fir ze dréinen · Scrollen fir ze zoomen', 'island.wechat': 'Dir surft am WeChat', 'island.qq': 'Dir surft am QQ', 'modal.title': 'Entwécklerverifizéierung', 'modal.subtitle': "Debug-Passwuert aginn", 'modal.cancel': 'Ofbriechen', 'modal.confirm': 'Bestätegen', 'modal.error': 'Falscht Passwuert, probéiert nach eng Kéier~', 'quickMenu.title': 'Schnellmenü', 'quick.feedback': 'Feedback', 'quick.badge': 'Badges', 'quick.friendlink': 'Linken' },
+    haw: { 'a11y.skip': 'Lele i ka maʻiʻo', 'nav.home': 'Kahua', 'nav.projects': 'Nā Papahana', 'nav.lab': "Keʻena Hoʻāʻo", 'nav.about': 'E Pili Ana', 'lang.label': 'ʻŌlelo', 'ie.link': 'Polokalamu Kahiko', 'ie.subtitle': "ʻAʻole kākoʻo ʻia kēia polokalamu kele pūnaewele", 'hero.year': 'Makahiki', 'hero.title1': 'Aloha, ʻo wau nō', 'hero.title2': 'Mea Hoʻomohala Pūnaewele', 'hero.desc': "Ka hale kikohoʻe o RuanRuan — hoʻohui i ka noʻonoʻo, ʻenehana hou, a me ke akeakamai hoʻolālā e kūkulu i nā mea hana a me ke akamai mehana.", 'hero.greeting': 'E hoʻomau i ka ʻimi naʻauao · E hoʻoponopono mau i nā pilikia me ka nani', 'hero.cta1': 'E ʻimi i nā papahana', 'hero.cta2': 'Galaxy GitHub', 'projects.title': 'Nā Hana i Koho ʻia', 'projects.subtitle': 'He ʻuhane i kēlā me kēia laina', 'projects.year': 'WAIHONA · 2026', 'lab.title': 'Keʻena Hoʻomohala', 'lab.subtitle': 'Papahana · Kekele · Wā e hiki mai ana', 'lab.ai': 'Hoʻolālā kōkua AI', 'lab.ai.desc': 'Ka ʻimi ʻana i ka UI hana.', 'lab.proto': 'Nā Papahana Hoʻāʻo', 'lab.proto.desc': 'Nā micro-animation kiʻekiʻe.', 'lab.data': 'Hōʻike ʻIkepili', 'lab.data.desc': 'Ka moʻolelo ikaika.', 'about.title': 'E pili ana iā RuanRuan', 'about.p1': 'He kanaka hoihoi i ka ʻenehana a me ka hoʻolālā, e haʻi ana he mana ka maʻalahi.', 'about.p2': "Hōʻike ʻo Raccoon.Fit i kahi ʻano ʻenehana o ka hoʻololi, hana, a me ka uhaki palena.", 'about.p3': 'E hoʻomau i ka ʻimi naʻauao · E hoʻoponopono mau i nā pilikia me ka nani', 'about.cta': 'Ka ʻaoʻao pilikino', 'skills.title': 'Nā mākau koʻikoʻi', 'skills.frontend': 'Hoʻolālā Frontend', 'skills.uiux': 'Hoʻolālā UI/UX', 'skills.product': 'Noʻonoʻo huahana', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'E hoʻāʻo', 'card.cta.play': 'E pāʻani', 'card.cta.ai': 'E hoʻāʻo i ka AI', 'card.cta.eol': 'E nānā i ka leka hoʻopau', 'footer.tagline': 'E ʻimi · E hana · E ulu — Ke kali nei i ka launa pū.', 'footer.email': 'Leka uila', 'footer.github': 'GitHub', 'footer.website': 'Pūnaewele', 'footer.copyright': '© 2025-2026 RuanRuan · Akeakamai Hoʻolālā Raccoon', 'footer.year': 'E hoʻomau i ka ʻimi naʻauao · E hana mau loa', '3d.btn': 'E nānā i ke kŘkohu 3D', '3d.loading': 'Ke hoʻouka nei i ke kŘkohu makahiki hou...', '3d.hint': 'E kauō no ka hoʻololi · E ʻolokaʻa no ka hoʻonui', 'island.wechat': 'Ke mākaʻikaʻi nei ʻoe ma WeChat', 'island.qq': 'Ke mākaʻikaʻi nei ʻoe ma QQ', 'modal.title': 'Hōʻoia Mea Hoʻomohala', 'modal.subtitle': 'E hoʻokomo i ka ʻōlelo huna debug', 'modal.cancel': 'Hoʻopau', 'modal.confirm': 'Hōʻoia', 'modal.error': 'Hewa ka ʻōlelo huna, e hoʻāʻo hou~', 'quickMenu.title': 'Papa kuhikuhi wikiwiki', 'quick.feedback': 'Manaʻo', 'quick.badge': 'Nā hōʻailona', 'quick.friendlink': 'Nā loulou' },
+    nv: { 'a11y.skip': "Baa ńdiitʼááh", 'nav.home': 'Hooghan', 'nav.projects': 'Naashnish', 'nav.lab': 'Naalkaah Bá Hooghan', 'nav.about': "Baa Haneʼ", 'lang.label': 'Saad', 'ie.link': 'Saad Bee Azééh', 'ie.subtitle': "Díí saad bee azééh doo yáʼátʼééh da", 'hero.year': 'Yihah', 'hero.title1': "Yáʼátʼééh, shí éí", 'hero.title2': 'Web Áshłaaígíí', 'hero.desc': "RuanRuan bighan — nizhónígo ádaalyaa, ániidígíí bee naʼanish, dóó nitsáhákees bee naʼanishígíí ałhąąh ádaalyaa.", 'hero.greeting': "Tʼáá íiyisíí baa nitsíníkees · Tʼáá áko hózhǫ́ǫgo naanish áńdaalneʼ", 'hero.cta1': 'Naashnish yaa nitsíníkees', 'hero.cta2': 'GitHub Sǫʼ', 'projects.title': 'Naashnish Ádaalyaaígíí', 'projects.subtitle': "Tʼáá ałtso kodóó nizhónígo", 'projects.year': 'NAASHNISH · 2026', 'lab.title': 'Ániid Naalkaah', 'lab.subtitle': 'Ániidígíí · Ałkʼiʼdiilnííł · Náásdi', 'lab.ai': 'AI Bee Naʼalkaah', 'lab.ai.desc': 'Ániidígíí bee naʼanish yaʼííłtaʼ.', 'lab.proto': 'Álchʼįʼ Ádaalneʼ', 'lab.proto.desc': 'Nizhónígo ádaalneʼígíí.', 'lab.data': "Bee Akʼeʼelchíhí", 'lab.data.desc': 'Haneʼ bee naʼanishígíí.', 'about.title': 'RuanRuan Baa Haneʼ', 'about.p1': "Tʼáadoo leʼé bee naʼanish dóó nitsáhákees yeeʼ hólǫ́ǫgo, 'doo nantłʼah da' níigo.", 'about.p2': "Raccoon.Fit éí nihá ádaalyaaígíí, ániidígíí, dóó hashtʼeʼádaalyaaígíí bee naʼanish.", 'about.p3': "Tʼáá íiyisíí baa nitsíníkees · Tʼáá áko hózhǫ́ǫgo naanish áńdaalneʼ", 'about.cta': "Nízaadgóó ńdiitʼááh", 'skills.title': 'Ííshjání Ádaalyaaígíí', 'skills.frontend': 'Frontend Áshłaa', 'skills.uiux': 'UI/UX Ádaalyaa', 'skills.product': 'Áłchíní Bá Nitsáhákees', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': "Ííníłʼį́į́ʼ", 'card.cta.play': "Nidaʼneʼ", 'card.cta.ai': "AI Ííníłʼį́į́ʼ", 'card.cta.eol': 'Doo Náánáłah Da', 'footer.tagline': "Nitsíníkees · Ánítʼį́į́h · Náánáłah — Nihił hahoodzo dooleeł.", 'footer.email': 'E-mail', 'footer.github': 'GitHub', 'footer.website': "Web Bitsʼą́ą́dóó", 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Nitsáhákees', 'footer.year': "Tʼáá íiyisíí baa nitsíníkees · Náánáłahgo Ánítʼį́į́h", '3d.btn': "3D Yaa Nitsíníkees", '3d.loading': "Nihá yitʼįįh...", '3d.hint': "Níłtsą́ągo ńdiitʼááh · Nízaadgóó ńdiitʼááh", 'island.wechat': "WeChat yeeʼ ńdiitʼááh", 'island.qq': "QQ yeeʼ ńdiitʼááh", 'modal.title': "Ííshjání Ádeilnííh", 'modal.subtitle': "Baa haneʼígíí ńdííłtʼááh", 'modal.cancel': "Tʼáadoo", 'modal.confirm': 'Aooʼ', 'modal.error': "Doo łaʼ ákótʼée da, ńtʼééʼ nídííłtʼááh~", 'quickMenu.title': "Tsį́į́łgo Bikááʼ", 'quick.feedback': "Ninaʼídíłkid", 'quick.badge': "Bee Óltaʼ", 'quick.friendlink': "Sikʼis Bikááʼ" },
+    yi: { 'a11y.skip': 'איבערהיפּן צום אינהאַלט', 'nav.home': 'היים', 'nav.projects': 'פּראָיעקטן', 'nav.lab': 'לאַבאָראַטאָריע', 'nav.about': 'וועגן', 'lang.label': 'שפּראַך', 'ie.link': 'אַלט בלעטערער', 'ie.subtitle': 'דער בלעטערער ווערט ניט געשטיצט', 'hero.year': 'יאָר', 'hero.title1': 'שלום־עליכם, איך בין', 'hero.title2': 'וועב אַנטוויקלער', 'hero.desc': "RuanRuan'ס דיגיטאַלע היים — פֿאַרבינדונג פֿון שעפֿערישקייט, פֿאָרגעשריטענע טעכנאָלאָגיע און דיזײַן־פֿילאָסאָפֿיע צו בויען וואַרעמע מכשירים און קונסט.", 'hero.greeting': 'בלײַבט נייַגעריק · לײזט פּראָבלעמען שטענדיק עלעגאַנט', 'hero.cta1': 'פֿאָרשן פּראָיעקטן', 'hero.cta2': 'GitHub גאַלאַקטיק', 'projects.title': 'אויסגעוויילטע ווערק', 'projects.subtitle': 'אַ נשמה אין יעדער שורה קאָד', 'projects.year': 'פּאָרטפֿאָליאָ · 2026', 'lab.title': 'שעפֿערישע לאַבאָראַטאָריע', 'lab.subtitle': 'פּראָטאָטיפּ · קראָסאָווער · צוקונפֿט', 'lab.ai': 'AI־געשטיצט דיזײַן', 'lab.ai.desc': 'פֿאָרשונג פֿון גענעראַטיווער UI.', 'lab.proto': 'אינטעראַקטיווע פּראָטאָטיפּן', 'lab.proto.desc': 'פֿאָרגעשריטענע מיקראָ־אַנימאַציעס.', 'lab.data': 'דאַטן־וויזואַליזירונג', 'lab.data.desc': 'דינאַמישע דערציילונג.', 'about.title': 'וועגן RuanRuan', 'about.p1': 'אַ פֿאַנאַטיקער פֿון טעכנאָלאָגיע און דיזײַן, פּרעדיקט אַז פּאַשטקייט איז מאַכט.', 'about.p2': "Raccoon.Fit רעפּרעזענטירט אַן אינזשעניריע־עסטעטיק פֿון אַדאַפּטירונג, שאַפֿונג און גרעניץ־דורכברעכונג.", 'about.p3': 'בלײַבט נייַגעריק · לײזט פּראָבלעמען שטענדיק עלעגאַנט', 'about.cta': 'פּערזענלעכע זײַט', 'skills.title': 'האַרץ־קאָמפּעטענצן', 'skills.frontend': 'פֿראָנטענד־אַרכיטעקטור', 'skills.uiux': 'UI/UX דיזײַן', 'skills.product': 'פּראָדוקט־טראַכטונג', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'פּרובירן', 'card.cta.play': 'שפּילן', 'card.cta.ai': 'פּרובירן AI', 'card.cta.eol': 'זען אָפּשטעל־מעלדונג', 'footer.tagline': 'פֿאָרשן · שאַפֿן · וואַקסן — דערוואַרטן צו רעזאָנירן מיט אײַך.', 'footer.email': 'בליצפּאָסט', 'footer.github': 'GitHub', 'footer.website': 'וועבזײַטל', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon דיזײַן־פֿילאָסאָפֿיע', 'footer.year': 'בלײַבט נייַגעריק · שאַפֿט אײביק', '3d.btn': 'זען 3D מאָדעל', '3d.loading': 'לאָדט נײַ־יאָר מאָדעל...', '3d.hint': 'שלעפּן צו דרייען · סקראָלן צו פֿאַרגרעסערן', 'island.wechat': 'איר בלעטערט אין WeChat', 'island.qq': 'איר בלעטערט אין QQ', 'modal.title': 'אַנטוויקלער וועריפֿיקאַציע', 'modal.subtitle': 'אײַנגעבן דיבאַג־פּאַראָל', 'modal.cancel': 'אַנולירן', 'modal.confirm': 'באַשטעטיקן', 'modal.error': 'פֿאַלשע פּאַראָל, פּרובירט נאָכאַמאָל~', 'quickMenu.title': 'שנעל מעניו', 'quick.feedback': 'פֿידבעק', 'quick.badge': 'אויסצייכענונגען', 'quick.friendlink': 'לינקס' },
+    mi: { 'a11y.skip': 'Peke ki te ihirangi', 'nav.home': 'Kāinga', 'nav.projects': 'Ngā Kaupapa', 'nav.lab': 'Taiwhanga', 'nav.about': 'Mōku', 'lang.label': 'Reo', 'ie.link': 'Pūmanawa Tawhito', 'ie.subtitle': 'Kāore tēnei pūmanawa tautuhinga e tautokona', 'hero.year': 'Tau', 'hero.title1': 'Kia ora, ko au tēnei', 'hero.title2': 'Kaiwhakawhanake Tukutuku', 'hero.desc': "Te kāinga matihiko o RuanRuan — te whakakotahi i te auahatanga, te hangarau matatau, me te whakaaro hoahoa ki te hanga taputapu mahana me te toi.", 'hero.greeting': 'Kia mau ki te pākiki · Whakaotia ngā raruraru i ngā wā katoa', 'hero.cta1': 'Tūhura kaupapa', 'hero.cta2': 'GitHub Tūārangi', 'projects.title': 'Ngā Mahi Whiriwhiri', 'projects.subtitle': 'He wairua kei ia rārangi waehere', 'projects.year': 'KŌPAE · 2026', 'lab.title': 'Taiwhanga Auaha', 'lab.subtitle': 'Tauira · Whakawhiti · Āmua', 'lab.ai': 'Hoahoa āwhina AI', 'lab.ai.desc': 'Te tūhura UI whakaputa.', 'lab.proto': 'Ngā Tauira Pāhekoheko', 'lab.proto.desc': 'Ngā moroiti-hātepe matatau.', 'lab.data': 'Whakaatu Raraunga', 'lab.data.desc': 'Te kōrero hihiri.', 'about.title': 'Mō RuanRuan', 'about.p1': 'He kaingākau ki te hangarau me te hoahoa, e kī ana he kaha te māmā.', 'about.p2': "E tohu ana a Raccoon.Fit i tētahi rerehua pūkaha o te urutau, te waihanga, me te wāwāhi rohe.", 'about.p3': 'Kia mau ki te pākiki · Whakaotia ngā raruraru i ngā wā katoa', 'about.cta': 'Whārangi whaiaro', 'skills.title': 'Ngā Pūkenga Matua', 'skills.frontend': 'Hoahoanga Frontend', 'skills.uiux': 'Hoahoa UI/UX', 'skills.product': 'Whakaaro hua', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Whakamātau', 'card.cta.play': 'Tākaro', 'card.cta.ai': 'Whakamātau AI', 'card.cta.eol': 'Tirohia te pānui whakamutu', 'footer.tagline': 'Tūhura · Waihanga · Tupu — E tatari ana ki te orite tahi.', 'footer.email': 'Īmēra', 'footer.github': 'GitHub', 'footer.website': 'Paetukutuku', 'footer.copyright': '© 2025-2026 RuanRuan · Whakaaro Hoahoa Raccoon', 'footer.year': 'Kia mau ki te pākiki · Waihangahia mō ake tonu', '3d.btn': 'Tirohia te tauira 3D', '3d.loading': 'E uta ana i te tauira tau hōu...', '3d.hint': 'Tōia ki te huri · Panuku ki te topa', 'island.wechat': 'Kei te tirotiro koe i WeChat', 'island.qq': 'Kei te tirotiro koe i QQ', 'modal.title': 'Manatoko Kaiwhakawhanake', 'modal.subtitle': 'Whakauruhia te kupuhipa patuiro', 'modal.cancel': 'Whakakore', 'modal.confirm': 'Whakaū', 'modal.error': 'Kupuhipa hē, whakamātau anō~', 'quickMenu.title': 'Tahora Tere', 'quick.feedback': 'Urupare', 'quick.badge': 'Tohu', 'quick.friendlink': 'Hononga' },
+    bo: { 'a11y.skip': 'ནང་དོན་ལ་འགྲོ།', 'nav.home': 'མདུན་ངོས།', 'nav.projects': 'ལས་འཆར།', 'nav.lab': 'ཚོད་ལྟ་ཁང་།', 'nav.about': 'ངོ་སྤྲོད།', 'lang.label': 'སྐད་ཡིག', 'ie.link': 'མཐུན་སྦྱོར་ཐོག་ལྟ།', 'ie.subtitle': 'གསར་གཏོད་རྒྱུན་མི་ཆད། སྤྲོ་སྣང་འཕྲོ།', 'hero.year': 'སྤྱི་ལོ།', 'hero.title1': 'བཟོ་རིག་གི་མཐའ་མེད་', 'hero.title2': 'ནུས་པ་གསར་པ།', 'hero.desc': 'རུའན་རུའན་གྱི་ཨང་ཀིའི་གནས་ས་ — གསར་གཏོད་དང་། མདུན་གྲལ་ལག་རྩལ། སྒྱུ་རྩལ་དགོངས་པ་བཅས་སྦྲེལ་ནས་དྲོད་ལྡན་གྱི་ཡོ་བྱད་དང་སྒྱུ་རྩལ་བསྐྲུན།', 'hero.greeting': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། ཁྱད་འཕགས་ཀྱིས་དཀའ་ངལ་སེལ།', 'hero.cta1': 'ལས་འཆར་ཁག་ལ་ལྟ།', 'hero.cta2': 'GitHub སྐར་ཚོམ།', 'projects.title': 'འདེམས་སྒྲུག་བརྩམས་ཆོས།', 'projects.subtitle': 'བཟོ་རིག་གི་རྩ་བ། གྲངས་ཐིག་རེ་རེར་སེམས་ཤུགས་ཡོད།', 'projects.year': 'བརྩམས་ཆོས་ཕྱོགས་བསྒྲིགས། ༢༠༢༦', 'lab.title': 'གསར་གཏོད་ཚོད་ལྟ་ཁང་།', 'lab.subtitle': 'དཔེ་བཟོ། ཕྱི་འབྲེལ། མ་འོངས་པ།', 'lab.ai': 'བཟོ་རིག་ནུས་པས་རོགས་པའི་སྒྱུ་རྩལ།', 'lab.ai.desc': 'རང་བྱུང་UI རྟོག་ཞིབ།', 'lab.proto': 'ཕན་ཚུན་འབྲེལ་བའི་དཔེ་བཟོ།', 'lab.proto.desc': 'མཐོ་རིམ་ཧྲུལ་རྫས་མྱུར་རྒྱུག', 'lab.data': 'གྲངས་ཐིག་མངོན་པ།', 'lab.data.desc': 'གནས་འགུལ་གཏམ་བཤད།', 'about.title': 'རུའན་རུའན་ངོ་སྤྲོད།', 'about.p1': 'ལག་རྩལ་དང་སྒྱུ་རྩལ་ལ་དུང་ཞེན་ཅན། "སྟབས་བདེ་ནི་ནུས་པ་ཡིན་"', 'about.p2': 'Raccoon.Fit ནི་གཤིས་འགྱུར་དང་། གསར་གཏོད། བཀག་རྒྱ་འགེམས་པའི་བཟོ་སྐྲུན་མཛེས་དཔྱོད་ཀྱི་གཟུགས་བརྙན་ཡིན།', 'about.p3': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། ཁྱད་འཕགས་ཀྱིས་དཀའ་ངལ་སེལ།', 'about.cta': 'སྒེར་ངོས་ལ་ལྟ།', 'skills.title': 'སྙིང་པོའི་ནུས་པ།', 'skills.frontend': 'མདུན་ངོས་བཟོ་རིག', 'skills.uiux': 'UI/UX སྒྱུ་རྩལ།', 'skills.product': 'ཐོན་རྫས་དགོངས་པ།', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'ཚོད་ལྟ་བྱེད།', 'card.cta.play': 'རྩེད་མོ་རྩེ།', 'card.cta.ai': 'བཟོ་རིག་ནུས་པ་ལྟ།', 'card.cta.eol': 'མཇུག་སྒྲིལ་གསལ་བསྒྲགས།', 'footer.tagline': 'རྟོག་ཞིབ། གསར་གཏོད། འཚར་ལོངས། — ཁྱེད་དང་མཉམ་དུ་འགྲོ་བར་རེ་བ།', 'footer.email': 'གློག་འཕྲིན།', 'footer.github': 'GitHub ཚོགས་སྡེ།', 'footer.website': 'དྲ་ཚིགས།', 'footer.copyright': '© 2025-2026 རུའན་རུའན། རཱི་ཁཱོན་སྒྱུ་རྩལ་དགོངས་པ།', 'footer.year': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། གཏན་དུ་གསར་གཏོད་བྱེད།', '3d.btn': '3D དཔེ་བཟོ་ལྟ།', '3d.loading': 'ལོ་གསར་དཔེ་བཟོ་འཇུག་བཞིན་པ།', '3d.hint': 'འགུལ་སྐྱོད་ཐད་འཕྲེད། འཁོར་སྐྱོད་བརྟོལ།', 'island.wechat': 'ཁྱེད་WeChat ནང་ལྟ་བཞིན་ཡོད།', 'island.qq': 'ཁྱེད་QQ ནང་ལྟ་བཞིན་ཡོད།', 'modal.title': 'འཕེལ་རྒྱས་ངོས་འཛིན།', 'modal.subtitle': 'ཞིབ་འཚོལ་ཆོག་མཆན་འཇུག', 'modal.cancel': 'འདོར་བ།', 'modal.confirm': 'ངོས་ལེན།', 'modal.error': 'ཆོག་མཆན་ནོར། བསྐྱར་ཚོད་ལྟ་བྱེད།~', 'quickMenu.title': 'མགྱོགས་ཐོ།', 'quick.feedback': 'བསམ་ཚུལ།', 'quick.badge': 'གཟི་རྟགས།', 'quick.friendlink': 'འབྲེལ་མཐུད།' },
+    ug: { 'a11y.skip': 'مەزمۇنغا ئاتلاپ ئۆتۈش', 'nav.home': 'باش بەت', 'nav.projects': 'قۇرۇلۇشلار', 'nav.lab': 'تەجرىبىخانا', 'nav.about': 'ھەققىدە', 'lang.label': 'تىل', 'ie.link': 'IE ماسلاشتۇرۇلغان', 'ie.subtitle': 'ئىجادىيەت توختىمايدۇ · ئىلھام چېچەكلەيدۇ', 'hero.year': 'ئىجادىيەت توختىمايدۇ · ئىلھام ئاتلىنىدۇ', 'hero.title1': 'كودنىڭ', 'hero.title2': 'چەكسىز ئىمكانىيەتلىرى', 'hero.desc': 'RuanRuan نىڭ رەقەملىك ماكانى — ئىجادىيەت، ئالدىنقى قاتار تېخنىكا ۋە لايىھە پەلسەپىسىنى بىرلەشتۈرۈپ، ئىللىق قوراللار ۋە سەنئەت يارىتىش.', 'hero.greeting': 'قىزىقىشنى داۋاملاشتۇرۇڭ · ھەمىشە ئەنە شۇ ئۇسۇلدا مەسىلىلەرنى ھەل قىلىڭ', 'hero.cta1': 'قۇرۇلۇشلارنى ئىزدەش', 'hero.cta2': 'GitHub يۇلتۇز سىستېمىسى', 'projects.title': 'تاللانغان ئەسەرلەر', 'projects.subtitle': 'ھەر بىر قۇر كودتا بىر روھ بار', 'projects.year': 'پورتفولىيو · 2026', 'lab.title': 'ئىجادىيەت تەجرىبىخانىسى', 'lab.subtitle': 'ئەسلى نۇسخا · باغلىنىش · كەلگۈسى', 'lab.ai': 'سۈنئىي ئەقىل ياردەمچى لايىھە', 'lab.ai.desc': 'گېنېراتىپ UI ئىزدىنىش.', 'lab.proto': 'ئىنتېراكتىپ ئەسلى نۇسخىلار', 'lab.proto.desc': 'ئالىي دەرىجىلىك مىكرو-ئانىماتسىيە.', 'lab.data': 'سانلىق مەلۇمات كۆرۈنۈشلەندۈرۈش', 'lab.data.desc': 'دىنامىك ھېكايە.', 'about.title': 'RuanRuan ھەققىدە', 'about.p1': 'تېخنىكا ۋە لايىھە ھەۋەسكارى، "ئاددىيلىق كۈچتۇر" دەپ ئىشىنىدۇ.', 'about.p2': "Raccoon.Fit ماسلىشىش، ئىجاد قىلىش ۋە چېگرالارنى بۇزۇشنىڭ ئىنژېنېرلىق ئېستېتىكىسىنى ئىپادىلەيدۇ.", 'about.p3': 'قىزىقىشنى داۋاملاشتۇرۇڭ · ھەمىشە ئەنە شۇ ئۇسۇلدا مەسىلىلەرنى ھەل قىلىڭ', 'about.cta': 'شەخسىي بەت', 'skills.title': 'ئاساسىي ئىقتىدارلار', 'skills.frontend': 'ئالدى يۈز ئارخىتېكتۇرىسى', 'skills.uiux': 'UI/UX لايىھە', 'skills.product': 'مەھسۇلات تەپەككۇرى', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'سىناپ بېقىش', 'card.cta.play': 'ئويناش', 'card.cta.ai': 'سۈنئىي ئەقىلنى سىناش', 'card.cta.eol': 'توختىتىش ئېلانىنى كۆرۈش', 'footer.tagline': 'ئىزدە · ئىجاد قىل · ئۆس — سىز بىلەن ماسلىشىشنى ئۈمىد قىلىمىز.', 'footer.email': 'ئېلخەت', 'footer.github': 'GitHub', 'footer.website': 'تور بەت', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon لايىھە پەلسەپىسى', 'footer.year': 'قىزىقىشنى داۋاملاشتۇرۇڭ · مەڭگۈ ئىجاد قىلىڭ', '3d.btn': '3D مودېلنى كۆرۈش', '3d.loading': 'يېڭى يىل مودېلى يۈكلىنىۋاتىدۇ...', '3d.hint': 'سۆرەپ ئايلاندۇرۇڭ · يوغانلىتىش ئۈچۈن دومىلىتىڭ', 'island.wechat': 'سىز WeChat تا كۆرۈۋاتىسىز', 'island.qq': 'سىز QQ دا كۆرۈۋاتىسىز', 'modal.title': 'ئاچقۇچى تەكشۈرۈش', 'modal.subtitle': 'دېتال تەڭشەش پارولىنى كىرگۈزۈڭ', 'modal.cancel': 'بىكار قىلىش', 'modal.confirm': 'جەزملەش', 'modal.error': 'پارول خاتا، قايتا سىناڭ~', 'quickMenu.title': 'تىز تىزىملىك', 'quick.feedback': 'پىكىر', 'quick.badge': 'نىشانلار', 'quick.friendlink': 'ئۇلىنىشلار' },
+    la: { 'a11y.skip': 'Transilire ad materiam', 'nav.home': 'Domus', 'nav.projects': 'Opera', 'nav.lab': 'Officina', 'nav.about': 'De me', 'lang.label': 'Lingua', 'ie.link': 'Versio IE-compos', 'ie.subtitle': 'Creativitas non cessat · Inspiratio floret', 'hero.year': 'Annus · Creativitas currit', 'hero.title1': 'Explora infinitas', 'hero.title2': 'Facultates codicis', 'hero.desc': "Refugium digitale RuanRuan — creativitatem, technologiam novissimam et philosophiam designationis coniungens ad instrumenta calida et artem aedificanda.", 'hero.greeting': 'Curiosus mane · Semper eleganter solve', 'hero.cta1': 'Opera explorare', 'hero.cta2': 'Galaxia GitHub', 'projects.title': 'Opera selecta', 'projects.subtitle': 'Anima in omni linea codicis', 'projects.year': 'PORTFOLIUM · MMXXVI', 'lab.title': 'Officina creativa', 'lab.subtitle': 'Exemplar · Coniunctio · Futurum', 'lab.ai': 'Designatio AI-adiuta', 'lab.ai.desc': 'Exploratio UI generativae.', 'lab.proto': 'Exemplaria interactiva', 'lab.proto.desc': 'Micro-animationes provectae.', 'lab.data': 'Visualizatio datorum', 'lab.data.desc': 'Narratio dynamica.', 'about.title': 'De RuanRuan', 'about.p1': 'Fanaticus technologiae et designationis, praedicans simplicitatem esse vim.', 'about.p2': "Raccoon.Fit aestheticam ingeniariam adaptationis, creationis et finium perfringendorum repraesentat.", 'about.p3': 'Curiosus mane · Semper eleganter solve', 'about.cta': 'Pagina personalis', 'skills.title': 'Competentiae principales', 'skills.frontend': 'Architectura frontalis', 'skills.uiux': 'Designatio UI/UX', 'skills.product': 'Cogitatio producti', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Experiri', 'card.cta.play': 'Ludere', 'card.cta.ai': 'Experiri AI', 'card.cta.eol': 'Videre nuntium cessationis', 'footer.tagline': 'Explorare · Creare · Crescere — Tecum resonare expectamus.', 'footer.email': 'Epistula electronica', 'footer.github': 'GitHub', 'footer.website': 'Situs interretialis', 'footer.copyright': '© MMXXV-MMXXVI RuanRuan · Philosophia designationis Raccoon', 'footer.year': 'Curiosus mane · In aeternum crea', '3d.btn': 'Videre exemplar 3D', '3d.loading': 'Exemplar anni novi oneratur...', '3d.hint': 'Trahe ad rotandum · Volve ad amplificandum', 'island.wechat': 'In WeChat navigas', 'island.qq': 'In QQ navigas', 'modal.title': 'Verificatio programmatoris', 'modal.subtitle': 'Intra tesseram lusoriam', 'modal.cancel': 'Abrogare', 'modal.confirm': 'Confirmare', 'modal.error': 'Tessera falsa, iterum tenta~', 'quickMenu.title': 'Index celer', 'quick.feedback': 'Responsum', 'quick.badge': 'Insignia', 'quick.friendlink': 'Nexus' },
+    grc: { 'a11y.skip': 'Ὑπερβαίνειν πρὸς τὸ περιεχόμενον', 'nav.home': 'Οἶκος', 'nav.projects': 'Ἔργα', 'nav.lab': 'Ἐργαστήριον', 'nav.about': 'Περὶ ἐμοῦ', 'lang.label': 'Γλῶττα', 'ie.link': 'Ἔκδοσις IE-συμβατή', 'ie.subtitle': 'Ἡ δημιουργία οὐ παύεται · Ἡ ἐπίπνοια ἀνθεῖ', 'hero.year': 'Ἔτος · Ἡ ἐπίπνοια τρέχει', 'hero.title1': 'Ἐξερευνᾶν τὰς ἀπείρους', 'hero.title2': 'Δυνάμεις τοῦ κώδικος', 'hero.desc': "Τὸ ψηφιακὸν καταφύγιον τοῦ RuanRuan — συνάπτον δημιουργίαν, τεχνολογίαν αἰχμῆς καὶ φιλοσοφίαν σχεδιασμοῦ εἰς οἰκοδομὴν θερμῶν ἐργαλείων καὶ τέχνης.", 'hero.greeting': 'Περίεργος μένε · Ἀεὶ εὐσχημόνως λῦε', 'hero.cta1': 'Ἔργα ἐξερευνᾶν', 'hero.cta2': 'Γαλαξίας GitHub', 'projects.title': 'Ἐξειλεγμένα ἔργα', 'projects.subtitle': 'Ψυχὴ ἐν πάσῃ γραμμῇ κώδικος', 'projects.year': 'ΧΑΡΤΟΦΥΛΑΚΙΟΝ · ͵βκϛʹ', 'lab.title': 'Δημιουργικὸν ἐργαστήριον', 'lab.subtitle': 'Πρωτότυπον · Διάβασις · Μέλλον', 'lab.ai': 'Σχεδιασμὸς AI-βοηθούμενος', 'lab.ai.desc': 'Ἐξερεύνησις γεννητικοῦ UI.', 'lab.proto': 'Διαδραστικὰ πρωτότυπα', 'lab.proto.desc': 'Προηγμέναι μικρο-κινήσεις.', 'lab.data': 'Ὀπτικοποίησις δεδομένων', 'lab.data.desc': 'Δυναμικὴ διήγησις.', 'about.title': 'Περὶ RuanRuan', 'about.p1': 'Ζηλωτὴς τεχνολογίας καὶ σχεδιασμοῦ, κηρύττων ὅτι ἡ ἁπλότης ἐστὶ δύναμις.', 'about.p2': "Τὸ Raccoon.Fit ἀντιπροσωπεύει μίαν μηχανικὴν αἰσθητικὴν προσαρμογῆς, δημιουργίας καὶ καταλύσεως ὁρίων.", 'about.p3': 'Περίεργος μένε · Ἀεὶ εὐσχημόνως λῦε', 'about.cta': 'Προσωπικὴ σελίς', 'skills.title': 'Κύριαι ἱκανότητες', 'skills.frontend': 'Ἀρχιτεκτονικὴ προσθίου μέρους', 'skills.uiux': 'Σχεδιασμὸς UI/UX', 'skills.product': 'Σκέψις προϊόντος', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Πειρᾶσθαι', 'card.cta.play': 'Παίζειν', 'card.cta.ai': 'Πειρᾶσθαι AI', 'card.cta.eol': 'Ὁρᾶν ἀγγελίαν παύσεως', 'footer.tagline': 'Ἐξερευνᾶν · Δημιουργεῖν · Αὐξάνεσθαι — Συντονίζεσθαι μεθʼ ὑμῶν προσδοκῶμεν.', 'footer.email': 'Ἠλεκτρονικὴ ἐπιστολή', 'footer.github': 'GitHub', 'footer.website': 'Ἱστοσελίς', 'footer.copyright': '© ͵βκεʹ-͵βκϛʹ RuanRuan · Φιλοσοφία σχεδιασμοῦ Raccoon', 'footer.year': 'Περίεργος μένε · Αἰωνίως δημιούργει', '3d.btn': 'Ὁρᾶν πρότυπον 3D', '3d.loading': 'Πρότυπον νέου ἔτους φορτοῦται...', '3d.hint': 'Σύρειν πρὸς περιστροφήν · Κυλίειν πρὸς μεγέθυνσιν', 'island.wechat': 'Ἐν WeChat πλοηγῇ', 'island.qq': 'Ἐν QQ πλοηγῇ', 'modal.title': 'Ἐπαλήθευσις προγραμματιστοῦ', 'modal.subtitle': 'Εἰσάγειν σύνθημα ἐκσφαλματώσεως', 'modal.cancel': 'Ἀκυροῦν', 'modal.confirm': 'Βεβαιοῦν', 'modal.error': 'Ψευδὲς σύνθημα, πάλιν πείρασον~', 'quickMenu.title': 'Ταχὺς κατάλογος', 'quick.feedback': 'Ἀνταπόκρισις', 'quick.badge': 'Παράσημα', 'quick.friendlink': 'Σύνδεσμοι' },
+    non: { 'a11y.skip': 'Hlaupa yfir í efni', 'nav.home': 'Heim', 'nav.projects': 'Verkefni', 'nav.lab': 'Smiðja', 'nav.about': 'Um mik', 'lang.label': 'Tunga', 'ie.link': 'IE-samhæft útgáfa', 'ie.subtitle': 'Sköpun hættir eigi · Innblástur blómstrar', 'hero.year': 'Ár · Innblástur hleypur', 'hero.title1': 'Kanna óendanlega', 'hero.title2': 'Möguleika kóða', 'hero.desc': "Stafrænt skjól RuanRuan — samtvinna sköpun, fremstu tækni og hönnunarheimspeki til að byggja hlý verkfæri og list.", 'hero.greeting': 'Ver forvitinn · Leystu ávallt vandamál með glæsibrag', 'hero.cta1': 'Kanna verkefni', 'hero.cta2': 'GitHub Vetrarbraut', 'projects.title': 'Valin verk', 'projects.subtitle': 'Önd í hverri línu kóða', 'projects.year': 'VERKASKRA · 2026', 'lab.title': 'Skapandi smiðja', 'lab.subtitle': 'Frumgerð · Þverfag · Framtíð', 'lab.ai': 'AI-aðstoðuð hönnun', 'lab.ai.desc': 'Könnun skapandi UI.', 'lab.proto': 'Gagnvirkar frumgerðir', 'lab.proto.desc': 'Háþróaðar örhreyfingar.', 'lab.data': 'Gagnasýn', 'lab.data.desc': 'Kvikt frásögn.', 'about.title': 'Um RuanRuan', 'about.p1': 'Ákafur unnandi tækni og hönnunar, predikar að einfaldleiki sé máttur.', 'about.p2': "Raccoon.Fit táknar verkfræðilega fagurfræði aðlögunar, sköpunar og landamærabrots.", 'about.p3': 'Ver forvitinn · Leystu ávallt vandamál með glæsibrag', 'about.cta': 'Persónuleg síða', 'skills.title': 'Kjarnafærni', 'skills.frontend': 'Framendahönnun', 'skills.uiux': 'UI/UX hönnun', 'skills.product': 'Vöruhugsun', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Reyna', 'card.cta.play': 'Leika', 'card.cta.ai': 'Reyna AI', 'card.cta.eol': 'Sjá lokunartilkynningu', 'footer.tagline': 'Kanna · Skapa · Vaxa — Hlakka til að hljóma með þér.', 'footer.email': 'Rafpóstur', 'footer.github': 'GitHub', 'footer.website': 'Vefsíða', 'footer.copyright': '© 2025-2026 RuanRuan · Hönnunarheimspeki Raccoon', 'footer.year': 'Ver forvitinn · Skapaðu að eilífu', '3d.btn': 'Skoða 3D líkan', '3d.loading': 'Hleður áramótalíkani...', '3d.hint': 'Dragðu til að snúa · Skrunaðu til að þysja', 'island.wechat': 'Þú vafrar í WeChat', 'island.qq': 'Þú vafrar í QQ', 'modal.title': 'Sannprófun þróunaraðila', 'modal.subtitle': 'Sláðu inn kembilykilorð', 'modal.cancel': 'Hætta við', 'modal.confirm': 'Staðfesta', 'modal.error': 'Rangt lykilorð, reyndu aftur~', 'quickMenu.title': 'Flýtivalmynd', 'quick.feedback': 'Endurgjöf', 'quick.badge': 'Merki', 'quick.friendlink': 'Tenglar' },
+    ang: { 'a11y.skip': 'Oferhlēapan tō innunge', 'nav.home': 'Hām', 'nav.projects': 'Weorc', 'nav.lab': 'Smēaþanc', 'nav.about': 'Be mē', 'lang.label': 'Geþēode', 'ie.link': 'IE-gedafen fadung', 'ie.subtitle': 'Cræft ne ætstent · Wōdblǣd blōweþ', 'hero.year': 'Gēar · Wōdblǣd ierneþ', 'hero.title1': 'Fandian þāra unge-endodra', 'hero.title2': 'Mihta rūncræftes', 'hero.desc': "RuanRuanes lārtēow-gebūr — mengende cræft, forþweardne searucræft and hīwes-cræftes lār tō timbrenne wearme tōlas and cræftas.", 'hero.greeting': 'Wes frōd · Symble līehtlīce rēc', 'hero.cta1': 'Weorc fandian', 'hero.cta2': 'GitHub tungol-hwearft', 'projects.title': 'Gecorene weorc', 'projects.subtitle': 'Gāst in ǣlcum līnan rūncræftes', 'projects.year': 'WEORC-BŌC · MMXXVI', 'lab.title': 'Cræftig smēaþanc', 'lab.subtitle': 'Bȳsen · Oferfæreld · Tōweard', 'lab.ai': 'Searucræft-fultumod hīwung', 'lab.ai.desc': 'Fandung cennendra UI.', 'lab.proto': 'Gefēr-bȳsena', 'lab.proto.desc': 'Forþwearde lȳtle-styringa.', 'lab.data': 'Gearu-gesihþ', 'lab.data.desc': 'Weallende spell.', 'about.title': 'Be RuanRuan', 'about.p1': 'Andfolga searucræftes and hīwes-cræftes, bodigende þæt ānfaldnes is cræft.', 'about.p2': "Raccoon.Fit getācnaþ searucræftlīce fægernesse geþwǣrnesse, timbrunge and gemǣro-tōbrecunge.", 'about.p3': 'Wes frōd · Symble līehtlīce rēc', 'about.cta': 'Āgen tramet', 'skills.title': 'Heort-cræftas', 'skills.frontend': 'Forþweard timbrung', 'skills.uiux': 'UI/UX hīwung', 'skills.product': 'Andweorc geþanc', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Fandian', 'card.cta.play': 'Plegian', 'card.cta.ai': 'Fandian AI', 'card.cta.eol': 'Sēon endung-bēacen', 'footer.tagline': 'Fandian · Timbran · Weaxan — Ēstful wē bēoþ tō swegienne mid þē.', 'footer.email': 'Ǣrendgewrit', 'footer.github': 'GitHub', 'footer.website': 'Webbstede', 'footer.copyright': '© MMXXV-MMXXVI RuanRuan · Raccoon hīwes-cræftes lār', 'footer.year': 'Wes frōd · Tymbraþ āwa tō ealdre', '3d.btn': 'Sēon 3D bȳsen', '3d.loading': 'Nīwe gēares bȳsen hlæst...', '3d.hint': 'Dragan tō wendanne · Scrollan tō nēalǣcanne', 'island.wechat': 'Þū scēawast in WeChat', 'island.qq': 'Þū scēawast in QQ', 'modal.title': 'Timbrendes costnung', 'modal.subtitle': 'Inbring dēagol-word forþweardes', 'modal.cancel': 'Ongēanwendan', 'modal.confirm': 'Gefæstnian', 'modal.error': 'Wōh dēagol-word, fanda eft~', 'quickMenu.title': 'Hræd getæl', 'quick.feedback': 'Edlēan-cwide', 'quick.badge': 'Tācnu', 'quick.friendlink': 'Bendas' },
+    hili: { 'a11y.skip': 'Olah! Mi movo zido', 'nav.home': 'Siye', 'nav.projects': 'Mita kuzi', 'nav.lab': 'Celi gusha siye', 'nav.about': 'Mi ye zido', 'lang.label': 'Olah mita', 'ie.link': 'Gusha IE movo', 'ie.subtitle': 'Nu movo gusha. Mita nye todo.', 'hero.year': 'Zido movo', 'hero.title1': 'Olah! Mi RuanRuan', 'hero.title2': 'Mita dada kuzi', 'hero.desc': "RuanRuan siye — mita todo, kuzi gusha, celi movo. Mi biat ye movo mita todo.", 'hero.greeting': 'Kuzi! Todo gusha ye movo', 'hero.cta1': 'Mosi mita kuzi!', 'hero.cta2': 'GitHub Dada Siye', 'projects.title': 'Mita Kuzi Zido', 'projects.subtitle': 'Todo mita ye mita gusha', 'projects.year': 'MITA ZIDO · 2026', 'lab.title': 'Celi Gusha Siye', 'lab.subtitle': 'Mita · Kuzi · Movo lata', 'lab.ai': 'Dada AI mita', 'lab.ai.desc': 'Mita kuzi mosi zido.', 'lab.proto': 'Movo mita zido', 'lab.proto.desc': 'Dada mita todo ye celi.', 'lab.data': 'Mita zido mosi', 'lab.data.desc': 'Movo mita ye gusha.', 'about.title': 'Mi ye RuanRuan', 'about.p1': "Mi todo mita. Kuzi gusha mosi. 'Mita todo ye gusha' mi biat.", 'about.p2': 'Raccoon.Fit boya todo. Bio movo mita, biat kuzi, ye gusha movo.', 'about.p3': 'Kuzi! Todo gusha ye movo', 'about.cta': 'Mi mita movo ye', 'skills.title': 'Kuzi Mita Biat', 'skills.frontend': 'Dada movo mita', 'skills.uiux': 'Mita todo zido', 'skills.product': 'Kuzi mita todo ye', 'skills.threejs': 'Dada 3D mita', 'skills.nodejs': 'Node.js mita', 'skills.devops': 'DevOps mita', 'card.cta.try': 'Mosi zido!', 'card.cta.play': 'Movo boya!', 'card.cta.ai': 'Mosi AI mita', 'card.cta.eol': 'Mita nye todo movo', 'footer.tagline': 'Movo · Kuzi · Todo — Bio ye movo mita.', 'footer.email': 'Mita ye celi biat', 'footer.github': 'GitHub Siye', 'footer.website': 'Mita movo zido', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Mita Dada', 'footer.year': 'Kuzi! Mita todo movo ye', '3d.btn': 'Mosi 3D mita zido', '3d.loading': 'Mita movo lata bio...', '3d.hint': 'Movo zido · Kuzi movo lata', 'island.wechat': 'Nu movo WeChat zido', 'island.qq': 'Nu movo QQ zido', 'modal.title': 'Kuzi movo biat zido', 'modal.subtitle': 'Mita ye bio movo', 'modal.cancel': 'Nye movo', 'modal.confirm': 'Todo! Biat!', 'modal.error': 'Nye todo mita, mosi bio movo~', 'quickMenu.title': 'Kuzi movo zido', 'quick.feedback': 'Mita ye biat', 'quick.badge': 'Todo mita zido', 'quick.friendlink': 'Boya movo mita' }
 };
 
 const state = {
@@ -1492,13 +2102,19 @@ function detectLang() {
     if (l.startsWith('zh-tw') || l.startsWith('zh-hk') || l.startsWith('zh-mo')) return 'zh-TW';
     if (l.startsWith('zh')) return 'zh-CN';
     if (l.startsWith('ja')) return 'ja';
+    if (l.startsWith('ko')) return 'ko';
+    if (l.startsWith('fr')) return 'fr';
+    if (l.startsWith('sa')) return 'sa';
+    if (l.startsWith('ar')) return 'ar';
+    if (l.startsWith('ru')) return 'ru';
     if (l.startsWith('en-gb')) return 'en-GB';
     if (l.startsWith('en')) return 'en-US';
     return 'zh-CN';
 }
 
 function langToDict(l) {
-    if (l === 'zh-TW' || l === 'ja') return l;
+    const direct = ['zh-TW','ja','ko','fr','sa','ar','egy','anubis','eo','ru','tok','jbo','tlh','qya','dot','nvi','eu','cy','haw','nv','yi','mi','bo','ug','la','grc','non','ang','hili','is','ca','mt','fy','lb'];
+    if (direct.includes(l)) return l;
     if (l.startsWith('zh')) return 'zh';
     return 'en';
 }
@@ -1520,6 +2136,11 @@ function applyLang(l) {
     localStorage.setItem('lang', l);
     const sel = document.getElementById('i18nSelect');
     if (sel) sel.value = l;
+    const indicator = document.getElementById('langIndicator');
+    if (indicator) {
+        const labels = { 'zh-CN':'中','zh-TW':'繁','en-US':'EN','en-GB':'EN','ja':'日','ko':'한','fr':'FR','sa':'स','ar':'عر','egy':'𓂀','anubis':'𓃣','eo':'EO','ru':'RU','tok':'TP','jbo':'JB','tlh':'KL','qya':'QY','dot':'DT','nvi':'NV','eu':'EU','cy':'CY','haw':'HW','nv':'NV','yi':'YI','mi':'MI','bo':'བོ','ug':'UG','la':'LA','grc':'GR','non':'NO','ang':'Æ','hili':'丘丘语','is':'IS','ca':'CA','mt':'MT','fy':'FY','lb':'LB' };
+        indicator.textContent = labels[l] || '中';
+    }
 }
 
 applyTheme(state.theme);

@@ -1,1479 +1,1859 @@
+
 <!DOCTYPE html>
-<!--[if IE 8]><html lang="zh-CN" class="ie8"><![endif]-->
-<!--[if IE 9]><html lang="zh-CN" class="ie9"><![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--><html lang="zh-CN"><!--<![endif]-->
+<!--[if IE 8]><html lang="zh-CN" class="ie8" data-theme="light"><![endif]-->
+<!--[if IE 9]><html lang="zh-CN" class="ie9" data-theme="light"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="zh-CN" data-theme="light"><!--<![endif]-->
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="软软的小窝 - 数字创意空间">
-<title>软软的小窝 ✨</title>
+<meta name="description" content="Ruanruan's Nest · Digital Creative Space · IE Compatible">
+<title>软软的小窝</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
 <style>
 /* ========================================
-   iOS 26 Ethereal Flow 液态玻璃设计系统 - IE8+ 完美兼容版
-   全部使用IE兼容技术实现
-======================================== */
+   IE Compatible Design System - IE8+
+   Light theme as default, dark via data-theme
+   ======================================== */
 
-/* ========================================
-   全局重置 - IE兼容版
-======================================== */
-* { margin: 0; padding: 0; }
-html { font-size: 16px; scroll-behavior: smooth; }
+/* ---- Reset ---- */
+* { margin:0; padding:0; }
+html { font-size:16px; scroll-behavior:smooth; }
 body {
-    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0a0a0f;
-    color: #fff;
-    line-height: 1.65;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
-
-/* 新年横幅样式 */
-.newyear-banner-ie {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 9999;
-    background: linear-gradient(90deg, #B71C1C, #E53935, #FFD700, #E53935, #B71C1C);
-    background-size: 200% 100%;
-    animation: banner-shimmer 3s linear infinite;
-    box-shadow: 0 2px 10px rgba(229, 57, 53, 0.3);
-}
-
-@keyframes banner-shimmer {
-    0% { background-position: 100% 0; }
-    100% { background-position: -100% 0; }
-}
-
-.newyear-banner-content-ie {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 8px 16px;
-    display: block;
-    *zoom: 1;
-}
-
-.newyear-banner-content-ie:after {
-    content: '';
-    display: table;
-    clear: both;
-}
-
-.newyear-link-ie {
-    float: left;
-    display: inline;
-    color: #FFD700;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.newyear-link-ie:hover {
-    color: #FFF;
-    text-decoration: underline;
-}
-
-.newyear-text-ie {
-    float: right;
-    display: inline;
-    color: #FFD700;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-/* 灯笼装饰 */
-.lantern-ie {
-    position: fixed;
-    font-size: 28px;
-    z-index: 100;
-    animation: lantern-swing 3s ease-in-out infinite;
-    cursor: pointer;
-    text-decoration: none;
-    top: 70px;
-}
-
-.lantern-ie:hover {
-    transform: scale(1.2);
-}
-
-.lantern-left-ie { left: 3%; }
-.lantern-right-ie { right: 3%; }
-
-@keyframes lantern-swing {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-}
-
-/* 新年祝福标签 */
-.newyear-badge-ie {
-    display: inline-block;
-    padding: 8px 16px;
-    background: linear-gradient(90deg, #B71C1C, #E53935);
-    border: 1px solid #FFD700;
-    border-radius: 9999px;
-    color: #FFD700;
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    animation: pulse-glow 2s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
-    50% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
-}
-
-/* 新年装饰角标 */
-.newyear-corner-ie {
-    position: absolute;
-    font-size: 36px;
-    opacity: 0.25;
-    pointer-events: none;
-}
-
-.corner-tl-ie { top: 16px; left: 16px; }
-.corner-tr-ie { top: 16px; right: 16px; }
-.corner-bl-ie { bottom: 16px; left: 16px; }
-.corner-br-ie { bottom: 16px; right: 16px; }
-
-/* ========================================
-   液态背景系统 - IE滤镜版
-======================================== */
-.liquid-bg-ie {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1000;
-    overflow: hidden;
-    pointer-events: none;
-    display: none;
-}
-
-.ie8 .liquid-bg-ie,
-.ie9 .liquid-bg-ie {
-    display: block;
-}
-
-.liquid-orb-ie {
-    position: absolute;
-    border-radius: 50%;
-    filter: progid:DXImageTransform.Microsoft.Blur(pixelradius=60);
-    opacity: 0.5;
-}
-
-.orb-ie-1 {
-    width: 600px;
-    height: 600px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=transparent)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=transparent);
-    top: -10%;
-    left: -10%;
-}
-
-.orb-ie-2 {
-    width: 500px;
-    height: 500px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#6366f1, endColorstr=transparent)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#6366f1, endColorstr=transparent);
-    top: 30%;
-    right: -15%;
-}
-
-.orb-ie-3 {
-    width: 400px;
-    height: 400px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#d946ef, endColorstr=transparent)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d946ef, endColorstr=transparent);
-    bottom: -10%;
-    left: 30%;
-}
-
-.orb-ie-4 {
-    width: 350px;
-    height: 350px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#14b8a6, endColorstr=transparent)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#14b8a6, endColorstr=transparent);
-    top: 50%;
-    left: 50%;
-    margin-left: -175px;
-    margin-top: -175px;
-}
-
-.orb-ie-5 {
-    width: 450px;
-    height: 450px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#a855f7, endColorstr=transparent)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#a855f7, endColorstr=transparent);
-    bottom: 20%;
-    right: 10%;
-}
-
-/* IE背景遮罩 */
-.liquid-mask-ie {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #0a0a0f;
-    z-index: -999;
-    display: none;
-}
-
-.ie8 .liquid-mask-ie,
-.ie9 .liquid-mask-ie {
-    display: block;
-}
-
-/* 精品玻璃卡片 - IE版 */
-.glass-ie {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    position: relative;
-}
-
-.glass-ie:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: rgba(255,255,255,0.2);
+    font-family:'Microsoft YaHei','PingFang SC',-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.7;
+    overflow-x:hidden;
+    min-height:100vh;
+    transition:background 0.4s, color 0.4s;
 }
 
 /* ========================================
-   导航栏 - IE布局
-======================================== */
-.nav-wrap-ie {
-    position: fixed;
-    top: 52px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    width: calc(100% - 32px);
-    max-width: 640px;
+   LIGHT THEME (Default)
+   ======================================== */
+html[data-theme="light"] body { background:#faf6f1; color:#3a2b1e; }
+html[data-theme="light"] ::selection { background:rgba(193,127,89,0.35); color:#3a2b1e; }
+html[data-theme="light"] a { color:#8b5a3c; }
+html[data-theme="light"] a:hover { color:#5c3620; }
+
+/* ---- Background Orbs (Light) ---- */
+html[data-theme="light"] .ie-bg { background:#faf6f1; background:radial-gradient(ellipse at 30% 20%, rgba(217,168,120,0.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 60%, rgba(193,127,89,0.08) 0%, transparent 55%); }
+html[data-theme="light"] .ie-orb {
+    position:fixed; border-radius:50%; pointer-events:none; z-index:-10;
+    opacity:0.25; display:none;
+}
+html[data-theme="light"] .ie-orb-1 { width:580px; height:580px; top:-8%; left:-10%; background:radial-gradient(circle, rgba(217,168,120,0.4), transparent 70%); }
+html[data-theme="light"] .ie-orb-2 { width:460px; height:460px; bottom:5%; right:-8%; background:radial-gradient(circle, rgba(193,127,89,0.3), transparent 70%); }
+html[data-theme="light"] .ie-orb-3 { width:320px; height:320px; top:50%; left:50%; margin:-160px 0 0 -160px; background:radial-gradient(circle, rgba(232,195,155,0.2), transparent 70%); }
+
+/* ---- Cards (Light) ---- */
+html[data-theme="light"] .ie-glass {
+    background:rgba(255,248,240,0.78);
+    border:1px solid rgba(232,213,192,0.6);
+    box-shadow:0 6px 24px rgba(60,36,21,0.06), inset 0 1px 2px rgba(255,255,255,0.7);
+    position:relative; overflow:hidden;
+}
+html[data-theme="light"] .ie-glass:before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
 }
 
-.nav-bar-ie {
-    display: block;
-    padding: 10px 18px;
-    background: rgba(18,18,26,0.85);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    border-radius: 36px;
-    position: relative;
-    *zoom: 1;
+html[data-theme="light"] .ie-card {
+    background:rgba(255,248,240,0.72);
+    border:1px solid rgba(232,213,192,0.55);
+    box-shadow:0 4px 16px rgba(60,36,21,0.04), inset 0 1px 1px rgba(255,255,255,0.5);
+    position:relative; overflow:hidden;
+}
+html[data-theme="light"] .ie-card:before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
 }
 
-.nav-bar-ie:after {
-    content: '';
-    display: table;
-    clear: both;
+html[data-theme="light"] .ie-navbar {
+    background:rgba(255,248,240,0.88);
+    border:1px solid rgba(232,213,192,0.6);
+    box-shadow:0 4px 20px rgba(60,36,21,0.06);
 }
 
-.nav-brand-ie {
-    float: left;
-    display: inline;
-    vertical-align: middle;
-    text-decoration: none;
-    color: #fff;
-    font-weight: 600;
-    font-size: 15px;
-    margin-right: 20px;
+html[data-theme="light"] .ie-btn-primary {
+    background:#c17f59;
+    background:linear-gradient(135deg, #c17f59, #8b5a3c);
+    color:#fff; border:none;
+    box-shadow:0 3px 14px rgba(139,90,60,0.35);
+}
+html[data-theme="light"] .ie-btn-secondary {
+    background:rgba(255,248,240,0.65);
+    border:1px solid rgba(193,127,89,0.22);
+    color:#5c3620;
 }
 
-.nav-icon-ie {
-    display: inline-block;
-    width: 38px;
-    height: 38px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
-    border-radius: 20px;
-    text-align: center;
-    line-height: 38px;
-    font-size: 20px;
-    vertical-align: middle;
-    margin-right: 10px;
+html[data-theme="light"] .ie-tag {
+    background:rgba(193,127,89,0.1);
+    border:1px solid rgba(193,127,89,0.18);
+    color:#8b5a3c;
 }
 
-.nav-menu-ie {
-    float: left;
-    display: inline;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+html[data-theme="light"] .ie-h1 { color:#3a2b1e; }
+html[data-theme="light"] .ie-h1 span { color:#c17f59; }
+html[data-theme="light"] .ie-h2 { color:#3a2b1e; }
+html[data-theme="light"] .ie-h3 { color:#3a2b1e; }
+html[data-theme="light"] .ie-desc { color:rgba(58,43,30,0.6); }
+html[data-theme="light"] .ie-muted { color:rgba(58,43,30,0.45); }
+html[data-theme="light"] .ie-divider { border-color:rgba(193,127,89,0.12); }
+html[data-theme="light"] .ie-section-label { color:#c17f59; }
+html[data-theme="light"] .ie-skill-bar { background:rgba(193,127,89,0.12); }
+html[data-theme="light"] .ie-skill-fill { background:#c17f59; background:linear-gradient(90deg, #c17f59, #8b5a3c); }
+html[data-theme="light"] .ie-select {
+    background:rgba(255,248,240,0.8);
+    border:1px solid rgba(193,127,89,0.2);
+    color:#5c3620;
 }
 
-.nav-menu-ie li {
-    display: inline;
-    float: left;
-    margin: 0 2px;
-}
+/* ---- Quick Menu (Light) ---- */
+html[data-theme="light"] .ie-quick { background:rgba(255,248,240,0.85); border:1px solid rgba(232,213,192,0.55); }
 
-.nav-link-ie {
-    display: block;
-    padding: 8px 14px;
-    color: rgba(235,235,245,0.5);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 500;
-    border-radius: 9999px;
-    background: transparent;
-}
+/* ---- Modal (Light) ---- */
+html[data-theme="light"] .ie-modal-overlay { background:rgba(60,36,21,0.3); }
+html[data-theme="light"] .ie-modal-box { background:rgba(255,248,240,0.95); border:1px solid rgba(232,213,192,0.6); }
 
-.nav-link-ie:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.08);
-}
+/* ---- Hero Image (Light) ---- */
+html[data-theme="light"] .ie-hero-img { border-color:rgba(193,127,89,0.25); }
 
-.nav-link-ie.active {
-    color: #fff;
-    background: rgba(255,255,255,0.12);
-}
+/* ---- Code in about section (Light) ---- */
+html[data-theme="light"] .ie-code-box { background:rgba(58,43,30,0.04); color:#5c3620; border:1px solid rgba(193,127,89,0.12); }
 
-.nav-actions-ie {
-    float: right;
-    display: inline;
-}
+/* ---- Link/contact items (Light) ---- */
+html[data-theme="light"] .ie-link-row a { color:#8b5a3c; }
+html[data-theme="light"] .ie-link-row a:hover { background:rgba(193,127,89,0.08); color:#5c3620; }
+html[data-theme="light"] .ie-footer-top { border-color:rgba(193,127,89,0.12); }
 
-.nav-action-btn-ie {
-    display: inline-block;
-    padding: 8px 14px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(235,235,245,0.7);
-    cursor: pointer;
-    text-decoration: none;
-    margin-left: 6px;
-}
-
-.nav-action-btn-ie:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-}
-
-.nav-time-ie {
-    display: inline-block;
-    padding: 6px 12px;
-    font-family: 'Consolas', monospace;
-    font-size: 12px;
-    color: rgba(235,235,245,0.7);
-    margin-left: 6px;
-}
-
-.nav-time-dot-ie {
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    background: #f43f5e;
-    border-radius: 50%;
-    margin-right: 6px;
-    *margin-top: 8px;
+/* ---- Badge (Light) ---- */
+html[data-theme="light"] .ie-badge {
+    background:rgba(193,127,89,0.1);
+    border:1px solid rgba(193,127,89,0.2);
+    color:#8b5a3c;
 }
 
 /* ========================================
-   主内容区域
-======================================== */
-main-ie {
-    display: block;
-    position: relative;
-    z-index: 1;
+   DARK THEME
+   ======================================== */
+html[data-theme="dark"] body { background:#0a0a0f; color:#e0e0f0; }
+html[data-theme="dark"] ::selection { background:rgba(139,92,246,0.4); color:#fff; }
+html[data-theme="dark"] a { color:#a855f7; }
+html[data-theme="dark"] a:hover { color:#c084fc; }
+
+html[data-theme="dark"] .ie-bg { background:#0a0a0f; }
+html[data-theme="dark"] .ie-orb { display:none; }
+
+html[data-theme="dark"] .ie-glass {
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.07);
+    box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+html[data-theme="dark"] .ie-glass:before {
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
 }
 
-section-ie {
-    display: block;
-    padding: 80px 16px;
+html[data-theme="dark"] .ie-card {
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:0 6px 24px rgba(0,0,0,0.35);
+}
+html[data-theme="dark"] .ie-card:before {
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
 }
 
-.container-ie {
-    max-width: 1100px;
-    margin: 0 auto;
+html[data-theme="dark"] .ie-navbar {
+    background:rgba(18,18,26,0.9);
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:0 4px 24px rgba(0,0,0,0.4);
 }
 
-/* Hero 区域 */
-.hero-ie {
-    min-height: 100vh;
-    display: block;
-    text-align: center;
-    padding-top: 140px;
-    padding-bottom: 32px;
+html[data-theme="dark"] .ie-btn-primary {
+    background:#8b5cf6;
+    background:linear-gradient(135deg, #8b5cf6, #a855f7);
+    color:#fff; border:none;
+    box-shadow:0 3px 18px rgba(139,92,246,0.3);
+}
+html[data-theme="dark"] .ie-btn-secondary {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    color:#e0e0f0;
 }
 
-.hero-badge-ie {
-    display: inline-block;
-    padding: 10px 20px;
-    background: rgba(139,92,246,0.12);
-    border: 1px solid rgba(139,92,246,0.25);
-    border-radius: 9999px;
-    color: #a855f7;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 24px;
+html[data-theme="dark"] .ie-tag {
+    background:rgba(139,92,246,0.08);
+    border:1px solid rgba(139,92,246,0.15);
+    color:rgba(235,235,245,0.7);
 }
 
-.hero-h1-ie {
-    font-size: 52px;
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 16px;
-    letter-spacing: -0.03em;
-    background: none;
-    filter: none;
-    color: #fff;
+html[data-theme="dark"] .ie-h1 { color:#fff; }
+html[data-theme="dark"] .ie-h1 span { color:#a855f7; }
+html[data-theme="dark"] .ie-h2 { color:#fff; }
+html[data-theme="dark"] .ie-h3 { color:#fff; }
+html[data-theme="dark"] .ie-desc { color:rgba(235,235,245,0.5); }
+html[data-theme="dark"] .ie-muted { color:rgba(235,235,245,0.35); }
+html[data-theme="dark"] .ie-divider { border-color:rgba(255,255,255,0.06); }
+html[data-theme="dark"] .ie-section-label { color:#a855f7; }
+html[data-theme="dark"] .ie-skill-bar { background:rgba(139,92,246,0.1); }
+html[data-theme="dark"] .ie-skill-fill { background:#8b5cf6; background:linear-gradient(90deg, #8b5cf6, #a855f7); }
+html[data-theme="dark"] .ie-select {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    color:#e0e0f0;
 }
 
-.hero-h1-ie span {
-    color: #d946ef;
+html[data-theme="dark"] .ie-quick { background:rgba(18,18,26,0.9); border:1px solid rgba(255,255,255,0.08); }
+html[data-theme="dark"] .ie-modal-overlay { background:rgba(0,0,0,0.5); }
+html[data-theme="dark"] .ie-modal-box { background:rgba(15,15,22,0.95); border:1px solid rgba(255,255,255,0.08); }
+html[data-theme="dark"] .ie-hero-img { border-color:rgba(139,92,246,0.2); }
+html[data-theme="dark"] .ie-code-box { background:rgba(0,0,0,0.2); color:#c0c0d0; border:1px solid rgba(255,255,255,0.06); }
+html[data-theme="dark"] .ie-link-row a { color:#a855f7; }
+html[data-theme="dark"] .ie-link-row a:hover { background:rgba(139,92,246,0.12); color:#c084fc; }
+html[data-theme="dark"] .ie-footer-top { border-color:rgba(255,255,255,0.06); }
+html[data-theme="dark"] .ie-badge {
+    background:rgba(139,92,246,0.1);
+    border:1px solid rgba(139,92,246,0.18);
+    color:#c084fc;
 }
 
-.hero-desc-ie {
-    font-size: 16px;
-    color: rgba(235,235,245,0.7);
-    max-width: 540px;
-    margin: 0 auto 32px;
-    line-height: 1.75;
-}
+/* ---- Neutral (both themes) ---- */
+.ie-bg { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-100; }
+.ie-orb { display:none; }
+/* Show orbs in light mode only */
+html[data-theme="light"] .ie-orb { display:block; }
 
-/* 新年祝福卡片 */
-.newyear-wish-ie {
-    display: inline-block;
-    padding: 12px 24px;
-    background: linear-gradient(90deg, rgba(183, 28, 28, 0.3), rgba(229, 57, 53, 0.3));
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    border-radius: 16px;
-    margin-bottom: 24px;
-    color: #FFD700;
-    font-size: 14px;
-    font-weight: 500;
+.ie-btn-primary, .ie-btn-secondary {
+    display:inline-block; padding:12px 26px; border-radius:9999px;
+    font-size:14px; font-weight:600; text-decoration:none; cursor:pointer;
+    margin:4px 6px; transition:transform 0.2s, box-shadow 0.3s;
 }
+.ie-btn-primary:hover, .ie-btn-secondary:hover { transform:translateY(-2px); }
+.ie-btn-primary:active, .ie-btn-secondary:active { transform:translateY(0); }
 
-.hero-img-wrap-ie {
-    position: relative;
-    max-width: 440px;
-    margin: 0 auto 32px;
-    display: inline-block;
-}
+.ie-tag { display:inline-block; padding:4px 10px; border-radius:9999px; font-size:11px; margin:2px 4px 4px 0; }
 
-.hero-img-wrap-ie img {
-    width: 440px;
-    height: auto;
-    display: block;
-    border-radius: 28px;
-    border: 2px solid rgba(139,92,246,0.3);
-}
+.ie-h1 { font-size:48px; font-weight:700; line-height:1.2; margin-bottom:14px; }
+.ie-h2 { font-size:30px; font-weight:700; margin-bottom:8px; }
+.ie-h3 { font-size:20px; font-weight:600; margin-bottom:8px; }
+.ie-desc { font-size:14px; line-height:1.75; max-width:540px; margin:0 auto; }
+.ie-muted { font-size:12px; }
+.ie-section-label { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; display:block; }
 
-.hero-btns-ie {
-    display: block;
-    margin-top: 24px;
-}
+/* ---- Layout ---- */
+.ie-container { max-width:1100px; margin:0 auto; padding:0 20px; }
+.ie-section { display:block; padding:72px 0; position:relative; z-index:1; }
+.ie-section-hero { padding:120px 0 60px; text-align:center; min-height:100vh; }
 
-.btn-ie {
-    display: inline-block;
-    padding: 14px 28px;
-    border-radius: 9999px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    margin: 0 8px;
+/* ---- Navigation ---- */
+.ie-nav-wrap { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:1000; width:calc(100% - 32px); max-width:680px; }
+.ie-navbar { border-radius:36px; padding:10px 20px; position:relative; }
+.ie-navbar:after { content:''; display:table; clear:both; }
+.ie-nav-brand { float:left; display:inline; text-decoration:none; font-weight:700; font-size:15px; padding:10px 8px; }
+.ie-nav-brand .ie-ico { display:inline-block; width:36px; height:36px; line-height:36px; text-align:center; font-size:20px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+.ie-nav-brand .ie-ico-light { background:#c17f59; background:linear-gradient(135deg, #c17f59, #8b5a3c); }
+.ie-nav-brand .ie-ico-dark { background:#8b5cf6; background:linear-gradient(135deg, #8b5cf6, #a855f7); }
+html[data-theme="light"] .ie-nav-brand .ie-ico-dark { display:none; }
+html[data-theme="dark"] .ie-nav-brand .ie-ico-light { display:none; }
+.ie-nav-menu { float:left; list-style:none; margin:0; padding:0 0 0 8px; }
+.ie-nav-menu li { float:left; display:inline; margin:0 2px; }
+.ie-nav-link { display:block; padding:10px 14px; text-decoration:none; font-size:13px; font-weight:500; border-radius:9999px; }
+html[data-theme="light"] .ie-nav-link { color:rgba(58,43,30,0.5); }
+html[data-theme="light"] .ie-nav-link:hover { background:rgba(193,127,89,0.06); color:#5c3620; }
+html[data-theme="light"] .ie-nav-link.active { background:rgba(193,127,89,0.1); color:#5c3620; }
+html[data-theme="dark"] .ie-nav-link { color:rgba(235,235,245,0.45); }
+html[data-theme="dark"] .ie-nav-link:hover { background:rgba(255,255,255,0.06); color:#fff; }
+html[data-theme="dark"] .ie-nav-link.active { background:rgba(255,255,255,0.1); color:#fff; }
+.ie-nav-right { float:right; display:inline; padding-top:3px; }
+.ie-nav-right > * { display:inline-block; vertical-align:middle; margin-left:8px; }
+.ie-theme-btn {
+    padding:8px 14px; border-radius:9999px; font-size:12px; font-weight:500; cursor:pointer;
+    border:none; transition:background 0.2s;
 }
+html[data-theme="light"] .ie-theme-btn { background:rgba(193,127,89,0.08); color:#5c3620; border:1px solid rgba(193,127,89,0.15); }
+html[data-theme="light"] .ie-theme-btn:hover { background:rgba(193,127,89,0.15); }
+html[data-theme="dark"] .ie-theme-btn { background:rgba(255,255,255,0.04); color:#e0e0f0; border:1px solid rgba(255,255,255,0.08); }
+html[data-theme="dark"] .ie-theme-btn:hover { background:rgba(255,255,255,0.1); }
+.ie-clock { font-family:'Consolas',monospace; font-size:12px; padding:6px 10px; border-radius:9999px; }
+html[data-theme="light"] .ie-clock { background:rgba(58,43,30,0.03); color:rgba(58,43,30,0.5); }
+html[data-theme="dark"] .ie-clock { background:rgba(255,255,255,0.03); color:rgba(235,235,245,0.5); }
+.ie-clock-dot { display:inline-block; width:5px; height:5px; border-radius:50%; margin-right:6px; background:#f43f5e; }
 
-.btn-primary-ie {
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#a855f7)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#a855f7);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(139,92,246,0.35);
-    border: none;
-}
+/* ---- Hero ---- */
+.ie-hero-badge { display:inline-block; padding:8px 18px; border-radius:9999px; font-size:12px; font-weight:600; margin-bottom:20px; }
+.ie-hero-img-wrap { position:relative; max-width:420px; margin:0 auto 28px; }
+.ie-hero-img { width:100%; max-width:420px; border-radius:24px; border:2px solid; display:block; }
 
-.btn-secondary-ie {
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.1);
-}
+/* ---- Cards Grid (float-based) ---- */
+.ie-grid { margin:-12px; }
+.ie-grid:after { content:''; display:table; clear:both; }
+.ie-col-3 { float:left; width:calc(33.333% - 24px); margin:12px; }
+.ie-col-2 { float:left; width:calc(50% - 24px); margin:12px; }
+.ie-card, .ie-glass { border-radius:20px; padding:28px 24px; }
+.ie-card:hover, .ie-glass:hover { transform:translateY(-3px); transition:transform 0.35s; }
+.ie-card-ico { width:48px; height:48px; border-radius:18px; text-align:center; line-height:48px; font-size:22px; margin-bottom:14px; }
+html[data-theme="light"] .ie-card-ico { background:rgba(193,127,89,0.1); }
+html[data-theme="dark"] .ie-card-ico { background:rgba(139,92,246,0.1); }
 
-/* 区块标题 */
-.section-hd-ie {
-    text-align: center;
-    margin-bottom: 32px;
-}
+/* ---- Lab Cards ---- */
+.ie-lab-ico { font-size:28px; margin-bottom:10px; }
 
-.section-hd-ie h2 {
-    font-size: 34px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
-}
+/* ---- Section Header ---- */
+.ie-section-hd { text-align:center; margin-bottom:36px; }
 
-.section-hd-ie p {
-    font-size: 14px;
-    color: rgba(235,235,245,0.5);
-}
+/* ---- Skills ---- */
+.ie-skill-item { margin-bottom:14px; }
+.ie-skill-hd:after { content:''; display:table; clear:both; }
+.ie-skill-name { float:left; font-size:13px; font-weight:500; }
+.ie-skill-num { float:right; font-size:12px; }
+html[data-theme="light"] .ie-skill-num { color:rgba(58,43,30,0.35); }
+html[data-theme="dark"] .ie-skill-num { color:rgba(235,235,245,0.3); }
+.ie-skill-bar { height:5px; border-radius:9999px; overflow:hidden; margin-top:4px; }
+.ie-skill-fill { height:100%; width:0; transition:width 1.2s; border-radius:9999px; }
 
-/* 项目卡片 */
-.projects-grid-ie {
-    display: block;
-    margin: -12px;
-}
+/* ---- Footer ---- */
+.ie-footer { display:block; padding:48px 20px 32px; text-align:center; }
+.ie-footer-inner { max-width:480px; margin:0 auto; padding:32px 20px 0; }
+.ie-footer-top { border-top:1px solid; padding-top:32px; }
+.ie-footer-logo { font-size:20px; font-weight:700; margin-bottom:12px; display:block; }
+.ie-footer-logo .ie-ico { display:inline-block; width:40px; height:40px; line-height:40px; text-align:center; font-size:22px; border-radius:50%; margin-right:8px; vertical-align:middle; }
+html[data-theme="light"] .ie-footer-ico { background:#c17f59; background:linear-gradient(135deg, #c17f59, #8b5a3c); }
+html[data-theme="dark"] .ie-footer-ico { background:#8b5cf6; background:linear-gradient(135deg, #8b5cf6, #a855f7); }
+.ie-link-row { margin:16px 0; }
+.ie-link-row a { display:inline-block; padding:6px 14px; text-decoration:none; font-size:13px; border-radius:9999px; margin:2px; }
+.ie-footer-copy { font-size:11px; margin-top:12px; }
 
-.projects-grid-ie:after {
-    content: '';
-    display: table;
-    clear: both;
-}
+/* ---- Quick Menu ---- */
+.ie-quick-wrap { position:fixed; bottom:20px; left:20px; z-index:900; }
+.ie-quick { border-radius:18px; padding:12px 18px; font-size:12px; }
+.ie-quick a, .ie-quick span { display:block; text-decoration:none; margin:3px 0; font-weight:500; cursor:pointer; }
+html[data-theme="light"] .ie-quick a { color:#8b5a3c; }
+html[data-theme="dark"] .ie-quick a { color:#a855f7; }
 
-.project-card-ie {
-    float: left;
-    width: calc(33.333% - 24px);
-    margin: 12px;
-    padding: 24px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border-radius: 28px;
+/* ---- Language Selector ---- */
+.ie-lang-wrap { display:inline-block; vertical-align:middle; margin-left:6px; }
+.ie-select {
+    font-size:12px; font-weight:600; padding:5px 10px; border-radius:9999px;
+    cursor:pointer; outline:none; font-family:inherit;
 }
+.ie-lang-indicator { font-size:11px; font-weight:700; padding:4px 8px; border-radius:9999px; margin-right:4px; }
+html[data-theme="light"] .ie-lang-indicator { background:rgba(193,127,89,0.1); color:#8b5a3c; }
+html[data-theme="dark"] .ie-lang-indicator { background:rgba(139,92,246,0.12); color:#c084fc; }
 
-.project-card-ie:hover {
-    transform: translateY(-4px);
-}
+/* ---- Skip Link ---- */
+.ie-skip { position:absolute; top:-100%; left:50%; transform:translateX(-50%); padding:10px 18px; border-radius:20px; font-size:12px; font-weight:600; z-index:9999; text-decoration:none; }
+html[data-theme="light"] .ie-skip { background:#3a2b1e; color:#faf6f1; }
+html[data-theme="dark"] .ie-skip { background:#fff; color:#0a0a0f; }
 
-.project-ico-ie {
-    width: 52px;
-    height: 52px;
-    background: rgba(139,92,246,0.15);
-    border-radius: 20px;
-    text-align: center;
-    line-height: 52px;
-    font-size: 24px;
-    margin-bottom: 16px;
-}
+/* ---- Modal ---- */
+.ie-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:2000; }
+.ie-modal.active { display:block; }
+.ie-modal-overlay { position:absolute; top:0; left:0; width:100%; height:100%; }
+.ie-modal-box { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:22px; padding:32px; max-width:420px; width:85%; text-align:center; }
+.ie-modal-box h3 { margin-bottom:10px; }
+.ie-modal-box p { margin-bottom:18px; }
+html[data-theme="light"] .ie-modal-box p { color:rgba(58,43,30,0.6); }
+html[data-theme="dark"] .ie-modal-box p { color:rgba(235,235,245,0.5); }
 
-.project-card-ie h3 {
-    font-size: 19px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 8px;
-}
+/* ---- Code Block ---- */
+.ie-code-box { font-family:'Consolas',monospace; padding:16px; border-radius:12px; font-size:12px; line-height:1.6; margin-top:12px; overflow-x:auto; white-space:pre-wrap; }
 
-.project-card-ie p {
-    font-size: 14px;
-    color: rgba(235,235,245,0.5);
-    margin-bottom: 16px;
-    line-height: 1.7;
-}
-
-.project-tags-ie {
-    display: block;
-    margin-bottom: 16px;
-}
-
-.tag-ie {
-    display: inline-block;
-    padding: 5px 12px;
-    background: rgba(139,92,246,0.08);
-    border: 1px solid rgba(139,92,246,0.15);
-    border-radius: 9999px;
-    font-size: 12px;
-    color: rgba(235,235,245,0.7);
-    margin-right: 6px;
-    margin-bottom: 6px;
-}
-
-/* 实验室卡片 */
-.lab-grid-ie {
-    display: block;
-    margin: -12px;
-}
-
-.lab-grid-ie:after {
-    content: '';
-    display: table;
-    clear: both;
-}
-
-.lab-card-ie {
-    float: left;
-    width: calc(33.333% - 24px);
-    margin: 12px;
-    padding: 24px;
-    text-align: center;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border-radius: 28px;
-}
-
-.lab-ico-ie {
-    font-size: 30px;
-    margin-bottom: 12px;
-}
-
-.lab-card-ie h3 {
-    font-size: 17px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 8px;
-}
-
-.lab-card-ie p {
-    font-size: 13px;
-    color: rgba(235,235,245,0.5);
-    line-height: 1.7;
-}
-
-/* 关于区域 */
-.about-area-ie {
-    display: block;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 16px;
-}
-
-.about-area-ie:after {
-    content: '';
-    display: table;
-    clear: both;
-}
-
-.about-box-ie {
-    float: left;
-    width: calc(50% - 16px);
-    margin: 0 8px;
-    padding: 24px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border-radius: 28px;
-}
-
-.about-box-ie h3 {
-    font-size: 26px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 16px;
-}
-
-.about-box-ie p {
-    font-size: 14px;
-    color: rgba(235,235,245,0.7);
-    margin-bottom: 16px;
-    line-height: 1.8;
-}
-
-.about-box-ie a {
-    color: #a855f7;
-    text-decoration: none;
-}
-
-.about-box-ie a:hover {
-    text-decoration: underline;
-}
-
-.skills-box-ie {
-    float: left;
-    width: calc(50% - 16px);
-    margin: 0 8px;
-    padding: 24px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.2);
-    border-left: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    border-radius: 28px;
-}
-
-.skills-title-ie {
-    font-size: 17px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 16px;
-}
-
-.skill-item-ie {
-    margin-bottom: 16px;
-}
-
-.skill-hd-ie {
-    display: block;
-    margin-bottom: 6px;
-}
-
-.skill-hd-ie:after {
-    content: '';
-    display: table;
-    clear: both;
-}
-
-.skill-name-ie {
-    float: left;
-    font-size: 14px;
-    font-weight: 500;
-    color: #fff;
-}
-
-.skill-num-ie {
-    float: right;
-    font-size: 12px;
-    color: rgba(235,235,245,0.35);
-}
-
-.skill-bar-ie {
-    height: 5px;
-    background: rgba(139,92,246,0.1);
-    border-radius: 9999px;
-    overflow: hidden;
-}
-
-.skill-fill-ie {
-    height: 100%;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
-    width: 0;
-    transition: width 1.2s;
-}
-
-/* 页脚 */
-.footer-ie {
-    display: block;
-    padding: 48px 16px 32px;
-    text-align: center;
-}
-
-.footer-box-ie {
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 32px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    position: relative;
-}
-
-.footer-logo-ie {
-    display: inline-block;
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 16px;
-}
-
-.footer-ico-ie {
-    display: inline-block;
-    width: 44px;
-    height: 44px;
-    background: transparent;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#8b5cf6, endColorstr=#d946ef);
-    border-radius: 20px;
-    text-align: center;
-    line-height: 44px;
-    font-size: 24px;
-    vertical-align: middle;
-    margin-right: 10px;
-}
-
-.footer-ie p {
-    font-size: 14px;
-    color: rgba(235,235,245,0.7);
-    margin-bottom: 16px;
-}
-
-.footer-links-ie {
-    display: block;
-    margin-bottom: 16px;
-}
-
-.footer-links-ie a {
-    display: inline-block;
-    padding: 8px 16px;
-    color: rgba(235,235,245,0.5);
-    text-decoration: none;
-    font-size: 13px;
-    border-radius: 9999px;
-}
-
-.footer-links-ie a:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.06);
-}
-
-.footer-copy-ie {
-    font-size: 12px;
-    color: rgba(235,235,245,0.35);
-    padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.04);
-}
-
-/* 页脚新年祝福 */
-.footer-newyear-ie {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    color: #FFD700;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-/* 跳过链接 */
-.skip-link-ie {
-    position: absolute;
-    top: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 20px;
-    background: #fff;
-    color: #0a0a0f;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    z-index: 9999;
-}
+/* ---- Misc ---- */
+.ie-text-center { text-align:center; }
+.ie-divider { border:none; border-top:1px solid; margin:16px 0; }
 
 /* ========================================
-   响应式 - IE兼容
-======================================== */
-@media screen and (max-width: 768px) {
-    .project-card-ie {
-        width: calc(100% - 24px);
-        float: none;
-    }
-
-    .lab-card-ie {
-        width: calc(100% - 24px);
-        float: none;
-    }
-
-    .about-box-ie,
-    .skills-box-ie {
-        width: calc(100% - 16px);
-        float: none;
-        margin-bottom: 16px;
-    }
-
-    .nav-menu-ie {
-        display: none;
-    }
-
-    .nav-bar-ie {
-        text-align: center;
-    }
-
-    .nav-brand-ie {
-        float: none;
-        display: inline-block;
-    }
-
-    .nav-actions-ie {
-        float: none;
-        display: inline-block;
-        margin-top: 10px;
-    }
-    
-    .newyear-banner-content-ie {
-        text-align: center;
-    }
-    
-    .newyear-link-ie,
-    .newyear-text-ie {
-        float: none;
-        display: block;
-        margin: 4px 0;
-    }
-    
-    .lantern-ie {
-        display: none;
-    }
+   RESPONSIVE
+   ======================================== */
+@media screen and (max-width:768px) {
+    .ie-h1 { font-size:34px; }
+    .ie-h2 { font-size:24px; }
+    .ie-col-3, .ie-col-2 { width:calc(100% - 24px); float:none; }
+    .ie-nav-menu { display:none; }
+    .ie-navbar { text-align:center; }
+    .ie-nav-brand { float:none; display:inline-block; }
+    .ie-nav-right { float:none; display:inline-block; margin-top:8px; }
+    .ie-section-hero { padding:100px 0 40px; }
+    .ie-lang-wrap { margin-top:8px; }
 }
 
-/* 滚动条 - IE */
-html {
-    scrollbar-face-color: #8b5cf6;
-    scrollbar-shadow-color: #d946ef;
-    scrollbar-track-color: transparent;
-}
+/* IE scrollbar */
+html { scrollbar-face-color:#c17f59; scrollbar-shadow-color:#8b5a3c; scrollbar-track-color:transparent; }
 
-/* 选择 */
-::selection {
-    background: rgba(139,92,246,0.4);
-    color: #fff;
-}
+/* ========================================
+   IE6-8 Fixes
+   ======================================== */
+.ie8 .ie-grid { *zoom:1; }
+.ie8 .ie-navbar { *zoom:1; }
+.ie8 .ie-col-3 { *width:300px; }
+.ie8 .ie-btn-primary { *display:inline; *zoom:1; }
+.ie8 .ie-btn-secondary { *display:inline; *zoom:1; }
+.ie8 .ie-orb { display:none !important; }
+.ie8 .ie-glass { border:1px solid #ddd; }
+.ie8 .ie-card { border:1px solid #ddd; }
 </style>
-
-<!--[if IE 8]>
-<style>
-/* IE8特定样式 */
-.liquid-orb-ie { filter: none; }
-.nav-menu-ie li { display: inline; }
-.btn-ie { *display: inline; *zoom: 1; }
-.project-card-ie, .lab-card-ie, .about-box-ie, .skills-box-ie { *width: 300px; }
-</style>
-<![endif]-->
-
-<!--[if IE 9]>
-<style>
-/* IE9特定样式 */
-.liquid-orb-ie { filter: progid:DXImageTransform.Microsoft.Blur(pixelradius=60); }
-</style>
-<![endif]-->
 </head>
 <body>
-    <!-- 新年横幅 -->
-    <div class="newyear-banner-ie">
-        <div class="newyear-banner-content-ie">
-            <a href="index-ie.html" class="newyear-link-ie">🎯 IE兼容版</a>
-            <span class="newyear-text-ie">🎊 恭贺新禧 · 丙午马年大吉 · 万事如意 🎊</span>
+
+<div class="ie-bg"></div>
+<div class="ie-orb ie-orb-1"></div>
+<div class="ie-orb ie-orb-2"></div>
+<div class="ie-orb ie-orb-3"></div>
+
+<!-- Skip Link -->
+<a href="#main-ie" class="ie-skip" data-i18n="a11y.skip">跳到主要内容</a>
+
+<!-- Navigation -->
+<div class="ie-nav-wrap">
+    <nav class="ie-navbar" role="navigation" aria-label="主导航">
+        <a href="#home-ie" class="ie-nav-brand">
+            <span class="ie-ico ie-ico-light">🦝</span>
+            <span class="ie-ico ie-ico-dark">🦝</span>
+            <span>软软的小窝</span>
+        </a>
+        <ul class="ie-nav-menu" id="navMenuIe">
+            <li><a href="#home-ie" class="ie-nav-link active" data-i18n="nav.home">首页</a></li>
+            <li><a href="#projects-ie" class="ie-nav-link" data-i18n="nav.projects">项目</a></li>
+            <li><a href="#lab-ie" class="ie-nav-link" data-i18n="nav.lab">实验室</a></li>
+            <li><a href="#about-ie" class="ie-nav-link" data-i18n="nav.about">关于</a></li>
+        </ul>
+        <div class="ie-nav-right">
+            <button class="ie-theme-btn" id="themeBtnIe" aria-label="切换主题">
+                <span id="themeIconIe">☀️</span>
+                <span id="themeLabelIe">浅色</span>
+            </button>
+            <span class="ie-lang-wrap">
+                <span class="ie-lang-indicator" id="langIndicator">中</span>
+                <select class="ie-select" id="i18nSelect" aria-label="选择语言">
+                    <option value="zh-CN">中文（简体）</option>
+                    <option value="zh-TW">中文（繁體）</option>
+                    <option value="en-US">English</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="fr">Français</option>
+                    <option value="sa">संस्कृत</option>
+                    <option value="ar">العربية</option>
+                    <option value="egy">𓂀 古埃及语</option>
+                    <option value="anubis">𓃣 圣书体</option>
+                    <option value="eo">Esperanto</option>
+                    <option value="ru">Русский</option>
+                    <option value="tok">toki pona</option>
+                    <option value="jbo">lojban</option>
+                    <option value="tlh">tlhIngan Hol</option>
+                    <option value="qya">Quenya</option>
+                    <option value="dot">Dothraki</option>
+                    <option value="nvi">Na'vi</option>
+                    <option value="eu">Euskara</option>
+                    <option value="cy">Cymraeg</option>
+                    <option value="is">Íslenska</option>
+                    <option value="ca">Català</option>
+                    <option value="mt">Malti</option>
+                    <option value="fy">Frysk</option>
+                    <option value="lb">Lëtzebuergesch</option>
+                    <option value="haw">ʻŌlelo Hawaiʻi</option>
+                    <option value="nv">Diné Bizaad</option>
+                    <option value="yi">ייִדיש</option>
+                    <option value="mi">Te Reo Māori</option>
+                    <option value="bo">བོད་སྐད</option>
+                    <option value="ug">ئۇيغۇرچە</option>
+                    <option value="la">Latina</option>
+                    <option value="grc">Ἑλληνική</option>
+                    <option value="non">Norrœnt</option>
+                    <option value="ang">Ænglisc</option>
+                    <option value="hili">丘丘语</option>
+                    <option value="censor">丘丘语 (审查)</option>
+                    <option value="cat" disabled>小猫语 (小红书:月理Aevira(tarot))</option>
+                </select>
+            </span>
+            <span class="ie-clock">
+                <span class="ie-clock-dot"></span>
+                <span id="clockIe">00:00:00</span>
+            </span>
         </div>
-    </div>
+    </nav>
+</div>
 
-    <!-- 灯笼装饰 -->
-    <a href="#" class="lantern-ie lantern-left-ie" title="新年快乐">🏮</a>
-    <a href="#" class="lantern-ie lantern-right-ie" title="马年大吉">🧧</a>
-
-    <!-- IE兼容液态背景 -->
-    <div class="liquid-bg-ie">
-        <div class="liquid-orb-ie orb-ie-1"></div>
-        <div class="liquid-orb-ie orb-ie-2"></div>
-        <div class="liquid-orb-ie orb-ie-3"></div>
-        <div class="liquid-orb-ie orb-ie-4"></div>
-        <div class="liquid-orb-ie orb-ie-5"></div>
-    </div>
-    <div class="liquid-mask-ie"></div>
-
-    <!-- 跳过链接 - IE版 -->
-    <a href="#main-ie" class="skip-link-ie" tabindex="1">跳到主要内容</a>
-
-    <!-- 导航 - IE版 -->
-    <div class="nav-wrap-ie">
-        <nav class="nav-bar-ie">
-            <a href="#home-ie" class="nav-brand-ie">
-                <span class="nav-icon-ie">🦝</span>
-                <span>软软的小窝</span>
-            </a>
-
-            <ul class="nav-menu-ie" id="navMenuIe">
-                <li><a href="#home-ie" class="nav-link-ie active">首页</a></li>
-                <li><a href="#projects-ie" class="nav-link-ie">项目</a></li>
-                <li><a href="#lab-ie" class="nav-link-ie">实验室</a></li>
-                <li><a href="#about-ie" class="nav-link-ie">关于</a></li>
-            </ul>
-
-            <div class="nav-actions-ie">
-                <button class="nav-action-btn-ie" id="themeBtnIe">
-                    <span id="themeIconIe">🌙</span>
-                    <span>深色</span>
-                </button>
-                <div class="nav-time-ie">
-                    <span class="nav-time-dot-ie"></span>
-                    <span id="clockIe">00:00:00</span>
-                </div>
-                <a href="https://raccoon.fit/mobile" class="nav-action-btn-ie" target="_blank" id="officialBtnIe">
-                    <span>客服合集</span>
-                </a>
+<!-- Main Content -->
+<main id="main-ie">
+    <!-- Hero Section -->
+    <section id="home-ie" class="ie-section ie-section-hero">
+        <div class="ie-container">
+            <span class="ie-badge" data-i18n="hero.year">创意不息 · 灵感奔腾</span>
+            <h1 class="ie-h1">
+                <span data-i18n="hero.title1">探索代码的</span><br>
+                <span data-i18n="hero.title2">无限可能</span>
+            </h1>
+            <p class="ie-desc" data-i18n="hero.desc" style="margin-bottom:20px;">
+                这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。
+            </p>
+            <p class="ie-section-label" data-i18n="hero.greeting" style="margin-bottom:24px;">
+                保持好奇 · 永远优雅地解决问题
+            </p>
+            <div class="ie-hero-img-wrap">
+                <img class="ie-hero-img" src="https://raccoon.fit/image/20260101/2026新年快乐.jpg" alt="Hero image" width="420" height="280">
             </div>
-        </nav>
-    </div>
-
-    <!-- 主内容 - IE版 -->
-    <main-ie id="main-ie">
-        <!-- 首页 - IE版 -->
-        <section-ie id="home-ie" class="hero-ie">
-            <div class="container-ie">
-                <!-- 新年徽章 -->
-                <div class="newyear-badge-ie">
-                    <span>🎊</span>
-                    <span>丙午马年 · 新春快乐</span>
-                    <span>🎊</span>
-                </div>
-                <h1 class="hero-h1-ie">
-                    探索代码的<br><span>无限可能</span>
-                </h1>
-                <p class="hero-desc-ie">
-                    这里是软软的数字空间，一个专注于创造、学习和分享的地方。
-                    通过代码探索未知，用技术解决现实问题。
-                </p>
-                <!-- 新年祝福 -->
-                <div class="newyear-wish-ie">
-                    ✨ 愿新的一年代码无bug，创意无极限 ✨
-                </div>
-                <div class="hero-img-wrap-ie">
-                    <img src="https://raccoon.fit/image/20260101/2026新年快乐.jpg" alt="2026新年快乐" width="440" height="293">
-                </div>
-                <div class="hero-btns-ie">
-                    <a href="#projects-ie" class="btn-ie btn-primary-ie">
-                        <span>🚀</span>
-                        <span>探索项目</span>
-                    </a>
-                    <a href="#contact-ie" class="btn-ie btn-secondary-ie">
-                        <span>💬</span>
-                        <span>联系我</span>
-                    </a>
-                </div>
-            </div>
-        </section-ie>
-
-        <!-- 项目 - IE版 -->
-        <section-ie id="projects-ie">
-            <div class="container-ie">
-                <div class="section-hd-ie">
-                    <h2>精选作品</h2>
-                    <p>每个项目都是对技术深度的探索和对用户体验的思考</p>
-                </div>
-
-                <div class="projects-grid-ie">
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">&lt;/&gt;</div>
-                        <h3>Ride</h3>
-                        <p>站在开发之巅 - 一个强大的在线开发环境，让编码更高效。</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">在线IDE</span>
-                            <span class="tag-ie">开发工具</span>
-                        </div>
-                        <a href="https://raccoon.fit/Ride" class="btn-ie btn-primary-ie" target="_blank">立即体验 ↗</a>
-                    </div>
-
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">&lt;/&gt;</div>
-                        <h3>哔哩哔哩直播流获取</h3>
-                        <p>一键获取哔哩哔哩直播流地址和直播信息</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">直播辅助</span>
-                            <span class="tag-ie">哔哩哔哩</span>
-                        </div>
-                        <a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" class="btn-ie btn-primary-ie" target="_blank">立即体验 ↗</a>
-                    </div>
-
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">📱</div>
-                        <h3>MULU</h3>
-                        <p>一个已归档的移动应用项目，探索了完整的开发流程。</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">React Native</span>
-                            <span class="tag-ie">UI/UX</span>
-                        </div>
-                        <a href="#" class="btn-ie btn-secondary-ie">查看归档</a>
-                    </div>
-
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">📝</div>
-                        <h3>灵熊小记</h3>
-                        <p>你的神奇小伙伴「灵熊」已就位！帮你悄无声息地搞定很多事。</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">Vue.js</span>
-                            <span class="tag-ie">Markdown</span>
-                        </div>
-                        <a href="https://link3.cc/training_fengfeng_games" class="btn-ie btn-primary-ie" target="_blank">访问项目 ↗</a>
-                    </div>
-
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">🎮</div>
-                        <h3>小游戏库</h3>
-                        <p>探索人工智能与前端开发的结合，关注想法的诞生与实现。</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">CSS</span>
-                            <span class="tag-ie">HTML5</span>
-                        </div>
-                        <a href="https://raccoon.fit/game" class="btn-ie btn-secondary-ie" target="_blank">查看详情 ↗</a>
-                    </div>
-
-                    <div class="glass-ie project-card-ie">
-                        <div class="project-ico-ie">🤖</div>
-                        <h3>RACCOON AI</h3>
-                        <p>欢迎体验 RACCOON AI，与智能对话的未来对话。</p>
-                        <div class="project-tags-ie">
-                            <span class="tag-ie">AI</span>
-                            <span class="tag-ie">聊天</span>
-                        </div>
-                        <a href="https://raccoon.fit/ai" class="btn-ie btn-secondary-ie" target="_blank">立即体验 ↗</a>
-                    </div>
-                </div>
-            </div>
-        </section-ie>
-
-        <!-- 实验室 - IE版 -->
-        <section-ie id="lab-ie">
-            <div class="container-ie">
-                <div class="section-hd-ie">
-                    <h2>创意实验室</h2>
-                    <p>这里存放着正在进行中的实验、原型和创意构思</p>
-                </div>
-
-                <div class="lab-grid-ie">
-                    <div class="glass-ie lab-card-ie">
-                        <div class="lab-ico-ie">🔮</div>
-                        <h3>AI 辅助设计</h3>
-                        <p>探索人工智能在设计流程中的应用，尝试自动生成 UI 组件和设计系统。</p>
-                    </div>
-                    <div class="glass-ie lab-card-ie">
-                        <div class="lab-ico-ie">🎨</div>
-                        <h3>交互原型</h3>
-                        <p>创建高级交互动画和微交互，提升数字产品的体验质感。</p>
-                    </div>
-                    <div class="glass-ie lab-card-ie">
-                        <div class="lab-ico-ie">📊</div>
-                        <h3>数据可视化</h3>
-                        <p>将复杂数据转化为直观的视觉故事，探索信息设计的边界。</p>
-                    </div>
-                </div>
-            </div>
-        </section-ie>
-
-        <!-- 关于 - IE版 -->
-        <section-ie id="about-ie">
-            <div class="about-area-ie">
-                <div class="glass-ie about-box-ie">
-                    <h3>关于软软</h3>
-                    <p>
-                        一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，
-                        更是创造美和价值的艺术形式。
-                    </p>
-                    <p>
-                        选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——
-                        这些特质正是技术探索者所需要的核心品质。
-                    </p>
-                    <p>
-                        Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、
-                        追求卓越的技术哲学。
-                    </p>
-                    <a href="me">>> 点这里进入软软的个人主页</a>
-                </div>
-
-                <div class="glass-ie skills-box-ie">
-                    <h4 class="skills-title-ie">技术专长</h4>
-
-                    <div class="skill-item-ie" data-width="85">
-                        <div class="skill-hd-ie">
-                            <span class="skill-name-ie">前端开发</span>
-                            <span class="skill-num-ie">85%</span>
-                        </div>
-                        <div class="skill-bar-ie">
-                            <div class="skill-fill-ie" id="skill-fill-1"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item-ie" data-width="75">
-                        <div class="skill-hd-ie">
-                            <span class="skill-name-ie">UI/UX 设计</span>
-                            <span class="skill-num-ie">75%</span>
-                        </div>
-                        <div class="skill-bar-ie">
-                            <div class="skill-fill-ie" id="skill-fill-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item-ie" data-width="80">
-                        <div class="skill-hd-ie">
-                            <span class="skill-name-ie">产品思维</span>
-                            <span class="skill-num-ie">80%</span>
-                        </div>
-                        <div class="skill-bar-ie">
-                            <div class="skill-fill-ie" id="skill-fill-3"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-item-ie" data-width="70">
-                        <div class="skill-hd-ie">
-                            <span class="skill-name-ie">创意编程</span>
-                            <span class="skill-num-ie">70%</span>
-                        </div>
-                        <div class="skill-bar-ie">
-                            <div class="skill-fill-ie" id="skill-fill-4"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section-ie>
-    </main-ie>
-
-    <!-- 页脚 - IE版 -->
-    <footer-ie id="contact-ie" class="footer-ie">
-        <div class="footer-box-ie">
-            <!-- 新年装饰角标 -->
-            <span class="newyear-corner-ie corner-tl-ie">🧧</span>
-            <span class="newyear-corner-ie corner-tr-ie">🏮</span>
-            <span class="newyear-corner-ie corner-bl-ie">🎊</span>
-            <span class="newyear-corner-ie corner-br-ie">✨</span>
-            
-            <div class="footer-logo-ie">
-                <span class="footer-ico-ie">🦝</span>
-                <span>软软的小窝</span>
-            </div>
-            <p>探索、创造、成长。欢迎与我联系，交流想法，合作创新。</p>
-            <div class="footer-links-ie">
-                <a href="mailto:Raccoon@raccoon.fit">邮箱</a>
-                <a href="https://github.com/raccoon-fit" target="_blank">GitHub</a>
-                <a href="https://raccoon.fit" target="_blank">官网</a>
-                <a href="#home-ie">返回顶部</a>
-            </div>
-            <div class="footer-copy-ie">
-                © 2025-2026 软软. 本网站由浣熊设计与开发
-            </div>
-            <!-- 新年祝福 -->
-            <div class="footer-newyear-ie">
-                🎊 恭贺新禧 · 丙午马年大吉 · 万事如意 · 新春快乐 🎊
+            <div style="margin-top:24px;">
+                <a href="#projects-ie" class="ie-btn-primary" data-i18n="hero.cta1">探索项目</a>
+                <a href="https://github.com/raccoon-fit" target="_blank" class="ie-btn-secondary" data-i18n="hero.cta2">GitHub 星系</a>
             </div>
         </div>
-    </footer-ie>
+    </section>
 
-    <script type="text/javascript">
-    (function() {
-        'use strict';
+    <!-- Projects Section -->
+    <section id="projects-ie" class="ie-section">
+        <div class="ie-container">
+            <div class="ie-section-hd">
+                <span class="ie-section-label" data-i18n="projects.year">PORTFOLIO · 2026</span>
+                <h2 class="ie-h2" data-i18n="projects.title">精选作品</h2>
+                <p class="ie-desc" data-i18n="projects.subtitle">匠心独运 · 每一行代码皆有灵魂</p>
+            </div>
+            <div class="ie-grid">
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">&lt;/&gt;</div>
+                    <h3 class="ie-h3">Ride</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">站在开发之巅 - 一个强大的在线开发环境，让编码更高效。</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">在线IDE</span>
+                        <span class="ie-tag">开发工具</span>
+                    </div>
+                    <a href="https://raccoon.fit/Ride" class="ie-btn-primary" target="_blank" data-i18n="card.cta.try">立即体验</a>
+                </div>
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">&lt;/&gt;</div>
+                    <h3 class="ie-h3">哔哩哔哩直播流获取</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">一键获取哔哩哔哩直播流地址和直播信息</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">直播辅助</span>
+                        <span class="ie-tag">哔哩哔哩</span>
+                    </div>
+                    <a href="https://raccoon.fit/live/bilibili/Live_stream_information_acquisition" class="ie-btn-primary" target="_blank" data-i18n="card.cta.try">立即体验</a>
+                </div>
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">📝</div>
+                    <h3 class="ie-h3">灵熊小记</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">你的神奇小伙伴「灵熊」已就位！帮你悄无声息地搞定很多事。</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">Vue.js</span>
+                        <span class="ie-tag">Markdown</span>
+                    </div>
+                    <a href="https://link3.cc/training_fengfeng_games" class="ie-btn-primary" target="_blank" data-i18n="card.cta.try">访问项目</a>
+                </div>
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">🎮</div>
+                    <h3 class="ie-h3">小游戏库</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">探索人工智能与前端开发的结合，关注想法的诞生与实现。</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">CSS</span>
+                        <span class="ie-tag">HTML5</span>
+                    </div>
+                    <a href="https://raccoon.fit/game" class="ie-btn-secondary" target="_blank" data-i18n="card.cta.play">查看详情</a>
+                </div>
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">🤖</div>
+                    <h3 class="ie-h3">RACCOON AI</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">欢迎体验 RACCOON AI，与智能对话的未来对话。</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">AI</span>
+                        <span class="ie-tag">聊天</span>
+                    </div>
+                    <a href="https://raccoon.fit/ai" class="ie-btn-secondary" target="_blank" data-i18n="card.cta.ai">立即体验</a>
+                </div>
+                <div class="ie-col-3 ie-glass">
+                    <div class="ie-card-ico">📱</div>
+                    <h3 class="ie-h3">MULU</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:12px;">一个已归档的移动应用项目，探索了完整的开发流程。</p>
+                    <div style="margin-bottom:14px;">
+                        <span class="ie-tag">React Native</span>
+                        <span class="ie-tag">UI/UX</span>
+                    </div>
+                    <a href="#" class="ie-btn-secondary" data-i18n="card.cta.eol">查看归档</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // ========================================
-        // IE浏览器检测
-        // ========================================
-        var isIE = false;
-        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        if ((/MSIE/i.test(userAgent) || /Trident/i.test(userAgent)) || (/Edge/i.test(userAgent))) {
-            isIE = true;
-        }
+    <!-- Lab Section -->
+    <section id="lab-ie" class="ie-section">
+        <div class="ie-container">
+            <div class="ie-section-hd">
+                <h2 class="ie-h2" data-i18n="lab.title">创意实验室</h2>
+                <p class="ie-desc" data-i18n="lab.subtitle">原型 · 跨界 · 未来感</p>
+            </div>
+            <div class="ie-grid">
+                <div class="ie-col-3 ie-card ie-text-center">
+                    <div class="ie-lab-ico">🔮</div>
+                    <h3 class="ie-h3" data-i18n="lab.ai">AI 辅助设计</h3>
+                    <p class="ie-desc" style="max-width:none;" data-i18n="lab.ai.desc">生成式UI探索。</p>
+                </div>
+                <div class="ie-col-3 ie-card ie-text-center">
+                    <div class="ie-lab-ico">🎨</div>
+                    <h3 class="ie-h3" data-i18n="lab.proto">交互原型</h3>
+                    <p class="ie-desc" style="max-width:none;" data-i18n="lab.proto.desc">高级微动效。</p>
+                </div>
+                <div class="ie-col-3 ie-card ie-text-center">
+                    <div class="ie-lab-ico">📊</div>
+                    <h3 class="ie-h3" data-i18n="lab.data">数据可视化</h3>
+                    <p class="ie-desc" style="max-width:none;" data-i18n="lab.data.desc">动态叙事。</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // ========================================
-        // 主题管理 - IE兼容版
-        // ========================================
-        var Theme = {
-            dark: true,
-            init: function() {
-                try {
-                    var saved = localStorage.getItem('theme');
-                    if (saved) {
-                        this.dark = saved === 'dark';
-                    } else {
-                        this.dark = true;
-                        localStorage.setItem('theme', 'dark');
-                    }
-                    this.apply();
-                } catch (e) {
-                    this.apply();
-                }
-            },
-            toggle: function() {
-                this.dark = !this.dark;
-                try {
-                    localStorage.setItem('theme', this.dark ? 'dark' : 'light');
-                } catch (e) {}
-                this.apply();
-            },
-            apply: function() {
-                var icon = document.getElementById('themeIconIe');
-                var btnText = document.getElementById('themeBtnIe');
-                if (icon) icon.innerHTML = this.dark ? '☀️' : '🌙';
-                if (btnText) {
-                    var spans = btnText.getElementsByTagName('span');
-                    if (spans.length > 1) {
-                        spans[1].innerHTML = this.dark ? '浅色' : '深色';
-                    }
-                }
+    <!-- Skills Section -->
+    <section id="skills-ie" class="ie-section">
+        <div class="ie-container">
+            <div class="ie-section-hd">
+                <h2 class="ie-h2">技术专长</h2>
+            </div>
+            <div class="ie-grid">
+                <div class="ie-col-2 ie-card">
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.frontend">前端开发</span>
+                            <span class="ie-skill-num">85%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill1" data-width="85"></div></div>
+                    </div>
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.uiux">UI/UX 设计</span>
+                            <span class="ie-skill-num">75%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill2" data-width="75"></div></div>
+                    </div>
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.product">产品思维</span>
+                            <span class="ie-skill-num">80%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill3" data-width="80"></div></div>
+                    </div>
+                </div>
+                <div class="ie-col-2 ie-card">
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.threejs">Three.js / WebGL</span>
+                            <span class="ie-skill-num">65%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill4" data-width="65"></div></div>
+                    </div>
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.nodejs">Node.js 后端</span>
+                            <span class="ie-skill-num">70%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill5" data-width="70"></div></div>
+                    </div>
+                    <div class="ie-skill-item">
+                        <div class="ie-skill-hd">
+                            <span class="ie-skill-name" data-i18n="skills.devops">DevOps / 部署</span>
+                            <span class="ie-skill-num">60%</span>
+                        </div>
+                        <div class="ie-skill-bar"><div class="ie-skill-fill" id="skillFill6" data-width="60"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about-ie" class="ie-section">
+        <div class="ie-container">
+            <div class="ie-grid">
+                <div class="ie-col-2 ie-glass">
+                    <h3 class="ie-h3" data-i18n="about.title">关于软软</h3>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:14px;" data-i18n="about.p1">
+                        一个对技术和设计充满热情的探索者，相信代码不仅是解决问题的工具，更是创造美和价值的艺术形式。
+                    </p>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:14px;" data-i18n="about.p2">
+                        选择浣熊作为标识，是因为欣赏它们的好奇心、适应力和解决问题的智慧——这些特质正是技术探索者所需要的核心品质。
+                    </p>
+                    <p class="ie-desc" style="max-width:none;margin-bottom:14px;" data-i18n="about.p3">
+                        Raccoon.Fit 不仅仅是一个域名，更是持续学习、适应变化、追求卓越的技术哲学。
+                    </p>
+                    <a href="me" class="ie-btn-primary" data-i18n="about.cta">进入个人主页</a>
+                </div>
+                <div class="ie-col-2 ie-glass">
+                    <h3 class="ie-h3">Contact</h3>
+                    <div class="ie-code-box">
+<span>Email: Raccoon@raccoon.fit</span>
+<span>GitHub: github.com/raccoon-fit</span>
+<span>Web:   raccoon.fit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer id="contact-ie" class="ie-footer">
+    <div class="ie-footer-inner ie-footer-top">
+        <span class="ie-footer-logo">
+            <span class="ie-ico ie-footer-ico">🦝</span>
+            <span>软软的小窝</span>
+        </span>
+        <p class="ie-desc" style="max-width:none;margin-bottom:12px;" data-i18n="footer.tagline">
+            探索、创造、成长。欢迎与我联系，交流想法，合作创新。
+        </p>
+        <div class="ie-link-row">
+            <a href="mailto:Raccoon@raccoon.fit" data-i18n="footer.email">邮箱</a>
+            <a href="https://github.com/raccoon-fit" target="_blank" data-i18n="footer.github">GitHub</a>
+            <a href="https://raccoon.fit" target="_blank" data-i18n="footer.website">官网</a>
+            <a href="#home-ie">返回顶部</a>
+        </div>
+        <p class="ie-footer-copy ie-muted" data-i18n="footer.copyright">
+            &copy; 2025-2026 Ruanruan. Designed &amp; developed by Raccoon.
+        </p>
+    </div>
+</footer>
+
+<!-- Quick Menu -->
+<div class="ie-quick-wrap">
+    <div class="ie-quick">
+        <a href="https://raccoon.fit/feedback" target="_blank" data-i18n="quick.feedback">💬 反馈</a>
+        <span data-i18n="quick.friendlink" style="cursor:default;"></span>
+        <a href="index.html" data-i18n="ie.link">IE兼容版入口</a>
+        <span class="ie-muted" data-i18n="ie.subtitle">创意不息 · 灵感绽放</span>
+    </div>
+</div>
+
+<!-- Modal (for future use) -->
+<div class="ie-modal" id="ieModal">
+    <div class="ie-modal-overlay" id="ieModalOverlay"></div>
+    <div class="ie-modal-box">
+        <h3 class="ie-h3" id="ieModalTitle"></h3>
+        <p id="ieModalBody"></p>
+        <button class="ie-btn-primary" id="ieModalConfirm">OK</button>
+        <button class="ie-btn-secondary" id="ieModalCancel">Cancel</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+(function() {
+    'use strict';
+
+    // ========================================
+    // IE8 POLYFILLS
+    // ========================================
+    // Array.prototype.indexOf
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function(elt) {
+            var len = this.length >>> 0;
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0) ? Math.ceil(from) : Math.floor(from);
+            if (from < 0) from += len;
+            for (; from < len; from++) {
+                if (from in this && this[from] === elt) return from;
             }
+            return -1;
         };
+    }
+    // String.prototype.trim
+    if (!String.prototype.trim) {
+        String.prototype.trim = function() {
+            return this.replace(/^\s+|\s+$/g, '');
+        };
+    }
+    // HTML5 element shiv for IE8
+    (function() {
+        var html5 = ['main','section','nav','footer','header','article','aside','figure','figcaption'];
+        for (var i = 0; i < html5.length; i++) {
+            document.createElement(html5[i]);
+        }
+    })();
 
-        // ========================================
-        // 时钟 - IE兼容版
-        // ========================================
-        function updateClock() {
-            var clockEl = document.getElementById('clockIe');
-            if (clockEl) {
-                var now = new Date();
-                var hours = now.getHours();
-                var minutes = now.getMinutes();
-                var seconds = now.getSeconds();
-                if (hours < 10) hours = '0' + hours;
-                if (minutes < 10) minutes = '0' + minutes;
-                if (seconds < 10) seconds = '0' + seconds;
-                clockEl.innerHTML = hours + ':' + minutes + ':' + seconds;
+    // ========================================
+    // I18N DATA - Embed from main index
+    // ========================================
+
+var I18N = {
+    zh: {
+        'a11y.skip': '跳到主要内容',
+        'nav.home': '首页',
+        'nav.projects': '项目',
+        'nav.lab': '实验室',
+        'nav.about': '关于',
+        'lang.label': '中',
+        'ie.link': 'IE兼容版入口',
+        'ie.subtitle': '创意不息 · 灵感绽放',
+        'hero.year': '✨ 创意不息 · 灵感奔腾',
+        'hero.title1': '探索代码的',
+        'hero.title2': '无限可能',
+        'hero.desc': '这里是软软的数字栖所 —— 融合创造力、前沿技术与设计哲学，构建有温度的工具与艺术。',
+        'hero.greeting': '保持好奇 · 永远优雅地解决问题',
+        'hero.cta1': '探索项目',
+        'hero.cta2': 'GitHub 星系',
+        'projects.title': '精选作品',
+        'projects.subtitle': '匠心独运 · 每一行代码皆有灵魂',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ 创意实验室',
+        'lab.subtitle': '原型 · 跨界 · 未来感',
+        'lab.ai': 'AI 辅助设计',
+        'lab.ai.desc': '生成式UI探索。',
+        'lab.proto': '交互原型',
+        'lab.proto.desc': '高级微动效。',
+        'lab.data': '数据可视化',
+        'lab.data.desc': '动态叙事。',
+        'about.title': '关于软软',
+        'about.p1': '技术与设计的狂热信徒，信奉「简洁即力量」。',
+        'about.p2': 'Raccoon.Fit 代表着适应、创造、打破边界的工程美学。',
+        'about.p3': '保持好奇 · 永远优雅地解决问题',
+        'about.cta': '探索个人主页',
+        'skills.title': '核心能力',
+        'skills.frontend': '前端架构',
+        'skills.uiux': 'UI/UX设计',
+        'skills.product': '产品思维',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': '立即体验',
+        'card.cta.play': '试玩',
+        'card.cta.ai': '体验AI',
+        'card.cta.eol': '查看停运公告',
+        'footer.tagline': '探索 · 创造 · 成长 — 期待与你共鸣。',
+        'footer.email': '✉️ 邮箱',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 官网',
+        'footer.copyright': '© 2025-2026 软软 · 浣熊设计哲学',
+        'footer.year': '✨ 保持好奇 · 永远创造 ✨',
+        '3d.btn': '点我查看 3D 模型',
+        '3d.loading': '🎊 加载新年模型中...',
+        '3d.hint': '🖱 拖拽旋转 · 滚轮缩放',
+        'island.wechat': '您正在使用微信浏览',
+        'island.qq': '您正在使用QQ浏览',
+        'modal.title': '开发者验证',
+        'modal.subtitle': '输入调试密码',
+        'modal.cancel': '取消',
+        'modal.confirm': '确认',
+        'modal.error': '密码错误，再试试看~',
+        'quickMenu.title': '快速入口',
+        'quick.feedback': '反馈建议',
+        'quick.badge': '称号',
+        'quick.friendlink': '友情链接'
+    },
+    'zh-TW': {
+        'a11y.skip': '跳到主要內容',
+        'nav.home': '首頁',
+        'nav.projects': '項目',
+        'nav.lab': '實驗室',
+        'nav.about': '關於',
+        'lang.label': '中',
+        'ie.link': 'IE相容版入口',
+        'ie.subtitle': '創意不息 · 靈感綻放',
+        'hero.year': '✨ 創意不息 · 靈感奔騰',
+        'hero.title1': '探索代碼的',
+        'hero.title2': '無限可能',
+        'hero.desc': '這裡是軟軟的數位棲所 —— 融合創造力、前沿技術與設計哲學，構建有溫度的工具與藝術。',
+        'hero.greeting': '保持好奇 · 永遠優雅地解決問題',
+        'hero.cta1': '探索項目',
+        'hero.cta2': 'GitHub 星系',
+        'projects.title': '精選作品',
+        'projects.subtitle': '匠心獨運 · 每一行程式碼皆有靈魂',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ 創意實驗室',
+        'lab.subtitle': '原型 · 跨界 · 未來感',
+        'lab.ai': 'AI 輔助設計',
+        'lab.ai.desc': '生成式UI探索。',
+        'lab.proto': '互動原型',
+        'lab.proto.desc': '高級微動效。',
+        'lab.data': '資料視覺化',
+        'lab.data.desc': '動態敘事。',
+        'about.title': '關於軟軟',
+        'about.p1': '技術與設計的狂熱信徒，信奉「簡潔即力量」。',
+        'about.p2': 'Raccoon.Fit 代表著適應、創造、打破邊界的工程美學。',
+        'about.p3': '保持好奇 · 永遠優雅地解決問題',
+        'about.cta': '探索個人主頁',
+        'skills.title': '核心能力',
+        'skills.frontend': '前端架構',
+        'skills.uiux': 'UI/UX設計',
+        'skills.product': '產品思維',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': '立即體驗',
+        'card.cta.play': '試玩',
+        'card.cta.ai': '體驗AI',
+        'card.cta.eol': '查看停運公告',
+        'footer.tagline': '探索 · 創造 · 成長 — 期待與你共鳴。',
+        'footer.email': '✉️ 郵箱',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 官網',
+        'footer.copyright': '© 2025-2026 軟軟 · 浣熊設計哲學',
+        'footer.year': '✨ 保持好奇 · 永遠創造 ✨',
+        '3d.btn': '點我查看 3D 模型',
+        '3d.loading': '🎊 載入新年模型中...',
+        '3d.hint': '🖱 拖曳旋轉 · 滾輪縮放',
+        'island.wechat': '您正在使用微信瀏覽',
+        'island.qq': '您正在使用QQ瀏覽',
+        'modal.title': '開發者驗證',
+        'modal.subtitle': '輸入除錯密碼',
+        'modal.cancel': '取消',
+        'modal.confirm': '確認',
+        'modal.error': '密碼錯誤，再試試看~',
+        'quickMenu.title': '快速入口',
+        'quick.feedback': '回饋建議',
+        'quick.badge': '稱號',
+        'quick.friendlink': '友情連結'
+    },
+    en: {
+        'a11y.skip': 'Skip to main content',
+        'nav.home': 'Home',
+        'nav.projects': 'Projects',
+        'nav.lab': 'Lab',
+        'nav.about': 'About',
+        'lang.label': 'EN',
+        'ie.link': 'IE-compatible version',
+        'ie.subtitle': 'Year of the Horse · Triumph Ahead',
+        'hero.year': '🐎 Year of the Horse · Inspiration Gallops',
+        'hero.title1': 'Discover Code\u2019s',
+        'hero.title2': 'Infinite Possibilities',
+        'hero.desc': 'A digital nest of RuanRuan — fusing creativity, frontier tech and design philosophy to build warm tools and art.',
+        'hero.greeting': 'New Spring · Bug-free Code · Creativity Blooms',
+        'hero.cta1': 'Explore Projects',
+        'hero.cta2': 'GitHub Galaxy',
+        'projects.title': 'Featured Work',
+        'projects.subtitle': 'Crafted with Soul · Every Line of Code',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ Creative Lab',
+        'lab.subtitle': 'Prototype · Crossover · Future',
+        'lab.ai': 'AI-assisted Design',
+        'lab.ai.desc': 'Generative UI exploration.',
+        'lab.proto': 'Interaction Prototypes',
+        'lab.proto.desc': 'Advanced micro-animations.',
+        'lab.data': 'Data Visualization',
+        'lab.data.desc': 'Dynamic storytelling.',
+        'about.title': 'About RuanRuan',
+        'about.p1': 'A fanatic of tech and design, preaching that simplicity is power.',
+        'about.p2': 'Raccoon.Fit represents an engineering aesthetic of adaptation, creation, and breaking boundaries.',
+        'about.p3': 'Stay Curious · Always Solve Problems Elegantly',
+        'about.cta': 'Explore Personal Page',
+        'skills.title': 'Core Competencies',
+        'skills.frontend': 'Frontend Architecture',
+        'skills.uiux': 'UI/UX Design',
+        'skills.product': 'Product Thinking',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Try Now',
+        'card.cta.play': 'Play',
+        'card.cta.ai': 'Try AI',
+        'card.cta.eol': 'View Sunset Notice',
+        'footer.tagline': 'Explore · Create · Grow — Looking forward to resonating with you.',
+        'footer.email': '✉️ Email',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Website',
+        'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Design Philosophy',
+        'footer.year': '🐎 Year of the Horse · All the Best · Inspiration Gallops 🎊',
+        '3d.btn': 'Click to View 3D Model',
+        '3d.loading': '🎊 Loading New Year Model...',
+        '3d.hint': '🖱 Drag to rotate · Scroll to zoom',
+        'island.wechat': 'You are browsing in WeChat',
+        'island.qq': 'You are browsing in QQ',
+        'modal.title': 'Developer Verification',
+        'modal.subtitle': 'Enter debug password',
+        'modal.cancel': 'Cancel',
+        'modal.confirm': 'Confirm',
+        'modal.error': 'Wrong password, try again~',
+        'quickMenu.title': 'Quick Menu',
+        'quick.feedback': 'Feedback',
+        'quick.badge': 'Badges',
+        'quick.friendlink': 'Links'
+    },
+    ja: {
+        'a11y.skip': 'メインコンテンツへ',
+        'nav.home': 'ホーム',
+        'nav.projects': 'プロジェクト',
+        'nav.lab': 'ラボ',
+        'nav.about': '概要',
+        'lang.label': '日',
+        'ie.link': 'IE互換版入口',
+        'ie.subtitle': '創造は止まない · インスピレーション開花',
+        'hero.year': '✨ 創造は止まない · インスピレーションの奔流',
+        'hero.title1': 'コードの',
+        'hero.title2': '無限の可能性',
+        'hero.desc': 'RuanRuanのデジタルの巣 —— 創造性、先端技術、デザイン哲学を融合し、温もりのあるツールとアートを構築。',
+        'hero.greeting': '好奇心を持ち続け · 常にエレガントに解決',
+        'hero.cta1': 'プロジェクトへ',
+        'hero.cta2': 'GitHub ギャラクシー',
+        'projects.title': '選りすぐりの作品',
+        'projects.subtitle': '魂を込めた一行一一行',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ クリエイティブラボ',
+        'lab.subtitle': 'プロトタイプ · クロスオーバー · 未来感',
+        'lab.ai': 'AI 支援デザイン',
+        'lab.ai.desc': '生成的UIの探求。',
+        'lab.proto': 'インタラクションプロト',
+        'lab.proto.desc': '高度なマイクロアニメーション。',
+        'lab.data': 'データ可視化',
+        'lab.data.desc': '動的な物語。',
+        'about.title': 'RuanRuanについて',
+        'about.p1': '技術とデザインの熱狂的信者、「シンプルこそ力」を信条とする。',
+        'about.p2': 'Raccoon.Fit は適応、創造、境界を打ち破るエンジニアリング美学を表す。',
+        'about.p3': '好奇心を持ち続け · 常にエレガントに問題を解決',
+        'about.cta': '個人ページへ',
+        'skills.title': 'コアコンピタンス',
+        'skills.frontend': 'フロントエンド設計',
+        'skills.uiux': 'UI/UXデザイン',
+        'skills.product': 'プロダクト思考',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': '今すぐ体験',
+        'card.cta.play': 'プレイ',
+        'card.cta.ai': 'AIを体験',
+        'card.cta.eol': 'サンセット公告を見る',
+        'footer.tagline': '探求 · 創造 · 成長 — 共鳴を楽しみに。',
+        'footer.email': '✉️ メール',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 ウェブサイト',
+        'footer.copyright': '© 2025-2026 RuanRuan · ラクーンデザイン哲学',
+        'footer.year': '✨ 好奇心を持ち続け · 永遠に創造 ✨',
+        '3d.btn': '3Dモデルを見る',
+        '3d.loading': '🎊 新年モデル読み込み中...',
+        '3d.hint': '🖱 ドラッグ回転 · スクロールズーム',
+        'island.wechat': 'WeChatで閲覧中',
+        'island.qq': 'QQで閲覧中',
+        'modal.title': '開発者認証',
+        'modal.subtitle': 'デバッグパスワード入力',
+        'modal.cancel': 'キャンセル',
+        'modal.confirm': '確認',
+        'modal.error': 'パスワードが違います〜',
+        'quickMenu.title': 'クイックメニュー',
+        'quick.feedback': 'フィードバック',
+        'quick.badge': '称号',
+        'quick.friendlink': 'リンク'
+    },
+    ko: {
+        'a11y.skip': '주요 콘텐츠로 건너뛰기',
+        'nav.home': '홈',
+        'nav.projects': '프로젝트',
+        'nav.lab': '연구실',
+        'nav.about': '소개',
+        'lang.label': '한',
+        'ie.link': 'IE 호환 버전',
+        'ie.subtitle': '창의는 멈추지 않는다 · 영감이 피어나다',
+        'hero.year': '✨ 창의는 멈추지 않는다 · 영감의 질주',
+        'hero.title1': '코드의',
+        'hero.title2': '무한한 가능성',
+        'hero.desc': 'RuanRuan의 디지털 보금자리 — 창의성, 첨단 기술, 디자인 철학을 융합하여 따뜻한 도구와 예술을 만듭니다.',
+        'hero.greeting': '호기심을 유지하고 · 항상 우아하게 문제를 해결하세요',
+        'hero.cta1': '프로젝트 탐색',
+        'hero.cta2': 'GitHub 갤럭시',
+        'projects.title': '주요 작품',
+        'projects.subtitle': '한 줄 한 줄 영혼을 담아',
+        'projects.year': '포트폴리오 · 2026',
+        'lab.title': '✨ 크리에이티브 랩',
+        'lab.subtitle': '프로토타입 · 크로스오버 · 미래',
+        'lab.ai': 'AI 보조 디자인',
+        'lab.ai.desc': '생성형 UI 탐구.',
+        'lab.proto': '인터랙션 프로토타입',
+        'lab.proto.desc': '고급 마이크로 애니메이션.',
+        'lab.data': '데이터 시각화',
+        'lab.data.desc': '동적 스토리텔링.',
+        'about.title': 'RuanRuan 소개',
+        'about.p1': '기술과 디자인의 열렬한 신봉자, 「단순함이 곧 힘」을 믿습니다.',
+        'about.p2': 'Raccoon.Fit은 적응, 창조, 경계를 허무는 엔지니어링 미학을 대표합니다.',
+        'about.p3': '호기심을 유지하고 · 항상 우아하게 문제를 해결하세요',
+        'about.cta': '개인 페이지',
+        'skills.title': '핵심 역량',
+        'skills.frontend': '프론트엔드 아키텍처',
+        'skills.uiux': 'UI/UX 디자인',
+        'skills.product': '제품 사고',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': '체험하기',
+        'card.cta.play': '플레이',
+        'card.cta.ai': 'AI 체험',
+        'card.cta.eol': '종료 공지 보기',
+        'footer.tagline': '탐색 · 창조 · 성장 — 공명을 기대하며.',
+        'footer.email': '✉️ 이메일',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 웹사이트',
+        'footer.copyright': '© 2025-2026 RuanRuan · 라쿤 디자인 철학',
+        'footer.year': '✨ 호기심을 유지하고 · 영원히 창조하세요 ✨',
+        '3d.btn': '3D 모델 보기',
+        '3d.loading': '🎊 새해 모델 로딩 중...',
+        '3d.hint': '🖱 드래그 회전 · 스크롤 확대',
+        'island.wechat': 'WeChat에서 보고 계십니다',
+        'island.qq': 'QQ에서 보고 계십니다',
+        'modal.title': '개발자 인증',
+        'modal.subtitle': '디버그 비밀번호 입력',
+        'modal.cancel': '취소',
+        'modal.confirm': '확인',
+        'modal.error': '비밀번호가 틀렸습니다~',
+        'quickMenu.title': '빠른 메뉴',
+        'quick.feedback': '피드백',
+        'quick.badge': '칭호',
+        'quick.friendlink': '링크'
+    },
+    fr: {
+        'a11y.skip': 'Aller au contenu principal',
+        'nav.home': 'Accueil',
+        'nav.projects': 'Projets',
+        'nav.lab': 'Labo',
+        'nav.about': 'À propos',
+        'lang.label': 'FR',
+        'ie.link': 'Version compatible IE',
+        'ie.subtitle': 'La créativité ne s\'arrête jamais · L\'inspiration fleurit',
+        'hero.year': '✨ La créativité ne s\'arrête jamais · L\'inspiration galope',
+        'hero.title1': 'Découvrez les',
+        'hero.title2': 'Possibilités infinies du code',
+        'hero.desc': 'Le refuge numérique de RuanRuan — fusionnant créativité, technologies de pointe et philosophie du design pour construire des outils et de l\'art chaleureux.',
+        'hero.greeting': 'Restez curieux · Résolvez toujours les problèmes avec élégance',
+        'hero.cta1': 'Explorer les projets',
+        'hero.cta2': 'Galaxie GitHub',
+        'projects.title': 'Travaux choisis',
+        'projects.subtitle': 'De l\'âme dans chaque ligne de code',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ Labo créatif',
+        'lab.subtitle': 'Prototype · Crossover · Futur',
+        'lab.ai': 'Design assisté par IA',
+        'lab.ai.desc': 'Exploration de l\'UI générative.',
+        'lab.proto': 'Prototypes d\'interaction',
+        'lab.proto.desc': 'Micro-animations avancées.',
+        'lab.data': 'Visualisation de données',
+        'lab.data.desc': 'Narration dynamique.',
+        'about.title': 'À propos de RuanRuan',
+        'about.p1': 'Passionné de technologie et de design, prêchant que la simplicité est le pouvoir.',
+        'about.p2': 'Raccoon.Fit représente une esthétique d\'ingénierie d\'adaptation, de création et de rupture des frontières.',
+        'about.p3': 'Restez curieux · Résolvez toujours les problèmes avec élégance',
+        'about.cta': 'Page personnelle',
+        'skills.title': 'Compétences clés',
+        'skills.frontend': 'Architecture frontend',
+        'skills.uiux': 'Design UI/UX',
+        'skills.product': 'Vision produit',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Essayer',
+        'card.cta.play': 'Jouer',
+        'card.cta.ai': 'Essayer l\'IA',
+        'card.cta.eol': 'Voir l\'avis d\'arrêt',
+        'footer.tagline': 'Explorer · Créer · Grandir — Hâte de résonner avec vous.',
+        'footer.email': '✉️ Email',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Site web',
+        'footer.copyright': '© 2025-2026 RuanRuan · Philosophie du design Raccoon',
+        'footer.year': '✨ Restez curieux · Créez pour toujours ✨',
+        '3d.btn': 'Voir le modèle 3D',
+        '3d.loading': '🎊 Chargement du modèle du Nouvel An...',
+        '3d.hint': '🖱 Glisser pour tourner · Molette pour zoomer',
+        'island.wechat': 'Vous naviguez dans WeChat',
+        'island.qq': 'Vous naviguez dans QQ',
+        'modal.title': 'Vérification développeur',
+        'modal.subtitle': 'Entrez le mot de passe de débogage',
+        'modal.cancel': 'Annuler',
+        'modal.confirm': 'Confirmer',
+        'modal.error': 'Mot de passe incorrect, réessayez~',
+        'quickMenu.title': 'Menu rapide',
+        'quick.feedback': 'Commentaires',
+        'quick.badge': 'Badges',
+        'quick.friendlink': 'Liens'
+    },
+    sa: {
+        'a11y.skip': 'मुख्यविषयवस्तुम् प्रति गच्छतु',
+        'nav.home': 'गृहम्',
+        'nav.projects': 'परियोजनाः',
+        'nav.lab': 'प्रयोगशाला',
+        'nav.about': 'परिचयः',
+        'lang.label': 'स',
+        'ie.link': 'IE-अनुकूलसंस्करणम्',
+        'ie.subtitle': 'सर्जनशीलता न रुद्ध्यते · प्रेरणा प्रस्फुटति',
+        'hero.year': '✨ सर्जनशीलता न रुद्ध्यते · प्रेरणायाः धावनम्',
+        'hero.title1': 'सङ्केतस्य',
+        'hero.title2': 'अनन्तसम्भावनाः',
+        'hero.desc': 'रुआनरुआनस्य डिजिटलनिवासः — सर्जनशीलतायाः, अत्याधुनिकप्रौद्योगिक्याः, अभिकल्पदर्शनस्य च सङ्गमेन उष्णानि उपकरणानि कलां च निर्माति।',
+        'hero.greeting': 'जिज्ञासां रक्षतु · सर्वदा मार्जिततया समस्याः समाधत्त',
+        'hero.cta1': 'परियोजनाः अन्वेष्टुम्',
+        'hero.cta2': 'GitHub तारापुञ्जः',
+        'projects.title': 'चितानि कार्याणि',
+        'projects.subtitle': 'प्रतिपङ्क्तिः आत्मना सह',
+        'projects.year': 'परियोजनासूची · २०२६',
+        'lab.title': '✨ सर्जनात्मकप्रयोगशाला',
+        'lab.subtitle': 'प्रारूपम् · सङ्क्रमणम् · भविष्यम्',
+        'lab.ai': 'AI-सहायितम् अभिकल्पनम्',
+        'lab.ai.desc': 'जनक-UI अन्वेषणम्।',
+        'lab.proto': 'अन्तरक्रियाप्रारूपाणि',
+        'lab.proto.desc': 'उन्नतसूक्ष्म-चालनानि।',
+        'lab.data': 'दत्तांशदृश्यीकरणम्',
+        'lab.data.desc': 'गतिककथानकम्।',
+        'about.title': 'रुआनरुआनविषये',
+        'about.p1': 'प्रौद्योगिक्याः अभिकल्पस्य च उत्साही, "सरलता एव शक्तिः" इति विश्वसिति।',
+        'about.p2': 'Raccoon.Fit अनुकूलनस्य, सर्जनस्य, सीमाभेदस्य च अभियान्त्रिकीसौन्दर्यं प्रतिनिधत्ते।',
+        'about.p3': 'जिज्ञासां रक्षतु · सर्वदा मार्जिततया समस्याः समाधत्त',
+        'about.cta': 'वैयक्तिकपृष्ठम्',
+        'skills.title': 'प्रमुखदक्षताः',
+        'skills.frontend': 'अग्रभागवास्तुकला',
+        'skills.uiux': 'UI/UX अभिकल्पनम्',
+        'skills.product': 'उत्पादचिन्तनम्',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'प्रयोगताम्',
+        'card.cta.play': 'क्रीडतु',
+        'card.cta.ai': 'AI प्रयोगताम्',
+        'card.cta.eol': 'स्थगनसूचना द्रष्टुम्',
+        'footer.tagline': 'अन्वेषणम् · सर्जनम् · वृद्धिः — अनुनादाय प्रतीक्षते।',
+        'footer.email': '✉️ विपत्रम्',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 जालस्थानम्',
+        'footer.copyright': '© 2025-2026 रुआनरुआन · रैकून-अभिकल्पदर्शनम्',
+        'footer.year': '✨ जिज्ञासां रक्षतु · शाश्वतं सृजतु ✨',
+        '3d.btn': '3D-प्रतिरूपं द्रष्टुम्',
+        '3d.loading': '🎊 नववर्षप्रतिरूपं भारयन्...',
+        '3d.hint': '🖱 कर्षणेन भ्रमणम् · चक्रेण आवर्धनम्',
+        'island.wechat': 'भवान् WeChat-मध्ये पश्यति',
+        'island.qq': 'भवान् QQ-मध्ये पश्यति',
+        'modal.title': 'विकासकप्रमाणीकरणम्',
+        'modal.subtitle': 'दोषहरणसङ्केतशब्दं प्रवेशयतु',
+        'modal.cancel': 'निरस्यताम्',
+        'modal.confirm': 'पुष्टीकरोतु',
+        'modal.error': 'अशुद्धः सङ्केतशब्दः, पुनः प्रयत्नं करोतु~',
+        'quickMenu.title': 'शीघ्रसूची',
+        'quick.feedback': 'प्रतिपुष्टिः',
+        'quick.badge': 'उपाधयः',
+        'quick.friendlink': 'सम्पर्कसूत्राणि'
+    },
+    ar: {
+        'a11y.skip': 'انتقل إلى المحتوى الرئيسي',
+        'nav.home': 'الرئيسية',
+        'nav.projects': 'المشاريع',
+        'nav.lab': 'المختبر',
+        'nav.about': 'حول',
+        'lang.label': 'ع',
+        'ie.link': 'نسخة متوافقة مع IE',
+        'ie.subtitle': 'الإبداع لا يتوقف · الإلهام يزدهر',
+        'hero.year': '✨ الإبداع لا يتوقف · الإلهام ينطلق',
+        'hero.title1': 'اكتشف',
+        'hero.title2': 'إمكانيات لا نهائية للكود',
+        'hero.desc': 'المأوى الرقمي لـ RuanRuan — يدمج الإبداع والتقنيات المتطورة وفلسفة التصميم لبناء أدوات وفن دافئ.',
+        'hero.greeting': 'ابق فضولياً · حل المشكلات بأناقة دائمة',
+        'hero.cta1': 'استكشاف المشاريع',
+        'hero.cta2': 'مجرّة GitHub',
+        'projects.title': 'أعمال مختارة',
+        'projects.subtitle': 'روح في كل سطر من الكود',
+        'projects.year': 'ملف الأعمال · 2026',
+        'lab.title': '✨ مختبر إبداعي',
+        'lab.subtitle': 'نموذج أولي · تكامل · مستقبل',
+        'lab.ai': 'تصميم بمساعدة الذكاء الاصطناعي',
+        'lab.ai.desc': 'استكشاف واجهة المستخدم التوليدية.',
+        'lab.proto': 'نماذج تفاعلية',
+        'lab.proto.desc': 'حركات دقيقة متقدمة.',
+        'lab.data': 'تصوير البيانات',
+        'lab.data.desc': 'سرد قصصي ديناميكي.',
+        'about.title': 'حول RuanRuan',
+        'about.p1': 'متعصب للتكنولوجيا والتصميم، يؤمن بأن البساطة هي القوة.',
+        'about.p2': 'تمثل Raccoon.Fit جمالية هندسية للتكيف والإبداع وكسر الحدود.',
+        'about.p3': 'ابق فضولياً · حل المشكلات بأناقة دائمة',
+        'about.cta': 'الصفحة الشخصية',
+        'skills.title': 'الكفاءات الأساسية',
+        'skills.frontend': 'هندسة الواجهة الأمامية',
+        'skills.uiux': 'تصميم UI/UX',
+        'skills.product': 'تفكير المنتج',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'جرّب الآن',
+        'card.cta.play': 'العب',
+        'card.cta.ai': 'جرّب AI',
+        'card.cta.eol': 'عرض إشعار التوقف',
+        'footer.tagline': 'استكشاف · إبداع · نمو — نتطلع للتآلف معك.',
+        'footer.email': '✉️ البريد',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 الموقع',
+        'footer.copyright': '© 2025-2026 RuanRuan · فلسفة تصميم الراكون',
+        'footer.year': '✨ ابق فضولياً · أبدع إلى الأبد ✨',
+        '3d.btn': 'عرض النموذج ثلاثي الأبعاد',
+        '3d.loading': '🎊 جارٍ تحميل نموذج العام الجديد...',
+        '3d.hint': '🖱 اسحب للتدوير · عجلة للتكبير',
+        'island.wechat': 'أنت تتصفح في WeChat',
+        'island.qq': 'أنت تتصفح في QQ',
+        'modal.title': 'تحقق المطور',
+        'modal.subtitle': 'أدخل كلمة مرور التصحيح',
+        'modal.cancel': 'إلغاء',
+        'modal.confirm': 'تأكيد',
+        'modal.error': 'كلمة مرور خاطئة، حاول مرة أخرى~',
+        'quickMenu.title': 'قائمة سريعة',
+        'quick.feedback': 'ملاحظات',
+        'quick.badge': 'ألقاب',
+        'quick.friendlink': 'روابط'
+    },
+    egy: {
+        'a11y.skip': 'šm r ḥr-ỉb',
+        'nav.home': 'pr',
+        'nav.projects': 'mnw',
+        'nav.lab': 'pr-ꜥnḫ',
+        'nav.about': 'r nty',
+        'lang.label': '𓂀',
+        'ie.link': 'sḫr n pḥ',
+        'ie.subtitle': 'sḫr nn grg · kꜣ nfr',
+        'hero.year': '✨ rnpt nfr · kꜣ nḫt',
+        'hero.title1': 'gmḥ',
+        'hero.title2': 'sštꜣ n mdw-nṯr',
+        'hero.desc': 'pr n RuanRuan — smꜣ sḫr, sštꜣ, mꜣꜥt n qdt r ỉr ḫt nfrt.',
+        'hero.greeting': 'sḏm m ḥr · ỉr ḫt m mꜣꜥt',
+        'hero.cta1': 'gmḥ mnw',
+        'hero.cta2': 'pr mḏꜣt n GitHub',
+        'projects.title': 'mnw stp',
+        'projects.subtitle': 'kꜣ m sš nb',
+        'projects.year': 'sẖꜣw · 2026',
+        'lab.title': '✨ pr-ꜥnḫ',
+        'lab.subtitle': 'sḫr · smꜣ · ḫpr',
+        'lab.ai': 'sštꜣ n Ḏḥwty',
+        'lab.ai.desc': 'gmḥ sšm n sḫr.',
+        'lab.proto': 'twt n sḫr',
+        'lab.proto.desc': 'nḏnḏ nfr.',
+        'lab.data': 'ssm n rḫ',
+        'lab.data.desc': 'sḏd n ḫprw.',
+        'about.title': 'r nty RuanRuan',
+        'about.p1': 'mr rḫ n sḫr, ḥr sḏm "nḏs pw nḫt".',
+        'about.p2': 'Raccoon.Fit wꜣt n sḫr nfr, ỉr ḫt, sbn tꜣš.',
+        'about.p3': 'sḏm m ḥr · ỉr ḫt m mꜣꜥt',
+        'about.cta': 'pr-ḥr nty.k',
+        'skills.title': 'ḥkꜣw n ỉb',
+        'skills.frontend': 'qdt n ḥꜣt',
+        'skills.uiux': 'sḫr n mꜣꜣ',
+        'skills.product': 'sḫr n ḫt',
+        'skills.threejs': 'sḫr n ḏt',
+        'skills.nodejs': 'ỉr n ḫt',
+        'skills.devops': 'ḥmwt n kꜣt',
+        'card.cta.try': 'ỉr mꜣꜣ',
+        'card.cta.play': 'ḥb',
+        'card.cta.ai': 'sḏm Ḏḥwty',
+        'card.cta.eol': 'mꜣꜣ sš n ỉmꜣḫ',
+        'footer.tagline': 'gmḥ · qd · rwḏ — ỉw ỉb.k ḥr ỉꜣw.',
+        'footer.email': '✉️ sẖꜣw',
+        'footer.github': '🐙 pr-mḏꜣt',
+        'footer.website': '🌐 pr-ḥr',
+        'footer.copyright': '© 2025-2026 RuanRuan · sḫr n Raccoon',
+        'footer.year': '✨ sḏm m ḥr · qd ḏt ✨',
+        '3d.btn': 'mꜣꜣ twt',
+        '3d.loading': '🎊 ꜥq twt n rnpt...',
+        '3d.hint': '🖱 sṯꜣ · pḥr r ꜥꜣ',
+        'island.wechat': 'tw.k m WeChat',
+        'island.qq': 'tw.k m QQ',
+        'modal.title': 'ꜥq n qd',
+        'modal.subtitle': 'ḏd rn n sštꜣ',
+        'modal.cancel': 'ḫsf',
+        'modal.confirm': 'sḏm',
+        'modal.error': 'rn ꜥḏꜣ, ỉr m kỉ sp~',
+        'quickMenu.title': 'sẖꜣw ꜥšꜣ',
+        'quick.feedback': 'sḏd-ỉb',
+        'quick.badge': 'ḥkꜣw',
+        'quick.friendlink': 'mḥwt'
+    },
+    anubis: {
+        'a11y.skip': 'šm r dwꜣt',
+        'nav.home': 'ỉmnt',
+        'nav.projects': 'mnw',
+        'nav.lab': 'wꜥbt',
+        'nav.about': 'r ỉnpw',
+        'lang.label': '𓃣',
+        'ie.link': 'sḫr n pḥ',
+        'ie.subtitle': 'nn sk · kꜣ nfr m dwꜣt',
+        'hero.year': '✨ ỉnpw ḥr sꜣ · kꜣ nḫt',
+        'hero.title1': 'gmḥ',
+        'hero.title2': 'sštꜣ n mdw-nṯr',
+        'hero.desc': 'bꜣ n RuanRuan m dwꜣt — smꜣ sḫr, sštꜣ, ỉb n mꜣꜥt r ỉr ḫt nfrt.',
+        'hero.greeting': 'ỉb.k m mḫꜣt · ỉr ḫt m mꜣꜥt',
+        'hero.cta1': 'gmḥ mnw m dwꜣt',
+        'hero.cta2': 'pr-mḏꜣt n wsỉr',
+        'projects.title': 'mnw n ḏt',
+        'projects.subtitle': 'bꜣ m sš nb',
+        'projects.year': 'rnpt-sp · 2026',
+        'lab.title': '✨ wꜥbt n sḫr',
+        'lab.subtitle': 'sštꜣ · wt · ḫpr',
+        'lab.ai': 'sštꜣ n Ḏḥwty m dwꜣt',
+        'lab.ai.desc': 'gmḥ sšm n sḫr m ỉmnt.',
+        'lab.proto': 'šwt n sḫr',
+        'lab.proto.desc': 'nḏnḏ nfr m ḥtp.',
+        'lab.data': 'ssm n rḫ',
+        'lab.data.desc': 'sḏd n ḫprw m dwꜣt.',
+        'about.title': 'r nty ỉnpw',
+        'about.p1': 'mr rḫ n sḫr m dwꜣt, ḥr wḏꜥ-mdw "nḏs pw nḫt m mꜣꜥt".',
+        'about.p2': 'ỉnpw ḥr sꜣ Raccoon.Fit — wꜣt n sḫr nfr, ỉr ḫt, sbn tꜣš m ẖrt-nṯr.',
+        'about.p3': 'ỉb.k m mḫꜣt · ỉr ḫt m mꜣꜥt',
+        'about.cta': 'pr-ḥr nty.k m dwꜣt',
+        'skills.title': 'ḥkꜣw n ỉb',
+        'skills.frontend': 'qdt n ḥꜣt m ỉmnt',
+        'skills.uiux': 'sḫr n mꜣꜣ',
+        'skills.product': 'sḫr n ḫt',
+        'skills.threejs': 'sḫr n ḏt',
+        'skills.nodejs': 'ỉr n ḫt m dwꜣt',
+        'skills.devops': 'ḥmwt n wt',
+        'card.cta.try': 'ḥtp mꜣꜣ',
+        'card.cta.play': 'ḥb m dwꜣt',
+        'card.cta.ai': 'wḏꜥ-mdw Ḏḥwty',
+        'card.cta.eol': 'mꜣꜣ sš n ỉmꜣḫ',
+        'footer.tagline': 'gmḥ · qd · rwḏ — ỉnpw ḥr sꜣ.k.',
+        'footer.email': '✉️ sẖꜣw n bꜣ',
+        'footer.github': '🐙 pr-mḏꜣt n wsỉr',
+        'footer.website': '🌐 pr-ḥr m ẖrt-nṯr',
+        'footer.copyright': '© 2025-2026 RuanRuan · sꜣ ỉnpw',
+        'footer.year': '✨ ỉb.k m mḫꜣt · qd ḏt ✨',
+        '3d.btn': 'mꜣꜣ twt n ḏt',
+        '3d.loading': '𓃣 wt twt n rnpt...',
+        '3d.hint': '🖱 sṯꜣ n ỉnpw · pḥr r ꜥꜣ',
+        'island.wechat': 'tw.k m WeChat m dwꜣt',
+        'island.qq': 'tw.k m QQ m dwꜣt',
+        'modal.title': 'ꜥq n wt',
+        'modal.subtitle': 'ḏd rn n sštꜣ n ỉnpw',
+        'modal.cancel': 'ḫsf m dwꜣt',
+        'modal.confirm': 'wḏꜥ-mdw',
+        'modal.error': 'ỉb.k ḏꜣr m mḫꜣt, ỉr m kỉ sp~',
+        'quickMenu.title': 'sẖꜣw n ỉnpw',
+        'quick.feedback': 'sḏd-ỉb n wsỉr',
+        'quick.badge': 'ḥkꜣw n ỉnpw',
+        'quick.friendlink': 'mḥwt m dwꜣt'
+    },
+    eo: {
+        'a11y.skip': 'Salti al ĉefa enhavo',
+        'nav.home': 'Hejmo',
+        'nav.projects': 'Projektoj',
+        'nav.lab': 'Laboratorio',
+        'nav.about': 'Pri',
+        'lang.label': 'EO',
+        'ie.link': 'IE-kongrua versio',
+        'ie.subtitle': 'Kreemo ne ĉesas · Inspiro floras',
+        'hero.year': '✨ Kreemo ne ĉesas · Inspiro galopas',
+        'hero.title1': 'Malkovru la',
+        'hero.title2': 'Senfinajn eblojn de kodo',
+        'hero.desc': 'La cifereca nesto de RuanRuan — kunfandante kreemon, plejaltnivelan teknologion kaj dezajnan filozofion por konstrui varmajn ilojn kaj arton.',
+        'hero.greeting': 'Restu scivolema · Ĉiam solvu problemojn elegante',
+        'hero.cta1': 'Esplori projektojn',
+        'hero.cta2': 'GitHub Galaksio',
+        'projects.title': 'Elektitaj verkoj',
+        'projects.subtitle': 'Animo en ĉiu linio de kodo',
+        'projects.year': 'PORTFOLIO · 2026',
+        'lab.title': '✨ Krea Laboratorio',
+        'lab.subtitle': 'Prototipo · Transiro · Estonteco',
+        'lab.ai': 'AI-helpata dezajno',
+        'lab.ai.desc': 'Esplorado de genera UI.',
+        'lab.proto': 'Interagaj prototipoj',
+        'lab.proto.desc': 'Altnivelaj mikro-animacioj.',
+        'lab.data': 'Datumvidigo',
+        'lab.data.desc': 'Dinamika rakontado.',
+        'about.title': 'Pri RuanRuan',
+        'about.p1': 'Fervorulo pri teknologio kaj dezajno, predikante ke simpleco estas potenco.',
+        'about.p2': 'Raccoon.Fit reprezentas inĝenieran estetikon de adaptiĝo, kreado kaj rompo de limoj.',
+        'about.p3': 'Restu scivolema · Ĉiam solvu problemojn elegante',
+        'about.cta': 'Persona paĝo',
+        'skills.title': 'Kernaj kompetentoj',
+        'skills.frontend': 'Frontenda arkitekturo',
+        'skills.uiux': 'UI/UX dezajno',
+        'skills.product': 'Produkta pensado',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Provu nun',
+        'card.cta.play': 'Ludu',
+        'card.cta.ai': 'Provu AI',
+        'card.cta.eol': 'Vidi ĉesigan avizon',
+        'footer.tagline': 'Esploru · Kreu · Kresku — Antaŭĝojas resonanci kun vi.',
+        'footer.email': '✉️ Retpoŝto',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Retejo',
+        'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Dezajna Filozofio',
+        'footer.year': '✨ Restu scivolema · Kreu eterne ✨',
+        '3d.btn': 'Vidi 3D-modelon',
+        '3d.loading': '🎊 Ŝarĝante novjaran modelon...',
+        '3d.hint': '🖱 Trenu por turni · Rulumu por zomi',
+        'island.wechat': 'Vi foliumas en WeChat',
+        'island.qq': 'Vi foliumas en QQ',
+        'modal.title': 'Programista kontrolo',
+        'modal.subtitle': 'Enigu sencimigan pasvorton',
+        'modal.cancel': 'Nuligi',
+        'modal.confirm': 'Konfirmi',
+        'modal.error': 'Malĝusta pasvorto, provu denove~',
+        'quickMenu.title': 'Rapida menuo',
+        'quick.feedback': 'Rekomendoj',
+        'quick.badge': 'Insignoj',
+        'quick.friendlink': 'Ligiloj'
+    },
+    ru: {
+        'a11y.skip': 'Перейти к содержимому',
+        'nav.home': 'Главная',
+        'nav.projects': 'Проекты',
+        'nav.lab': 'Лаб',
+        'nav.about': 'О себе',
+        'lang.label': 'RU',
+        'ie.link': 'IE-совместимая версия',
+        'ie.subtitle': 'Творчество не угасает · Вдохновение цветёт',
+        'hero.year': '✨ Творчество не угасает · Вдохновение мчится',
+        'hero.title1': 'Откройте безграничные',
+        'hero.title2': 'Возможности кода',
+        'hero.desc': 'Цифровое убежище RuanRuan — сплав творчества, передовых технологий и философии дизайна для создания тёплых инструментов и искусства.',
+        'hero.greeting': 'Будьте любопытны · Всегда решайте задачи элегантно',
+        'hero.cta1': 'Исследовать проекты',
+        'hero.cta2': 'GitHub Галактика',
+        'projects.title': 'Избранные работы',
+        'projects.subtitle': 'Мастерство в каждой строке кода',
+        'projects.year': 'ПОРТФОЛИО · 2026',
+        'lab.title': '✨ Творческая лаборатория',
+        'lab.subtitle': 'Прототип · Кроссовер · Будущее',
+        'lab.ai': 'AI-дизайн',
+        'lab.ai.desc': 'Исследование генеративного UI.',
+        'lab.proto': 'Интерактивные прототипы',
+        'lab.proto.desc': 'Продвинутые микро-анимации.',
+        'lab.data': 'Визуализация данных',
+        'lab.data.desc': 'Динамическое повествование.',
+        'about.title': 'О RuanRuan',
+        'about.p1': 'Фанатик технологий и дизайна, проповедующий, что простота — это сила.',
+        'about.p2': 'Raccoon.Fit воплощает эстетику инженерии: адаптация, созидание, разрушение границ.',
+        'about.p3': 'Будьте любопытны · Всегда решайте задачи элегантно',
+        'about.cta': 'Личная страница',
+        'skills.title': 'Ключевые компетенции',
+        'skills.frontend': 'Фронтенд-архитектура',
+        'skills.uiux': 'UI/UX дизайн',
+        'skills.product': 'Продуктовое мышление',
+        'skills.threejs': 'Three.js/WebGL',
+        'skills.nodejs': 'Node.js',
+        'skills.devops': 'DevOps',
+        'card.cta.try': 'Попробовать',
+        'card.cta.play': 'Играть',
+        'card.cta.ai': 'Попробовать AI',
+        'card.cta.eol': 'Уведомление о закрытии',
+        'footer.tagline': 'Исследуй · Создавай · Расти — Ждём отклика.',
+        'footer.email': '✉️ Почта',
+        'footer.github': '🐙 GitHub',
+        'footer.website': '🌐 Сайт',
+        'footer.copyright': '© 2025-2026 RuanRuan · Философия дизайна Raccoon',
+        'footer.year': '✨ Будьте любопытны · Творите вечно ✨',
+        '3d.btn': 'Посмотреть 3D модель',
+        '3d.loading': '🎊 Загрузка новогодней модели...',
+        '3d.hint': '🖱 Вращайте · Колесо для масштаба',
+        'island.wechat': 'Вы просматриваете в WeChat',
+        'island.qq': 'Вы просматриваете в QQ',
+        'modal.title': 'Проверка разработчика',
+        'modal.subtitle': 'Введите пароль отладки',
+        'modal.cancel': 'Отмена',
+        'modal.confirm': 'Подтвердить',
+        'modal.error': 'Неверный пароль, попробуйте ещё раз~',
+        'quickMenu.title': 'Быстрое меню',
+        'quick.feedback': 'Отзыв',
+        'quick.badge': 'Значки',
+        'quick.friendlink': 'Ссылки'
+    },
+    tok: { 'a11y.skip': "tawa tomo sona", 'nav.home': "tomo", 'nav.projects': "pali", 'nav.lab': "tomo pali", 'nav.about': "jan", 'lang.label': "toki", 'ie.link': "nasin sin", 'ie.subtitle': "o lukin kepeken ilo sin", 'hero.year': "sike suno sin", 'hero.title1': "o pali e", 'hero.title2': "ijo sin ale", 'hero.desc': "tomo pi jan RuanRuan — wan e sona, e nasin pali, e nasin lukin tawa pali e ilo pona e ijo pona.", 'hero.greeting': "o awen wile sona · o pona e ale", 'hero.cta1': "o lukin e pali", 'hero.cta2': "tomo sona GitHub", 'projects.title': "pali pona", 'projects.subtitle': "kon lon lipu ale", 'projects.year': "lipu pali · 2026", 'lab.title': "tomo pali sin", 'lab.subtitle': "open · kama · tenpo kama", 'lab.ai': "ilo sona", 'lab.ai.desc': "lukin e nasin lukin kama.", 'lab.proto': "pali lili", 'lab.proto.desc': "tawa lili pona.", 'lab.data': "sitelen sona", 'lab.data.desc': "toki kepeken tawa.", 'about.title': "jan RuanRuan", 'about.p1': "jan pi sona pali en nasin lukin, 'lili li wawa'.", 'about.p2': "Raccoon.Fit li nasin pali pona pi kama, pali, pakala e poka.", 'about.p3': "o awen wile sona · o pona e ale", 'about.cta': "lipu jan", 'skills.title': "sona wawa", 'skills.frontend': "nasin sinpin", 'skills.uiux': "nasin lukin pona", 'skills.product': "nasin pali", 'skills.threejs': "ilo 3D", 'skills.nodejs': "ilo lawa", 'skills.devops': "pali ilo", 'card.cta.try': "o lukin", 'card.cta.play': "o musi", 'card.cta.ai': "o sona", 'card.cta.eol': "lukin e lipu pini", 'footer.tagline': "alasa · pali · kama suli — awen e sina.", 'footer.email': "lipu tawa", 'footer.github': "tomo lipu suli", 'footer.website': "lipu", 'footer.copyright': "© 2025-2026 jan RuanRuan · nasin pi jan Raccoon", 'footer.year': "o awen wile sona · o pali lon tenpo ale", '3d.btn': "lukin e sijelo 3D", '3d.loading': "kama jo e sijelo sin...", '3d.hint': "o tawa e ilo · o sike lili", 'island.wechat': "sina lon WeChat", 'island.qq': "sina lon QQ", 'modal.title': "sona jan pali", 'modal.subtitle': "o pana e nimi wawa", 'modal.cancel': "o pini", 'modal.confirm': "o lon", 'modal.error': "nimi pakala, o sin~", 'quickMenu.title': "nasin wawa", 'quick.feedback': "toki sin", 'quick.badge': "sitelen pona", 'quick.friendlink': "jan pona" },
+    jbo: { 'a11y.skip': ".i ko ba'orgau lo se cusku", 'nav.home': "zdani", 'nav.projects': "se gunka", 'nav.lab': "cikre dinju", 'nav.about': "mi", 'lang.label': "bau", 'ie.link': "cabna samtcise'u", 'ie.subtitle': ".i ko catlu fi'o se pilno lo cabna samtcise'u", 'hero.year': ".i lo cabna nanca", 'hero.title1': "facki lo ka ce'u", 'hero.title2': "se cimni be lo samselpla", 'hero.desc': ".i lo zdani be la RuanRuan — ku'i lo ka finti je lo ka satci je lo ka pijyske cu jorne lo nu zbasu lo glare tutci je lo larcu.", 'hero.greeting': ".i ko curmi lo ka kucli .i ko ro roi gasnu lo ka xamgu", 'hero.cta1': "catlu lo se gunka", 'hero.cta2': "GitHub tarci bo girzu", 'projects.title': "se cuxna se gunka", 'projects.subtitle': ".i ro linji be lo samselpla cu ralju", 'projects.year': "se gunka liste · 2026", 'lab.title': ".i finti cikre dinju", 'lab.subtitle': "fapro · runta · balvi", 'lab.ai': "rutni menli sidbo", 'lab.ai.desc': "smuci lo ka finti lo vidni.", 'lab.proto': "cunso jorne", 'lab.proto.desc': "banli mikri muvgau.", 'lab.data': "datni vidni", 'lab.data.desc': "runta lisri.", 'about.title': "la RuanRuan", 'about.p1': ".i ko'a se sinma lo skami je lo dizyjd .i ko'a krici lo du'u lo sampu cu tsali.", 'about.p2': ".i la Raccoon.Fit cu se smuni lo dizyjd bo ka cmavyma'i je ka finti je ka gasnu lo nu lo jimte cu na fanta.", 'about.p3': ".i ko curmi lo ka kucli .i ko ro roi gasnu lo ka xamgu", 'about.cta': "se zdani papri", 'skills.title': "ralseljibri", 'skills.frontend': "crane dinju larcyzbe", 'skills.uiux': "UI/UX dizyjd", 'skills.product': "pruce sidbo", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "troci", 'card.cta.play': "kelci", 'card.cta.ai': "troci lo rutni menli", 'card.cta.eol': "catlu lo se tcita be lo nu sisti", 'footer.tagline': "sisku · finti · banro — mi pacna lo nu do se cinri.", 'footer.email': "samymri", 'footer.github': "gitcau be lo sampla", 'footer.website': "judri", 'footer.copyright': "© 2025-2026 la RuanRuan · la Raccoon dizyjd pijyske", 'footer.year': ".i ko curmi lo ka kucli .i ko finti ze'a lo temci", '3d.btn': "catlu lo 3D tarmi", '3d.loading': "samymri lo 3D tarmi...", '3d.hint': "jenca lo nu carna · bidju lo nu zgana", 'island.wechat': ".i do ca catlu fi'o se pilno la WeChat", 'island.qq': ".i do ca catlu fi'o se pilno la QQ", 'modal.title': "samgi'e cipra", 'modal.subtitle': "cusku lo ciksi vlacku", 'modal.cancel': "sisti", 'modal.confirm': "birti", 'modal.error': ".i lo vlacku cu srera .i ko troci ri'ufa~", 'quickMenu.title': "sutra liste", 'quick.feedback': "xruti", 'quick.badge': "sinma", 'quick.friendlink': "pendo" },
+    tlh: { 'a11y.skip': 'naDev yIqIm', 'nav.home': 'juH', 'nav.projects': 'Qu\'mey', 'nav.lab': 'yaH', 'nav.about': 'jIHvaD', 'lang.label': 'TLH', 'ie.link': "IE-muv QaQ", 'ie.subtitle': "QaQbe' 'ach Qapla'!", 'hero.year': "DIS chu' · yIghoSDo'!", 'hero.title1': 'De\'wI\' rur', 'hero.title2': "Hoch'e' yIlegh", 'hero.desc': "RuanRuan juH'e' — De'wI' Sov je 'ej chenmoHwI' tIgh je mIwvam'e'.", 'hero.greeting': 'bIval · reH bIQaplaH!', 'hero.cta1': "Qu'mey yIlegh", 'hero.cta2': "GitHub qa''a'", 'projects.title': "Qu'mey'e' wIvlu'", 'projects.subtitle': "Qu'mey'e' bIvalbej", 'projects.year': "Qu' · 2026", 'lab.title': 'yaHwIj', 'lab.subtitle': "chen · 'oH · pIq", 'lab.ai': 'De\'wI\' Sov', 'lab.ai.desc': "chenmoHwI' ghot.", 'lab.proto': "mutlhwI' ghot", 'lab.proto.desc': "Qapla' mIw.", 'lab.data': "De' 'angwI'", 'lab.data.desc': "qechmey'e' lut.", 'about.title': 'RuanRuan jIH', 'about.p1': "De'wI' Sov je vIHar, 'IHbe'chugh vaj Qapla'be'.", 'about.p2': "Raccoon.Fit 'oHlaw' Hoch, chenmoH, je 'ej law' tlhoy.", 'about.p3': 'bIval · reH bIQaplaH!', 'about.cta': "jIH ghom", 'skills.title': 'pIn', 'skills.frontend': "DungDaq Duj", 'skills.uiux': "leghmeH 'IH", 'skills.product': "chenmoHmeH qech", 'skills.threejs': "wejlogh nagh", 'skills.nodejs': "De'wI' Qu'", 'skills.devops': "Qu' chenmoHwI'", 'card.cta.try': "yIlegh'egh", 'card.cta.play': "yIQuj", 'card.cta.ai': "De'wI' Sov yIlegh", 'card.cta.eol': "mev 'e' yIlegh", 'footer.tagline': "legh · chenmoH · tInmoH — bIQaplaHjaj.", 'footer.email': "QIn 'angwI'", 'footer.github': "ghom'a'", 'footer.website': "juH 'angwI'", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon QIch", 'footer.year': "bIval · reH yIchenmoH!", '3d.btn': "wejlogh yIlegh", '3d.loading': "wejlogh vIchenmoH...", '3d.hint': "yI'uch 'ej yIghang · yIghangQo'", 'island.wechat': "WeChat qaStaHvIS bIlegh'egh", 'island.qq': "QQ qaStaHvIS bIlegh'egh", 'modal.title': "chenmoHwI' chov", 'modal.subtitle': "pegh mu' yItu'", 'modal.cancel': "yImev", 'modal.confirm': "HIja'", 'modal.error': "pegh mu' Qagh, yInIDqa'~", 'quickMenu.title': "ghuHwI' Hov", 'quick.feedback': 'Hoy\'', 'quick.badge': "Qapla' mIw", 'quick.friendlink': "juppu' wIlo'" },
+    qya: { 'a11y.skip': 'Á lesta i quetta', 'nav.home': 'Már', 'nav.projects': 'Cardar', 'nav.lab': 'Sangië', 'nav.about': 'Inyë', 'lang.label': 'QY', 'ie.link': "IE-yúyo nómë", 'ie.subtitle': "Órenya ú pusta · Alcarinqua", 'hero.year': "Loa · Alcarinqua", 'hero.title1': "Á cenë i", 'hero.title2': "Únótimë cardar", 'hero.desc': "Sini RuanRuanva mar — órenyava, laitë yaivë ar sanaweva, care vórima úcarë ar alyala lindalë.", 'hero.greeting': "Á manya i órelya · Illumë finda", 'hero.cta1': "Á tulya i cardassen", 'hero.cta2': "GitHub yénórë", 'projects.title': "Alcarinquë cardar", 'projects.subtitle': "Írima quetta cardanna", 'projects.year': "Quentelë · 2026", 'lab.title': "Sangië", 'lab.subtitle': "Esta · Tencia · Apa", 'lab.ai': "Valaróma Sáma", 'lab.ai.desc': "Onna cenwa yestanna.", 'lab.proto': "Tengwacardar", 'lab.proto.desc': "Arata vaháya.", 'lab.data': "Istarë", 'lab.data.desc': "Lintië quenta.", 'about.title': "RuanRuan", 'about.p1': "Lómëasta yaivesse ar cáravesse, savin 'i pitya ná i túre'.", 'about.p2': "Raccoon.Fit tencala turyanwa, caranwa, ar pusta tyelpeva, arta estelë.", 'about.p3': "Á manya i órelya · Illumë finda", 'about.cta': "Ilyë quetta inyen", 'skills.title': "Túriontari", 'skills.frontend': "Cendelë carma", 'skills.uiux': "UI/UX tévië", 'skills.product': "Carma sanya", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Á yesta", 'card.cta.play': "Á tyalë", 'card.cta.ai': "Á cenë i Sáma", 'card.cta.eol': "Á cenë i hehtanna", 'footer.tagline': "Tulya · Carya · Lanya — Estelyë lélinwa.", 'footer.email': "Tengwa", 'footer.github': "Parmalambë", 'footer.website': "Nómion", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Sanawe", 'footer.year': "Á manya i órelya · Oiale carya", '3d.btn': "Á cenë i 3D cáma", '3d.loading': "Laitë loa cáma tulëa...", '3d.hint': "Á nirë ar pus · Á nicë tanna", 'island.wechat': "WeChat-ssë elyë", 'island.qq': "QQ-ssë elyë", 'modal.title': "Táranya estelë", 'modal.subtitle': "Á tencë i hún", 'modal.cancel': "Áva", 'modal.confirm': "Nai", 'modal.error': "Hún raicë, á enyala~", 'quickMenu.title': "Lintië mentië", 'quick.feedback': "Quentien", 'quick.badge': "Túrion tani", 'quick.friendlink': "Meldonya" },
+    dot: { 'a11y.skip': 'Ethe athvilajerar', 'nav.home': 'Rhaesh', 'nav.projects': 'Tikh', 'nav.lab': 'Vaes Athvillar', 'nav.about': 'Anha', 'lang.label': 'DT', 'ie.link': "IE athhrazhakar", 'ie.subtitle': "Athvillar vos akko · Qoy qoyi", 'hero.year': "Athvillar vos akko · Hrazef anni", 'hero.title1': "Achrakh h'anhaan", 'hero.title2': "Voj qisi tikh", 'hero.desc': "Rhaesh RuanRuan — athvilajerar mae, athvillar ma zhor, ma qisi tikh ma drivoe k'athjilari.", 'hero.greeting': "Azzhok ven · Akka k'athvillar", 'hero.cta1': "Achrakh tikh", 'hero.cta2': "GitHub Khalasar", 'projects.title': "Tikh Zhilake", 'projects.subtitle': "Qoy anna vekha tikh", 'projects.year': "Tikh Vichomer · 2026", 'lab.title': "Vaes Athvillar", 'lab.subtitle': "At · Sajo · Rhel", 'lab.ai': "Ma Athvillar Zhavvorsa", 'lab.ai.desc': "Tikh qisi ma athvillar.", 'lab.proto': "Tikh Mori", 'lab.proto.desc': "Ma zhor assokh.", 'lab.data': "Assokh Vojjor", 'lab.data.desc': "Rhel ma hrazefoon.", 'about.title': "Hash RuanRuan", 'about.p1': "Mori assokh ma athvillar, anha azhok 'vezh akka qisi'.", 'about.p2': "Raccoon.Fit ma qisi rhel, at, ma drivo k'athvilajerari.", 'about.p3': "Azzhok ven · Akka k'athvillar", 'about.cta': "Vojjor Anha", 'skills.title': "Qisi Mori", 'skills.frontend': "Ostir Vojjor", 'skills.uiux': "UI/UX Jif", 'skills.product': "Tikh Qisi", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Ethe", 'card.cta.play': "Ajjalan", 'card.cta.ai': "Char Ma Athvillar", 'card.cta.eol': "Vichomer Voj Rhel", 'footer.tagline': "Achrakh · At · Jadat — Anha azhok mae.", 'footer.email': "Voj Qisi", 'footer.github': "Khalasar Vojjor", 'footer.website': "Rhaesh Vojjor", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Tikh Qisi", 'footer.year': "Azzhok ven · Akka at!", '3d.btn': "Voj 3D Tikh", '3d.loading': "Jadat 3D anni...", '3d.hint': "Fonas che · Gradakh", 'island.wechat': "WeChat asshekhqoyi", 'island.qq': "QQ asshekhqoyi", 'modal.title': "Athvillar Voj Qisi", 'modal.subtitle': "Ast Voj Hrazef", 'modal.cancel': "Vos", 'modal.confirm': "Sek", 'modal.error': "Hrazef qoy, fonas che~", 'quickMenu.title': "Voj Qisi Sorf", 'quick.feedback': "Astilat", 'quick.badge': "Qisi Voj", 'quick.friendlink': "Yalli" },
+    nvi: { 'a11y.skip': 'Ftang tsayvur', 'nav.home': 'Kelku', 'nav.projects': 'Tìkangkem', 'nav.lab': 'Tsray Sìlpey', 'nav.about': 'Oeri', 'lang.label': "Lì'fya", 'ie.link': "IE-fya'o a'ewan", 'ie.subtitle': "Tìrusol nìltsan · Tìrey lefpom", 'hero.year': "Zìsìt Amip · Ayoe zera'u!", 'hero.title1': "Rutxe tse'a", 'hero.title2': "Ayut alor", 'hero.desc': "Kelku RuanRuanä — tìrey, sìlronsem sì tìhawl, ngop ayuti lefpom sì rel arusikx.", 'hero.greeting': "Nume nulnew · Tìkangkem sivi nìltsan", 'hero.cta1': "Tìkangkemìri tse'a", 'hero.cta2': "GitHub Tsawke", 'projects.title': "Tìkangkem Apxa", 'projects.subtitle': "Tirea hu frael pukpxi", 'projects.year': "Tìkangkemvi · 2026", 'lab.title': "Tsray Sìlpey", 'lab.subtitle': "Sngum · 'Awsiteng · Zusawkrr", 'lab.ai': "Ronsrelngop Aytìkangkem", 'lab.ai.desc': "Nga'prrte' rel a'ewan.", 'lab.proto': "Tìngop Apxa", 'lab.proto.desc': "Tì'efu atxan.", 'lab.data': "Ayfamrel", 'lab.data.desc': "Vur lehrrap.", 'about.title': "Teri RuanRuan", 'about.p1': "Lu poru tìnew sì tìtstunwi, 'lìng lu txur'.", 'about.p2': "Raccoon.Fit lu tìhawl ayoengä, ngop, 'ia tìftxavang.", 'about.p3': "Nume nulnew · Tìkangkem sivi nìltsan", 'about.cta': "Teri oe", 'skills.title': "Tìtxula Txo", 'skills.frontend': "Ftxey Tìhawl", 'skills.uiux': "UI/UX Ngop", 'skills.product': "Tìkangkem Tìhawl", 'skills.threejs': "Three.js/WebGL", 'skills.nodejs': "Node.js", 'skills.devops': "DevOps", 'card.cta.try': "Tìngop", 'card.cta.play': "Uvan", 'card.cta.ai': "Tìngop Ronsrelngop", 'card.cta.eol': "Tse'a Stum", 'footer.tagline': "Tse'a · Ngop · Tsawl slu — Sìlpey tsnì nga new.", 'footer.email': "Pamrel", 'footer.github': "Fìtsengmì Tstu", 'footer.website': "Fìtsenge", 'footer.copyright': "© 2025-2026 RuanRuan · Raccoon Tìhawl", 'footer.year': "Nume nulnew · Ngop nìtut!", '3d.btn': "Tse'a 3D Rel", '3d.loading': "Zong 3D...", '3d.hint': "'Ärìp · 'Awve tse'a", 'island.wechat': "WeChat lu nga", 'island.qq': "QQ lu nga", 'modal.title': "Tsamsiyu Tìfyawìntxu", 'modal.subtitle': "Pänutìng lì'u", 'modal.cancel': "Kehe", 'modal.confirm': "Srane", 'modal.error': "Lì'u keye'ung, nga' nìmun~", 'quickMenu.title': "Win Ftxey", 'quick.feedback': "Tìpawm", 'quick.badge': "Tìfnu", 'quick.friendlink': "'Eylan" },
+    eu: { 'a11y.skip': 'Saltatu edukira', 'nav.home': 'Hasiera', 'nav.projects': 'Proiektuak', 'nav.lab': 'Laborategia', 'nav.about': 'Niri buruz', 'lang.label': 'Hizkuntza', 'ie.link': "Internet Explorer bertsioa", 'ie.subtitle': "Arakatzaile zaharrago bat erabiltzen ari zara", 'hero.year': 'Urtea', 'hero.title1': 'Sortzailea', 'hero.title2': 'Garatzailea', 'hero.desc': 'Esperientzia digitalak diseinatzen eta eraikitzen ditut', 'hero.greeting': 'Kaixo', 'hero.cta1': 'Nire lana ikusi', 'hero.cta2': 'Harremanetan jarri', 'projects.title': 'Proiektuak', 'projects.subtitle': 'Nire azken lanak', 'projects.year': 'Urtea', 'lab.title': 'Laborategia', 'lab.subtitle': 'Esperimentuak eta prototipoak', 'lab.ai': 'Adimen Artifiziala', 'lab.ai.desc': 'AA bidezko esperientzia interaktiboak', 'lab.proto': 'Prototipoak', 'lab.proto.desc': 'Ideia berrien proba azkarrak', 'lab.data': 'Datuak', 'lab.data.desc': 'Datuen bistaratze eta analisia', 'about.title': 'Niri buruz', 'about.p1': 'Sormena eta teknologia uztartzen dituen garatzailea naiz', 'about.p2': 'Erabiltzaile esperientzia aberatsak sortzea dut helburu', 'about.p3': 'Web teknologia modernoekin lan egiten dut', 'about.cta': 'Gehiago jakin', 'skills.title': 'Trebetasunak', 'skills.frontend': 'Frontend garapena', 'skills.uiux': 'UI/UX diseinua', 'skills.product': 'Produktu kudeaketa', 'skills.threejs': 'Three.js', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Probatu', 'card.cta.play': 'Jolastu', 'card.cta.ai': 'AA probatu', 'card.cta.eol': 'Amaituta', 'footer.tagline': 'Ideiak errealitate bihurtzen', 'footer.email': 'Posta elektronikoa', 'footer.github': 'GitHub', 'footer.website': 'Webgunea', 'footer.copyright': 'Eskubide guztiak erreserbatuta', 'footer.year': 'Urtea', '3d.btn': '3D ikusi', '3d.loading': 'Kargatzen...', '3d.hint': 'Egin klik interakzionatzeko', 'island.wechat': 'WeChat', 'island.qq': 'QQ', 'modal.title': 'Oharra', 'modal.subtitle': 'Ziur zaude?', 'modal.cancel': 'Utzi', 'modal.confirm': 'Berretsi', 'modal.error': 'Errorea gertatu da', 'quickMenu.title': 'Menu azkarra', 'quick.feedback': 'Iritzia', 'quick.badge': 'Bereizgarria',         'quick.friendlink': 'Loturak'
+    },
+    cy: { 'a11y.skip': "Neidio i'r cynnwys", 'nav.home': 'Hafan', 'nav.projects': 'Prosiectau', 'nav.lab': 'Labordy', 'nav.about': 'Amdanaf', 'lang.label': 'Iaith', 'ie.link': "Fersiwn Internet Explorer", 'ie.subtitle': "Rydych yn defnyddio porwr hŷn", 'hero.year': 'Blwyddyn', 'hero.title1': 'Crëwr', 'hero.title2': 'Datblygwr', 'hero.desc': "Dylunio ac adeiladu profiadau digidol — cyfuno creadigrwydd, technoleg flaengar a dylunio i adeiladu offer a chelf gynnes.", 'hero.greeting': 'Arhoswch yn chwilfrydig · Datryswch broblemau\'n gain bob amser', 'hero.cta1': 'Archwilio prosiectau', 'hero.cta2': 'Galaeth GitHub', 'projects.title': 'Gwaith Dethol', 'projects.subtitle': 'Enaid ym mhob llinell o god', 'projects.year': 'PORTFFOLIO · 2026', 'lab.title': 'Lab Creadigol', 'lab.subtitle': 'Prototeip · Croesi · Dyfodol', 'lab.ai': 'Dylunio â Chymorth AI', 'lab.ai.desc': 'Archwilio UI cynhyrchiol.', 'lab.proto': 'Prototeipiau rhyngweithio', 'lab.proto.desc': 'Micro-animeiddiadau uwch.', 'lab.data': 'Delweddu data', 'lab.data.desc': 'Adrodd straeon deinamig.', 'about.title': 'Am RuanRuan', 'about.p1': 'Selog technoleg a dylunio, yn pregethu mai symlrwydd yw grym.', 'about.p2': 'Mae Raccoon.Fit yn cynrychioli estheteg beirianneg o addasu, creu a thorri ffiniau.', 'about.p3': 'Arhoswch yn chwilfrydig · Datryswch broblemau\'n gain bob amser', 'about.cta': 'Tudalen bersonol', 'skills.title': 'Cymwyseddau craidd', 'skills.frontend': 'Pensaernïaeth frontend', 'skills.uiux': 'Dylunio UI/UX', 'skills.product': 'Meddwl cynnyrch', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Rhoi cynnig', 'card.cta.play': 'Chwarae', 'card.cta.ai': 'Rhoi cynnig ar AI', 'card.cta.eol': 'Gweld hysbysiad dirwyn i ben', 'footer.tagline': 'Archwilio · Creu · Tyfu — Edrych ymlaen at atseinio gyda chi.', 'footer.email': 'E-bost', 'footer.github': 'GitHub', 'footer.website': 'Gwefan', 'footer.copyright': '© 2025-2026 RuanRuan · Athroniaeth Dylunio Raccoon', 'footer.year': 'Arhoswch yn chwilfrydig · Crewch am byth', '3d.btn': 'Gweld model 3D', '3d.loading': 'Llwytho model y flwyddyn newydd...', '3d.hint': 'Llusgwch i gylchdroi · Sgroliwch i chwyddo', 'island.wechat': 'Rydych yn pori yn WeChat', 'island.qq': 'Rydych yn pori yn QQ', 'modal.title': 'Dilysu datblygwr', 'modal.subtitle': 'Rhowch gyfrinair dadfygio', 'modal.cancel': 'Canslo', 'modal.confirm': 'Cadarnhau', 'modal.error': 'Cyfrinair anghywir, ceisiwch eto~', 'quickMenu.title': 'Dewislen gyflym', 'quick.feedback': 'Adborth', 'quick.badge': 'Bathodynnau', 'quick.friendlink': 'Dolenni' },
+    is: { 'a11y.skip': 'Fara beint í efni', 'nav.home': 'Heim', 'nav.projects': 'Verkefni', 'nav.lab': 'Tilraunastofa', 'nav.about': 'Um mig', 'lang.label': 'Tungumál', 'ie.link': "Internet Explorer útgáfa", 'ie.subtitle': 'Þú ert að nota eldri vafra', 'hero.year': 'Ár', 'hero.title1': 'Höfundur', 'hero.title2': 'Forritari', 'hero.desc': 'Stafrænt athvarf RuanRuan — samruni sköpunar, framúrskarandi tækni og hönnunarheimspeki.', 'hero.greeting': 'Vertu forvitinn · Leystu vandamál með glæsibrag', 'hero.cta1': 'Skoða verkefni', 'hero.cta2': 'GitHub Stjörnuþokan', 'projects.title': 'Valin verk', 'projects.subtitle': 'Sál í hverri línu kóða', 'projects.year': 'VERKEFNA SAFN · 2026', 'lab.title': 'Skapandi tilraunastofa', 'lab.subtitle': 'Frumgerð · Þverfaglegt · Framtíð', 'lab.ai': 'AI-aðstoðuð hönnun', 'lab.ai.desc': 'Könnun á generative UI.', 'lab.proto': 'Gagnvirkar frumgerðir', 'lab.proto.desc': 'Háþróuð ör-hreyfing.', 'lab.data': 'Gagnasýn', 'lab.data.desc': 'Kvik frásögn.', 'about.title': 'Um RuanRuan', 'about.p1': 'Ástríðufullur tækni- og hönnunarunnandi, boðar að einfaldleiki sé máttur.', 'about.p2': 'Raccoon.Fit táknar verkfræðilega fagurfræði aðlögunar, sköpunar og landamærabrots.', 'about.p3': 'Vertu forvitinn · Leystu vandamál með glæsibrag', 'about.cta': 'Persónuleg síða', 'skills.title': 'Kjarnahæfni', 'skills.frontend': 'Framendahönnun', 'skills.uiux': 'UI/UX hönnun', 'skills.product': 'Vöruhugsun', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Prófa', 'card.cta.play': 'Spila', 'card.cta.ai': 'Prófa AI', 'card.cta.eol': 'Sjá lokunartilkynningu', 'footer.tagline': 'Kanna · Skapa · Vaxa — Hlakka til að hljóma með þér.', 'footer.email': 'Tölvupóstur', 'footer.github': 'GitHub', 'footer.website': 'Vefsíða', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon hönnunarheimspeki', 'footer.year': 'Vertu forvitinn · Skapaðu að eilífu', '3d.btn': 'Skoða 3D líkan', '3d.loading': 'Hleður nýárs líkani...', '3d.hint': 'Dragðu til að snúa · Skrunaðu til að stækka', 'island.wechat': 'Þú ert að vafra í WeChat', 'island.qq': 'Þú ert að vafra í QQ', 'modal.title': 'Staðfesting þróunaraðila', 'modal.subtitle': 'Sláðu inn kembilykilorð', 'modal.cancel': 'Hætta við', 'modal.confirm': 'Staðfesta', 'modal.error': 'Rangt lykilorð, reyndu aftur~', 'quickMenu.title': 'Flýtivalmynd', 'quick.feedback': 'Endurgjöf', 'quick.badge': 'Merki', 'quick.friendlink': 'Tenglar' },
+    ca: { 'a11y.skip': 'Saltar al contingut', 'nav.home': 'Inici', 'nav.projects': 'Projectes', 'nav.lab': 'Laboratori', 'nav.about': 'Sobre mi', 'lang.label': 'Idioma', 'ie.link': "Versió Internet Explorer", 'ie.subtitle': "Esteu utilitzant un navegador antic", 'hero.year': 'Any', 'hero.title1': 'Creador', 'hero.title2': 'Desenvolupador', 'hero.desc': "Refugi digital de RuanRuan — fusionant creativitat, tecnologia puntera i filosofia de disseny per construir eines i art càlids.", 'hero.greeting': 'Mantingueu la curiositat · Resoleu problemes amb elegància', 'hero.cta1': 'Explorar projectes', 'hero.cta2': 'Galàxia GitHub', 'projects.title': 'Obres seleccionades', 'projects.subtitle': 'Ànima en cada línia de codi', 'projects.year': 'CARTERA · 2026', 'lab.title': 'Laboratori creatiu', 'lab.subtitle': 'Prototip · Creuament · Futur', 'lab.ai': 'Disseny assistit per IA', 'lab.ai.desc': "Exploració d'UI generativa.", 'lab.proto': 'Prototips interactius', 'lab.proto.desc': 'Micro-animacions avançades.', 'lab.data': 'Visualització de dades', 'lab.data.desc': 'Narració dinàmica.', 'about.title': 'Sobre RuanRuan', 'about.p1': 'Fanàtic de la tecnologia i el disseny, predicant que la simplicitat és poder.', 'about.p2': "Raccoon.Fit representa una estètica d'enginyeria d'adaptació, creació i ruptura de fronteres.", 'about.p3': 'Mantingueu la curiositat · Resoleu problemes amb elegància', 'about.cta': 'Pàgina personal', 'skills.title': 'Competències clau', 'skills.frontend': 'Arquitectura frontend', 'skills.uiux': 'Disseny UI/UX', 'skills.product': 'Pensament de producte', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Provar', 'card.cta.play': 'Jugar', 'card.cta.ai': 'Provar IA', 'card.cta.eol': "Veure avís de tancament", 'footer.tagline': 'Explorar · Crear · Créixer — Esperant ressonar amb tu.', 'footer.email': 'Correu electrònic', 'footer.github': 'GitHub', 'footer.website': 'Lloc web', 'footer.copyright': '© 2025-2026 RuanRuan · Filosofia de disseny Raccoon', 'footer.year': 'Mantingueu la curiositat · Creeu per sempre', '3d.btn': 'Veure model 3D', '3d.loading': "Carregant model d'any nou...", '3d.hint': 'Arrossegueu per girar · Roda per ampliar', 'island.wechat': 'Esteu navegant en WeChat', 'island.qq': 'Esteu navegant en QQ', 'modal.title': 'Verificació de desenvolupador', 'modal.subtitle': 'Introduïu la contrasenya de depuració', 'modal.cancel': 'Cancel·lar', 'modal.confirm': 'Confirmar', 'modal.error': 'Contrasenya incorrecta, torneu a provar~', 'quickMenu.title': 'Menú ràpid', 'quick.feedback': 'Comentaris', 'quick.badge': 'Insígnies', 'quick.friendlink': 'Enllaços' },
+    mt: { 'a11y.skip': 'Aqbeż għall-kontenut', 'nav.home': 'Dar', 'nav.projects': 'Proġetti', 'nav.lab': 'Laboratorju', 'nav.about': 'Dwar', 'lang.label': 'Lingwa', 'ie.link': "Verżjoni Internet Explorer", 'ie.subtitle': 'Qed tuża browser antik', 'hero.year': 'Sena', 'hero.title1': 'Kreatur', 'hero.title2': 'Żviluppatur', 'hero.desc': "Kenn diġitali ta' RuanRuan — tgħaqqad il-kreattività, it-teknoloġija avvanzata u l-filosofija tad-disinn biex tibni għodda u arti sħuna.", 'hero.greeting': 'Ibqa\' kurjuż · Dejjem issolvi l-problemi b\'mod eleganti', 'hero.cta1': 'Esplora proġetti', 'hero.cta2': 'Galassja GitHub', 'projects.title': 'Xogħlijiet magħżula', 'projects.subtitle': "Ruħ f'kull linja ta' kodiċi", 'projects.year': 'PORTFOLIO · 2026', 'lab.title': 'Laboratorju kreattiv', 'lab.subtitle': 'Prototip · Inkroċju · Futur', 'lab.ai': 'Disinn assistit mill-AI', 'lab.ai.desc': "Esplorazzjoni ta' UI ġenerattiva.", 'lab.proto': 'Prototipi interattivi', 'lab.proto.desc': 'Mikro-animazzjonijiet avvanzati.', 'lab.data': 'Viżwalizzazzjoni tad-data', 'lab.data.desc': 'Rakkont dinamiku.', 'about.title': 'Dwar RuanRuan', 'about.p1': 'Fanatiku tat-teknoloġija u d-disinn, jipprietka li s-sempliċità hija poter.', 'about.p2': "Raccoon.Fit tirrappreżenta estetika tal-inġinerija ta' adattament, ħolqien u tkissir tal-fruntieri.", 'about.p3': 'Ibqa\' kurjuż · Dejjem issolvi l-problemi b\'mod eleganti', 'about.cta': 'Paġna personali', 'skills.title': 'Kompetenzi ewlenin', 'skills.frontend': 'Arkitettura frontend', 'skills.uiux': 'Disinn UI/UX', 'skills.product': 'Ħsieb tal-prodott', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Ipprova', 'card.cta.play': 'Ilgħab', 'card.cta.ai': 'Ipprova AI', 'card.cta.eol': 'Ara avviż ta\' għeluq', 'footer.tagline': 'Esplora · Oħloq · Kabbar — Nistenna li nirresona miegħek.', 'footer.email': 'Email', 'footer.github': 'GitHub', 'footer.website': 'Sit web', 'footer.copyright': '© 2025-2026 RuanRuan · Filosofija tad-disinn Raccoon', 'footer.year': 'Ibqa\' kurjuż · Oħloq għal dejjem', '3d.btn': 'Ara mudell 3D', '3d.loading': "Tagħbija tal-mudell tas-sena l-ġdida...", '3d.hint': 'Iddreggja biex iddawwar · Skrollja biex iżżumja', 'island.wechat': 'Qed tibbrawżja f\'WeChat', 'island.qq': 'Qed tibbrawżja f\'QQ', 'modal.title': 'Verifika tal-iżviluppatur', 'modal.subtitle': 'Daħħal il-password tad-debugging', 'modal.cancel': 'Ikkanċella', 'modal.confirm': 'Ikkonferma', 'modal.error': 'Password ħażina, erġa\' pprova~', 'quickMenu.title': 'Menù rapidu', 'quick.feedback': 'Feedback', 'quick.badge': 'Badges', 'quick.friendlink': 'Ħoloq' },
+    fy: { 'a11y.skip': 'Nei ynhâld gean', 'nav.home': 'Thús', 'nav.projects': 'Projekten', 'nav.lab': 'Laboratoarium', 'nav.about': 'Oer my', 'lang.label': 'Taal', 'ie.link': "Internet Explorer ferzje", 'ie.subtitle': 'Jo brûke in âldere browser', 'hero.year': 'Jier', 'hero.title1': 'Makker', 'hero.title2': 'Untwikkeler', 'hero.desc': "Digitale ûnderkommen fan RuanRuan — gearfoegjen fan kreativiteit, nijsgjirrige technology en ûntwerpfilosofy om waarme ark en keunst te bouwen.", 'hero.greeting': 'Bliuw nijsgjirrich · Los problemen altyd elegant op', 'hero.cta1': 'Projekten ferkenne', 'hero.cta2': 'GitHub Galaxy', 'projects.title': 'Selektearre wurk', 'projects.subtitle': 'Siel yn elke rigel koade', 'projects.year': 'PORTEFEUILLE · 2026', 'lab.title': 'Kreatyf laboratoarium', 'lab.subtitle': 'Prototype · Krusing · Takomst', 'lab.ai': 'AI-stipe ûntwerp', 'lab.ai.desc': 'Ferkenning fan generative UI.', 'lab.proto': 'Ynteraktive prototypen', 'lab.proto.desc': 'Avansearre mikro-animaasjes.', 'lab.data': 'Datafisualisaasje', 'lab.data.desc': 'Dynamyske fertelling.', 'about.title': 'Oer RuanRuan', 'about.p1': 'Fanaat fan technology en ûntwerp, preket dat ienfâld krêft is.', 'about.p2': 'Raccoon.Fit fertsjintwurdiget in technyske estetyk fan oanpassing, skepping en grinzen trochbrekke.', 'about.p3': 'Bliuw nijsgjirrich · Los problemen altyd elegant op', 'about.cta': 'Persoanlike side', 'skills.title': 'Kearnkompetinsjes', 'skills.frontend': 'Frontend-arsjitektuer', 'skills.uiux': 'UI/UX ûntwerp', 'skills.product': 'Produkt tinken', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Besykje', 'card.cta.play': 'Spylje', 'card.cta.ai': 'AI besykje', 'card.cta.eol': 'Besjoch stopsetten meidieling', 'footer.tagline': 'Ferkenne · Skeppe · Groeie — Sjoch út nei resoneearje mei dy.', 'footer.email': 'E-mail', 'footer.github': 'GitHub', 'footer.website': 'Webside', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon ûntwerpfilosofy', 'footer.year': 'Bliuw nijsgjirrich · Skeppe foar altyd', '3d.btn': 'Besjoch 3D-model', '3d.loading': 'Nijjiersmodel laden...', '3d.hint': 'Sleep om te draaien · Skowe om yn te zoomen', 'island.wechat': 'Jo blêdzje yn WeChat', 'island.qq': 'Jo blêdzje yn QQ', 'modal.title': 'Untwikkelderferifikaasje', 'modal.subtitle': 'Fier debugwachtwurd yn', 'modal.cancel': 'Annulearje', 'modal.confirm': 'Befêstigje', 'modal.error': 'Ferkeard wachtwurd, besykje nochris~', 'quickMenu.title': 'Fluchmenu', 'quick.feedback': 'Weromkeppeling', 'quick.badge': 'Badges', 'quick.friendlink': 'Keppelingen' },
+    lb: { 'a11y.skip': 'Zum Inhalt sprangen', 'nav.home': 'Heem', 'nav.projects': 'Projeten', 'nav.lab': 'Laboratoire', 'nav.about': 'Iwwert mech', 'lang.label': 'Sprooch', 'ie.link': "Internet Explorer Versioun", 'ie.subtitle': 'Dir benotzt en eelere Browser', 'hero.year': 'Joer', 'hero.title1': 'Creatrice', 'hero.title2': 'Entwéckler', 'hero.desc': "Digitalt Doheem vum RuanRuan — fusionéiert Kreativitéit, modernste Technologie an Designphilosophie fir waarm Geschier a Konscht ze bauen.", 'hero.greeting': 'Bleiwt virwëtzeg · Léist Problemer ëmmer elegant', 'hero.cta1': 'Projeten entdecken', 'hero.cta2': 'GitHub Galaxis', 'projects.title': 'Ausgewielt Wierker', 'projects.subtitle': 'Séil an all Zeil Code', 'projects.year': 'PORTFOLIO · 2026', 'lab.title': 'Kreativlaboratoire', 'lab.subtitle': 'Prototyp · Crossover · Zukunft', 'lab.ai': 'AI-ënnerstëtzt Design', 'lab.ai.desc': 'Generativ UI Exploratioun.', 'lab.proto': 'Interaktiv Prototyppen', 'lab.proto.desc': 'Fortgeschratt Mikro-Animatiounen.', 'lab.data': 'Datenvisualiséierung', 'lab.data.desc': 'Dynamesch Erzielung.', 'about.title': 'Iwwert RuanRuan', 'about.p1': "Fanatiker vun Technologie an Design, priedegt datt Einfachheet Kraaft ass.", 'about.p2': "Raccoon.Fit representéiert eng Ingenieursesthetik vun Adaptatioun, Kreatioun an Iwwerschreidung vu Grenzen.", 'about.p3': 'Bleiwt virwëtzeg · Léist Problemer ëmmer elegant', 'about.cta': 'Perséinlech Säit', 'skills.title': 'Kärkompetenzen', 'skills.frontend': 'Frontend-Architektur', 'skills.uiux': 'UI/UX Design', 'skills.product': 'Produktdenken', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Probéieren', 'card.cta.play': 'Spillen', 'card.cta.ai': 'AI probéieren', 'card.cta.eol': 'Astellungen ukucken', 'footer.tagline': 'Entdecken · Kreéieren · Wuessen — Freeë mech mat dir ze resonéieren.', 'footer.email': 'E-Mail', 'footer.github': 'GitHub', 'footer.website': 'Websäit', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Designphilosophie', 'footer.year': 'Bleiwt virwëtzeg · Kreéiert fir ëmmer', '3d.btn': '3D-Modell ukucken', '3d.loading': 'Neijoersmodell lued...', '3d.hint': 'Zéien fir ze dréinen · Scrollen fir ze zoomen', 'island.wechat': 'Dir surft am WeChat', 'island.qq': 'Dir surft am QQ', 'modal.title': 'Entwécklerverifizéierung', 'modal.subtitle': "Debug-Passwuert aginn", 'modal.cancel': 'Ofbriechen', 'modal.confirm': 'Bestätegen', 'modal.error': 'Falscht Passwuert, probéiert nach eng Kéier~', 'quickMenu.title': 'Schnellmenü', 'quick.feedback': 'Feedback', 'quick.badge': 'Badges', 'quick.friendlink': 'Linken' },
+    haw: { 'a11y.skip': 'Lele i ka maʻiʻo', 'nav.home': 'Kahua', 'nav.projects': 'Nā Papahana', 'nav.lab': "Keʻena Hoʻāʻo", 'nav.about': 'E Pili Ana', 'lang.label': 'ʻŌlelo', 'ie.link': 'Polokalamu Kahiko', 'ie.subtitle': "ʻAʻole kākoʻo ʻia kēia polokalamu kele pūnaewele", 'hero.year': 'Makahiki', 'hero.title1': 'Aloha, ʻo wau nō', 'hero.title2': 'Mea Hoʻomohala Pūnaewele', 'hero.desc': "Ka hale kikohoʻe o RuanRuan — hoʻohui i ka noʻonoʻo, ʻenehana hou, a me ke akeakamai hoʻolālā e kūkulu i nā mea hana a me ke akamai mehana.", 'hero.greeting': 'E hoʻomau i ka ʻimi naʻauao · E hoʻoponopono mau i nā pilikia me ka nani', 'hero.cta1': 'E ʻimi i nā papahana', 'hero.cta2': 'Galaxy GitHub', 'projects.title': 'Nā Hana i Koho ʻia', 'projects.subtitle': 'He ʻuhane i kēlā me kēia laina', 'projects.year': 'WAIHONA · 2026', 'lab.title': 'Keʻena Hoʻomohala', 'lab.subtitle': 'Papahana · Kekele · Wā e hiki mai ana', 'lab.ai': 'Hoʻolālā kōkua AI', 'lab.ai.desc': 'Ka ʻimi ʻana i ka UI hana.', 'lab.proto': 'Nā Papahana Hoʻāʻo', 'lab.proto.desc': 'Nā micro-animation kiʻekiʻe.', 'lab.data': 'Hōʻike ʻIkepili', 'lab.data.desc': 'Ka moʻolelo ikaika.', 'about.title': 'E pili ana iā RuanRuan', 'about.p1': 'He kanaka hoihoi i ka ʻenehana a me ka hoʻolālā, e haʻi ana he mana ka maʻalahi.', 'about.p2': "Hōʻike ʻo Raccoon.Fit i kahi ʻano ʻenehana o ka hoʻololi, hana, a me ka uhaki palena.", 'about.p3': 'E hoʻomau i ka ʻimi naʻauao · E hoʻoponopono mau i nā pilikia me ka nani', 'about.cta': 'Ka ʻaoʻao pilikino', 'skills.title': 'Nā mākau koʻikoʻi', 'skills.frontend': 'Hoʻolālā Frontend', 'skills.uiux': 'Hoʻolālā UI/UX', 'skills.product': 'Noʻonoʻo huahana', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'E hoʻāʻo', 'card.cta.play': 'E pāʻani', 'card.cta.ai': 'E hoʻāʻo i ka AI', 'card.cta.eol': 'E nānā i ka leka hoʻopau', 'footer.tagline': 'E ʻimi · E hana · E ulu — Ke kali nei i ka launa pū.', 'footer.email': 'Leka uila', 'footer.github': 'GitHub', 'footer.website': 'Pūnaewele', 'footer.copyright': '© 2025-2026 RuanRuan · Akeakamai Hoʻolālā Raccoon', 'footer.year': 'E hoʻomau i ka ʻimi naʻauao · E hana mau loa', '3d.btn': 'E nānā i ke kŘkohu 3D', '3d.loading': 'Ke hoʻouka nei i ke kŘkohu makahiki hou...', '3d.hint': 'E kauō no ka hoʻololi · E ʻolokaʻa no ka hoʻonui', 'island.wechat': 'Ke mākaʻikaʻi nei ʻoe ma WeChat', 'island.qq': 'Ke mākaʻikaʻi nei ʻoe ma QQ', 'modal.title': 'Hōʻoia Mea Hoʻomohala', 'modal.subtitle': 'E hoʻokomo i ka ʻōlelo huna debug', 'modal.cancel': 'Hoʻopau', 'modal.confirm': 'Hōʻoia', 'modal.error': 'Hewa ka ʻōlelo huna, e hoʻāʻo hou~', 'quickMenu.title': 'Papa kuhikuhi wikiwiki', 'quick.feedback': 'Manaʻo', 'quick.badge': 'Nā hōʻailona', 'quick.friendlink': 'Nā loulou' },
+    nv: { 'a11y.skip': "Baa ńdiitʼááh", 'nav.home': 'Hooghan', 'nav.projects': 'Naashnish', 'nav.lab': 'Naalkaah Bá Hooghan', 'nav.about': "Baa Haneʼ", 'lang.label': 'Saad', 'ie.link': 'Saad Bee Azééh', 'ie.subtitle': "Díí saad bee azééh doo yáʼátʼééh da", 'hero.year': 'Yihah', 'hero.title1': "Yáʼátʼééh, shí éí", 'hero.title2': 'Web Áshłaaígíí', 'hero.desc': "RuanRuan bighan — nizhónígo ádaalyaa, ániidígíí bee naʼanish, dóó nitsáhákees bee naʼanishígíí ałhąąh ádaalyaa.", 'hero.greeting': "Tʼáá íiyisíí baa nitsíníkees · Tʼáá áko hózhǫ́ǫgo naanish áńdaalneʼ", 'hero.cta1': 'Naashnish yaa nitsíníkees', 'hero.cta2': 'GitHub Sǫʼ', 'projects.title': 'Naashnish Ádaalyaaígíí', 'projects.subtitle': "Tʼáá ałtso kodóó nizhónígo", 'projects.year': 'NAASHNISH · 2026', 'lab.title': 'Ániid Naalkaah', 'lab.subtitle': 'Ániidígíí · Ałkʼiʼdiilnííł · Náásdi', 'lab.ai': 'AI Bee Naʼalkaah', 'lab.ai.desc': 'Ániidígíí bee naʼanish yaʼííłtaʼ.', 'lab.proto': 'Álchʼįʼ Ádaalneʼ', 'lab.proto.desc': 'Nizhónígo ádaalneʼígíí.', 'lab.data': "Bee Akʼeʼelchíhí", 'lab.data.desc': 'Haneʼ bee naʼanishígíí.', 'about.title': 'RuanRuan Baa Haneʼ', 'about.p1': "Tʼáadoo leʼé bee naʼanish dóó nitsáhákees yeeʼ hólǫ́ǫgo, 'doo nantłʼah da' níigo.", 'about.p2': "Raccoon.Fit éí nihá ádaalyaaígíí, ániidígíí, dóó hashtʼeʼádaalyaaígíí bee naʼanish.", 'about.p3': "Tʼáá íiyisíí baa nitsíníkees · Tʼáá áko hózhǫ́ǫgo naanish áńdaalneʼ", 'about.cta': "Nízaadgóó ńdiitʼááh", 'skills.title': 'Ííshjání Ádaalyaaígíí', 'skills.frontend': 'Frontend Áshłaa', 'skills.uiux': 'UI/UX Ádaalyaa', 'skills.product': 'Áłchíní Bá Nitsáhákees', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': "Ííníłʼį́į́ʼ", 'card.cta.play': "Nidaʼneʼ", 'card.cta.ai': "AI Ííníłʼį́į́ʼ", 'card.cta.eol': 'Doo Náánáłah Da', 'footer.tagline': "Nitsíníkees · Ánítʼį́į́h · Náánáłah — Nihił hahoodzo dooleeł.", 'footer.email': 'E-mail', 'footer.github': 'GitHub', 'footer.website': "Web Bitsʼą́ą́dóó", 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Nitsáhákees', 'footer.year': "Tʼáá íiyisíí baa nitsíníkees · Náánáłahgo Ánítʼį́į́h", '3d.btn': "3D Yaa Nitsíníkees", '3d.loading': "Nihá yitʼįįh...", '3d.hint': "Níłtsą́ągo ńdiitʼááh · Nízaadgóó ńdiitʼááh", 'island.wechat': "WeChat yeeʼ ńdiitʼááh", 'island.qq': "QQ yeeʼ ńdiitʼááh", 'modal.title': "Ííshjání Ádeilnííh", 'modal.subtitle': "Baa haneʼígíí ńdííłtʼááh", 'modal.cancel': "Tʼáadoo", 'modal.confirm': 'Aooʼ', 'modal.error': "Doo łaʼ ákótʼée da, ńtʼééʼ nídííłtʼááh~", 'quickMenu.title': "Tsį́į́łgo Bikááʼ", 'quick.feedback': "Ninaʼídíłkid", 'quick.badge': "Bee Óltaʼ", 'quick.friendlink': "Sikʼis Bikááʼ" },
+    yi: { 'a11y.skip': 'איבערהיפּן צום אינהאַלט', 'nav.home': 'היים', 'nav.projects': 'פּראָיעקטן', 'nav.lab': 'לאַבאָראַטאָריע', 'nav.about': 'וועגן', 'lang.label': 'שפּראַך', 'ie.link': 'אַלט בלעטערער', 'ie.subtitle': 'דער בלעטערער ווערט ניט געשטיצט', 'hero.year': 'יאָר', 'hero.title1': 'שלום־עליכם, איך בין', 'hero.title2': 'וועב אַנטוויקלער', 'hero.desc': "RuanRuan'ס דיגיטאַלע היים — פֿאַרבינדונג פֿון שעפֿערישקייט, פֿאָרגעשריטענע טעכנאָלאָגיע און דיזײַן־פֿילאָסאָפֿיע צו בויען וואַרעמע מכשירים און קונסט.", 'hero.greeting': 'בלײַבט נייַגעריק · לײזט פּראָבלעמען שטענדיק עלעגאַנט', 'hero.cta1': 'פֿאָרשן פּראָיעקטן', 'hero.cta2': 'GitHub גאַלאַקטיק', 'projects.title': 'אויסגעוויילטע ווערק', 'projects.subtitle': 'אַ נשמה אין יעדער שורה קאָד', 'projects.year': 'פּאָרטפֿאָליאָ · 2026', 'lab.title': 'שעפֿערישע לאַבאָראַטאָריע', 'lab.subtitle': 'פּראָטאָטיפּ · קראָסאָווער · צוקונפֿט', 'lab.ai': 'AI־געשטיצט דיזײַן', 'lab.ai.desc': 'פֿאָרשונג פֿון גענעראַטיווער UI.', 'lab.proto': 'אינטעראַקטיווע פּראָטאָטיפּן', 'lab.proto.desc': 'פֿאָרגעשריטענע מיקראָ־אַנימאַציעס.', 'lab.data': 'דאַטן־וויזואַליזירונג', 'lab.data.desc': 'דינאַמישע דערציילונג.', 'about.title': 'וועגן RuanRuan', 'about.p1': 'אַ פֿאַנאַטיקער פֿון טעכנאָלאָגיע און דיזײַן, פּרעדיקט אַז פּאַשטקייט איז מאַכט.', 'about.p2': "Raccoon.Fit רעפּרעזענטירט אַן אינזשעניריע־עסטעטיק פֿון אַדאַפּטירונג, שאַפֿונג און גרעניץ־דורכברעכונג.", 'about.p3': 'בלײַבט נייַגעריק · לײזט פּראָבלעמען שטענדיק עלעגאַנט', 'about.cta': 'פּערזענלעכע זײַט', 'skills.title': 'האַרץ־קאָמפּעטענצן', 'skills.frontend': 'פֿראָנטענד־אַרכיטעקטור', 'skills.uiux': 'UI/UX דיזײַן', 'skills.product': 'פּראָדוקט־טראַכטונג', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'פּרובירן', 'card.cta.play': 'שפּילן', 'card.cta.ai': 'פּרובירן AI', 'card.cta.eol': 'זען אָפּשטעל־מעלדונג', 'footer.tagline': 'פֿאָרשן · שאַפֿן · וואַקסן — דערוואַרטן צו רעזאָנירן מיט אײַך.', 'footer.email': 'בליצפּאָסט', 'footer.github': 'GitHub', 'footer.website': 'וועבזײַטל', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon דיזײַן־פֿילאָסאָפֿיע', 'footer.year': 'בלײַבט נייַגעריק · שאַפֿט אײביק', '3d.btn': 'זען 3D מאָדעל', '3d.loading': 'לאָדט נײַ־יאָר מאָדעל...', '3d.hint': 'שלעפּן צו דרייען · סקראָלן צו פֿאַרגרעסערן', 'island.wechat': 'איר בלעטערט אין WeChat', 'island.qq': 'איר בלעטערט אין QQ', 'modal.title': 'אַנטוויקלער וועריפֿיקאַציע', 'modal.subtitle': 'אײַנגעבן דיבאַג־פּאַראָל', 'modal.cancel': 'אַנולירן', 'modal.confirm': 'באַשטעטיקן', 'modal.error': 'פֿאַלשע פּאַראָל, פּרובירט נאָכאַמאָל~', 'quickMenu.title': 'שנעל מעניו', 'quick.feedback': 'פֿידבעק', 'quick.badge': 'אויסצייכענונגען', 'quick.friendlink': 'לינקס' },
+    mi: { 'a11y.skip': 'Peke ki te ihirangi', 'nav.home': 'Kāinga', 'nav.projects': 'Ngā Kaupapa', 'nav.lab': 'Taiwhanga', 'nav.about': 'Mōku', 'lang.label': 'Reo', 'ie.link': 'Pūmanawa Tawhito', 'ie.subtitle': 'Kāore tēnei pūmanawa tautuhinga e tautokona', 'hero.year': 'Tau', 'hero.title1': 'Kia ora, ko au tēnei', 'hero.title2': 'Kaiwhakawhanake Tukutuku', 'hero.desc': "Te kāinga matihiko o RuanRuan — te whakakotahi i te auahatanga, te hangarau matatau, me te whakaaro hoahoa ki te hanga taputapu mahana me te toi.", 'hero.greeting': 'Kia mau ki te pākiki · Whakaotia ngā raruraru i ngā wā katoa', 'hero.cta1': 'Tūhura kaupapa', 'hero.cta2': 'GitHub Tūārangi', 'projects.title': 'Ngā Mahi Whiriwhiri', 'projects.subtitle': 'He wairua kei ia rārangi waehere', 'projects.year': 'KŌPAE · 2026', 'lab.title': 'Taiwhanga Auaha', 'lab.subtitle': 'Tauira · Whakawhiti · Āmua', 'lab.ai': 'Hoahoa āwhina AI', 'lab.ai.desc': 'Te tūhura UI whakaputa.', 'lab.proto': 'Ngā Tauira Pāhekoheko', 'lab.proto.desc': 'Ngā moroiti-hātepe matatau.', 'lab.data': 'Whakaatu Raraunga', 'lab.data.desc': 'Te kōrero hihiri.', 'about.title': 'Mō RuanRuan', 'about.p1': 'He kaingākau ki te hangarau me te hoahoa, e kī ana he kaha te māmā.', 'about.p2': "E tohu ana a Raccoon.Fit i tētahi rerehua pūkaha o te urutau, te waihanga, me te wāwāhi rohe.", 'about.p3': 'Kia mau ki te pākiki · Whakaotia ngā raruraru i ngā wā katoa', 'about.cta': 'Whārangi whaiaro', 'skills.title': 'Ngā Pūkenga Matua', 'skills.frontend': 'Hoahoanga Frontend', 'skills.uiux': 'Hoahoa UI/UX', 'skills.product': 'Whakaaro hua', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Whakamātau', 'card.cta.play': 'Tākaro', 'card.cta.ai': 'Whakamātau AI', 'card.cta.eol': 'Tirohia te pānui whakamutu', 'footer.tagline': 'Tūhura · Waihanga · Tupu — E tatari ana ki te orite tahi.', 'footer.email': 'Īmēra', 'footer.github': 'GitHub', 'footer.website': 'Paetukutuku', 'footer.copyright': '© 2025-2026 RuanRuan · Whakaaro Hoahoa Raccoon', 'footer.year': 'Kia mau ki te pākiki · Waihangahia mō ake tonu', '3d.btn': 'Tirohia te tauira 3D', '3d.loading': 'E uta ana i te tauira tau hōu...', '3d.hint': 'Tōia ki te huri · Panuku ki te topa', 'island.wechat': 'Kei te tirotiro koe i WeChat', 'island.qq': 'Kei te tirotiro koe i QQ', 'modal.title': 'Manatoko Kaiwhakawhanake', 'modal.subtitle': 'Whakauruhia te kupuhipa patuiro', 'modal.cancel': 'Whakakore', 'modal.confirm': 'Whakaū', 'modal.error': 'Kupuhipa hē, whakamātau anō~', 'quickMenu.title': 'Tahora Tere', 'quick.feedback': 'Urupare', 'quick.badge': 'Tohu', 'quick.friendlink': 'Hononga' },
+    bo: { 'a11y.skip': 'ནང་དོན་ལ་འགྲོ།', 'nav.home': 'མདུན་ངོས།', 'nav.projects': 'ལས་འཆར།', 'nav.lab': 'ཚོད་ལྟ་ཁང་།', 'nav.about': 'ངོ་སྤྲོད།', 'lang.label': 'སྐད་ཡིག', 'ie.link': 'མཐུན་སྦྱོར་ཐོག་ལྟ།', 'ie.subtitle': 'གསར་གཏོད་རྒྱུན་མི་ཆད། སྤྲོ་སྣང་འཕྲོ།', 'hero.year': 'སྤྱི་ལོ།', 'hero.title1': 'བཟོ་རིག་གི་མཐའ་མེད་', 'hero.title2': 'ནུས་པ་གསར་པ།', 'hero.desc': 'རུའན་རུའན་གྱི་ཨང་ཀིའི་གནས་ས་ — གསར་གཏོད་དང་། མདུན་གྲལ་ལག་རྩལ། སྒྱུ་རྩལ་དགོངས་པ་བཅས་སྦྲེལ་ནས་དྲོད་ལྡན་གྱི་ཡོ་བྱད་དང་སྒྱུ་རྩལ་བསྐྲུན།', 'hero.greeting': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། ཁྱད་འཕགས་ཀྱིས་དཀའ་ངལ་སེལ།', 'hero.cta1': 'ལས་འཆར་ཁག་ལ་ལྟ།', 'hero.cta2': 'GitHub སྐར་ཚོམ།', 'projects.title': 'འདེམས་སྒྲུག་བརྩམས་ཆོས།', 'projects.subtitle': 'བཟོ་རིག་གི་རྩ་བ། གྲངས་ཐིག་རེ་རེར་སེམས་ཤུགས་ཡོད།', 'projects.year': 'བརྩམས་ཆོས་ཕྱོགས་བསྒྲིགས། ༢༠༢༦', 'lab.title': 'གསར་གཏོད་ཚོད་ལྟ་ཁང་།', 'lab.subtitle': 'དཔེ་བཟོ། ཕྱི་འབྲེལ། མ་འོངས་པ།', 'lab.ai': 'བཟོ་རིག་ནུས་པས་རོགས་པའི་སྒྱུ་རྩལ།', 'lab.ai.desc': 'རང་བྱུང་UI རྟོག་ཞིབ།', 'lab.proto': 'ཕན་ཚུན་འབྲེལ་བའི་དཔེ་བཟོ།', 'lab.proto.desc': 'མཐོ་རིམ་ཧྲུལ་རྫས་མྱུར་རྒྱུག', 'lab.data': 'གྲངས་ཐིག་མངོན་པ།', 'lab.data.desc': 'གནས་འགུལ་གཏམ་བཤད།', 'about.title': 'རུའན་རུའན་ངོ་སྤྲོད།', 'about.p1': 'ལག་རྩལ་དང་སྒྱུ་རྩལ་ལ་དུང་ཞེན་ཅན། "སྟབས་བདེ་ནི་ནུས་པ་ཡིན་"', 'about.p2': 'Raccoon.Fit ནི་གཤིས་འགྱུར་དང་། གསར་གཏོད། བཀག་རྒྱ་འགེམས་པའི་བཟོ་སྐྲུན་མཛེས་དཔྱོད་ཀྱི་གཟུགས་བརྙན་ཡིན།', 'about.p3': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། ཁྱད་འཕགས་ཀྱིས་དཀའ་ངལ་སེལ།', 'about.cta': 'སྒེར་ངོས་ལ་ལྟ།', 'skills.title': 'སྙིང་པོའི་ནུས་པ།', 'skills.frontend': 'མདུན་ངོས་བཟོ་རིག', 'skills.uiux': 'UI/UX སྒྱུ་རྩལ།', 'skills.product': 'ཐོན་རྫས་དགོངས་པ།', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'ཚོད་ལྟ་བྱེད།', 'card.cta.play': 'རྩེད་མོ་རྩེ།', 'card.cta.ai': 'བཟོ་རིག་ནུས་པ་ལྟ།', 'card.cta.eol': 'མཇུག་སྒྲིལ་གསལ་བསྒྲགས།', 'footer.tagline': 'རྟོག་ཞིབ། གསར་གཏོད། འཚར་ལོངས། — ཁྱེད་དང་མཉམ་དུ་འགྲོ་བར་རེ་བ།', 'footer.email': 'གློག་འཕྲིན།', 'footer.github': 'GitHub ཚོགས་སྡེ།', 'footer.website': 'དྲ་ཚིགས།', 'footer.copyright': '© 2025-2026 རུའན་རུའན། རཱི་ཁཱོན་སྒྱུ་རྩལ་དགོངས་པ།', 'footer.year': 'འདོད་ཆགས་རྒྱུན་འཁྱོངས། གཏན་དུ་གསར་གཏོད་བྱེད།', '3d.btn': '3D དཔེ་བཟོ་ལྟ།', '3d.loading': 'ལོ་གསར་དཔེ་བཟོ་འཇུག་བཞིན་པ།', '3d.hint': 'འགུལ་སྐྱོད་ཐད་འཕྲེད། འཁོར་སྐྱོད་བརྟོལ།', 'island.wechat': 'ཁྱེད་WeChat ནང་ལྟ་བཞིན་ཡོད།', 'island.qq': 'ཁྱེད་QQ ནང་ལྟ་བཞིན་ཡོད།', 'modal.title': 'འཕེལ་རྒྱས་ངོས་འཛིན།', 'modal.subtitle': 'ཞིབ་འཚོལ་ཆོག་མཆན་འཇུག', 'modal.cancel': 'འདོར་བ།', 'modal.confirm': 'ངོས་ལེན།', 'modal.error': 'ཆོག་མཆན་ནོར། བསྐྱར་ཚོད་ལྟ་བྱེད།~', 'quickMenu.title': 'མགྱོགས་ཐོ།', 'quick.feedback': 'བསམ་ཚུལ།', 'quick.badge': 'གཟི་རྟགས།', 'quick.friendlink': 'འབྲེལ་མཐུད།' },
+    ug: { 'a11y.skip': 'مەزمۇنغا ئاتلاپ ئۆتۈش', 'nav.home': 'باش بەت', 'nav.projects': 'قۇرۇلۇشلار', 'nav.lab': 'تەجرىبىخانا', 'nav.about': 'ھەققىدە', 'lang.label': 'تىل', 'ie.link': 'IE ماسلاشتۇرۇلغان', 'ie.subtitle': 'ئىجادىيەت توختىمايدۇ · ئىلھام چېچەكلەيدۇ', 'hero.year': 'ئىجادىيەت توختىمايدۇ · ئىلھام ئاتلىنىدۇ', 'hero.title1': 'كودنىڭ', 'hero.title2': 'چەكسىز ئىمكانىيەتلىرى', 'hero.desc': 'RuanRuan نىڭ رەقەملىك ماكانى — ئىجادىيەت، ئالدىنقى قاتار تېخنىكا ۋە لايىھە پەلسەپىسىنى بىرلەشتۈرۈپ، ئىللىق قوراللار ۋە سەنئەت يارىتىش.', 'hero.greeting': 'قىزىقىشنى داۋاملاشتۇرۇڭ · ھەمىشە ئەنە شۇ ئۇسۇلدا مەسىلىلەرنى ھەل قىلىڭ', 'hero.cta1': 'قۇرۇلۇشلارنى ئىزدەش', 'hero.cta2': 'GitHub يۇلتۇز سىستېمىسى', 'projects.title': 'تاللانغان ئەسەرلەر', 'projects.subtitle': 'ھەر بىر قۇر كودتا بىر روھ بار', 'projects.year': 'پورتفولىيو · 2026', 'lab.title': 'ئىجادىيەت تەجرىبىخانىسى', 'lab.subtitle': 'ئەسلى نۇسخا · باغلىنىش · كەلگۈسى', 'lab.ai': 'سۈنئىي ئەقىل ياردەمچى لايىھە', 'lab.ai.desc': 'گېنېراتىپ UI ئىزدىنىش.', 'lab.proto': 'ئىنتېراكتىپ ئەسلى نۇسخىلار', 'lab.proto.desc': 'ئالىي دەرىجىلىك مىكرو-ئانىماتسىيە.', 'lab.data': 'سانلىق مەلۇمات كۆرۈنۈشلەندۈرۈش', 'lab.data.desc': 'دىنامىك ھېكايە.', 'about.title': 'RuanRuan ھەققىدە', 'about.p1': 'تېخنىكا ۋە لايىھە ھەۋەسكارى، "ئاددىيلىق كۈچتۇر" دەپ ئىشىنىدۇ.', 'about.p2': "Raccoon.Fit ماسلىشىش، ئىجاد قىلىش ۋە چېگرالارنى بۇزۇشنىڭ ئىنژېنېرلىق ئېستېتىكىسىنى ئىپادىلەيدۇ.", 'about.p3': 'قىزىقىشنى داۋاملاشتۇرۇڭ · ھەمىشە ئەنە شۇ ئۇسۇلدا مەسىلىلەرنى ھەل قىلىڭ', 'about.cta': 'شەخسىي بەت', 'skills.title': 'ئاساسىي ئىقتىدارلار', 'skills.frontend': 'ئالدى يۈز ئارخىتېكتۇرىسى', 'skills.uiux': 'UI/UX لايىھە', 'skills.product': 'مەھسۇلات تەپەككۇرى', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'سىناپ بېقىش', 'card.cta.play': 'ئويناش', 'card.cta.ai': 'سۈنئىي ئەقىلنى سىناش', 'card.cta.eol': 'توختىتىش ئېلانىنى كۆرۈش', 'footer.tagline': 'ئىزدە · ئىجاد قىل · ئۆس — سىز بىلەن ماسلىشىشنى ئۈمىد قىلىمىز.', 'footer.email': 'ئېلخەت', 'footer.github': 'GitHub', 'footer.website': 'تور بەت', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon لايىھە پەلسەپىسى', 'footer.year': 'قىزىقىشنى داۋاملاشتۇرۇڭ · مەڭگۈ ئىجاد قىلىڭ', '3d.btn': '3D مودېلنى كۆرۈش', '3d.loading': 'يېڭى يىل مودېلى يۈكلىنىۋاتىدۇ...', '3d.hint': 'سۆرەپ ئايلاندۇرۇڭ · يوغانلىتىش ئۈچۈن دومىلىتىڭ', 'island.wechat': 'سىز WeChat تا كۆرۈۋاتىسىز', 'island.qq': 'سىز QQ دا كۆرۈۋاتىسىز', 'modal.title': 'ئاچقۇچى تەكشۈرۈش', 'modal.subtitle': 'دېتال تەڭشەش پارولىنى كىرگۈزۈڭ', 'modal.cancel': 'بىكار قىلىش', 'modal.confirm': 'جەزملەش', 'modal.error': 'پارول خاتا، قايتا سىناڭ~', 'quickMenu.title': 'تىز تىزىملىك', 'quick.feedback': 'پىكىر', 'quick.badge': 'نىشانلار', 'quick.friendlink': 'ئۇلىنىشلار' },
+    la: { 'a11y.skip': 'Transilire ad materiam', 'nav.home': 'Domus', 'nav.projects': 'Opera', 'nav.lab': 'Officina', 'nav.about': 'De me', 'lang.label': 'Lingua', 'ie.link': 'Versio IE-compos', 'ie.subtitle': 'Creativitas non cessat · Inspiratio floret', 'hero.year': 'Annus · Creativitas currit', 'hero.title1': 'Explora infinitas', 'hero.title2': 'Facultates codicis', 'hero.desc': "Refugium digitale RuanRuan — creativitatem, technologiam novissimam et philosophiam designationis coniungens ad instrumenta calida et artem aedificanda.", 'hero.greeting': 'Curiosus mane · Semper eleganter solve', 'hero.cta1': 'Opera explorare', 'hero.cta2': 'Galaxia GitHub', 'projects.title': 'Opera selecta', 'projects.subtitle': 'Anima in omni linea codicis', 'projects.year': 'PORTFOLIUM · MMXXVI', 'lab.title': 'Officina creativa', 'lab.subtitle': 'Exemplar · Coniunctio · Futurum', 'lab.ai': 'Designatio AI-adiuta', 'lab.ai.desc': 'Exploratio UI generativae.', 'lab.proto': 'Exemplaria interactiva', 'lab.proto.desc': 'Micro-animationes provectae.', 'lab.data': 'Visualizatio datorum', 'lab.data.desc': 'Narratio dynamica.', 'about.title': 'De RuanRuan', 'about.p1': 'Fanaticus technologiae et designationis, praedicans simplicitatem esse vim.', 'about.p2': "Raccoon.Fit aestheticam ingeniariam adaptationis, creationis et finium perfringendorum repraesentat.", 'about.p3': 'Curiosus mane · Semper eleganter solve', 'about.cta': 'Pagina personalis', 'skills.title': 'Competentiae principales', 'skills.frontend': 'Architectura frontalis', 'skills.uiux': 'Designatio UI/UX', 'skills.product': 'Cogitatio producti', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Experiri', 'card.cta.play': 'Ludere', 'card.cta.ai': 'Experiri AI', 'card.cta.eol': 'Videre nuntium cessationis', 'footer.tagline': 'Explorare · Creare · Crescere — Tecum resonare expectamus.', 'footer.email': 'Epistula electronica', 'footer.github': 'GitHub', 'footer.website': 'Situs interretialis', 'footer.copyright': '© MMXXV-MMXXVI RuanRuan · Philosophia designationis Raccoon', 'footer.year': 'Curiosus mane · In aeternum crea', '3d.btn': 'Videre exemplar 3D', '3d.loading': 'Exemplar anni novi oneratur...', '3d.hint': 'Trahe ad rotandum · Volve ad amplificandum', 'island.wechat': 'In WeChat navigas', 'island.qq': 'In QQ navigas', 'modal.title': 'Verificatio programmatoris', 'modal.subtitle': 'Intra tesseram lusoriam', 'modal.cancel': 'Abrogare', 'modal.confirm': 'Confirmare', 'modal.error': 'Tessera falsa, iterum tenta~', 'quickMenu.title': 'Index celer', 'quick.feedback': 'Responsum', 'quick.badge': 'Insignia', 'quick.friendlink': 'Nexus' },
+    grc: { 'a11y.skip': 'Ὑπερβαίνειν πρὸς τὸ περιεχόμενον', 'nav.home': 'Οἶκος', 'nav.projects': 'Ἔργα', 'nav.lab': 'Ἐργαστήριον', 'nav.about': 'Περὶ ἐμοῦ', 'lang.label': 'Γλῶττα', 'ie.link': 'Ἔκδοσις IE-συμβατή', 'ie.subtitle': 'Ἡ δημιουργία οὐ παύεται · Ἡ ἐπίπνοια ἀνθεῖ', 'hero.year': 'Ἔτος · Ἡ ἐπίπνοια τρέχει', 'hero.title1': 'Ἐξερευνᾶν τὰς ἀπείρους', 'hero.title2': 'Δυνάμεις τοῦ κώδικος', 'hero.desc': "Τὸ ψηφιακὸν καταφύγιον τοῦ RuanRuan — συνάπτον δημιουργίαν, τεχνολογίαν αἰχμῆς καὶ φιλοσοφίαν σχεδιασμοῦ εἰς οἰκοδομὴν θερμῶν ἐργαλείων καὶ τέχνης.", 'hero.greeting': 'Περίεργος μένε · Ἀεὶ εὐσχημόνως λῦε', 'hero.cta1': 'Ἔργα ἐξερευνᾶν', 'hero.cta2': 'Γαλαξίας GitHub', 'projects.title': 'Ἐξειλεγμένα ἔργα', 'projects.subtitle': 'Ψυχὴ ἐν πάσῃ γραμμῇ κώδικος', 'projects.year': 'ΧΑΡΤΟΦΥΛΑΚΙΟΝ · ͵βκϛʹ', 'lab.title': 'Δημιουργικὸν ἐργαστήριον', 'lab.subtitle': 'Πρωτότυπον · Διάβασις · Μέλλον', 'lab.ai': 'Σχεδιασμὸς AI-βοηθούμενος', 'lab.ai.desc': 'Ἐξερεύνησις γεννητικοῦ UI.', 'lab.proto': 'Διαδραστικὰ πρωτότυπα', 'lab.proto.desc': 'Προηγμέναι μικρο-κινήσεις.', 'lab.data': 'Ὀπτικοποίησις δεδομένων', 'lab.data.desc': 'Δυναμικὴ διήγησις.', 'about.title': 'Περὶ RuanRuan', 'about.p1': 'Ζηλωτὴς τεχνολογίας καὶ σχεδιασμοῦ, κηρύττων ὅτι ἡ ἁπλότης ἐστὶ δύναμις.', 'about.p2': "Τὸ Raccoon.Fit ἀντιπροσωπεύει μίαν μηχανικὴν αἰσθητικὴν προσαρμογῆς, δημιουργίας καὶ καταλύσεως ὁρίων.", 'about.p3': 'Περίεργος μένε · Ἀεὶ εὐσχημόνως λῦε', 'about.cta': 'Προσωπικὴ σελίς', 'skills.title': 'Κύριαι ἱκανότητες', 'skills.frontend': 'Ἀρχιτεκτονικὴ προσθίου μέρους', 'skills.uiux': 'Σχεδιασμὸς UI/UX', 'skills.product': 'Σκέψις προϊόντος', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Πειρᾶσθαι', 'card.cta.play': 'Παίζειν', 'card.cta.ai': 'Πειρᾶσθαι AI', 'card.cta.eol': 'Ὁρᾶν ἀγγελίαν παύσεως', 'footer.tagline': 'Ἐξερευνᾶν · Δημιουργεῖν · Αὐξάνεσθαι — Συντονίζεσθαι μεθʼ ὑμῶν προσδοκῶμεν.', 'footer.email': 'Ἠλεκτρονικὴ ἐπιστολή', 'footer.github': 'GitHub', 'footer.website': 'Ἱστοσελίς', 'footer.copyright': '© ͵βκεʹ-͵βκϛʹ RuanRuan · Φιλοσοφία σχεδιασμοῦ Raccoon', 'footer.year': 'Περίεργος μένε · Αἰωνίως δημιούργει', '3d.btn': 'Ὁρᾶν πρότυπον 3D', '3d.loading': 'Πρότυπον νέου ἔτους φορτοῦται...', '3d.hint': 'Σύρειν πρὸς περιστροφήν · Κυλίειν πρὸς μεγέθυνσιν', 'island.wechat': 'Ἐν WeChat πλοηγῇ', 'island.qq': 'Ἐν QQ πλοηγῇ', 'modal.title': 'Ἐπαλήθευσις προγραμματιστοῦ', 'modal.subtitle': 'Εἰσάγειν σύνθημα ἐκσφαλματώσεως', 'modal.cancel': 'Ἀκυροῦν', 'modal.confirm': 'Βεβαιοῦν', 'modal.error': 'Ψευδὲς σύνθημα, πάλιν πείρασον~', 'quickMenu.title': 'Ταχὺς κατάλογος', 'quick.feedback': 'Ἀνταπόκρισις', 'quick.badge': 'Παράσημα', 'quick.friendlink': 'Σύνδεσμοι' },
+    non: { 'a11y.skip': 'Hlaupa yfir í efni', 'nav.home': 'Heim', 'nav.projects': 'Verkefni', 'nav.lab': 'Smiðja', 'nav.about': 'Um mik', 'lang.label': 'Tunga', 'ie.link': 'IE-samhæft útgáfa', 'ie.subtitle': 'Sköpun hættir eigi · Innblástur blómstrar', 'hero.year': 'Ár · Innblástur hleypur', 'hero.title1': 'Kanna óendanlega', 'hero.title2': 'Möguleika kóða', 'hero.desc': "Stafrænt skjól RuanRuan — samtvinna sköpun, fremstu tækni og hönnunarheimspeki til að byggja hlý verkfæri og list.", 'hero.greeting': 'Ver forvitinn · Leystu ávallt vandamál með glæsibrag', 'hero.cta1': 'Kanna verkefni', 'hero.cta2': 'GitHub Vetrarbraut', 'projects.title': 'Valin verk', 'projects.subtitle': 'Önd í hverri línu kóða', 'projects.year': 'VERKASKRA · 2026', 'lab.title': 'Skapandi smiðja', 'lab.subtitle': 'Frumgerð · Þverfag · Framtíð', 'lab.ai': 'AI-aðstoðuð hönnun', 'lab.ai.desc': 'Könnun skapandi UI.', 'lab.proto': 'Gagnvirkar frumgerðir', 'lab.proto.desc': 'Háþróaðar örhreyfingar.', 'lab.data': 'Gagnasýn', 'lab.data.desc': 'Kvikt frásögn.', 'about.title': 'Um RuanRuan', 'about.p1': 'Ákafur unnandi tækni og hönnunar, predikar að einfaldleiki sé máttur.', 'about.p2': "Raccoon.Fit táknar verkfræðilega fagurfræði aðlögunar, sköpunar og landamærabrots.", 'about.p3': 'Ver forvitinn · Leystu ávallt vandamál með glæsibrag', 'about.cta': 'Persónuleg síða', 'skills.title': 'Kjarnafærni', 'skills.frontend': 'Framendahönnun', 'skills.uiux': 'UI/UX hönnun', 'skills.product': 'Vöruhugsun', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Reyna', 'card.cta.play': 'Leika', 'card.cta.ai': 'Reyna AI', 'card.cta.eol': 'Sjá lokunartilkynningu', 'footer.tagline': 'Kanna · Skapa · Vaxa — Hlakka til að hljóma með þér.', 'footer.email': 'Rafpóstur', 'footer.github': 'GitHub', 'footer.website': 'Vefsíða', 'footer.copyright': '© 2025-2026 RuanRuan · Hönnunarheimspeki Raccoon', 'footer.year': 'Ver forvitinn · Skapaðu að eilífu', '3d.btn': 'Skoða 3D líkan', '3d.loading': 'Hleður áramótalíkani...', '3d.hint': 'Dragðu til að snúa · Skrunaðu til að þysja', 'island.wechat': 'Þú vafrar í WeChat', 'island.qq': 'Þú vafrar í QQ', 'modal.title': 'Sannprófun þróunaraðila', 'modal.subtitle': 'Sláðu inn kembilykilorð', 'modal.cancel': 'Hætta við', 'modal.confirm': 'Staðfesta', 'modal.error': 'Rangt lykilorð, reyndu aftur~', 'quickMenu.title': 'Flýtivalmynd', 'quick.feedback': 'Endurgjöf', 'quick.badge': 'Merki', 'quick.friendlink': 'Tenglar' },
+    ang: { 'a11y.skip': 'Oferhlēapan tō innunge', 'nav.home': 'Hām', 'nav.projects': 'Weorc', 'nav.lab': 'Smēaþanc', 'nav.about': 'Be mē', 'lang.label': 'Geþēode', 'ie.link': 'IE-gedafen fadung', 'ie.subtitle': 'Cræft ne ætstent · Wōdblǣd blōweþ', 'hero.year': 'Gēar · Wōdblǣd ierneþ', 'hero.title1': 'Fandian þāra unge-endodra', 'hero.title2': 'Mihta rūncræftes', 'hero.desc': "RuanRuanes lārtēow-gebūr — mengende cræft, forþweardne searucræft and hīwes-cræftes lār tō timbrenne wearme tōlas and cræftas.", 'hero.greeting': 'Wes frōd · Symble līehtlīce rēc', 'hero.cta1': 'Weorc fandian', 'hero.cta2': 'GitHub tungol-hwearft', 'projects.title': 'Gecorene weorc', 'projects.subtitle': 'Gāst in ǣlcum līnan rūncræftes', 'projects.year': 'WEORC-BŌC · MMXXVI', 'lab.title': 'Cræftig smēaþanc', 'lab.subtitle': 'Bȳsen · Oferfæreld · Tōweard', 'lab.ai': 'Searucræft-fultumod hīwung', 'lab.ai.desc': 'Fandung cennendra UI.', 'lab.proto': 'Gefēr-bȳsena', 'lab.proto.desc': 'Forþwearde lȳtle-styringa.', 'lab.data': 'Gearu-gesihþ', 'lab.data.desc': 'Weallende spell.', 'about.title': 'Be RuanRuan', 'about.p1': 'Andfolga searucræftes and hīwes-cræftes, bodigende þæt ānfaldnes is cræft.', 'about.p2': "Raccoon.Fit getācnaþ searucræftlīce fægernesse geþwǣrnesse, timbrunge and gemǣro-tōbrecunge.", 'about.p3': 'Wes frōd · Symble līehtlīce rēc', 'about.cta': 'Āgen tramet', 'skills.title': 'Heort-cræftas', 'skills.frontend': 'Forþweard timbrung', 'skills.uiux': 'UI/UX hīwung', 'skills.product': 'Andweorc geþanc', 'skills.threejs': 'Three.js/WebGL', 'skills.nodejs': 'Node.js', 'skills.devops': 'DevOps', 'card.cta.try': 'Fandian', 'card.cta.play': 'Plegian', 'card.cta.ai': 'Fandian AI', 'card.cta.eol': 'Sēon endung-bēacen', 'footer.tagline': 'Fandian · Timbran · Weaxan — Ēstful wē bēoþ tō swegienne mid þē.', 'footer.email': 'Ǣrendgewrit', 'footer.github': 'GitHub', 'footer.website': 'Webbstede', 'footer.copyright': '© MMXXV-MMXXVI RuanRuan · Raccoon hīwes-cræftes lār', 'footer.year': 'Wes frōd · Tymbraþ āwa tō ealdre', '3d.btn': 'Sēon 3D bȳsen', '3d.loading': 'Nīwe gēares bȳsen hlæst...', '3d.hint': 'Dragan tō wendanne · Scrollan tō nēalǣcanne', 'island.wechat': 'Þū scēawast in WeChat', 'island.qq': 'Þū scēawast in QQ', 'modal.title': 'Timbrendes costnung', 'modal.subtitle': 'Inbring dēagol-word forþweardes', 'modal.cancel': 'Ongēanwendan', 'modal.confirm': 'Gefæstnian', 'modal.error': 'Wōh dēagol-word, fanda eft~', 'quickMenu.title': 'Hræd getæl', 'quick.feedback': 'Edlēan-cwide', 'quick.badge': 'Tācnu', 'quick.friendlink': 'Bendas' },
+    hili: { 'a11y.skip': 'Olah! Mi movo zido', 'nav.home': 'Siye', 'nav.projects': 'Mita kuzi', 'nav.lab': 'Celi gusha siye', 'nav.about': 'Mi ye zido', 'lang.label': 'Olah mita', 'ie.link': 'Gusha IE movo', 'ie.subtitle': 'Nu movo gusha. Mita nye todo.', 'hero.year': 'Zido movo', 'hero.title1': 'Olah! Mi RuanRuan', 'hero.title2': 'Mita dada kuzi', 'hero.desc': "RuanRuan siye — mita todo, kuzi gusha, celi movo. Mi biat ye movo mita todo.", 'hero.greeting': 'Kuzi! Todo gusha ye movo', 'hero.cta1': 'Mosi mita kuzi!', 'hero.cta2': 'GitHub Dada Siye', 'projects.title': 'Mita Kuzi Zido', 'projects.subtitle': 'Todo mita ye mita gusha', 'projects.year': 'MITA ZIDO · 2026', 'lab.title': 'Celi Gusha Siye', 'lab.subtitle': 'Mita · Kuzi · Movo lata', 'lab.ai': 'Dada AI mita', 'lab.ai.desc': 'Mita kuzi mosi zido.', 'lab.proto': 'Movo mita zido', 'lab.proto.desc': 'Dada mita todo ye celi.', 'lab.data': 'Mita zido mosi', 'lab.data.desc': 'Movo mita ye gusha.', 'about.title': 'Mi ye RuanRuan', 'about.p1': "Mi todo mita. Kuzi gusha mosi. 'Mita todo ye gusha' mi biat.", 'about.p2': 'Raccoon.Fit boya todo. Bio movo mita, biat kuzi, ye gusha movo.', 'about.p3': 'Kuzi! Todo gusha ye movo', 'about.cta': 'Mi mita movo ye', 'skills.title': 'Kuzi Mita Biat', 'skills.frontend': 'Dada movo mita', 'skills.uiux': 'Mita todo zido', 'skills.product': 'Kuzi mita todo ye', 'skills.threejs': 'Dada 3D mita', 'skills.nodejs': 'Node.js mita', 'skills.devops': 'DevOps mita', 'card.cta.try': 'Mosi zido!', 'card.cta.play': 'Movo boya!', 'card.cta.ai': 'Mosi AI mita', 'card.cta.eol': 'Mita nye todo movo', 'footer.tagline': 'Movo · Kuzi · Todo — Bio ye movo mita.', 'footer.email': 'Mita ye celi biat', 'footer.github': 'GitHub Siye', 'footer.website': 'Mita movo zido', 'footer.copyright': '© 2025-2026 RuanRuan · Raccoon Mita Dada', 'footer.year': 'Kuzi! Mita todo movo ye', '3d.btn': 'Mosi 3D mita zido', '3d.loading': 'Mita movo lata bio...', '3d.hint': 'Movo zido · Kuzi movo lata', 'island.wechat': 'Nu movo WeChat zido', 'island.qq': 'Nu movo QQ zido', 'modal.title': 'Kuzi movo biat zido', 'modal.subtitle': 'Mita ye bio movo', 'modal.cancel': 'Nye movo', 'modal.confirm': 'Todo! Biat!', 'modal.error': 'Nye todo mita, mosi bio movo~', 'quickMenu.title': 'Kuzi movo zido', 'quick.feedback': 'Mita ye biat', 'quick.badge': 'Todo mita zido', 'quick.friendlink': 'Boya movo mita' },
+    censor: { 'a11y.skip': '***', 'nav.home': '***', 'nav.projects': '***', 'nav.lab': '***', 'nav.about': '***', 'lang.label': '***', 'ie.link': '***', 'ie.subtitle': '***', 'hero.year': '***', 'hero.title1': '***', 'hero.title2': '***', 'hero.desc': '***', 'hero.greeting': '***', 'hero.cta1': '***', 'hero.cta2': '***', 'projects.title': '***', 'projects.subtitle': '***', 'projects.year': '***', 'lab.title': '***', 'lab.subtitle': '***', 'lab.ai': '***', 'lab.ai.desc': '***', 'lab.proto': '***', 'lab.proto.desc': '***', 'lab.data': '***', 'lab.data.desc': '***', 'about.title': '***', 'about.p1': '***', 'about.p2': '***', 'about.p3': '***', 'about.cta': '***', 'skills.title': '***', 'skills.frontend': '***', 'skills.uiux': '***', 'skills.product': '***', 'skills.threejs': '***', 'skills.nodejs': '***', 'skills.devops': '***', 'card.cta.try': '***', 'card.cta.play': '***', 'card.cta.ai': '***', 'card.cta.eol': '***', 'footer.tagline': '***', 'footer.email': '***', 'footer.github': '***', 'footer.website': '***', 'footer.copyright': '***', 'footer.year': '***', '3d.btn': '***', '3d.loading': '***', '3d.hint': '***', 'island.wechat': '***', 'island.qq': '***', 'modal.title': '***', 'modal.subtitle': '***', 'modal.cancel': '***', 'modal.confirm': '***', 'modal.error': '***', 'quickMenu.title': '***', 'quick.feedback': '***', 'quick.badge': '***', 'quick.friendlink': '***' },
+    cat: { 'a11y.skip': 'maoou lili mao', 'nav.home': 'mao siye', 'nav.projects': 'maoou ruao', 'nav.lab': 'nana siye', 'nav.about': 'mao cill', 'lang.label': 'maoou', 'ie.link': 'oikana IE', 'ie.subtitle': 'mi maoon nana · maoou zaida mi', 'hero.year': 'viora', 'hero.title1': 'maoou na rkacna', 'hero.title2': 'maoou ma ouya', 'hero.desc': "maoou siye — maoou na cang, nana olier, dada aolyer. maoou ruao cang, maoou kenuo cang.", 'hero.greeting': 'maoou zaida cang · maoou na ouya cang', 'hero.cta1': 'mi kenuo ruao', 'hero.cta2': 'GitHub dada siye', 'projects.title': 'maoou ruao olier', 'projects.subtitle': 'maoou cill cang, maoou nana cang', 'projects.year': 'MAOOU · 2026', 'lab.title': 'nana cill siye', 'lab.subtitle': 'maoou na · ruao · kenuo', 'lab.ai': 'maoou nana AI', 'lab.ai.desc': 'maoou cill aolyer.', 'lab.proto': 'maoou ruao nana', 'lab.proto.desc': 'maoou cill nasali.', 'lab.data': 'maoou kenuo oikana', 'lab.data.desc': 'maoou ruao wuen.', 'about.title': 'maoou cill mao', 'about.p1': "maoou na siye, maoou ma aolyer. 'maoou zaida wuen' mao cill.", 'about.p2': "Raccoon.Fit: maoou cill kaiol — zaida, na, lili nara.", 'about.p3': 'maoou zaida cang · maoou na ouya cang', 'about.cta': 'mao siye', 'skills.title': 'maoou cill cang', 'skills.frontend': 'maoou ruao oikana', 'skills.uiux': 'maoou na aolyer', 'skills.product': 'maoou dada nana', 'skills.threejs': 'maoou nana 3D', 'skills.nodejs': 'maoou kenuo Node.js', 'skills.devops': 'maoou kenuo DevOps', 'card.cta.try': 'mi zaida', 'card.cta.play': 'mi cill', 'card.cta.ai': 'mi kenuo AI', 'card.cta.eol': 'maoou da nasali', 'footer.tagline': 'maoou na · ruao · lili — maoou kenuo mi.', 'footer.email': 'maoou ruao mi', 'footer.github': 'GitHub dada', 'footer.website': 'maoou siye', 'footer.copyright': '© 2025-2026 RuanRuan · Maoou Nana', 'footer.year': 'maoou zaida · maoou na asali', '3d.btn': 'mi kenuo 3D nana', '3d.loading': 'maoou nana viora...', '3d.hint': 'mi fafa · mi roro', 'island.wechat': 'mi maoon WeChat', 'island.qq': 'mi maoon QQ', 'modal.title': 'maoou zaida mi', 'modal.subtitle': 'mi kenuo cill', 'modal.cancel': 'maoou da', 'modal.confirm': 'maoou na', 'modal.error': 'nana cill, mi zaida viora~', 'quickMenu.title': 'maoou cill cang', 'quick.feedback': 'maoou ruao kenuo', 'quick.badge': 'maoou aolyer', 'quick.friendlink': 'maoou siye' }
+};
+
+    // ========================================
+    // STATE
+    // ========================================
+    var state = {
+        theme: 'light',
+        lang: 'zh-CN'
+    };
+    try {
+        var savedTheme = localStorage.getItem('theme-ie');
+        if (savedTheme) state.theme = savedTheme;
+        var savedLang = localStorage.getItem('lang-ie');
+        if (savedLang) state.lang = savedLang;
+    } catch(e) {}
+
+    // ========================================
+    // detectLang - IE compatible
+    // ========================================
+    function detectLang() {
+        var l = (navigator.language || navigator.userLanguage || navigator.browserLanguage || '').toLowerCase();
+        if (l.indexOf('zh-tw') === 0 || l.indexOf('zh-hk') === 0 || l.indexOf('zh-mo') === 0) return 'zh-TW';
+        if (l.indexOf('zh') === 0) return 'zh-CN';
+        if (l.indexOf('ja') === 0) return 'ja';
+        if (l.indexOf('ko') === 0) return 'ko';
+        if (l.indexOf('fr') === 0) return 'fr';
+        if (l.indexOf('sa') === 0) return 'sa';
+        if (l.indexOf('ar') === 0) return 'ar';
+        if (l.indexOf('ru') === 0) return 'ru';
+        if (l.indexOf('en') === 0) return 'en-US';
+        return 'zh-CN';
+    }
+
+    if (!state.lang) state.lang = detectLang();
+
+    // ========================================
+    // langToDict - map language to dict key
+    // ========================================
+    function langToDict(l) {
+        var direct = ['zh-TW','ja','ko','fr','sa','ar','egy','anubis','eo','ru','tok','jbo','tlh','qya','dot','nvi','eu','cy','haw','nv','yi','mi','bo','ug','la','grc','non','ang','hili','censor','cat','is','ca','mt','fy','lb'];
+        for (var i = 0; i < direct.length; i++) {
+            if (direct[i] === l) return l;
+        }
+        if (l.indexOf('zh') === 0) return 'zh';
+        return 'en';
+    }
+
+    // ========================================
+    // applyTheme - IE compatible
+    // ========================================
+    function applyTheme(t) {
+        state.theme = t;
+        document.documentElement.setAttribute('data-theme', t);
+        try { localStorage.setItem('theme-ie', t); } catch(e) {}
+        updateThemeUI();
+    }
+
+    function updateThemeUI() {
+        var icon = document.getElementById('themeIconIe');
+        var label = document.getElementById('themeLabelIe');
+        if (state.theme === 'light') {
+            if (icon) icon.innerHTML = '\u2600\uFE0F';
+            if (label) label.innerHTML = '\u6D45\u8272';
+        } else {
+            if (icon) icon.innerHTML = '\uD83C\uDF19';
+            if (label) label.innerHTML = '\u6DF1\u8272';
+        }
+    }
+
+    // ========================================
+    // applyLang - IE compatible
+    // ========================================
+    function applyLang(l, save) {
+        if (save === undefined) save = true;
+        if (l === 'cat') { l = 'hili'; }
+        state.lang = l;
+        var dictKey = langToDict(l);
+        var dict = I18N[dictKey] || I18N.zh;
+
+        // Apply translations to all [data-i18n] elements
+        var els = document.querySelectorAll ? document.querySelectorAll('[data-i18n]') : getByAttr('data-i18n');
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            var key = el.getAttribute('data-i18n');
+            if (dict[key] != null) {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.value = dict[key];
+                } else {
+                    if (el.textContent !== undefined) el.textContent = dict[key];
+                    else el.innerText = dict[key];
+                }
             }
         }
 
-        // ========================================
-        // 导航交互 - IE兼容版
-        // ========================================
-        function initNavigation() {
-            var navLinks = document.querySelectorAll ? document.querySelectorAll('.nav-link-ie') : document.getElementsByClassName('nav-link-ie');
-            var sections = document.querySelectorAll ? document.querySelectorAll('section-ie') : document.getElementsByTagName('section-ie');
+        // Update lang attribute on html
+        var langAttr = l.indexOf('zh') === 0 ? 'zh' : 'en';
+        document.documentElement.setAttribute('lang', langAttr);
 
-            function updateActiveLink() {
-                var scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-                scrollPos = scrollPos + 180;
+        if (save) {
+            try { localStorage.setItem('lang-ie', l); } catch(e) {}
+        }
 
-                for (var i = 0; i < sections.length; i++) {
-                    var section = sections[i];
-                    var sectionTop = section.offsetTop || 0;
-                    var sectionHeight = section.offsetHeight || 0;
-                    var sectionId = section.id || '';
+        // Update select value
+        var sel = document.getElementById('i18nSelect');
+        if (sel) sel.value = l;
 
-                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                        for (var j = 0; j < navLinks.length; j++) {
-                            var link = navLinks[j];
-                            var href = link.getAttribute('href') || '';
-                            if (href.indexOf('#' + sectionId) !== -1) {
-                                link.className = 'nav-link-ie active';
-                            } else {
-                                link.className = 'nav-link-ie';
-                            }
+        // Update indicator
+        var indicator = document.getElementById('langIndicator');
+        if (indicator) {
+            var labels = {'zh-CN':'\u4E2D','zh-TW':'\u7E41','en-US':'EN','en-GB':'EN','ja':'\u65E5','ko':'\uD55C','fr':'FR','sa':'\u0938','ar':'\u0639\u0631','egy':'\uD80C\uDD82','anubis':'\uD80C\uDD83','eo':'EO','ru':'RU','tok':'TP','jbo':'JB','tlh':'KL','qya':'QY','dot':'DT','nvi':'NV','eu':'EU','cy':'CY','haw':'HW','nv':'NV','yi':'YI','mi':'MI','bo':'\u0F56\u0F7C','ug':'UG','la':'LA','grc':'GR','non':'NO','ang':'\u00C6','hili':'\u4E18','censor':'\u4E18','cat':'\u732B'};
+            var val = labels[l] || l.split('-')[0].toUpperCase();
+            if (indicator.textContent !== undefined) indicator.textContent = val;
+            else indicator.innerText = val;
+        }
+    }
+
+    // Polyfill: get elements by attribute for older IEs
+    function getByAttr(attr) {
+        var all = document.getElementsByTagName('*');
+        var result = [];
+        for (var i = 0; i < all.length; i++) {
+            if (all[i].getAttribute && all[i].getAttribute(attr)) {
+                result.push(all[i]);
+            }
+        }
+        return result;
+    }
+
+    // ========================================
+    // CLOCK
+    // ========================================
+    function updateClock() {
+        var clockEl = document.getElementById('clockIe');
+        if (!clockEl) return;
+        var now = new Date();
+        var h = now.getHours();
+        var m = now.getMinutes();
+        var s = now.getSeconds();
+        if (h < 10) h = '0' + h;
+        if (m < 10) m = '0' + m;
+        if (s < 10) s = '0' + s;
+        clockEl.innerHTML = h + ':' + m + ':' + s;
+    }
+
+    // ========================================
+    // NAVIGATION - Scroll-based active link
+    // ========================================
+    function initNavigation() {
+        var navLinks = document.querySelectorAll ? document.querySelectorAll('.ie-nav-link') : getByClassName('ie-nav-link');
+        var sections = document.querySelectorAll ? document.querySelectorAll('section') : document.getElementsByTagName('section');
+
+        function updateActiveLink() {
+            var scrollPos = (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) + 200;
+
+            for (var i = 0; i < sections.length; i++) {
+                var section = sections[i];
+                var sectionTop = section.offsetTop || 0;
+                var sectionHeight = section.offsetHeight || 0;
+                var sectionId = section.id || '';
+
+                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    for (var j = 0; j < navLinks.length; j++) {
+                        var link = navLinks[j];
+                        var href = link.getAttribute('href') || '';
+                        if (href.indexOf('#' + sectionId) !== -1) {
+                            link.className = 'ie-nav-link active';
+                        } else {
+                            link.className = 'ie-nav-link';
                         }
                     }
                 }
             }
-
-            if (window.addEventListener) {
-                window.addEventListener('scroll', updateActiveLink, false);
-            } else if (window.attachEvent) {
-                window.attachEvent('onscroll', updateActiveLink);
-            }
-            updateActiveLink();
         }
 
-        // ========================================
-        // 滚动动画 - IE兼容版
-        // ========================================
-        function initScrollAnimations() {
-            var skills = [
-                { fill: document.getElementById('skill-fill-1'), width: '85%' },
-                { fill: document.getElementById('skill-fill-2'), width: '75%' },
-                { fill: document.getElementById('skill-fill-3'), width: '80%' },
-                { fill: document.getElementById('skill-fill-4'), width: '70%' }
-            ];
-
-            function animateSkills() {
-                for (var i = 0; i < skills.length; i++) {
-                    var skill = skills[i];
-                    if (skill.fill && skill.width) {
-                        skill.fill.style.width = skill.width;
-                    }
-                }
-            }
-
-            setTimeout(animateSkills, 500);
+        if (window.addEventListener) {
+            window.addEventListener('scroll', updateActiveLink, false);
+        } else if (window.attachEvent) {
+            window.attachEvent('onscroll', updateActiveLink);
         }
+        updateActiveLink();
+    }
 
-        // ========================================
-        // 平滑锚点 - IE兼容版
-        // ========================================
-        function initSmoothAnchor() {
-            var anchors = document.getElementsByTagName('a');
-            for (var i = 0; i < anchors.length; i++) {
-                var anchor = anchors[i];
+    function getByClassName(cls) {
+        if (document.getElementsByClassName) return document.getElementsByClassName(cls);
+        var all = document.getElementsByTagName('*');
+        var result = [];
+        for (var i = 0; i < all.length; i++) {
+            if (all[i].className && all[i].className.indexOf(cls) !== -1) {
+                result.push(all[i]);
+            }
+        }
+        return result;
+    }
+
+    // ========================================
+    // SMOOTH ANCHOR SCROLLING
+    // ========================================
+    function initSmoothAnchor() {
+        var anchors = document.getElementsByTagName('a');
+        for (var i = 0; i < anchors.length; i++) {
+            (function(anchor) {
                 var href = anchor.getAttribute('href') || '';
                 if (href.indexOf('#') === 0 && href.length > 1) {
+                    var handler = function(e) {
+                        e = e || window.event;
+                        if (e.preventDefault) e.preventDefault();
+                        else e.returnValue = false;
+                        var targetId = href.substring(1);
+                        var target = document.getElementById(targetId);
+                        if (target) {
+                            var offsetTop = target.offsetTop - 80;
+                            window.scrollTo(0, offsetTop);
+                        }
+                    };
                     if (anchor.addEventListener) {
-                        anchor.addEventListener('click', function(e) {
-                            e = e || window.event;
-                            if (e.preventDefault) e.preventDefault(); else e.returnValue = false;
-                            var targetId = this.getAttribute('href').substring(1);
-                            var targetElement = document.getElementById(targetId);
-                            if (targetElement) {
-                                var offsetTop = targetElement.offsetTop - 80;
-                                if (window.scrollTo) {
-                                    window.scrollTo(0, offsetTop);
-                                } else {
-                                    document.documentElement.scrollTop = offsetTop;
-                                    document.body.scrollTop = offsetTop;
-                                }
-                            }
-                        }, false);
+                        anchor.addEventListener('click', handler, false);
                     } else if (anchor.attachEvent) {
-                        anchor.attachEvent('onclick', function() {
-                            var targetId = this.getAttribute('href').substring(1);
-                            var targetElement = document.getElementById(targetId);
-                            if (targetElement) {
-                                document.documentElement.scrollTop = targetElement.offsetTop - 80;
-                            }
-                            return false;
-                        });
+                        anchor.attachEvent('onclick', handler);
                     }
                 }
+            })(anchors[i]);
+        }
+    }
+
+    // ========================================
+    // SKILL ANIMATIONS
+    // ========================================
+    function initSkillAnimations() {
+        var fills = document.querySelectorAll ? document.querySelectorAll('.ie-skill-fill') : getByClassName('ie-skill-fill');
+        setTimeout(function() {
+            for (var i = 0; i < fills.length; i++) {
+                var fill = fills[i];
+                var w = fill.getAttribute('data-width');
+                if (w) fill.style.width = w + '%';
+            }
+        }, 300);
+    }
+
+    // ========================================
+    // INIT
+    // ========================================
+    function init() {
+        applyTheme(state.theme);
+        applyLang(state.lang, false);
+        updateClock();
+        setInterval(updateClock, 1000);
+        initNavigation();
+        initSmoothAnchor();
+        initSkillAnimations();
+
+        // Theme toggle
+        var themeBtn = document.getElementById('themeBtnIe');
+        if (themeBtn) {
+            var themeHandler = function() {
+                applyTheme(state.theme === 'light' ? 'dark' : 'light');
+            };
+            if (themeBtn.addEventListener) {
+                themeBtn.addEventListener('click', themeHandler, false);
+            } else if (themeBtn.attachEvent) {
+                themeBtn.attachEvent('onclick', themeHandler);
             }
         }
 
-        // ========================================
-        // 官网按钮 - IE兼容版
-        // ========================================
-        function initOfficialBtn() {
-            var btn = document.getElementById('officialBtnIe');
-            if (btn) {
-                if (btn.addEventListener) {
-                    btn.addEventListener('click', function() {
-                        var self = this;
-                        self.style.transform = 'scale(0.95)';
-                        setTimeout(function() {
-                            self.style.transform = '';
-                        }, 100);
-                    });
-                } else if (btn.attachEvent) {
-                    btn.attachEvent('onclick', function() {
-                        btn.style.transform = 'scale(0.95)';
-                        setTimeout(function() {
-                            btn.style.transform = '';
-                        }, 100);
-                    });
-                }
+        // Language select
+        var langSel = document.getElementById('i18nSelect');
+        if (langSel) {
+            var langHandler = function() {
+                applyLang(langSel.value);
+            };
+            if (langSel.addEventListener) {
+                langSel.addEventListener('change', langHandler, false);
+            } else if (langSel.attachEvent) {
+                langSel.attachEvent('onchange', langHandler);
             }
         }
 
-        // ========================================
-        // 初始化 - IE兼容版
-        // ========================================
-        function init() {
-            Theme.init();
-            updateClock();
-            setInterval(updateClock, 1000);
-            initNavigation();
-            initScrollAnimations();
-            initSmoothAnchor();
-            initOfficialBtn();
-
-            var themeBtn = document.getElementById('themeBtnIe');
-            if (themeBtn) {
-                if (themeBtn.addEventListener) {
-                    themeBtn.addEventListener('click', function() { Theme.toggle(); }, false);
-                } else if (themeBtn.attachEvent) {
-                    themeBtn.attachEvent('onclick', function() { Theme.toggle(); });
-                }
+        try {
+            if (window.console && window.console.log) {
+                console.log('\uD83E\uDDAB IE\u517C\u5BB9\u7248 - \u8F6F\u8F6F\u7684\u5C0F\u7A9D');
             }
+        } catch(e) {}
+    }
 
-            try {
-                if (window.console && window.console.log) {
-                    console.log('%c🦝 软软的小窝', 'font-size:20px;font-weight:bold;background:linear-gradient(135deg,#8b5cf6,#d946ef);-webkit-background-clip:text;-webkit-text-fill-color:transparent;');
-                    console.log('%c🎊 新年快乐！丙午马年大吉！🎊', 'font-size:16px;color:#FFD700;');
-                }
-            } catch (e) {}
-        }
-
-        if (document.addEventListener) {
-            document.addEventListener('DOMContentLoaded', init, false);
-        } else if (document.attachEvent) {
-            document.attachEvent('onreadystatechange', function() {
-                if (document.readyState === 'complete') {
-                    init();
-                }
-            });
-        } else {
-            window.onload = init;
-        }
-
-    })();
-    </script>
-</body>
+    if (document.addEventListener) {
+        document.addEventListener('DOMContentLoaded', init, false);
+    } else if (document.attachEvent) {
+        document.attachEvent('onreadystatechange', function() {
+            if (document.readyState === 'complete') init();
+        });
+    } else {
+        window.onload = init;
+    }
+})();
+</script>
 </html>

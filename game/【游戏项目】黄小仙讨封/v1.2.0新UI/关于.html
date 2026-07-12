@@ -1,1 +1,276 @@
-【占位符】
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>关于 · 黄小仙讨封（卷轴）</title>
+    <meta name="theme-color" content="#5D4037">
+    <style>
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139,69,19,0.03) 2px,
+                    rgba(139,69,19,0.03) 4px
+                ),
+                radial-gradient(ellipse at 50% 30%, rgba(210,180,140,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(210,180,140,0.1) 0%, transparent 60%);
+        }
+
+        /* 卷轴主容器 */
+        .page-container {
+            max-width: 520px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            animation: fadeIn 0.8s ease forwards;
+            border-left: 6px solid var(--scroll-dark);
+            border-right: 6px solid var(--scroll-dark);
+            background: rgba(255, 248, 220, 0.6);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+        }
+
+        /* 卷轴左右卷曲厚度 */
+        .page-container::before,
+        .page-container::after {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 12px;
+            background: linear-gradient(to bottom, var(--scroll-dark), #A0522D, var(--scroll-dark));
+            box-shadow: inset 2px 0 5px rgba(0,0,0,0.3), inset -2px 0 5px rgba(0,0,0,0.2);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .page-container::before {
+            left: -6px;
+            border-radius: 4px 0 0 4px;
+        }
+        .page-container::after {
+            right: -6px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部标题区 */
+        .about-header {
+            margin-bottom: 40px;
+        }
+        .about-header .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            color: var(--scroll-gold);
+            animation: goldenPulse 3s ease-in-out infinite;
+            text-shadow: 0 0 8px rgba(184, 134, 11, 0.4);
+        }
+        @keyframes goldenPulse {
+            0%, 100% { opacity: 0.65; }
+            50% { opacity: 1; }
+        }
+        .about-header h1 {
+            font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+            color: var(--scroll-gold);
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 var(--scroll-dark);
+            margin-bottom: 10px;
+        }
+        .about-header .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--scroll-gold), transparent);
+            margin: 0 auto;
+        }
+
+        /* 版本号区域 */
+        .version-block {
+            margin-bottom: 50px;
+            padding: 20px 0;
+        }
+        .version-label {
+            font-size: 14px;
+            color: #5D4037;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            font-family: 'KaiTi', serif;
+        }
+        .version-number {
+            font-size: 52px;
+            font-weight: bold;
+            color: var(--scroll-gold);
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 var(--scroll-dark), 0 0 15px rgba(184, 134, 11, 0.3);
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
+        }
+        .version-number::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--scroll-dark);
+        }
+        .version-tag {
+            font-size: 13px;
+            color: #5D4037;
+            letter-spacing: 2px;
+            margin-top: 18px;
+            font-style: italic;
+            font-family: 'KaiTi', serif;
+        }
+
+        /* 隐私政策链接 */
+        .privacy-section {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 2px dashed var(--scroll-dark);
+            width: 100%;
+        }
+        .privacy-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--scroll-light);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            padding: 10px 22px;
+            background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
+            font-weight: bold;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+        }
+        .privacy-link .link-icon {
+            font-size: 16px;
+            color: #FFE4B5;
+        }
+        .privacy-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+        }
+        .privacy-link:active {
+            transform: translateY(1px);
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+        }
+        .privacy-hint {
+            font-size: 11px;
+            color: #5D4037;
+            margin-top: 12px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* 页脚 */
+        .footer-note {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #5D4037;
+            letter-spacing: 1px;
+            font-family: 'KaiTi', serif;
+        }
+        .footer-note a {
+            color: var(--scroll-dark);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: bold;
+        }
+        .footer-note a:hover {
+            color: var(--scroll-gold);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .about-header h1 { font-size: 24px; letter-spacing: 3px; }
+            .version-number { font-size: 40px; letter-spacing: 3px; }
+            .version-label { font-size: 12px; }
+            .privacy-link { font-size: 13px; padding: 8px 16px; }
+            .page-container { padding: 24px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- WebIDE 环境脚本（保留原有功能） -->
+    <script>
+        webapp.关闭跳转打开(false);
+        webapp.设置下拉刷新(false);
+        webapp.清空浏览记录();
+    </script>
+
+    <div class="page-container">
+        <!-- 关于标题 -->
+        <div class="about-header">
+            <span class="icon">✦</span>
+            <h1>关于黄小仙讨封</h1>
+            <div class="divider"></div>
+        </div>
+
+        <!-- 版本号 -->
+        <div class="version-block">
+            <p class="version-label">当前版本</p>
+            <p class="version-number">V1.1.0</p>
+            <p class="version-tag">五百年修为一念之间</p>
+        </div>
+
+        <!-- 隐私政策 -->
+        <div class="privacy-section">
+            <a href="https://raccoon.fit/隐私政策/game/黄小仙讨封.html"
+               target="_blank"
+               rel="noreferrer"
+               class="privacy-link">
+                <span class="link-icon">📜</span>
+                <span>隐私政策</span>
+            </a>
+            <p class="privacy-hint">点击查看完整隐私政策</p>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer-note">
+            <a href="https://raccoon.fit/" target="_blank" rel="noreferrer">© 2026 软软的小窝</a>
+        </div>
+    </div>
+</body>
+</html>

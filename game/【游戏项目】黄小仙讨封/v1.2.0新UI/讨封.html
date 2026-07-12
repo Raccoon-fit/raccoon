@@ -2503,5 +2503,88 @@ window.resetGame = resetGame;
   }
 })();
 </script>
+
+<script>
+(function() {
+  // ========== 强制修复 StorageBridge ==========
+  window.StorageBridge = (function() {
+    // 检测父页面原生存储是否可用
+    const hasNative = (() => {
+      try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; }
+    })();
+
+    if (!hasNative) {
+      console.warn('[StorageBridge] 未检测到父页面原生存储，使用 localStorage 回退');
+      return {
+        getItem: async (key, def = null) => localStorage.getItem(key) ?? def,
+        setItem: async (key, val) => { localStorage.setItem(key, val); },
+        removeItem: async (key) => { localStorage.removeItem(key); },
+        clear: async () => { localStorage.clear(); }
+      };
+    }
+
+    // 原生存储模式
+    let id = 0;
+    const pending = {};
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (d && d.id !== undefined && pending[d.id]) {
+        d.error ? pending[d.id].reject(new Error(d.error)) : pending[d.id].resolve(d.result);
+        delete pending[d.id];
+      }
+    });
+    function send(action, key, value, def) {
+      return new Promise((resolve, reject) => {
+        const i = ++id;
+        pending[i] = { resolve, reject };
+        window.parent.postMessage({ id:i, action, key, value, defaultValue:def }, '*');
+      });
+    }
+    return {
+      getItem: (k, d) => send('get', k, null, d),
+      setItem: (k, v) => send('set', k, v),
+      removeItem: (k) => send('remove', k),
+      clear: () => send('clear')
+    };
+  })();
+
+  // ========== 修复成就解锁函数（确保保存并通知父页面） ==========
+  const originalUnlock = window.unlockAchievement;
+  window.unlockAchievement = async function(id) {
+    if (!gameData || !gameData.achievements) return;
+    if (!gameData.achievements[id]) {
+      gameData.achievements[id] = true;
+      try {
+        await StorageBridge.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements));
+        console.log('[成就] 已保存:', id);
+      } catch(e) {
+        console.error('[成就] 保存失败:', e);
+        // 回退到 localStorage
+        try { localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameData.achievements)); } catch(e2) {}
+      }
+      // 显示成就弹窗
+      if (typeof showAchievement === 'function') {
+        const nameMap = {
+          'true': '本相自在', 'god': '点化成仙', 'mortal': '尘世轮回', 'fail_scholar': '功亏一篑',
+          'fail_kid': '原形毕露', 'farmer': '山野村夫', 'star': '文曲星耀', 'demon_king': '妖王之路',
+          'sacrifice': '舍身成仁', 'mad': '执念成魔', 'love': '红尘情缘', 'guardian': '守山之人',
+          'lost': '雨夜迷途', 'severed': '断缘而去', 'dawn': '黎明归宿', 'witness': '无对无错，善良依旧',
+          'suspicious': '疑心失缘', 'sword_friend': '剑影知交', 'sword_master': '剑道传承', 'green_memory': '前尘往事',
+          'great_good': '大善若水', 'great_evil': '大恶如魔', 'balance_sage': '中庸之道', 'ghost_friend': '鬼魂之交',
+          'star_seeker': '星辰指引'
+        };
+        const goldenIds = ['witness', 'sacrifice'];
+        if (nameMap[id]) showAchievement(nameMap[id], goldenIds.includes(id));
+      }
+      // 通知父页面成就更新
+      if (window.parent) {
+        window.parent.postMessage({ type: 'achievements-updated' }, '*');
+      }
+    }
+  };
+
+  console.log('[修复] 成就系统已重新绑定，StorageBridge 已就绪');
+})();
+</script>
 </body>
 </html>

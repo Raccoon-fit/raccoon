@@ -2450,5 +2450,58 @@ window.resetGame = resetGame;
       if (karma) playerKarma = parseInt(karma);
     };
   </script>
+<script>
+(function() {
+  function fixSettings() {
+    var btn = document.getElementById('settingsBtn');
+    var overlay = document.getElementById('settingsOverlay');
+    if (!btn || !overlay) return;
+
+    // 移除可能失效的旧事件（通过替换克隆节点）
+    var newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+
+    // 重新绑定打开事件
+    newBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      overlay.classList.add('show');
+    });
+
+    // 关闭按钮
+    var closeBtn = document.getElementById('closeSettingsBtn');
+    if (closeBtn) {
+      var newClose = closeBtn.cloneNode(true);
+      closeBtn.parentNode.replaceChild(newClose, closeBtn);
+      newClose.addEventListener('click', function() {
+        overlay.classList.remove('show');
+      });
+    }
+
+    // 点击遮罩关闭（如果存在 overlayBg，否则点击 overlay 本身关闭）
+    var overlayBg = document.getElementById('overlayBg');
+    if (overlayBg) {
+      var newBg = overlayBg.cloneNode(true);
+      overlayBg.parentNode.replaceChild(newBg, overlayBg);
+      newBg.addEventListener('click', function() {
+        overlay.classList.remove('show');
+        newBg.classList.remove('show');
+      });
+    } else {
+      // 若没有独立遮罩，点击 overlay 外部区域关闭
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          overlay.classList.remove('show');
+        }
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fixSettings);
+  } else {
+    fixSettings();
+  }
+})();
+</script>
 </body>
 </html>

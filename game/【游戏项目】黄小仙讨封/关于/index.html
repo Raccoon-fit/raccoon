@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>关于 · 黄小仙讨封</title>
+    <meta name="theme-color" content="#000000">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #C0C0C0;
+            --golden: #D4AF37;
+            --bronze: #8B7355;
+            --highlight-color: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 60%);
+        }
+
+        .page-container {
+            max-width: 520px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.8s ease forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== 顶部：关于标题 ========== */
+        .about-header {
+            margin-bottom: 40px;
+        }
+        .about-header .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            color: #D4AF37;
+            animation: goldenPulse 3s ease-in-out infinite;
+        }
+        @keyframes goldenPulse {
+            0%,
+            100% {
+                opacity: 0.65;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        .about-header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.15);
+            margin-bottom: 6px;
+        }
+        .about-header .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #8B7355, transparent);
+            margin: 0 auto;
+        }
+
+        /* ========== 中间：版本号 ========== */
+        .version-block {
+            margin-bottom: 50px;
+            padding: 20px 0;
+        }
+        .version-label {
+            font-size: 13px;
+            color: #666;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .version-number {
+            font-size: 48px;
+            font-weight: 300;
+            color: #D4AF37;
+            letter-spacing: 4px;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+        }
+        .version-number::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 1px;
+            background: rgba(139, 115, 85, 0.5);
+        }
+        .version-tag {
+            font-size: 12px;
+            color: #555;
+            letter-spacing: 1px;
+            margin-top: 14px;
+            font-style: italic;
+        }
+
+        /* ========== 底部：隐私政策 ========== */
+        .privacy-section {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 1px solid #1a1a1a;
+            width: 100%;
+        }
+        .privacy-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: all 0.35s ease;
+            padding: 8px 18px;
+            border: 1px solid #222;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: inherit;
+            position: relative;
+        }
+        .privacy-link .link-icon {
+            font-size: 13px;
+            color: #8B7355;
+            transition: all 0.35s ease;
+        }
+        .privacy-link:hover {
+            color: #D4AF37;
+            border-color: #8B7355;
+            background: rgba(139, 115, 85, 0.06);
+            box-shadow: 0 0 14px rgba(139, 115, 85, 0.15);
+        }
+        .privacy-link:hover .link-icon {
+            color: #D4AF37;
+            transform: translateX(2px);
+        }
+        .privacy-link:active {
+            transform: scale(0.97);
+        }
+        .privacy-hint {
+            font-size: 10px;
+            color: #3a3a3a;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* ========== 页脚 ========== */
+        .footer-note {
+            margin-top: 24px;
+            font-size: 11px;
+            color: #333;
+            letter-spacing: 1px;
+        }
+        .footer-note a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-note a:hover {
+            color: #8B7355;
+        }
+
+        @media (max-width: 480px) {
+            .about-header h1 {
+                font-size: 22px;
+                letter-spacing: 2px;
+            }
+            .version-number {
+                font-size: 38px;
+                letter-spacing: 2px;
+            }
+            .version-label {
+                font-size: 11px;
+            }
+            .privacy-link {
+                font-size: 13px;
+                padding: 6px 14px;
+            }
+            .page-container {
+                padding: 24px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<script>
+    webapp.关闭跳转打开(false);
+//关闭请求打开第三方APP用true打开
+
+webapp.设置下拉刷新(false);
+//关闭下拉刷新true打开
+
+webapp.清空浏览记录();
+//清空浏览历史访问记录
+//清空后返回键不回到上一页
+</script>
+    <div class="page-container">
+
+        <!-- ========== 顶部：关于标题 ========== -->
+        <div class="about-header">
+            <span class="icon">✦</span>
+            <h1>关于黄小仙讨封</h1>
+            <div class="divider"></div>
+        </div>
+
+        <!-- ========== 中间：版本号 ========== -->
+        <div class="version-block">
+            <p class="version-label">当前版本</p>
+            <p class="version-number">V1.1.0</p>
+            <p class="version-tag">五百年修为一念之间</p>
+        </div>
+
+        <!-- ========== 底部：隐私政策 ========== -->
+        <div class="privacy-section">
+            <a href="https://raccoon.fit/隐私政策/game/黄小仙讨封.html"
+            target="_blank"
+            rel="noreferrer"
+            class="privacy-link">
+            <span class="link-icon">📜</span>
+            <span>隐私政策</span>
+        </a>
+        <p class="privacy-hint">点击查看完整隐私政策</p>
+    </div>
+
+    <!-- ========== 页脚 ========== -->
+    <div class="footer-note">
+        <a href="https://raccoon.fit/" target="_blank" rel="noreferrer">© 2026 软软的小窝</a>
+    </div>
+
+</div>
+</body>
+</html>

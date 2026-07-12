@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>黄小仙 · 成就图鉴</title>
+    <meta name="theme-color" content="#0a0a0f">
+    <style>
+        :root {
+            --bg-color: #0a0a0d;
+            --text-color: #9a9892;
+            --accent-color: #5a7588;
+            --highlight-color: #d8d4cc;
+            --btn-border: #3a3834;
+            --btn-hover: #141418;
+            --legendary: #8cb4d8;
+            --legendary-glow: rgba(140, 180, 216, 0.35);
+            --unlocked-border: #5a5550;
+            --unlocked-text: #c8c4bc;
+            --card-bg: #0c0c10;
+            --card-border: #1a1a1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(90, 117, 136, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse at 50% 100%, rgba(90, 117, 136, 0.03) 0%, transparent 70%);
+        }
+
+        .page-container {
+            max-width: 680px;
+            width: 100%;
+            padding: 20px 16px 40px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 28px 20px 10px;
+            position: relative;
+            border-bottom: 1px solid #1a1a1e;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #e8e4dc;
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+            text-shadow: 0 0 2px rgba(200, 196, 188, 0.12);
+        }
+        .header .subtitle {
+            color: #5a5650;
+            font-size: 13px;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+        .header .stats {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header .stats .stat-item {
+            background: #0f0f14;
+            border: 1px solid #1a1a1e;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #7a7670;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .header .stats .stat-item.highlight {
+            border-color: #5a5550;
+            color: #c8c4bc;
+            background: #141210;
+        }
+        .header .stats .stat-count {
+            font-weight: bold;
+            font-size: 22px;
+            color: #d8d4cc;
+            letter-spacing: 0;
+        }
+        .header .top-actions {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .header .action-link {
+            display: inline-block;
+            color: #5a5650;
+            font-size: 12px;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid #2a2824;
+            padding: 6px 18px;
+            border-radius: 3px;
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .header .action-link:hover {
+            color: #8cb4d8;
+            border-color: #5a7588;
+        }
+        .header .action-link:active {
+            background: #141a20;
+            color: #8cb4d8;
+            border-color: #7a9ab0;
+        }
+
+        .section-title {
+            color: #6b6560;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-align: center;
+            padding: 14px 0 8px;
+            border-top: 1px solid #1a1a1e;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+        .section-title.legendary-title {
+            color: #8cb4d8;
+            border-top-color: #1a2028;
+        }
+
+        .achievement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+        }
+
+        .achievement-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 4px;
+            transition: all 0.35s ease;
+            cursor: default;
+            position: relative;
+            border-bottom: 1px solid rgba(26, 26, 30, 0.5);
+            min-height: 56px;
+            gap: 14px;
+        }
+        .achievement-row:hover {
+            background: rgba(20, 20, 26, 0.6);
+        }
+        .achievement-row:last-child {
+            border-bottom: none;
+        }
+
+        .achievement-icon-cell {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border: 1px solid #2a2824;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: #0c0c10;
+            color: #e8e4dc;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .achievement-row.unlocked .achievement-icon-cell {
+            opacity: 1;
+            border-color: #5a5550;
+            background: #141210;
+            box-shadow: 0 0 8px rgba(90, 85, 80, 0.2);
+        }
+        .achievement-row.unlocked.legendary .achievement-icon-cell {
+            border-color: #7a9ab0;
+            background: #181d24;
+            box-shadow: 0 0 14px var(--legendary-glow), 0 0 28px rgba(140, 180, 216, 0.12);
+            animation: legendaryPulse 3.5s ease-in-out infinite;
+        }
+        @keyframes legendaryPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 14px var(--legendary-glow), 0 0 28px rgba(140, 180, 216, 0.12);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(140, 180, 216, 0.45), 0 0 38px rgba(140, 180, 216, 0.22);
+            }
+        }
+        .achievement-row.locked .achievement-icon-cell {
+            opacity: 0.25;
+            border-color: #1a1a1e;
+            background: #08080c;
+            color: #3a3834;
+            filter: grayscale(0.6);
+        }
+
+        .achievement-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 6px;
+            min-width: 0;
+        }
+        .achievement-name {
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: all 0.35s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .achievement-row.unlocked .achievement-name {
+            color: #c8c4bc;
+        }
+        .achievement-row.unlocked.legendary .achievement-name {
+            color: #8cb4d8;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(140, 180, 216, 0.25);
+        }
+        .achievement-row.locked .achievement-name {
+            color: #3a3834;
+            font-style: italic;
+        }
+
+        .achievement-badge {
+            flex-shrink: 0;
+            font-size: 10px;
+            letter-spacing: 1px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid;
+            opacity: 0.7;
+            transition: all 0.35s ease;
+        }
+        .achievement-row.unlocked .achievement-badge {
+            border-color: #5a5550;
+            color: #8a8580;
+            background: rgba(90, 85, 80, 0.06);
+        }
+        .achievement-row.unlocked.legendary .achievement-badge {
+            border-color: #7a9ab0;
+            color: #8cb4d8;
+            background: rgba(140, 180, 216, 0.08);
+            opacity: 0.9;
+        }
+        .achievement-row.locked .achievement-badge {
+            border-color: #1a1a1e;
+            color: #2a2824;
+            background: transparent;
+            opacity: 0.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #3a3834;
+            font-style: italic;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 20px 16px;
+            color: #2a2824;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-top: auto;
+            border-top: 1px solid #111115;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-note a {
+            color: #4a4640;
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        .footer-note a:hover {
+            color: #8cb4d8;
+        }
+        .storage-status {
+            font-size: 9px;
+            color: #3a3834;
+            letter-spacing: 0.5px;
+        }
+        .storage-status.recovered {
+            color: #8cb4d8;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #141a20;
+            border: 1px solid #5a7588;
+            color: #8cb4d8;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .toast.error {
+            border-color: #8a4a4a;
+            color: #d8a0a0;
+            background: #1a1014;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-box {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            max-height: 80vh;
+        }
+        .modal-textarea {
+            width: 100%;
+            height: 100px;
+            max-height: 180px;
+            background: #0c0c10;
+            border: 1px solid #5a5550;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 10px;
+            font-family: monospace;
+            color: #c8c4bc;
+            resize: vertical;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+        .modal-textarea.error-style {
+            border-color: #8a4a4a;
+            color: #d8a0a0;
+        }
+        .modal-hint {
+            color: #6b6560;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-align: center;
+            margin: 0;
+        }
+        .modal-hint.error-style {
+            color: #d8a0a0;
+        }
+        .modal-btn {
+            padding: 8px 24px;
+            background: #141210;
+            color: #c8c4bc;
+            border: 1px solid #5a5550;
+            border-radius: 4px;
+            font-family: inherit;
+            cursor: pointer;
+            font-size: 13px;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.3s;
+        }
+        .modal-btn:hover {
+            border-color: #8cb4d8;
+            color: #8cb4d8;
+            background: #141a20;
+        }
+        .modal-btn.error-style {
+            background: #1a1014;
+            color: #d8a0a0;
+            border-color: #8a4a4a;
+        }
+        .modal-btn.error-style:hover {
+            border-color: #d8a0a0;
+            background: #201418;
+        }
+
+        .refresh-indicator {
+            text-align: center;
+            font-size: 10px;
+            color: #2a2824;
+            letter-spacing: 1px;
+            padding: 4px;
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .achievement-row {
+            animation: fadeInRow 0.5s ease forwards;
+        }
+        .achievement-row:nth-child(1) {
+            animation-delay: 0.02s;
+        }
+        .achievement-row:nth-child(2) {
+            animation-delay: 0.04s;
+        }
+        .achievement-row:nth-child(3) {
+            animation-delay: 0.06s;
+        }
+        .achievement-row:nth-child(4) {
+            animation-delay: 0.08s;
+        }
+        .achievement-row:nth-child(5) {
+            animation-delay: 0.10s;
+        }
+        .achievement-row:nth-child(6) {
+            animation-delay: 0.12s;
+        }
+        .achievement-row:nth-child(7) {
+            animation-delay: 0.14s;
+        }
+        .achievement-row:nth-child(8) {
+            animation-delay: 0.16s;
+        }
+        .achievement-row:nth-child(9) {
+            animation-delay: 0.18s;
+        }
+        .achievement-row:nth-child(10) {
+            animation-delay: 0.20s;
+        }
+        .achievement-row:nth-child(n+11) {
+            animation-delay: 0.22s;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+            .achievement-icon-cell {
+                width: 38px;
+                height: 38px;
+                font-size: 17px;
+            }
+            .achievement-name {
+                font-size: 14px;
+            }
+            .achievement-row {
+                padding: 8px 10px;
+                gap: 10px;
+                min-height: 48px;
+            }
+            .achievement-badge {
+                font-size: 9px;
+                padding: 2px 8px;
+            }
+            .page-container {
+                padding: 12px 8px 30px;
+            }
+            .header .top-actions {
+                gap: 10px;
+            }
+            .header .action-link {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .modal-textarea {
+                height: 80px;
+                font-size: 9px;
+            }
+        }
+        @media (min-width: 768px) {
+            .achievement-icon-cell {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
+            .achievement-name {
+                font-size: 17px;
+            }
+            .achievement-row {
+                padding: 14px 20px;
+                gap: 18px;
+                min-height: 64px;
+            }
+            .header h1 {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="header">
+            <h1>黄小仙</h1>
+            <p class="subtitle">成就图鉴</p>
+            <div class="stats">
+                <span class="stat-item highlight">
+                    已解锁 <span class="stat-count" id="unlockedCount">0</span> / <span id="totalCount">40</span>
+                </span>
+                <span class="stat-item" id="legendaryStat" style="display:none;">
+                    ✦ 传说 <span class="stat-count" id="legendaryCount">0</span>
+                </span>
+            </div>
+            <div class="top-actions">
+                <span class="action-link" id="btnExportTop">📤 导出仙籍</span>
+                <span class="action-link" id="btnImportTop">📥 导入仙籍</span>
+            </div>
+        </div>
+
+        <div id="unlockedSection">
+            <div class="section-title legendary-title" id="unlockedTitle" style="display:none;">✦ 已解锁的成就 ✦</div>
+            <div class="achievement-list" id="unlockedList"></div>
+            <div class="empty-state" id="unlockedEmpty">尚无成就解锁，去游戏中探索吧</div>
+        </div>
+
+        <div id="lockedSection">
+            <div class="section-title" id="lockedTitle">尚未解锁</div>
+            <div class="achievement-list" id="lockedList"></div>
+        </div>
+
+        <div class="refresh-indicator" id="refreshNote"></div>
+
+        <div class="footer-note">
+            <span class="storage-status" id="storageStatus"></span>
+            <span>黄小仙 · 成就图鉴</span>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const achievementIcons = [
+            { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
+            { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
+            { id: 'true', title: '本相自在', icon: '◯', legendary: false },
+            { id: 'god', title: '点化成仙', icon: '☀', legendary: false },
+            { id: 'mortal', title: '尘世轮回', icon: '人', legendary: false },
+            { id: 'fail_scholar', title: '功亏一篑', icon: '✗', legendary: false },
+            { id: 'fail_kid', title: '原形毕露', icon: '✗', legendary: false },
+            { id: 'farmer', title: '山野村夫', icon: '🌾', legendary: false },
+            { id: 'star', title: '文曲星耀', icon: '⭐', legendary: false },
+            { id: 'demon_king', title: '妖王之路', icon: '◆', legendary: false },
+            { id: 'mad', title: '执念成魔', icon: '◇', legendary: false },
+            { id: 'love', title: '红尘情缘', icon: '♡', legendary: false },
+            { id: 'guardian', title: '守山之人', icon: '⛰', legendary: false },
+            { id: 'lost', title: '雨夜迷途', icon: '?', legendary: false },
+            { id: 'severed', title: '断缘而去', icon: '—', legendary: false },
+            { id: 'dawn', title: '黎明归宿', icon: '☽', legendary: false },
+            { id: 'sword_friend', title: '剑影知交', icon: '⚔', legendary: false },
+            { id: 'sword_master', title: '剑道传承', icon: '剑', legendary: false },
+            { id: 'green_memory', title: '前尘往事', icon: '记', legendary: false },
+            { id: 'green_fate', title: '三世因缘', icon: '缘', legendary: false },
+            { id: 'great_good', title: '大善若水', icon: '☯', legendary: false },
+            { id: 'great_evil', title: '大恶如魔', icon: '💀', legendary: false },
+            { id: 'balance_sage', title: '中庸之道', icon: '⚖', legendary: false },
+            { id: 'ghost_friend', title: '鬼魂之交', icon: '👻', legendary: false },
+            { id: 'star_seeker', title: '星辰指引', icon: '星', legendary: false },
+            { id: 'hermit', title: '隐士之道', icon: '隐', legendary: false },
+            { id: 'treasure', title: '寻宝猎人', icon: '宝', legendary: false },
+            { id: 'dragon_friend', title: '蛟龙之友', icon: '龙', legendary: false },
+            { id: 'spirit_guardian', title: '灵脉守护', icon: '脉', legendary: false },
+            { id: 'forest_king', title: '森林之王', icon: '林', legendary: false },
+            { id: 'underworld', title: '黄泉交易', icon: '泉', legendary: false },
+            { id: 'immortal', title: '长生不老', icon: '寿', legendary: false },
+            { id: 'forgotten_god', title: '遗忘之神', icon: '忘', legendary: false },
+            { id: 'fake_god', title: '伪仙真相', icon: '假', legendary: false },
+            { id: 'fake_enemy', title: '宿敌真相', icon: '敌', legendary: false },
+            { id: 'dream_ending', title: '黄粱一梦', icon: '梦', legendary: false },
+            { id: 'time_loop', title: '时光倒流', icon: '循环', legendary: false },
+            { id: 'destiny_symphony', title: '命运交响', icon: '命', legendary: false },
+            { id: 'fate_encounter', title: '因缘际会', icon: '会', legendary: false },
+            { id: 'suspicious', title: '疑心失缘', icon: '疑', legendary: false },
+        ];
+
+        const STORAGE_KEY = 'huangdaxian_achievements';
+        const STORAGE_KEY_BAK = 'huangdaxian_achievements_bak';
+        const ORDER_KEY = 'huangdaxian_achievement_order';
+        const ORDER_KEY_BAK = 'huangdaxian_achievement_order_bak';
+        const STORAGE_VERSION_KEY = 'huangdaxian_storage_ver';
+        const STORAGE_VERSION = 2;
+
+        function isStorageAvailable() {
+            try {
+                const testKey = '__storage_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+                return true;
+            } catch (e) { return false; }
+        }
+
+        function safeSetStorage(key, backupKey, value) {
+            if (!isStorageAvailable()) return false;
+            const jsonStr = JSON.stringify(value);
+            let success = true;
+            try { localStorage.setItem(key, jsonStr); } catch (e) { success = false; }
+            try { localStorage.setItem(backupKey, jsonStr); } catch (e) {}
+            try { localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION)); } catch (e) {}
+            return success;
+        }
+
+        function safeGetStorage(key, backupKey) {
+            if (!isStorageAvailable()) return null;
+            let data = null;
+            let source = 'none';
+            try {
+                const raw = localStorage.getItem(key);
+                if (raw !== null && raw !== undefined) {
+                    data = JSON.parse(raw);
+                    source = 'primary';
+                }
+            } catch (e) { data = null; }
+            if (data === null || data === undefined) {
+                try {
+                    const rawBak = localStorage.getItem(backupKey);
+                    if (rawBak !== null && rawBak !== undefined) {
+                        const bakData = JSON.parse(rawBak);
+                        if (bakData !== null && bakData !== undefined) {
+                            data = bakData;
+                            source = 'backup';
+                            try { localStorage.setItem(key, rawBak); } catch (e) {}
+                        }
+                    }
+                } catch (e) { data = null; }
+            } else {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (raw) localStorage.setItem(backupKey, raw);
+                } catch (e) {}
+            }
+            return { data, source };
+        }
+
+        function checkAndRepairStorage() {
+            if (!isStorageAvailable()) return;
+            try {
+                const rawMain = localStorage.getItem(STORAGE_KEY);
+                const rawBak = localStorage.getItem(STORAGE_KEY_BAK);
+                if (rawMain && rawBak) {
+                    const mainData = JSON.parse(rawMain);
+                    const bakData = JSON.parse(rawBak);
+                    const mainCount = Object.keys(mainData || {}).filter(k => mainData[k] === true).length;
+                    const bakCount = Object.keys(bakData || {}).filter(k => bakData[k] === true).length;
+                    if (bakCount > mainCount + 1) {
+                        localStorage.setItem(STORAGE_KEY, rawBak);
+                        return 'recovered_achievements';
+                    }
+                }
+                const rawOrderMain = localStorage.getItem(ORDER_KEY);
+                const rawOrderBak = localStorage.getItem(ORDER_KEY_BAK);
+                if (!rawOrderMain && rawOrderBak) {
+                    localStorage.setItem(ORDER_KEY, rawOrderBak);
+                    return 'recovered_order';
+                }
+            } catch (e) {}
+            return 'ok';
+        }
+
+        function loadAchievements() {
+            const result = safeGetStorage(STORAGE_KEY, STORAGE_KEY_BAK);
+            if (result && result.data && typeof result.data === 'object' && !Array.isArray(result.data)) return result.data;
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                        try { localStorage.setItem(STORAGE_KEY_BAK, saved); } catch (e) {}
+                        return parsed;
+                    }
+                }
+            } catch (e) {}
+            return {};
+        }
+
+        function saveAchievements(achievements) {
+            return safeSetStorage(STORAGE_KEY, STORAGE_KEY_BAK, achievements);
+        }
+
+        function loadOrder() {
+            const result = safeGetStorage(ORDER_KEY, ORDER_KEY_BAK);
+            if (result && result.data && Array.isArray(result.data)) return result.data;
+            try {
+                const saved = localStorage.getItem(ORDER_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        try { localStorage.setItem(ORDER_KEY_BAK, saved); } catch (e) {}
+                        return parsed;
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        function saveOrder(orderArray) {
+            return safeSetStorage(ORDER_KEY, ORDER_KEY_BAK, orderArray);
+        }
+
+        function getSortedAchievements() {
+            const achievements = loadAchievements();
+            let order = loadOrder();
+            const unlockedIds = Object.keys(achievements).filter(id => achievements[id] === true);
+
+            if (!order) {
+                order = unlockedIds.slice();
+                saveOrder(order);
+            } else {
+                const newlyUnlocked = unlockedIds.filter(id => order.indexOf(id) === -1);
+                if (newlyUnlocked.length > 0) {
+                    order = [...newlyUnlocked, ...order];
+                    saveOrder(order);
+                }
+                const stillValid = order.filter(id => unlockedIds.indexOf(id) >= 0);
+                if (stillValid.length !== order.length) {
+                    order = stillValid;
+                    saveOrder(order);
+                }
+            }
+
+            const unlockedSet = new Set(unlockedIds);
+            const unlockedInOrder = order.filter(id => unlockedSet.has(id));
+            const remainingUnlocked = unlockedIds.filter(id => unlockedInOrder.indexOf(id) === -1);
+            const allUnlockedOrdered = [...unlockedInOrder, ...remainingUnlocked];
+
+            const allUnlockedMap = new Map();
+            allUnlockedOrdered.forEach(id => {
+                const ach = achievementIcons.find(a => a.id === id);
+                if (ach) allUnlockedMap.set(id, ach);
+            });
+
+            const unlockedAchievements = [];
+            const lockedAchievements = [];
+
+            achievementIcons.forEach(ach => {
+                if (allUnlockedMap.has(ach.id)) {
+                    unlockedAchievements.push(ach);
+                } else {
+                    lockedAchievements.push(ach);
+                }
+            });
+
+            unlockedAchievements.sort((a, b) => {
+                const idxA = allUnlockedOrdered.indexOf(a.id);
+                const idxB = allUnlockedOrdered.indexOf(b.id);
+                if (idxA >= 0 && idxB >= 0) return idxA - idxB;
+                if (idxA >= 0) return -1;
+                if (idxB >= 0) return 1;
+                return 0;
+            });
+
+            return { unlockedAchievements, lockedAchievements };
+        }
+
+        function utf8ToBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
+        function base64ToUtf8(b64) {
+            return decodeURIComponent(escape(atob(b64)));
+        }
+
+        function encryptExportData(jsonStr) {
+            const firstPass = utf8ToBase64(jsonStr);
+            return utf8ToBase64(firstPass);
+        }
+
+        function decryptExportData(encStr) {
+            try {
+                const firstPass = base64ToUtf8(encStr);
+                return base64ToUtf8(firstPass);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function exportAllData() {
+            const achievements = loadAchievements();
+            const order = loadOrder();
+            const exportPayload = {
+                version: STORAGE_VERSION,
+                exportTime: new Date().toISOString(),
+                achievements: achievements,
+                order: order || [],
+                totalUnlocked: Object.keys(achievements).filter(k => achievements[k] === true).length,
+            };
+            const jsonStr = JSON.stringify(exportPayload);
+            return encryptExportData(jsonStr);
+        }
+
+        function importAllData(inputStr) {
+            let jsonStr = decryptExportData(inputStr);
+            if (!jsonStr) {
+                jsonStr = inputStr;
+            }
+            try {
+                const payload = JSON.parse(jsonStr);
+                if (!payload || typeof payload !== 'object' || !payload.achievements || typeof payload.achievements !==
+                    'object' || Array.isArray(payload.achievements)) {
+                    return { success: false, message: '数据格式无效：不是有效的备份文件' };
+                }
+                const validIds = new Set(achievementIcons.map(a => a.id));
+                const importIds = Object.keys(payload.achievements);
+                const unknownIds = importIds.filter(id => !validIds.has(id));
+                if (unknownIds.length > 0 && importIds.length > 10) {
+                    return { success: false, message: '数据格式异常：包含未知成就ID' };
+                }
+                const currentAchievements = loadAchievements();
+                const mergedAchievements = {};
+                const allIds = new Set([...Object.keys(currentAchievements), ...importIds]);
+                allIds.forEach(id => {
+                    const currentVal = currentAchievements[id] === true;
+                    const importVal = payload.achievements[id] === true;
+                    mergedAchievements[id] = currentVal || importVal;
+                });
+                let mergedOrder = [];
+                if (Array.isArray(payload.order) && payload.order.length > 0) {
+                    const importOrder = payload.order.filter(id => mergedAchievements[id] === true);
+                    const currentOrder = loadOrder() || [];
+                    const currentUnlockedIds = Object.keys(currentAchievements).filter(k => currentAchievements[k] ===
+                        true);
+                    const newlySinceExport = currentUnlockedIds.filter(id => importOrder.indexOf(id) === -1);
+                    mergedOrder = [...newlySinceExport, ...importOrder];
+                    const seen = new Set();
+                    mergedOrder = mergedOrder.filter(id => {
+                        if (seen.has(id)) return false;
+                        seen.add(id);
+                        return mergedAchievements[id] === true;
+                    });
+                } else {
+                    const unlockedIds = Object.keys(mergedAchievements).filter(k => mergedAchievements[k] === true);
+                    mergedOrder = unlockedIds.slice();
+                }
+                const achSaved = saveAchievements(mergedAchievements);
+                const orderSaved = saveOrder(mergedOrder);
+                if (!achSaved || !orderSaved) {
+                    return { success: false, message: '写入存储失败，请检查存储空间' };
+                }
+                return {
+                    success: true,
+                    message: '数据导入成功！已合并 ' + Object.keys(mergedAchievements).filter(k => mergedAchievements[
+                        k] === true).length + ' 个成就',
+                    mergedCount: Object.keys(mergedAchievements).filter(k => mergedAchievements[k] === true).length,
+                };
+            } catch (e) {
+                return { success: false, message: 'JSON解析失败：' + e.message };
+            }
+        }
+
+        let toastTimer = null;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            if (toastTimer) clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.className = 'toast ' + (isError ? 'error' : '');
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+                toastTimer = null;
+            }, 2500);
+        }
+
+        function copyToClipboard(text) {
+            return new Promise((resolve, reject) => {
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                    navigator.clipboard.writeText(text).then(resolve).catch(() => fallbackCopy(text, resolve,
+                    reject));
+                } else {
+                    fallbackCopy(text, resolve, reject);
+                }
+            });
+        }
+
+        function fallbackCopy(text, resolve, reject) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                textarea.style.top = '-9999px';
+                textarea.style.opacity = '0';
+                textarea.style.width = '1px';
+                textarea.style.height = '1px';
+                textarea.setAttribute('readonly', '');
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                if (successful) resolve();
+                else reject(new Error('execCommand 返回失败'));
+            } catch (e) { reject(e); }
+        }
+
+        function showModal(text, hint, isError = false, onCopy = null) {
+            const existing = document.querySelector('.modal-overlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+
+            const box = document.createElement('div');
+            box.className = 'modal-box';
+
+            if (hint) {
+                const hintEl = document.createElement('p');
+                hintEl.className = 'modal-hint' + (isError ? ' error-style' : '');
+                hintEl.textContent = hint;
+                box.appendChild(hintEl);
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.className = 'modal-textarea' + (isError ? ' error-style' : '');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.onclick = function() {
+                this.select();
+                if (onCopy) onCopy();
+            };
+            box.appendChild(textarea);
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'modal-btn' + (isError ? ' error-style' : '');
+            closeBtn.textContent = '关闭';
+            closeBtn.onclick = function() { document.body.removeChild(overlay); };
+            box.appendChild(closeBtn);
+
+            overlay.appendChild(box);
+            overlay.onclick = function(e) {
+                if (e.target === overlay) document.body.removeChild(overlay);
+            };
+            document.body.appendChild(overlay);
+
+            setTimeout(() => textarea.select(), 100);
+        }
+
+        function createAchievementRow(ach, isUnlocked) {
+            const row = document.createElement('div');
+            row.className = 'achievement-row';
+            if (isUnlocked) {
+                row.classList.add('unlocked');
+                if (ach.legendary) row.classList.add('legendary');
+            } else {
+                row.classList.add('locked');
+            }
+
+            const iconCell = document.createElement('div');
+            iconCell.className = 'achievement-icon-cell';
+            iconCell.textContent = isUnlocked ? ach.icon : '?';
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'achievement-info';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'achievement-name';
+            nameSpan.textContent = ach.title;
+            infoDiv.appendChild(nameSpan);
+
+            const badge = document.createElement('span');
+            badge.className = 'achievement-badge';
+            if (isUnlocked && ach.legendary) badge.textContent = '传说';
+            else if (isUnlocked) badge.textContent = '已解锁';
+            else badge.textContent = '未解锁';
+
+            row.appendChild(iconCell);
+            row.appendChild(infoDiv);
+            row.appendChild(badge);
+            return row;
+        }
+
+        function renderAll(storageStatusMsg = null) {
+            const { unlockedAchievements, lockedAchievements } = getSortedAchievements();
+            const unlockedList = document.getElementById('unlockedList');
+            const lockedList = document.getElementById('lockedList');
+            const unlockedTitle = document.getElementById('unlockedTitle');
+            const unlockedEmpty = document.getElementById('unlockedEmpty');
+            const lockedTitle = document.getElementById('lockedTitle');
+            const unlockedCountEl = document.getElementById('unlockedCount');
+            const totalCountEl = document.getElementById('totalCount');
+            const legendaryStat = document.getElementById('legendaryStat');
+            const legendaryCountEl = document.getElementById('legendaryCount');
+            const refreshNote = document.getElementById('refreshNote');
+            const storageStatus = document.getElementById('storageStatus');
+
+            unlockedList.innerHTML = '';
+            lockedList.innerHTML = '';
+
+            const legendaryUnlocked = unlockedAchievements.filter(a => a.legendary);
+            const totalLegendary = achievementIcons.filter(a => a.legendary).length;
+
+            if (unlockedAchievements.length > 0) {
+                unlockedTitle.style.display = 'block';
+                unlockedEmpty.style.display = 'none';
+                unlockedAchievements.forEach(ach => unlockedList.appendChild(createAchievementRow(ach, true)));
+            } else {
+                unlockedTitle.style.display = 'none';
+                unlockedEmpty.style.display = 'block';
+            }
+
+            if (lockedAchievements.length > 0) {
+                lockedTitle.style.display = 'block';
+                lockedTitle.textContent = '尚未解锁';
+                lockedTitle.classList.remove('legendary-title');
+                lockedAchievements.forEach(ach => lockedList.appendChild(createAchievementRow(ach, false)));
+            } else {
+                if (lockedAchievements.length === 0 && unlockedAchievements.length > 0) {
+                    lockedTitle.style.display = 'block';
+                    lockedTitle.textContent = '全成就达成';
+                    lockedTitle.classList.add('legendary-title');
+                    const allDone = document.createElement('div');
+                    allDone.className = 'empty-state';
+                    allDone.textContent = '🎉 全部成就已解锁！功德圆满！';
+                    allDone.style.color = '#8cb4d8';
+                    allDone.style.padding = '30px 20px';
+                    lockedList.appendChild(allDone);
+                } else {
+                    lockedTitle.style.display = 'none';
+                }
+            }
+
+            unlockedCountEl.textContent = unlockedAchievements.length;
+            totalCountEl.textContent = achievementIcons.length;
+
+            if (legendaryUnlocked.length > 0) {
+                legendaryStat.style.display = 'inline-flex';
+                legendaryCountEl.textContent = legendaryUnlocked.length + '/' + totalLegendary;
+            } else {
+                legendaryStat.style.display = 'none';
+            }
+
+            const now = new Date();
+            refreshNote.textContent = '数据更新于 ' + now.toLocaleString('zh-CN', {
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }) + ' · 刷新页面以同步游戏进度';
+
+            if (storageStatus) {
+                if (storageStatusMsg === 'recovered_achievements') {
+                    storageStatus.textContent = '⚠ 检测到数据异常，已自动从备份恢复成就数据';
+                    storageStatus.className = 'storage-status recovered';
+                } else if (storageStatusMsg === 'recovered_order') {
+                    storageStatus.textContent = '⚠ 排序数据已从备份恢复';
+                    storageStatus.className = 'storage-status recovered';
+                } else if (!isStorageAvailable()) {
+                    storageStatus.textContent = '⚠ 存储不可用，数据无法持久保存';
+                    storageStatus.className = 'storage-status';
+                } else {
+                    storageStatus.textContent = '存储状态正常 · 数据已双备份';
+                    storageStatus.className = 'storage-status';
+                }
+            }
+        }
+
+        function init() {
+            const repairResult = checkAndRepairStorage();
+
+            if (isStorageAvailable()) {
+                try {
+                    const ver = localStorage.getItem(STORAGE_VERSION_KEY);
+                    if (!ver || parseInt(ver) < STORAGE_VERSION) {
+                        localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION));
+                        const mainData = localStorage.getItem(STORAGE_KEY);
+                        if (mainData) localStorage.setItem(STORAGE_KEY_BAK, mainData);
+                        const orderData = localStorage.getItem(ORDER_KEY);
+                        if (orderData) localStorage.setItem(ORDER_KEY_BAK, orderData);
+                    }
+                } catch (e) {}
+            }
+
+            renderAll(repairResult !== 'ok' ? repairResult : null);
+
+            if (repairResult === 'recovered_achievements') {
+                setTimeout(() => showToast('数据已从备份自动恢复'), 600);
+            } else if (repairResult === 'recovered_order') {
+                setTimeout(() => showToast('排序数据已恢复'), 600);
+            }
+
+            window.addEventListener('storage', function(e) {
+                if (e.key === STORAGE_KEY || e.key === ORDER_KEY ||
+                    e.key === STORAGE_KEY_BAK || e.key === ORDER_KEY_BAK) {
+                    renderAll();
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    const repairResult2 = checkAndRepairStorage();
+                    renderAll(repairResult2 !== 'ok' ? repairResult2 : null);
+                }
+            });
+
+            const btnExport = document.getElementById('btnExportTop');
+            if (btnExport) {
+                btnExport.addEventListener('click', async function() {
+                    const encrypted = exportAllData();
+                    try {
+                        await copyToClipboard(encrypted);
+                        showToast('✅ 备份数据已复制到剪贴板（已加密）');
+                    } catch (e) {
+                        showModal(encrypted, '请手动复制下方文本以备份数据', false, () => {
+                            copyToClipboard(encrypted).then(() => showToast('✅ 已复制')).catch(() => {});
+                        });
+                        showToast('请手动复制弹窗中的文本', true);
+                    }
+                });
+            }
+
+            const btnImport = document.getElementById('btnImportTop');
+            if (btnImport) {
+                btnImport.addEventListener('click', function() {
+                    const currentCount = Object.keys(loadAchievements()).filter(k => loadAchievements()[k] ===
+                        true).length;
+                    const promptMsg = '请粘贴之前导出的备份数据：\n\n' +
+                        '⚠ 导入将合并现有数据，不会丢失已有成就。\n' +
+                        '当前已有 ' + currentCount + ' 个成就解锁。';
+                    const input = prompt(promptMsg, '');
+                    if (input === null) return;
+                    if (input.trim() === '') {
+                        showToast('未输入任何数据', true);
+                        return;
+                    }
+                    const result = importAllData(input.trim());
+                    if (result.success) {
+                        showToast(result.message);
+                        renderAll();
+                    } else {
+                        showToast('导入失败：' + result.message, true);
+                        showModal(input.trim(), '请检查数据格式（应为加密字符串或JSON）：', true);
+                    }
+                });
+            }
+
+            if (!isStorageAvailable()) {
+                console.warn('[存储] localStorage 不可用，数据将无法持久保存');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

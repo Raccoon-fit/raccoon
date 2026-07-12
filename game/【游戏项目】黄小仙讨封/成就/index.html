@@ -21,11 +21,7 @@
             --card-border: #1a1a1e;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg-color);
@@ -437,106 +433,39 @@
         }
 
         @keyframes fadeInRow {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .achievement-row {
-            animation: fadeInRow 0.5s ease forwards;
-        }
-        .achievement-row:nth-child(1) {
-            animation-delay: 0.02s;
-        }
-        .achievement-row:nth-child(2) {
-            animation-delay: 0.04s;
-        }
-        .achievement-row:nth-child(3) {
-            animation-delay: 0.06s;
-        }
-        .achievement-row:nth-child(4) {
-            animation-delay: 0.08s;
-        }
-        .achievement-row:nth-child(5) {
-            animation-delay: 0.10s;
-        }
-        .achievement-row:nth-child(6) {
-            animation-delay: 0.12s;
-        }
-        .achievement-row:nth-child(7) {
-            animation-delay: 0.14s;
-        }
-        .achievement-row:nth-child(8) {
-            animation-delay: 0.16s;
-        }
-        .achievement-row:nth-child(9) {
-            animation-delay: 0.18s;
-        }
-        .achievement-row:nth-child(10) {
-            animation-delay: 0.20s;
-        }
-        .achievement-row:nth-child(n+11) {
-            animation-delay: 0.22s;
-        }
+        .achievement-row { animation: fadeInRow 0.5s ease forwards; }
+        .achievement-row:nth-child(1) { animation-delay: 0.02s; }
+        .achievement-row:nth-child(2) { animation-delay: 0.04s; }
+        .achievement-row:nth-child(3) { animation-delay: 0.06s; }
+        .achievement-row:nth-child(4) { animation-delay: 0.08s; }
+        .achievement-row:nth-child(5) { animation-delay: 0.10s; }
+        .achievement-row:nth-child(6) { animation-delay: 0.12s; }
+        .achievement-row:nth-child(7) { animation-delay: 0.14s; }
+        .achievement-row:nth-child(8) { animation-delay: 0.16s; }
+        .achievement-row:nth-child(9) { animation-delay: 0.18s; }
+        .achievement-row:nth-child(10) { animation-delay: 0.20s; }
+        .achievement-row:nth-child(n+11) { animation-delay: 0.22s; }
 
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 24px;
-                letter-spacing: 2px;
-            }
-            .achievement-icon-cell {
-                width: 38px;
-                height: 38px;
-                font-size: 17px;
-            }
-            .achievement-name {
-                font-size: 14px;
-            }
-            .achievement-row {
-                padding: 8px 10px;
-                gap: 10px;
-                min-height: 48px;
-            }
-            .achievement-badge {
-                font-size: 9px;
-                padding: 2px 8px;
-            }
-            .page-container {
-                padding: 12px 8px 30px;
-            }
-            .header .top-actions {
-                gap: 10px;
-            }
-            .header .action-link {
-                font-size: 10px;
-                padding: 4px 10px;
-            }
-            .modal-textarea {
-                height: 80px;
-                font-size: 9px;
-            }
+            .header h1 { font-size: 24px; letter-spacing: 2px; }
+            .achievement-icon-cell { width: 38px; height: 38px; font-size: 17px; }
+            .achievement-name { font-size: 14px; }
+            .achievement-row { padding: 8px 10px; gap: 10px; min-height: 48px; }
+            .achievement-badge { font-size: 9px; padding: 2px 8px; }
+            .page-container { padding: 12px 8px 30px; }
+            .header .top-actions { gap: 10px; }
+            .header .action-link { font-size: 10px; padding: 4px 10px; }
+            .modal-textarea { height: 80px; font-size: 9px; }
         }
+
         @media (min-width: 768px) {
-            .achievement-icon-cell {
-                width: 52px;
-                height: 52px;
-                font-size: 24px;
-            }
-            .achievement-name {
-                font-size: 17px;
-            }
-            .achievement-row {
-                padding: 14px 20px;
-                gap: 18px;
-                min-height: 64px;
-            }
-            .header h1 {
-                font-size: 40px;
-            }
+            .achievement-icon-cell { width: 52px; height: 52px; font-size: 24px; }
+            .achievement-name { font-size: 17px; }
+            .achievement-row { padding: 14px 20px; gap: 18px; min-height: 64px; }
+            .header h1 { font-size: 40px; }
         }
     </style>
 </head>
@@ -581,6 +510,61 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ========== 跨域存储桥（适配导航栏原生存储，回退 localStorage） ==========
+        const StorageBridge = (function() {
+            const hasNativeBridge = (() => {
+                try {
+                    return window.parent && window.parent !== window && window.parent.webapp;
+                } catch (e) { return false; }
+            })();
+
+            if (!hasNativeBridge) {
+                return {
+                    getItem: async (key, defaultValue = null) => localStorage.getItem(key) ?? defaultValue,
+                    setItem: async (key, value) => { localStorage.setItem(key, value); },
+                    removeItem: async (key) => { localStorage.removeItem(key); },
+                    clear: async () => { localStorage.clear(); }
+                };
+            }
+
+            let callId = 0;
+            const pending = {};
+
+            window.addEventListener('message', function(event) {
+                const data = event.data;
+                if (data && data.id && pending[data.id]) {
+                    if (data.error) {
+                        pending[data.id].reject(new Error(data.error));
+                    } else {
+                        pending[data.id].resolve(data.result);
+                    }
+                    delete pending[data.id];
+                }
+            });
+
+            function sendMessage(action, key, value, defaultValue) {
+                return new Promise(function(resolve, reject) {
+                    const id = ++callId;
+                    pending[id] = { resolve, reject };
+                    window.parent.postMessage({
+                        id: id,
+                        action: action,
+                        key: key,
+                        value: value,
+                        defaultValue: defaultValue
+                    }, '*');
+                });
+            }
+
+            return {
+                getItem: (key, defaultValue = null) => sendMessage('get', key, null, defaultValue),
+                setItem: (key, value) => sendMessage('set', key, value),
+                removeItem: (key) => sendMessage('remove', key),
+                clear: () => sendMessage('clear')
+            };
+        })();
+
+        // ========== 成就图标数据 ==========
         const achievementIcons = [
             { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
             { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
@@ -625,280 +609,130 @@
         ];
 
         const STORAGE_KEY = 'huangdaxian_achievements';
-        const STORAGE_KEY_BAK = 'huangdaxian_achievements_bak';
         const ORDER_KEY = 'huangdaxian_achievement_order';
-        const ORDER_KEY_BAK = 'huangdaxian_achievement_order_bak';
-        const STORAGE_VERSION_KEY = 'huangdaxian_storage_ver';
-        const STORAGE_VERSION = 2;
 
-        function isStorageAvailable() {
-            try {
-                const testKey = '__storage_test__';
-                localStorage.setItem(testKey, '1');
-                localStorage.removeItem(testKey);
-                return true;
-            } catch (e) { return false; }
-        }
+        let cachedAchievements = null;
+        let cachedOrder = null;
 
-        function safeSetStorage(key, backupKey, value) {
-            if (!isStorageAvailable()) return false;
-            const jsonStr = JSON.stringify(value);
-            let success = true;
-            try { localStorage.setItem(key, jsonStr); } catch (e) { success = false; }
-            try { localStorage.setItem(backupKey, jsonStr); } catch (e) {}
-            try { localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION)); } catch (e) {}
-            return success;
-        }
-
-        function safeGetStorage(key, backupKey) {
-            if (!isStorageAvailable()) return null;
-            let data = null;
-            let source = 'none';
-            try {
-                const raw = localStorage.getItem(key);
-                if (raw !== null && raw !== undefined) {
-                    data = JSON.parse(raw);
-                    source = 'primary';
-                }
-            } catch (e) { data = null; }
-            if (data === null || data === undefined) {
+        async function loadAchievements() {
+            if (cachedAchievements) return cachedAchievements;
+            const saved = await StorageBridge.getItem(STORAGE_KEY);
+            if (saved) {
                 try {
-                    const rawBak = localStorage.getItem(backupKey);
-                    if (rawBak !== null && rawBak !== undefined) {
-                        const bakData = JSON.parse(rawBak);
-                        if (bakData !== null && bakData !== undefined) {
-                            data = bakData;
-                            source = 'backup';
-                            try { localStorage.setItem(key, rawBak); } catch (e) {}
-                        }
+                    const data = JSON.parse(saved);
+                    if (data && typeof data === 'object' && !Array.isArray(data)) {
+                        cachedAchievements = data;
+                        return data;
                     }
-                } catch (e) { data = null; }
-            } else {
-                try {
-                    const raw = localStorage.getItem(key);
-                    if (raw) localStorage.setItem(backupKey, raw);
                 } catch (e) {}
             }
-            return { data, source };
-        }
-
-        function checkAndRepairStorage() {
-            if (!isStorageAvailable()) return;
-            try {
-                const rawMain = localStorage.getItem(STORAGE_KEY);
-                const rawBak = localStorage.getItem(STORAGE_KEY_BAK);
-                if (rawMain && rawBak) {
-                    const mainData = JSON.parse(rawMain);
-                    const bakData = JSON.parse(rawBak);
-                    const mainCount = Object.keys(mainData || {}).filter(k => mainData[k] === true).length;
-                    const bakCount = Object.keys(bakData || {}).filter(k => bakData[k] === true).length;
-                    if (bakCount > mainCount + 1) {
-                        localStorage.setItem(STORAGE_KEY, rawBak);
-                        return 'recovered_achievements';
-                    }
-                }
-                const rawOrderMain = localStorage.getItem(ORDER_KEY);
-                const rawOrderBak = localStorage.getItem(ORDER_KEY_BAK);
-                if (!rawOrderMain && rawOrderBak) {
-                    localStorage.setItem(ORDER_KEY, rawOrderBak);
-                    return 'recovered_order';
-                }
-            } catch (e) {}
-            return 'ok';
-        }
-
-        function loadAchievements() {
-            const result = safeGetStorage(STORAGE_KEY, STORAGE_KEY_BAK);
-            if (result && result.data && typeof result.data === 'object' && !Array.isArray(result.data)) return result.data;
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                        try { localStorage.setItem(STORAGE_KEY_BAK, saved); } catch (e) {}
-                        return parsed;
-                    }
-                }
-            } catch (e) {}
             return {};
         }
 
-        function saveAchievements(achievements) {
-            return safeSetStorage(STORAGE_KEY, STORAGE_KEY_BAK, achievements);
+        async function saveAchievements(achievements) {
+            cachedAchievements = achievements;
+            await StorageBridge.setItem(STORAGE_KEY, JSON.stringify(achievements));
         }
 
-        function loadOrder() {
-            const result = safeGetStorage(ORDER_KEY, ORDER_KEY_BAK);
-            if (result && result.data && Array.isArray(result.data)) return result.data;
-            try {
-                const saved = localStorage.getItem(ORDER_KEY);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed)) {
-                        try { localStorage.setItem(ORDER_KEY_BAK, saved); } catch (e) {}
-                        return parsed;
+        async function loadOrder() {
+            if (cachedOrder) return cachedOrder;
+            const saved = await StorageBridge.getItem(ORDER_KEY);
+            if (saved) {
+                try {
+                    const order = JSON.parse(saved);
+                    if (Array.isArray(order)) {
+                        cachedOrder = order;
+                        return order;
                     }
-                }
-            } catch (e) {}
+                } catch (e) {}
+            }
             return null;
         }
 
-        function saveOrder(orderArray) {
-            return safeSetStorage(ORDER_KEY, ORDER_KEY_BAK, orderArray);
+        async function saveOrder(orderArray) {
+            cachedOrder = orderArray;
+            await StorageBridge.setItem(ORDER_KEY, JSON.stringify(orderArray));
         }
 
-        function getSortedAchievements() {
-            const achievements = loadAchievements();
-            let order = loadOrder();
+        async function getSortedAchievements() {
+            const achievements = await loadAchievements();
+            let order = await loadOrder();
             const unlockedIds = Object.keys(achievements).filter(id => achievements[id] === true);
 
             if (!order) {
                 order = unlockedIds.slice();
-                saveOrder(order);
+                await saveOrder(order);
             } else {
                 const newlyUnlocked = unlockedIds.filter(id => order.indexOf(id) === -1);
                 if (newlyUnlocked.length > 0) {
                     order = [...newlyUnlocked, ...order];
-                    saveOrder(order);
+                    await saveOrder(order);
                 }
                 const stillValid = order.filter(id => unlockedIds.indexOf(id) >= 0);
                 if (stillValid.length !== order.length) {
                     order = stillValid;
-                    saveOrder(order);
+                    await saveOrder(order);
                 }
             }
 
-            const unlockedSet = new Set(unlockedIds);
-            const unlockedInOrder = order.filter(id => unlockedSet.has(id));
-            const remainingUnlocked = unlockedIds.filter(id => unlockedInOrder.indexOf(id) === -1);
-            const allUnlockedOrdered = [...unlockedInOrder, ...remainingUnlocked];
-
-            const allUnlockedMap = new Map();
-            allUnlockedOrdered.forEach(id => {
-                const ach = achievementIcons.find(a => a.id === id);
-                if (ach) allUnlockedMap.set(id, ach);
-            });
-
+            const allUnlockedOrdered = [...new Set([...order.filter(id => unlockedIds.includes(id)), ...unlockedIds])];
             const unlockedAchievements = [];
             const lockedAchievements = [];
 
             achievementIcons.forEach(ach => {
-                if (allUnlockedMap.has(ach.id)) {
+                if (allUnlockedOrdered.includes(ach.id)) {
                     unlockedAchievements.push(ach);
                 } else {
                     lockedAchievements.push(ach);
                 }
             });
 
-            unlockedAchievements.sort((a, b) => {
-                const idxA = allUnlockedOrdered.indexOf(a.id);
-                const idxB = allUnlockedOrdered.indexOf(b.id);
-                if (idxA >= 0 && idxB >= 0) return idxA - idxB;
-                if (idxA >= 0) return -1;
-                if (idxB >= 0) return 1;
-                return 0;
-            });
+            unlockedAchievements.sort((a, b) => allUnlockedOrdered.indexOf(a.id) - allUnlockedOrdered.indexOf(b.id));
 
             return { unlockedAchievements, lockedAchievements };
         }
 
-        function utf8ToBase64(str) {
-            return btoa(unescape(encodeURIComponent(str)));
-        }
-
-        function base64ToUtf8(b64) {
-            return decodeURIComponent(escape(atob(b64)));
-        }
-
-        function encryptExportData(jsonStr) {
-            const firstPass = utf8ToBase64(jsonStr);
-            return utf8ToBase64(firstPass);
-        }
-
-        function decryptExportData(encStr) {
-            try {
-                const firstPass = base64ToUtf8(encStr);
-                return base64ToUtf8(firstPass);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function exportAllData() {
-            const achievements = loadAchievements();
-            const order = loadOrder();
-            const exportPayload = {
-                version: STORAGE_VERSION,
+        async function exportAllData() {
+            const achievements = await loadAchievements();
+            const order = await loadOrder();
+            const payload = {
+                version: 2,
                 exportTime: new Date().toISOString(),
                 achievements: achievements,
                 order: order || [],
-                totalUnlocked: Object.keys(achievements).filter(k => achievements[k] === true).length,
+                totalUnlocked: Object.keys(achievements).filter(k => achievements[k] === true).length
             };
-            const jsonStr = JSON.stringify(exportPayload);
-            return encryptExportData(jsonStr);
+            return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
         }
 
-        function importAllData(inputStr) {
-            let jsonStr = decryptExportData(inputStr);
-            if (!jsonStr) {
+        async function importAllData(inputStr) {
+            let jsonStr;
+            try {
+                jsonStr = decodeURIComponent(escape(atob(inputStr)));
+            } catch (e) {
                 jsonStr = inputStr;
             }
             try {
                 const payload = JSON.parse(jsonStr);
-                if (!payload || typeof payload !== 'object' || !payload.achievements || typeof payload.achievements !==
-                    'object' || Array.isArray(payload.achievements)) {
-                    return { success: false, message: '数据格式无效：不是有效的备份文件' };
+                if (!payload || !payload.achievements || typeof payload.achievements !== 'object') {
+                    return { success: false, message: '数据格式无效' };
                 }
-                const validIds = new Set(achievementIcons.map(a => a.id));
-                const importIds = Object.keys(payload.achievements);
-                const unknownIds = importIds.filter(id => !validIds.has(id));
-                if (unknownIds.length > 0 && importIds.length > 10) {
-                    return { success: false, message: '数据格式异常：包含未知成就ID' };
-                }
-                const currentAchievements = loadAchievements();
-                const mergedAchievements = {};
-                const allIds = new Set([...Object.keys(currentAchievements), ...importIds]);
-                allIds.forEach(id => {
-                    const currentVal = currentAchievements[id] === true;
-                    const importVal = payload.achievements[id] === true;
-                    mergedAchievements[id] = currentVal || importVal;
+                const currentAchievements = await loadAchievements();
+                const merged = { ...currentAchievements };
+                Object.keys(payload.achievements).forEach(id => {
+                    if (payload.achievements[id] === true) merged[id] = true;
                 });
-                let mergedOrder = [];
-                if (Array.isArray(payload.order) && payload.order.length > 0) {
-                    const importOrder = payload.order.filter(id => mergedAchievements[id] === true);
-                    const currentOrder = loadOrder() || [];
-                    const currentUnlockedIds = Object.keys(currentAchievements).filter(k => currentAchievements[k] ===
-                        true);
-                    const newlySinceExport = currentUnlockedIds.filter(id => importOrder.indexOf(id) === -1);
-                    mergedOrder = [...newlySinceExport, ...importOrder];
-                    const seen = new Set();
-                    mergedOrder = mergedOrder.filter(id => {
-                        if (seen.has(id)) return false;
-                        seen.add(id);
-                        return mergedAchievements[id] === true;
-                    });
-                } else {
-                    const unlockedIds = Object.keys(mergedAchievements).filter(k => mergedAchievements[k] === true);
-                    mergedOrder = unlockedIds.slice();
+                await saveAchievements(merged);
+                if (Array.isArray(payload.order)) {
+                    await saveOrder(payload.order.filter(id => merged[id] === true));
                 }
-                const achSaved = saveAchievements(mergedAchievements);
-                const orderSaved = saveOrder(mergedOrder);
-                if (!achSaved || !orderSaved) {
-                    return { success: false, message: '写入存储失败，请检查存储空间' };
-                }
-                return {
-                    success: true,
-                    message: '数据导入成功！已合并 ' + Object.keys(mergedAchievements).filter(k => mergedAchievements[
-                        k] === true).length + ' 个成就',
-                    mergedCount: Object.keys(mergedAchievements).filter(k => mergedAchievements[k] === true).length,
-                };
+                return { success: true, message: `导入成功！已合并 ${Object.keys(merged).filter(k => merged[k] === true).length} 个成就` };
             } catch (e) {
                 return { success: false, message: 'JSON解析失败：' + e.message };
             }
         }
 
         let toastTimer = null;
-
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             if (!toast) return;
@@ -915,76 +749,22 @@
 
         function copyToClipboard(text) {
             return new Promise((resolve, reject) => {
-                if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-                    navigator.clipboard.writeText(text).then(resolve).catch(() => fallbackCopy(text, resolve,
-                    reject));
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(resolve).catch(reject);
                 } else {
-                    fallbackCopy(text, resolve, reject);
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        resolve();
+                    } catch (e) { reject(e); }
+                    document.body.removeChild(textarea);
                 }
             });
-        }
-
-        function fallbackCopy(text, resolve, reject) {
-            try {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.left = '-9999px';
-                textarea.style.top = '-9999px';
-                textarea.style.opacity = '0';
-                textarea.style.width = '1px';
-                textarea.style.height = '1px';
-                textarea.setAttribute('readonly', '');
-                document.body.appendChild(textarea);
-                textarea.focus();
-                textarea.select();
-                const successful = document.execCommand('copy');
-                document.body.removeChild(textarea);
-                if (successful) resolve();
-                else reject(new Error('execCommand 返回失败'));
-            } catch (e) { reject(e); }
-        }
-
-        function showModal(text, hint, isError = false, onCopy = null) {
-            const existing = document.querySelector('.modal-overlay');
-            if (existing) existing.remove();
-
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-
-            const box = document.createElement('div');
-            box.className = 'modal-box';
-
-            if (hint) {
-                const hintEl = document.createElement('p');
-                hintEl.className = 'modal-hint' + (isError ? ' error-style' : '');
-                hintEl.textContent = hint;
-                box.appendChild(hintEl);
-            }
-
-            const textarea = document.createElement('textarea');
-            textarea.className = 'modal-textarea' + (isError ? ' error-style' : '');
-            textarea.value = text;
-            textarea.setAttribute('readonly', '');
-            textarea.onclick = function() {
-                this.select();
-                if (onCopy) onCopy();
-            };
-            box.appendChild(textarea);
-
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'modal-btn' + (isError ? ' error-style' : '');
-            closeBtn.textContent = '关闭';
-            closeBtn.onclick = function() { document.body.removeChild(overlay); };
-            box.appendChild(closeBtn);
-
-            overlay.appendChild(box);
-            overlay.onclick = function(e) {
-                if (e.target === overlay) document.body.removeChild(overlay);
-            };
-            document.body.appendChild(overlay);
-
-            setTimeout(() => textarea.select(), 100);
         }
 
         function createAchievementRow(ach, isUnlocked) {
@@ -996,32 +776,28 @@
             } else {
                 row.classList.add('locked');
             }
-
             const iconCell = document.createElement('div');
             iconCell.className = 'achievement-icon-cell';
             iconCell.textContent = isUnlocked ? ach.icon : '?';
-
             const infoDiv = document.createElement('div');
             infoDiv.className = 'achievement-info';
             const nameSpan = document.createElement('span');
             nameSpan.className = 'achievement-name';
             nameSpan.textContent = ach.title;
             infoDiv.appendChild(nameSpan);
-
             const badge = document.createElement('span');
             badge.className = 'achievement-badge';
             if (isUnlocked && ach.legendary) badge.textContent = '传说';
             else if (isUnlocked) badge.textContent = '已解锁';
             else badge.textContent = '未解锁';
-
             row.appendChild(iconCell);
             row.appendChild(infoDiv);
             row.appendChild(badge);
             return row;
         }
 
-        function renderAll(storageStatusMsg = null) {
-            const { unlockedAchievements, lockedAchievements } = getSortedAchievements();
+        async function renderAll() {
+            const { unlockedAchievements, lockedAchievements } = await getSortedAchievements();
             const unlockedList = document.getElementById('unlockedList');
             const lockedList = document.getElementById('lockedList');
             const unlockedTitle = document.getElementById('unlockedTitle');
@@ -1032,7 +808,6 @@
             const legendaryStat = document.getElementById('legendaryStat');
             const legendaryCountEl = document.getElementById('legendaryCount');
             const refreshNote = document.getElementById('refreshNote');
-            const storageStatus = document.getElementById('storageStatus');
 
             unlockedList.innerHTML = '';
             lockedList.innerHTML = '';
@@ -1054,20 +829,18 @@
                 lockedTitle.textContent = '尚未解锁';
                 lockedTitle.classList.remove('legendary-title');
                 lockedAchievements.forEach(ach => lockedList.appendChild(createAchievementRow(ach, false)));
+            } else if (unlockedAchievements.length > 0) {
+                lockedTitle.style.display = 'block';
+                lockedTitle.textContent = '全成就达成';
+                lockedTitle.classList.add('legendary-title');
+                const allDone = document.createElement('div');
+                allDone.className = 'empty-state';
+                allDone.textContent = '🎉 全部成就已解锁！功德圆满！';
+                allDone.style.color = '#8cb4d8';
+                allDone.style.padding = '30px 20px';
+                lockedList.appendChild(allDone);
             } else {
-                if (lockedAchievements.length === 0 && unlockedAchievements.length > 0) {
-                    lockedTitle.style.display = 'block';
-                    lockedTitle.textContent = '全成就达成';
-                    lockedTitle.classList.add('legendary-title');
-                    const allDone = document.createElement('div');
-                    allDone.className = 'empty-state';
-                    allDone.textContent = '🎉 全部成就已解锁！功德圆满！';
-                    allDone.style.color = '#8cb4d8';
-                    allDone.style.padding = '30px 20px';
-                    lockedList.appendChild(allDone);
-                } else {
-                    lockedTitle.style.display = 'none';
-                }
+                lockedTitle.style.display = 'none';
             }
 
             unlockedCountEl.textContent = unlockedAchievements.length;
@@ -1082,112 +855,48 @@
 
             const now = new Date();
             refreshNote.textContent = '数据更新于 ' + now.toLocaleString('zh-CN', {
-                month: 'numeric',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            }) + ' · 刷新页面以同步游戏进度';
+                month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }) + ' · 存储方式：原生存储';
 
-            if (storageStatus) {
-                if (storageStatusMsg === 'recovered_achievements') {
-                    storageStatus.textContent = '⚠ 检测到数据异常，已自动从备份恢复成就数据';
-                    storageStatus.className = 'storage-status recovered';
-                } else if (storageStatusMsg === 'recovered_order') {
-                    storageStatus.textContent = '⚠ 排序数据已从备份恢复';
-                    storageStatus.className = 'storage-status recovered';
-                } else if (!isStorageAvailable()) {
-                    storageStatus.textContent = '⚠ 存储不可用，数据无法持久保存';
-                    storageStatus.className = 'storage-status';
-                } else {
-                    storageStatus.textContent = '存储状态正常 · 数据已双备份';
-                    storageStatus.className = 'storage-status';
-                }
-            }
+            document.getElementById('storageStatus').textContent = '存储状态正常 · 使用父页面原生存储';
         }
 
-        function init() {
-            const repairResult = checkAndRepairStorage();
+        async function init() {
+            await renderAll();
 
-            if (isStorageAvailable()) {
-                try {
-                    const ver = localStorage.getItem(STORAGE_VERSION_KEY);
-                    if (!ver || parseInt(ver) < STORAGE_VERSION) {
-                        localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION));
-                        const mainData = localStorage.getItem(STORAGE_KEY);
-                        if (mainData) localStorage.setItem(STORAGE_KEY_BAK, mainData);
-                        const orderData = localStorage.getItem(ORDER_KEY);
-                        if (orderData) localStorage.setItem(ORDER_KEY_BAK, orderData);
-                    }
-                } catch (e) {}
-            }
-
-            renderAll(repairResult !== 'ok' ? repairResult : null);
-
-            if (repairResult === 'recovered_achievements') {
-                setTimeout(() => showToast('数据已从备份自动恢复'), 600);
-            } else if (repairResult === 'recovered_order') {
-                setTimeout(() => showToast('排序数据已恢复'), 600);
-            }
-
-            window.addEventListener('storage', function(e) {
-                if (e.key === STORAGE_KEY || e.key === ORDER_KEY ||
-                    e.key === STORAGE_KEY_BAK || e.key === ORDER_KEY_BAK) {
+            // 监听来自游戏页的更新通知
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'achievements-updated') {
+                    cachedAchievements = null;
+                    cachedOrder = null;
                     renderAll();
                 }
             });
 
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'visible') {
-                    const repairResult2 = checkAndRepairStorage();
-                    renderAll(repairResult2 !== 'ok' ? repairResult2 : null);
+            document.getElementById('btnExportTop').addEventListener('click', async () => {
+                const encrypted = await exportAllData();
+                try {
+                    await copyToClipboard(encrypted);
+                    showToast('✅ 备份数据已复制到剪贴板');
+                } catch (e) {
+                    showToast('复制失败，请手动复制', true);
+                    prompt('请手动复制：', encrypted);
                 }
             });
 
-            const btnExport = document.getElementById('btnExportTop');
-            if (btnExport) {
-                btnExport.addEventListener('click', async function() {
-                    const encrypted = exportAllData();
-                    try {
-                        await copyToClipboard(encrypted);
-                        showToast('✅ 备份数据已复制到剪贴板（已加密）');
-                    } catch (e) {
-                        showModal(encrypted, '请手动复制下方文本以备份数据', false, () => {
-                            copyToClipboard(encrypted).then(() => showToast('✅ 已复制')).catch(() => {});
-                        });
-                        showToast('请手动复制弹窗中的文本', true);
-                    }
-                });
-            }
-
-            const btnImport = document.getElementById('btnImportTop');
-            if (btnImport) {
-                btnImport.addEventListener('click', function() {
-                    const currentCount = Object.keys(loadAchievements()).filter(k => loadAchievements()[k] ===
-                        true).length;
-                    const promptMsg = '请粘贴之前导出的备份数据：\n\n' +
-                        '⚠ 导入将合并现有数据，不会丢失已有成就。\n' +
-                        '当前已有 ' + currentCount + ' 个成就解锁。';
-                    const input = prompt(promptMsg, '');
-                    if (input === null) return;
-                    if (input.trim() === '') {
-                        showToast('未输入任何数据', true);
-                        return;
-                    }
-                    const result = importAllData(input.trim());
-                    if (result.success) {
-                        showToast(result.message);
-                        renderAll();
-                    } else {
-                        showToast('导入失败：' + result.message, true);
-                        showModal(input.trim(), '请检查数据格式（应为加密字符串或JSON）：', true);
-                    }
-                });
-            }
-
-            if (!isStorageAvailable()) {
-                console.warn('[存储] localStorage 不可用，数据将无法持久保存');
-            }
+            document.getElementById('btnImportTop').addEventListener('click', async () => {
+                const input = prompt('请粘贴之前导出的备份数据：');
+                if (!input) return;
+                const result = await importAllData(input.trim());
+                if (result.success) {
+                    showToast(result.message);
+                    cachedAchievements = null;
+                    cachedOrder = null;
+                    await renderAll();
+                } else {
+                    showToast('导入失败：' + result.message, true);
+                }
+            });
         }
 
         if (document.readyState === 'loading') {

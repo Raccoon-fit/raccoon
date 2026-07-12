@@ -128,24 +128,25 @@
             margin-top: 18px;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 12px;
             flex-wrap: wrap;
         }
         .action-link {
             display: inline-block;
             color: var(--scroll-light);
-            font-size: 13px;
+            font-size: 12px;
             letter-spacing: 2px;
             cursor: pointer;
             background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
             border: 2px solid var(--scroll-dark);
-            padding: 8px 22px;
+            padding: 8px 18px;
             border-radius: 6px;
             font-family: 'Ma Shan Zheng', 'KaiTi', serif;
             box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
             transition: all 0.2s;
             text-decoration: none;
             font-weight: bold;
+            white-space: nowrap;
         }
         .action-link:hover {
             transform: translateY(-2px);
@@ -411,7 +412,8 @@
             .achievement-icon-cell { width: 40px; height: 40px; font-size: 18px; }
             .achievement-name { font-size: 14px; }
             .achievement-row { padding: 10px 12px; gap: 12px; }
-            .action-link { padding: 6px 16px; font-size: 12px; }
+            .action-link { padding: 6px 14px; font-size: 11px; letter-spacing: 1px; }
+            .header .top-actions { gap: 8px; }
         }
         @media (min-width: 768px) {
             .achievement-icon-cell { width: 56px; height: 56px; font-size: 26px; }
@@ -435,6 +437,7 @@
             <div class="top-actions">
                 <span class="action-link" id="btnExportTop">📤 导出仙籍</span>
                 <span class="action-link" id="btnImportTop">📥 导入仙籍</span>
+                <span class="action-link" id="btnImportLegacy">📜 旧版存档导入</span>
             </div>
         </div>
 
@@ -460,7 +463,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ========== 跨域存储桥（同旧版，支持原生存储回退） ==========
+        // ========== 跨域存储桥（与父页面原生存储通信，回退localStorage） ==========
         const StorageBridge = (function() {
             const hasNativeBridge = (() => {
                 try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; }
@@ -496,7 +499,7 @@
             };
         })();
 
-        // ========== 成就数据 ==========
+        // ========== 成就定义（40项） ==========
         const achievementIcons = [
             { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
             { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
@@ -635,6 +638,47 @@
             }
         }
 
+        // ★ 新增：导入旧版双重Base64密文存档
+        async function importLegacyData(encStr) {
+            let json;
+            try {
+                // 尝试双重Base64解码
+                json = decodeURIComponent(escape(atob(atob(encStr))));
+            } catch(e1) {
+                try {
+                    // 尝试单层Base64解码
+                    json = decodeURIComponent(escape(atob(encStr)));
+                } catch(e2) {
+                    try {
+                        // 直接当JSON解析
+                        JSON.parse(encStr);
+                        json = encStr;
+                    } catch(e3) {
+                        return { success: false, message: '无法解密旧版存档，请检查粘贴的内容是否完整' };
+                    }
+                }
+            }
+            try {
+                const data = JSON.parse(json);
+                if (!data.achievements || typeof data.achievements !== 'object') {
+                    return { success: false, message: '旧版存档格式无效，缺少成就数据' };
+                }
+                const current = await loadAchievements();
+                const merged = { ...current };
+                Object.keys(data.achievements).forEach(id => {
+                    if (data.achievements[id] === true) merged[id] = true;
+                });
+                await saveAchievements(merged);
+                if (Array.isArray(data.order)) {
+                    const filteredOrder = data.order.filter(id => merged[id] === true);
+                    await saveOrder(filteredOrder);
+                }
+                return { success: true, message: `旧版存档导入成功！已合并 ${Object.keys(merged).filter(k=>merged[k]).length} 个成就` };
+            } catch(e) {
+                return { success: false, message: '解析JSON失败：' + e.message };
+            }
+        }
+
         let toastTimer;
         function showToast(msg, isError=false) {
             const t = document.getElementById('toast');
@@ -726,18 +770,39 @@
             });
 
             document.getElementById('btnImportTop').addEventListener('click', async () => {
-                const input = prompt('请粘贴仙籍备份：');
+                const input = prompt('请粘贴新版仙籍备份：');
                 if (!input) return;
                 const res = await importAllData(input.trim());
+                showToast(res.message, !res.success);
                 if (res.success) {
-                    showToast(res.message);
                     cachedAchievements = null; cachedOrder = null;
                     await renderAll();
-                } else showToast(res.message, true);
+                }
+            });
+
+            // ★ 旧版存档导入按钮
+            document.getElementById('btnImportLegacy').addEventListener('click', async () => {
+                const input = prompt('请粘贴旧版存档密文（以ZX或ey开头）：');
+                if (!input) return;
+                const trimmed = input.trim();
+                if (!trimmed) {
+                    showToast('输入为空', true);
+                    return;
+                }
+                const res = await importLegacyData(trimmed);
+                showToast(res.message, !res.success);
+                if (res.success) {
+                    cachedAchievements = null; cachedOrder = null;
+                    await renderAll();
+                }
             });
         }
 
-        document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>

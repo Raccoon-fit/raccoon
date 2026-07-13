@@ -296,7 +296,7 @@
             if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
             const achievements = getAchievementTitles();
             const saveData = {
-                playerName: playerName,   // 保存道号，供接续时恢复
+                playerName: playerName,
                 achievements: achievements,
                 storyNode: localStorage.getItem('storyNode') || 'start',
                 lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
@@ -321,24 +321,38 @@
                 const res = await fetch(url, options);
                 const result = await res.json();
                 if (result.code == 1) {
-                    if (!cloudDocId) { let newId = result.id || result.data || await findDocByTitle(); if (newId) { cloudDocId = newId; localStorage.setItem('cloudDocId', newId); } }
+                    if (!cloudDocId) {
+                        let newId = result.id || result.data;
+                        if (!newId) { newId = await findDocByTitle(); }
+                        if (newId) { cloudDocId = newId; localStorage.setItem('cloudDocId', newId); }
+                    }
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     updateUserInfo();
-                    alert('修为已封存至云端！');
+                    alert('修为已封存至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''));
                 } else alert('封存失败：' + (result.msg || '未知'));
             } catch(e) { alert('网络错误：' + e.message); }
         }
 
         async function pullCloudSave() {
-            if (!cloudDocId) {
-                alert('未找到仙籍ID！请先封存一次修为，或手动输入。');
-                const manualId = prompt('请输入云端文档ID：');
-                if (manualId && manualId.trim()) {
-                    cloudDocId = manualId.trim();
-                    localStorage.setItem('cloudDocId', cloudDocId);
-                } else return;
-            }
             if (!playerName) { alert('道号为空，请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
+
+            // 如果没有文档ID，尝试根据道号自动查找
+            if (!cloudDocId) {
+                alert('正在根据道号查找云端仙籍...');
+                const foundId = await findDocByTitle();
+                if (foundId) {
+                    cloudDocId = foundId;
+                    localStorage.setItem('cloudDocId', cloudDocId);
+                    alert('已找到云端仙籍，开始接续...');
+                } else {
+                    const manualId = prompt('未找到云端仙籍，请手动输入文档ID（可从封存成功提示中获取）：');
+                    if (manualId && manualId.trim()) {
+                        cloudDocId = manualId.trim();
+                        localStorage.setItem('cloudDocId', cloudDocId);
+                    } else return;
+                }
+            }
+
             const cfg = getConfig();
             const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
@@ -347,7 +361,6 @@
                 if (result.code == 1) {
                     let data;
                     try { data = JSON.parse(result.content); } catch(e) { alert('云端数据损坏，无法解析！'); return; }
-                    // 恢复成就
                     const titles = data.achievements || [];
                     const achObj = {};
                     const notFound = [];
@@ -357,21 +370,17 @@
                         else notFound.push(title);
                     });
                     saveAchievements(achObj);
-                    // 恢复存档
                     if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                     if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
-                    // 恢复道号（云端优先）
                     if (data.playerName) setPlayerName(data.playerName);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     renderAchievements();
                     updateUserInfo();
                     let msg = '仙缘已接续！';
-                    if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别（可能版本不匹配）：${notFound.join('、')}`;
+                    if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
                     alert(msg);
-                } else {
-                    alert('接续失败：' + (result.msg || '未知错误'));
-                }
+                } else alert('接续失败：' + (result.msg || '未知错误'));
             } catch(e) { alert('网络错误：' + e.message); }
         }
 

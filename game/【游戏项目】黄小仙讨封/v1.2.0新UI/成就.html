@@ -41,18 +41,8 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.2);
             position: relative;
         }
-        .header {
-            text-align: center;
-            border-bottom: 2px solid var(--scroll-dark);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
-        .header h1 {
-            color: var(--scroll-gold);
-            font-size: 36px;
-            letter-spacing: 6px;
-            text-shadow: 2px 2px 0 var(--scroll-dark);
-        }
+        .header { text-align: center; border-bottom: 2px solid var(--scroll-dark); margin-bottom: 20px; padding-bottom: 10px; }
+        .header h1 { color: var(--scroll-gold); font-size: 36px; letter-spacing: 6px; text-shadow: 2px 2px 0 var(--scroll-dark); }
         .subtitle { color: #5D4037; font-size: 14px; letter-spacing: 4px; font-style: italic; }
         .stats-row { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
         .stat-item {
@@ -303,9 +293,10 @@
         }
 
         async function pushCloudSave() {
-            if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); return; }
+            if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
             const achievements = getAchievementTitles();
             const saveData = {
+                playerName: playerName,   // 保存道号，供接续时恢复
                 achievements: achievements,
                 storyNode: localStorage.getItem('storyNode') || 'start',
                 lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
@@ -339,27 +330,48 @@
         }
 
         async function pullCloudSave() {
-            if (!cloudDocId) return alert('未找到仙籍ID');
-            if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); return; }
+            if (!cloudDocId) {
+                alert('未找到仙籍ID！请先封存一次修为，或手动输入。');
+                const manualId = prompt('请输入云端文档ID：');
+                if (manualId && manualId.trim()) {
+                    cloudDocId = manualId.trim();
+                    localStorage.setItem('cloudDocId', cloudDocId);
+                } else return;
+            }
+            if (!playerName) { alert('道号为空，请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
             const cfg = getConfig();
             const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
                 const res = await fetch(url);
                 const result = await res.json();
                 if (result.code == 1) {
-                    const data = JSON.parse(result.content);
+                    let data;
+                    try { data = JSON.parse(result.content); } catch(e) { alert('云端数据损坏，无法解析！'); return; }
+                    // 恢复成就
                     const titles = data.achievements || [];
                     const achObj = {};
-                    titles.forEach(t => { const f = achievementIcons.find(a => a.title === t); if (f) achObj[f.id] = true; });
+                    const notFound = [];
+                    titles.forEach(title => {
+                        const found = achievementIcons.find(a => a.title === title);
+                        if (found) achObj[found.id] = true;
+                        else notFound.push(title);
+                    });
                     saveAchievements(achObj);
-                    localStorage.setItem('storyNode', data.storyNode || 'start');
-                    localStorage.setItem('lingYun', data.lingYun || 100);
-                    localStorage.setItem('zhuoNian', data.zhuoNian || 0);
+                    // 恢复存档
+                    if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
+                    if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
+                    if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
+                    // 恢复道号（云端优先）
+                    if (data.playerName) setPlayerName(data.playerName);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     renderAchievements();
                     updateUserInfo();
-                    alert('仙缘已接续！');
-                } else alert('接续失败：' + result.msg);
+                    let msg = '仙缘已接续！';
+                    if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别（可能版本不匹配）：${notFound.join('、')}`;
+                    alert(msg);
+                } else {
+                    alert('接续失败：' + (result.msg || '未知错误'));
+                }
             } catch(e) { alert('网络错误：' + e.message); }
         }
 
@@ -380,8 +392,7 @@
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
                 if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
-                renderAchievements();
-                updateUserInfo();
+                renderAchievements(); updateUserInfo();
                 alert('仙籍导入成功！');
             } catch(e) { alert('导入失败：格式错误'); }
         }
@@ -390,34 +401,17 @@
 
         // ==================== 初始化 ====================
         window.addEventListener('load', () => {
-            // 1. 从URL获取道号和文档ID（主页面可以通过 ?player=xxx&docId=xxx 传递）
             const params = new URLSearchParams(location.search);
-            playerName = params.get('player') || '';
-            cloudDocId = params.get('docId') || '';
-
-            // 2. 如果URL没有，尝试从本地存储读取
-            if (!playerName) playerName = localStorage.getItem('playerName') || '';
-            if (!cloudDocId) cloudDocId = localStorage.getItem('cloudDocId') || '';
-
-            // 3. 尝试从父窗口读取（iframe且同源时有效）
+            playerName = params.get('player') || localStorage.getItem('playerName') || '';
+            cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
             if (!playerName) {
                 try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch(e) {}
             }
-
-            // 4. 保存并更新UI
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
             updateUserInfo();
             renderAchievements();
-
-            // 5. 如果道号仍然为空，延迟弹出输入框（避免页面加载时被拦截）
-            if (!playerName) {
-                setTimeout(() => {
-                    if (!playerName) promptSetPlayerName();
-                }, 800);
-            }
-
-            // 绑定修改道号按钮
+            if (!playerName) setTimeout(() => { if (!playerName) promptSetPlayerName(); }, 800);
             document.getElementById('editPlayerName').addEventListener('click', promptSetPlayerName);
         });
     </script>

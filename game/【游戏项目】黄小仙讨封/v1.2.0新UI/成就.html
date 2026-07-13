@@ -106,13 +106,12 @@
             </div>
         </div>
 
+        <!-- 道主信息卡片 -->
         <div style="background: rgba(255,255,255,0.7); padding: 16px; border-left: 4px solid #8B4513; border-radius: 4px; margin-bottom: 20px;">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
                 <span>道号：</span>
                 <strong id="display-daoHao">-</strong>
-<!--
-<span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
--->
+                <span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
             </div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>灵韵：</span><strong id="display-lingYun">-</strong></div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>浊念：</span><strong id="display-zhuoNian">-</strong></div>
@@ -205,20 +204,60 @@
         const STORAGE_KEY = 'huangdaxian_achievements';
         const ORDER_KEY = 'huangdaxian_achievement_order';
         const SPECIAL_KEY = 'huangdaxian_special_achievements';
-        const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes'; // 存储特殊成就的注释
-        const USED_CODES_KEY = 'huangdaxian_used_codes'; // 已使用的兑换码
+        const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes';
+        const USED_CODES_KEY = 'huangdaxian_used_codes';
         let cachedAchievements = null, cachedOrder = null, cachedSpecial = null, cachedNotes = null, cachedUsedCodes = null;
 
-        // ---------- 兑换码库 ----------
-        const VALID_CODES = {
-            'LY001A': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
-            'LY002B': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
-            'LY003C': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
-            'LY004D': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
-            'ZN001E': { type: 'zhuoNian', amount: 1, desc: '浊念+1' },
-            'ZN002F': { type: 'zhuoNian', amount: 1, desc: '浊念+1' },
+        // ---------- 动态兑换码映射 ----------
+        let VALID_CODES = {};
+        const DEFAULT_CODES = {
+            'LY001A': { type: 'lingYun', amount: 1 },
+            'LY002B': { type: 'lingYun', amount: 1 },
+            'LY003C': { type: 'lingYun', amount: 1 },
+            'LY004D': { type: 'lingYun', amount: 1 },
+            'ZN001E': { type: 'zhuoNian', amount: 1 },
+            'ZN002F': { type: 'zhuoNian', amount: 1 },
             'QD77SG': { type: 'achievement', title: '签达之人', note: '参与7日签到活动获得' }
         };
+        const CODES_URL = 'https://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=abf0c30306e2';
+
+        async function loadCodesFromRemote() {
+            try {
+                const res = await fetch(CODES_URL);
+                if (!res.ok) throw new Error('网络错误');
+                const text = await res.text();
+                const lines = text.split('\n');
+                const newCodes = {};
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line.startsWith('#')) continue;
+                    const parts = line.split(':');
+                    if (parts.length < 3) continue;
+                    const code = parts[0].trim().toUpperCase();
+                    const type = parts[1].trim();
+                    const param = parts.slice(2).join(':').trim();
+                    if (type === 'lingYun' || type === 'zhuoNian') {
+                        const amount = parseInt(param);
+                        if (!isNaN(amount)) newCodes[code] = { type, amount };
+                    } else if (type === 'achievement') {
+                        const titleAndNote = param.split('|');
+                        const title = titleAndNote[0].trim();
+                        const note = titleAndNote[1] ? titleAndNote[1].trim() : '';
+                        if (title) newCodes[code] = { type, title, note };
+                    }
+                }
+                if (Object.keys(newCodes).length === 0) {
+                    console.warn('远程兑换码为空，使用默认码');
+                    return false;
+                }
+                VALID_CODES = newCodes;
+                console.log('✅ 已从远程加载兑换码', Object.keys(newCodes).length, '个');
+                return true;
+            } catch (e) {
+                console.warn('远程兑换码加载失败，使用默认码', e);
+                return false;
+            }
+        }
 
         // ---------- 成就读写 ----------
         function getAchievements() {
@@ -241,7 +280,6 @@
         }
         function saveOrder(order) { cachedOrder = order; localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
 
-        // ---------- 特殊成就读写 ----------
         function getSpecialAchievements() {
             if (cachedSpecial) return cachedSpecial;
             const raw = localStorage.getItem(SPECIAL_KEY);
@@ -380,13 +418,11 @@
             if (!code || !code.trim()) return;
             const trimmedCode = code.trim().toUpperCase();
             
-            // 检查是否有效
             if (!VALID_CODES[trimmedCode]) {
                 alert('无效的兑换码！');
                 return;
             }
             
-            // 检查是否已使用
             const used = getUsedCodes();
             if (used.includes(trimmedCode)) {
                 alert('该兑换码已被使用！');
@@ -395,7 +431,6 @@
             
             const reward = VALID_CODES[trimmedCode];
             
-            // 处理奖励
             if (reward.type === 'lingYun') {
                 const current = parseInt(localStorage.getItem('lingYun') || '100');
                 localStorage.setItem('lingYun', current + reward.amount);
@@ -416,9 +451,8 @@
                 }
                 const updated = [...special, reward.title];
                 saveSpecialAchievements(updated);
-                // 保存注释
                 const notes = getSpecialNotes();
-                notes[reward.title] = reward.note || '';
+                if (reward.note) notes[reward.title] = reward.note;
                 saveSpecialNotes(notes);
                 addUsedCode(trimmedCode);
                 renderAchievements();
@@ -612,7 +646,10 @@
         function logout() { if (confirm('确定重入轮回？')) { localStorage.clear(); location.reload(); } }
 
         // ==================== 初始化 ====================
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+            const loaded = await loadCodesFromRemote();
+            if (!loaded) VALID_CODES = DEFAULT_CODES;
+
             const params = new URLSearchParams(location.search);
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';

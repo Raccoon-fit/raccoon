@@ -92,6 +92,7 @@
         .empty-state { text-align: center; padding: 30px; color: var(--scroll-dark); font-style: italic; }
         .save-time { text-align: center; color: #8b5a2b; font-size: 0.85em; margin: 10px 0; padding: 8px; background: rgba(139,90,43,0.1); border-radius: 4px; }
         .edit-link { font-size: 12px; color: var(--scroll-gold); cursor: pointer; margin-left: 8px; text-decoration: underline; }
+        .achievement-note { font-size: 10px; color: var(--scroll-gold); margin-left: 8px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -118,13 +119,25 @@
         </div>
 
         <div class="btn-group">
-            <button class="seal-btn red-seal" onclick="pushCloudSave()">封存修为</button>
-            <button class="seal-btn red-seal" onclick="pullCloudSave()">接续仙缘</button>
+            <button class="seal-btn red-seal" onclick="pushCloudSave()">上传云端</button>
+            <button class="seal-btn red-seal" onclick="pullCloudSave()">云端下载</button>
             <button class="seal-btn gray-seal" onclick="exportAllData()">导出仙籍</button>
             <button class="seal-btn gray-seal" onclick="importAllDataPrompt()">导入仙籍</button>
             <button class="seal-btn gray-seal" onclick="logout()">重入轮回</button>
         </div>
 
+        <!-- 兑换码区域 -->
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <button class="seal-btn gray-seal" onclick="redeemCode()" style="width: auto; padding: 10px 30px;">🎁 兑换码</button>
+        </div>
+
+        <!-- 特殊成就 -->
+        <div id="specialSection" style="display:none;">
+            <div class="section-title">✦ 特殊成就 · 天赐仙缘 ✦</div>
+            <div class="achievement-list" id="specialList"></div>
+        </div>
+
+        <!-- 常规成就 -->
         <div id="unlockedSection">
             <div class="section-title" id="unlockedTitle" style="display:none;">✦ 已历劫 · 道心圆满 ✦</div>
             <div class="achievement-list" id="unlockedList"></div>
@@ -189,8 +202,23 @@
 
         const STORAGE_KEY = 'huangdaxian_achievements';
         const ORDER_KEY = 'huangdaxian_achievement_order';
-        let cachedAchievements = null, cachedOrder = null;
+        const SPECIAL_KEY = 'huangdaxian_special_achievements';
+        const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes'; // 存储特殊成就的注释
+        const USED_CODES_KEY = 'huangdaxian_used_codes'; // 已使用的兑换码
+        let cachedAchievements = null, cachedOrder = null, cachedSpecial = null, cachedNotes = null, cachedUsedCodes = null;
 
+        // ---------- 兑换码库 ----------
+        const VALID_CODES = {
+            'LY001A': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
+            'LY002B': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
+            'LY003C': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
+            'LY004D': { type: 'lingYun', amount: 1, desc: '灵韵+1' },
+            'ZN001E': { type: 'zhuoNian', amount: 1, desc: '浊念+1' },
+            'ZN002F': { type: 'zhuoNian', amount: 1, desc: '浊念+1' },
+            'QD77SG': { type: 'achievement', title: '签达之人', note: '参与7日签到活动获得' }
+        };
+
+        // ---------- 成就读写 ----------
         function getAchievements() {
             if (cachedAchievements) return cachedAchievements;
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -210,11 +238,50 @@
             return [];
         }
         function saveOrder(order) { cachedOrder = order; localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
+
+        // ---------- 特殊成就读写 ----------
+        function getSpecialAchievements() {
+            if (cachedSpecial) return cachedSpecial;
+            const raw = localStorage.getItem(SPECIAL_KEY);
+            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedSpecial = arr; return arr; } } catch(e) {} }
+            return [];
+        }
+        function saveSpecialAchievements(arr) {
+            cachedSpecial = arr;
+            localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr));
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr)); } catch(e) {}
+        }
+        function getSpecialNotes() {
+            if (cachedNotes) return cachedNotes;
+            const raw = localStorage.getItem(SPECIAL_NOTES_KEY);
+            if (raw) { try { const obj = JSON.parse(raw); if (typeof obj === 'object') { cachedNotes = obj; return obj; } } catch(e) {} }
+            return {};
+        }
+        function saveSpecialNotes(obj) {
+            cachedNotes = obj;
+            localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj));
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj)); } catch(e) {}
+        }
+        function getUsedCodes() {
+            if (cachedUsedCodes) return cachedUsedCodes;
+            const raw = localStorage.getItem(USED_CODES_KEY);
+            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedUsedCodes = arr; return arr; } } catch(e) {} }
+            return [];
+        }
+        function addUsedCode(code) {
+            const arr = getUsedCodes();
+            arr.push(code);
+            cachedUsedCodes = arr;
+            localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr));
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr)); } catch(e) {}
+        }
+
         function getAchievementTitles() {
             const ach = getAchievements();
             return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id); return f ? f.title : id; });
         }
 
+        // ---------- 渲染成就 ----------
         function renderAchievements() {
             const ach = getAchievements();
             const order = getOrder();
@@ -248,6 +315,28 @@
             const ls = document.getElementById('legendaryStat');
             if (leg) { ls.style.display = 'inline-flex'; document.getElementById('legendaryCount').textContent = leg + '/' + totalLeg; }
             else ls.style.display = 'none';
+
+            renderSpecial();
+        }
+
+        function renderSpecial() {
+            const special = getSpecialAchievements();
+            const notes = getSpecialNotes();
+            const section = document.getElementById('specialSection');
+            const list = document.getElementById('specialList');
+            list.innerHTML = '';
+            if (special.length) {
+                section.style.display = 'block';
+                special.forEach(title => {
+                    const row = document.createElement('div');
+                    row.className = 'achievement-row unlocked';
+                    const noteText = notes[title] || '';
+                    row.innerHTML = `<div class="achievement-icon-cell">⭐</div><div class="achievement-name">${title}${noteText ? `<span class="achievement-note">${noteText}</span>` : ''}</div><span class="achievement-badge">特殊</span>`;
+                    list.appendChild(row);
+                });
+            } else {
+                section.style.display = 'none';
+            }
         }
 
         function createRow(item, unlocked) {
@@ -283,6 +372,58 @@
             document.getElementById('lastSaveTime').innerHTML = last ? `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` : '上次云端同步：<strong>从未同步</strong>';
         }
 
+        // ==================== 兑换码逻辑 ====================
+        function redeemCode() {
+            const code = prompt('请输入兑换码：');
+            if (!code || !code.trim()) return;
+            const trimmedCode = code.trim().toUpperCase();
+            
+            // 检查是否有效
+            if (!VALID_CODES[trimmedCode]) {
+                alert('无效的兑换码！');
+                return;
+            }
+            
+            // 检查是否已使用
+            const used = getUsedCodes();
+            if (used.includes(trimmedCode)) {
+                alert('该兑换码已被使用！');
+                return;
+            }
+            
+            const reward = VALID_CODES[trimmedCode];
+            
+            // 处理奖励
+            if (reward.type === 'lingYun') {
+                const current = parseInt(localStorage.getItem('lingYun') || '100');
+                localStorage.setItem('lingYun', current + reward.amount);
+                addUsedCode(trimmedCode);
+                updateUserInfo();
+                alert(`兑换成功！灵韵 +${reward.amount}（当前：${current + reward.amount}）`);
+            } else if (reward.type === 'zhuoNian') {
+                const current = parseInt(localStorage.getItem('zhuoNian') || '0');
+                localStorage.setItem('zhuoNian', current + reward.amount);
+                addUsedCode(trimmedCode);
+                updateUserInfo();
+                alert(`兑换成功！浊念 +${reward.amount}（当前：${current + reward.amount}）`);
+            } else if (reward.type === 'achievement') {
+                const special = getSpecialAchievements();
+                if (special.includes(reward.title)) {
+                    alert('该成就已存在！');
+                    return;
+                }
+                const updated = [...special, reward.title];
+                saveSpecialAchievements(updated);
+                // 保存注释
+                const notes = getSpecialNotes();
+                notes[reward.title] = reward.note || '';
+                saveSpecialNotes(notes);
+                addUsedCode(trimmedCode);
+                renderAchievements();
+                alert(`兑换成功！获得特殊成就：${reward.title}`);
+            }
+        }
+
         // ==================== 云端操作 ====================
         async function findDocByTitle() {
             const cfg = getConfig();
@@ -292,12 +433,55 @@
             return (result.code == 1 && result.list) ? result.list.find(i => i.title === playerName)?.id : null;
         }
 
+        async function getRemoteAchievementCount() {
+            if (!cloudDocId) return -1;
+            const cfg = getConfig();
+            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            try {
+                const res = await fetch(url);
+                const result = await res.json();
+                if (result.code == 1) {
+                    const data = JSON.parse(result.content);
+                    const remoteAchievements = data.achievements || [];
+                    const remoteSpecial = data.specialAchievements || [];
+                    return remoteAchievements.length + remoteSpecial.length;
+                }
+                return -2;
+            } catch(e) { return -3; }
+        }
+
         async function pushCloudSave() {
             if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
+            
             const achievements = getAchievementTitles();
+            const special = getSpecialAchievements();
+            const notes = getSpecialNotes();
+            const usedCodes = getUsedCodes();
+            const totalLocal = achievements.length + special.length;
+            
+            if (!cloudDocId) {
+                const existing = await findDocByTitle();
+                if (existing) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); }
+            }
+            
+            if (cloudDocId) {
+                const remoteCount = await getRemoteAchievementCount();
+                if (remoteCount > totalLocal) {
+                    const msg = `⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入“确认覆盖”后继续：`;
+                    const input = prompt(msg);
+                    if (input !== '确认覆盖') {
+                        alert('已取消上传，云端数据未受影响。');
+                        return;
+                    }
+                }
+            }
+            
             const saveData = {
                 playerName: playerName,
                 achievements: achievements,
+                specialAchievements: special,
+                specialNotes: notes,
+                usedCodes: usedCodes,
                 storyNode: localStorage.getItem('storyNode') || 'start',
                 lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
                 zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
@@ -306,10 +490,6 @@
             const contentStr = JSON.stringify(saveData);
             const cfg = getConfig();
             try {
-                if (!cloudDocId) {
-                    const existing = await findDocByTitle();
-                    if (existing) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); }
-                }
                 let url, options;
                 if (cloudDocId) {
                     url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
@@ -328,24 +508,21 @@
                     }
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     updateUserInfo();
-                    alert('修为已封存至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''));
-                } else alert('封存失败：' + (result.msg || '未知'));
+                    alert('修为已上传至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''));
+                } else alert('上传失败：' + (result.msg || '未知'));
             } catch(e) { alert('网络错误：' + e.message); }
         }
 
         async function pullCloudSave() {
             if (!playerName) { alert('道号为空，请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
 
-            // 如果没有文档ID，尝试根据道号自动查找
             if (!cloudDocId) {
-                alert('正在根据道号查找云端仙籍...');
                 const foundId = await findDocByTitle();
                 if (foundId) {
                     cloudDocId = foundId;
                     localStorage.setItem('cloudDocId', cloudDocId);
-                    alert('已找到云端仙籍，开始接续...');
                 } else {
-                    const manualId = prompt('未找到云端仙籍，请手动输入文档ID（可从封存成功提示中获取）：');
+                    const manualId = prompt('未找到云端仙籍，请手动输入文档ID：');
                     if (manualId && manualId.trim()) {
                         cloudDocId = manualId.trim();
                         localStorage.setItem('cloudDocId', cloudDocId);
@@ -360,7 +537,7 @@
                 const result = await res.json();
                 if (result.code == 1) {
                     let data;
-                    try { data = JSON.parse(result.content); } catch(e) { alert('云端数据损坏，无法解析！'); return; }
+                    try { data = JSON.parse(result.content); } catch(e) { alert('云端数据损坏！'); return; }
                     const titles = data.achievements || [];
                     const achObj = {};
                     const notFound = [];
@@ -370,6 +547,12 @@
                         else notFound.push(title);
                     });
                     saveAchievements(achObj);
+                    if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
+                    if (data.specialNotes) saveSpecialNotes(data.specialNotes);
+                    if (data.usedCodes) {
+                        cachedUsedCodes = data.usedCodes;
+                        localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes));
+                    }
                     if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                     if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
@@ -380,13 +563,25 @@
                     let msg = '仙缘已接续！';
                     if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
                     alert(msg);
-                } else alert('接续失败：' + (result.msg || '未知错误'));
+                } else alert('下载失败：' + (result.msg || '未知错误'));
             } catch(e) { alert('网络错误：' + e.message); }
         }
 
         // 导出/导入
         async function exportAllData() {
-            const payload = { version:2, exportTime:new Date().toISOString(), achievements:getAchievements(), order:getOrder(), playerName, storyNode:localStorage.getItem('storyNode'), lingYun:localStorage.getItem('lingYun'), zhuoNian:localStorage.getItem('zhuoNian') };
+            const payload = {
+                version:2,
+                exportTime:new Date().toISOString(),
+                achievements:getAchievements(),
+                order:getOrder(),
+                specialAchievements: getSpecialAchievements(),
+                specialNotes: getSpecialNotes(),
+                usedCodes: getUsedCodes(),
+                playerName,
+                storyNode:localStorage.getItem('storyNode'),
+                lingYun:localStorage.getItem('lingYun'),
+                zhuoNian:localStorage.getItem('zhuoNian')
+            };
             const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
             try { await navigator.clipboard.writeText(str); alert('仙籍已复制'); } catch(e) { prompt('请手动复制：', str); }
         }
@@ -397,6 +592,12 @@
                 const data = JSON.parse(json);
                 if (data.achievements) { const merged = { ...getAchievements(), ...data.achievements }; saveAchievements(merged); }
                 if (data.order) saveOrder(data.order);
+                if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
+                if (data.specialNotes) saveSpecialNotes(data.specialNotes);
+                if (data.usedCodes) {
+                    cachedUsedCodes = data.usedCodes;
+                    localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes));
+                }
                 if (data.playerName) setPlayerName(data.playerName);
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);

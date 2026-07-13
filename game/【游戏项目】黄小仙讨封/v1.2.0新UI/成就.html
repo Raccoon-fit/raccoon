@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>黄小仙 · 成就图鉴（卷轴）</title>
+    <title>道主仙府 · 功德卷</title>
     <meta name="theme-color" content="#5D4037">
     <style>
         :root {
@@ -16,98 +16,59 @@
             --card-border: #A0522D;
             --unlocked-glow: rgba(184, 134, 11, 0.35);
             --legendary-glow: rgba(139, 69, 19, 0.5);
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background-color: var(--scroll-bg);
             color: var(--scroll-text);
-            font-family: "SimSun", "Songti SC", "Noto Serif SC", "Ma Shan Zheng", serif;
+            font-family: var(--font-stack);
             line-height: 1.8;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
             background-image:
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(139, 69, 19, 0.03) 2px,
-                    rgba(139, 69, 19, 0.03) 4px
-                ),
-                radial-gradient(ellipse at 50% 0%, rgba(210, 180, 140, 0.2) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 100%, rgba(210, 180, 140, 0.15) 0%, transparent 60%);
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,69,19,0.03) 2px, rgba(139,69,19,0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210,180,140,0.2) 0%, transparent 60%);
         }
-
         .page-container {
-            max-width: 680px;
+            max-width: 720px;
             width: 100%;
             padding: 24px 20px 40px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            position: relative;
+            background: rgba(255, 248, 220, 0.5);
             border-left: 4px solid var(--scroll-dark);
             border-right: 4px solid var(--scroll-dark);
-            background: rgba(255, 248, 220, 0.5);
             box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            position: relative;
         }
-        .page-container::before,
-        .page-container::after {
-            content: "";
-            position: absolute;
-            top: 0; bottom: 0;
-            width: 8px;
-            background: linear-gradient(to bottom, var(--scroll-dark), #A0522D, var(--scroll-dark));
-            z-index: -1;
-            box-shadow: inset 1px 0 4px rgba(0,0,0,0.3);
-        }
-        .page-container::before {
-            left: -4px;
-            border-radius: 2px 0 0 2px;
-        }
-        .page-container::after {
-            right: -4px;
-            border-radius: 0 2px 2px 0;
-        }
-
         .header {
             text-align: center;
-            padding: 28px 20px 10px;
-            position: relative;
             border-bottom: 2px solid var(--scroll-dark);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
         }
         .header h1 {
             color: var(--scroll-gold);
-            font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
-            font-size: 38px;
-            font-weight: bold;
-            letter-spacing: 8px;
+            font-size: 36px;
+            letter-spacing: 6px;
             text-shadow: 2px 2px 0 var(--scroll-dark);
-            margin-bottom: 6px;
         }
-        .header .subtitle {
+        .subtitle {
             color: #5D4037;
             font-size: 14px;
             letter-spacing: 4px;
             font-style: italic;
-            font-family: 'KaiTi', serif;
         }
-        .header .stats {
-            margin-top: 16px;
+        .stats-row {
             display: flex;
-            align-items: center;
             justify-content: center;
             gap: 12px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
         .stat-item {
-            background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
+            background: linear-gradient(180deg, #D2B48C, #A0522D);
             border: 2px solid var(--scroll-dark);
             border-radius: 20px;
             padding: 6px 20px;
@@ -121,41 +82,31 @@
             font-weight: bold;
             font-size: 24px;
             color: #FFE4B5;
-            letter-spacing: 0;
-            margin: 0 4px;
         }
-        .header .top-actions {
-            margin-top: 18px;
-            display: flex;
-            justify-content: center;
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
-            flex-wrap: wrap;
+            margin: 20px 0;
         }
-        .action-link {
-            display: inline-block;
-            color: var(--scroll-light);
-            font-size: 12px;
-            letter-spacing: 2px;
-            cursor: pointer;
-            background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
-            border: 2px solid var(--scroll-dark);
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-            transition: all 0.2s;
-            text-decoration: none;
+        .seal-btn {
+            padding: 12px 8px;
+            font-size: 1em;
             font-weight: bold;
-            white-space: nowrap;
+            color: #f5e8c9;
+            background: #8B4513;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-stack);
+            box-shadow: 0 4px 0 #5D2906;
+            text-align: center;
+            letter-spacing: 1px;
         }
-        .action-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
-        }
-        .action-link:active {
-            transform: translateY(1px);
-            box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
-        }
+        .seal-btn:hover { transform: translateY(-2px); }
+        .red-seal { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
+        .gray-seal { background: #696969; box-shadow: 0 4px 0 #3D3D3D; }
 
         .section-title {
             color: var(--scroll-dark);
@@ -165,268 +116,95 @@
             padding: 16px 0 10px;
             border-top: 2px solid var(--scroll-dark);
             margin-top: 10px;
-            font-family: 'KaiTi', serif;
             font-weight: bold;
         }
-        .section-title.legendary-title {
-            color: var(--scroll-gold);
-            border-top-color: var(--scroll-gold);
-            text-shadow: 0 0 6px rgba(184, 134, 11, 0.3);
-        }
-
         .achievement-list {
             display: flex;
             flex-direction: column;
             gap: 0;
-            width: 100%;
         }
-
         .achievement-row {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            cursor: default;
-            position: relative;
+            padding: 10px 16px;
             border-bottom: 1px dashed var(--scroll-dark);
             min-height: 60px;
             gap: 16px;
             background: var(--card-bg);
             margin-bottom: 4px;
+            border-radius: 6px;
         }
-        .achievement-row:hover {
-            background: rgba(210, 180, 140, 0.5);
-        }
-        .achievement-row:last-child {
-            border-bottom: none;
-        }
-
+        .achievement-row:last-child { border-bottom: none; }
         .achievement-icon-cell {
             flex-shrink: 0;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border: 2px solid var(--scroll-dark);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             background: linear-gradient(135deg, #F5DEB3, #DEB887);
-            color: #3E2723;
-            transition: all 0.4s ease;
-            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4);
         }
         .achievement-row.unlocked .achievement-icon-cell {
-            background: linear-gradient(135deg, #FFF8DC, #F5DEB3);
             border-color: var(--scroll-gold);
-            box-shadow: 0 0 10px var(--unlocked-glow), inset 1px 1px 3px rgba(255,255,200,0.6);
-        }
-        .achievement-row.unlocked.legendary .achievement-icon-cell {
-            border-color: var(--scroll-dark);
-            background: linear-gradient(135deg, #FFE4B5, #D2B48C);
-            box-shadow: 0 0 16px var(--legendary-glow), 0 0 30px rgba(139,69,19,0.25);
-            animation: legendaryPulse 4s ease-in-out infinite;
-        }
-        @keyframes legendaryPulse {
-            0%, 100% { box-shadow: 0 0 12px var(--legendary-glow), 0 0 24px rgba(139,69,19,0.15); }
-            50% { box-shadow: 0 0 22px rgba(184,134,11,0.5), 0 0 36px rgba(139,69,19,0.35); }
+            box-shadow: 0 0 10px var(--unlocked-glow);
         }
         .achievement-row.locked .achievement-icon-cell {
-            opacity: 0.35;
-            border-color: var(--scroll-dark);
-            background: #EADDCA;
+            opacity: 0.4;
             filter: grayscale(0.4);
-            box-shadow: none;
         }
-
-        .achievement-info {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            min-width: 0;
+        .achievement-row.legendary .achievement-icon-cell {
+            border-color: var(--scroll-dark);
+            background: linear-gradient(135deg, #FFE4B5, #D2B48C);
+            box-shadow: 0 0 16px var(--legendary-glow);
         }
         .achievement-name {
-            font-size: 16px;
-            letter-spacing: 1px;
-            transition: color 0.3s;
+            flex: 1;
+            font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-weight: bold;
-            color: var(--scroll-text);
-        }
-        .achievement-row.unlocked .achievement-name {
-            color: #2E1A0F;
-        }
-        .achievement-row.unlocked.legendary .achievement-name {
-            color: var(--scroll-gold);
-            text-shadow: 0 0 5px rgba(184,134,11,0.2);
         }
         .achievement-row.locked .achievement-name {
             color: #8B7355;
             font-style: italic;
             font-weight: normal;
         }
-
         .achievement-badge {
-            flex-shrink: 0;
             font-size: 10px;
             letter-spacing: 1px;
             padding: 4px 12px;
             border-radius: 14px;
             border: 1px solid;
-            background: rgba(210, 180, 140, 0.3);
         }
-        .achievement-row.unlocked .achievement-badge {
-            border-color: var(--scroll-gold);
-            color: var(--scroll-dark);
-            background: rgba(184, 134, 11, 0.15);
-        }
-        .achievement-row.unlocked.legendary .achievement-badge {
-            border-color: var(--scroll-dark);
-            color: #FFF8DC;
-            background: linear-gradient(135deg, #A0522D, #8B4513);
-        }
-        .achievement-row.locked .achievement-badge {
-            border-color: var(--scroll-dark);
-            color: #8B7355;
-            opacity: 0.6;
-        }
-
+        .unlocked .achievement-badge { border-color: var(--scroll-gold); color: var(--scroll-dark); background: rgba(184,134,11,0.15); }
+        .legendary .achievement-badge { background: #8B4513; color: #FFE4B5; }
+        .locked .achievement-badge { border-color: var(--scroll-dark); color: #8B7355; opacity: 0.6; }
         .empty-state {
             text-align: center;
-            padding: 48px 20px;
+            padding: 30px;
             color: var(--scroll-dark);
             font-style: italic;
-            letter-spacing: 2px;
-            font-size: 15px;
-            opacity: 0.7;
         }
-
-        .footer-note {
+        .save-time {
             text-align: center;
-            padding: 24px 16px;
-            color: #5D4037;
-            font-size: 12px;
-            letter-spacing: 1px;
-            margin-top: auto;
-            border-top: 2px dashed var(--scroll-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-        .storage-status {
-            font-size: 10px;
-            color: var(--scroll-dark);
-            opacity: 0.7;
-        }
-
-        .toast {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #3E2723;
-            border: 2px solid var(--scroll-gold);
-            color: #FFE4B5;
-            padding: 12px 28px;
-            border-radius: 24px;
-            font-size: 13px;
-            letter-spacing: 1px;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
-            white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .toast.show { opacity: 1; pointer-events: auto; }
-        .toast.error {
-            background: #4A2C17;
-            border-color: #A93226;
-            color: #FFD2D2;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-box {
-            width: 100%;
-            max-width: 500px;
-            background: var(--scroll-bg);
-            border: 3px solid var(--scroll-dark);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .modal-textarea {
-            width: 100%;
-            height: 100px;
-            background: #FFF8DC;
-            border: 2px solid var(--scroll-dark);
-            border-radius: 6px;
-            padding: 12px;
-            font-family: monospace;
-            color: #3E2723;
-            resize: vertical;
-            font-size: 12px;
-        }
-        .modal-btn {
-            padding: 10px 24px;
-            background: linear-gradient(180deg, #D2B48C, #A0522D);
-            border: 2px solid var(--scroll-dark);
-            color: #FFF8DC;
-            border-radius: 6px;
-            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
-            cursor: pointer;
-            font-size: 14px;
-            letter-spacing: 2px;
-            transition: all 0.2s;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-        }
-        .modal-btn:hover { transform: translateY(-2px); }
-
-        .refresh-indicator {
-            text-align: center;
-            font-size: 11px;
-            color: var(--scroll-dark);
-            opacity: 0.6;
-            padding: 4px;
-        }
-
-        @media (max-width: 480px) {
-            .header h1 { font-size: 28px; letter-spacing: 4px; }
-            .achievement-icon-cell { width: 40px; height: 40px; font-size: 18px; }
-            .achievement-name { font-size: 14px; }
-            .achievement-row { padding: 10px 12px; gap: 12px; }
-            .action-link { padding: 6px 14px; font-size: 11px; letter-spacing: 1px; }
-            .header .top-actions { gap: 8px; }
-        }
-        @media (min-width: 768px) {
-            .achievement-icon-cell { width: 56px; height: 56px; font-size: 26px; }
-            .achievement-name { font-size: 18px; }
+            color: #8b5a2b;
+            font-size: 0.85em;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(139,90,43,0.1);
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="page-container">
         <div class="header">
-            <h1>黄小仙</h1>
+            <h1>道主仙府</h1>
             <p class="subtitle">功德卷 · 成就图鉴</p>
-            <div class="stats">
+            <div class="stats-row">
                 <div class="stat-item">
                     已解锁 <span class="stat-count" id="unlockedCount">0</span> / <span id="totalCount">40</span>
                 </div>
@@ -434,72 +212,64 @@
                     传说 <span class="stat-count" id="legendaryCount">0</span>
                 </div>
             </div>
-            <div class="top-actions">
-                <span class="action-link" id="btnExportTop">📤 导出仙籍</span>
-                <span class="action-link" id="btnImportTop">📥 导入仙籍</span>
-                <span class="action-link" id="btnImportLegacy">📜 旧版存档导入</span>
-            </div>
         </div>
 
+        <!-- 道主信息卡片 -->
+        <div style="background: rgba(255,255,255,0.7); padding: 16px; border-left: 4px solid #8B4513; border-radius: 4px; margin-bottom: 20px;">
+            <div style="display:flex; justify-content: space-between; margin-bottom:8px;">
+                <span>道号：</span><strong id="display-daoHao">-</strong>
+            </div>
+            <div style="display:flex; justify-content: space-between; margin-bottom:8px;">
+                <span>灵韵：</span><strong id="display-lingYun">-</strong>
+            </div>
+            <div style="display:flex; justify-content: space-between; margin-bottom:8px;">
+                <span>浊念：</span><strong id="display-zhuoNian">-</strong>
+            </div>
+            <div style="display:flex; justify-content: space-between; margin-bottom:8px;">
+                <span>当前节点：</span><strong id="display-storyNode">-</strong>
+            </div>
+            <div class="save-time" id="lastSaveTime">上次云端同步：<strong>从未同步</strong></div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="btn-group">
+            <button class="seal-btn red-seal" onclick="pushCloudSave()">封存修为</button>
+            <button class="seal-btn red-seal" onclick="pullCloudSave()">接续仙缘</button>
+            <button class="seal-btn gray-seal" onclick="exportAllData()">导出仙籍</button>
+            <button class="seal-btn gray-seal" onclick="importAllDataPrompt()">导入仙籍</button>
+            <button class="seal-btn gray-seal" onclick="logout()">重入轮回</button>
+        </div>
+
+        <!-- 成就区域 -->
         <div id="unlockedSection">
             <div class="section-title legendary-title" id="unlockedTitle" style="display:none;">✦ 已历劫 · 道心圆满 ✦</div>
             <div class="achievement-list" id="unlockedList"></div>
             <div class="empty-state" id="unlockedEmpty">尚无成就，去红尘走一遭吧</div>
         </div>
-
         <div id="lockedSection">
             <div class="section-title" id="lockedTitle">尘缘未了</div>
             <div class="achievement-list" id="lockedList"></div>
         </div>
-
-        <div class="refresh-indicator" id="refreshNote"></div>
-
-        <div class="footer-note">
-            <span class="storage-status" id="storageStatus">卷轴仙籍 · 万世不易</span>
-            <span>黄小仙 · 讨封之卷</span>
-        </div>
+        <div style="text-align:center; font-size:11px; color:#5D4037; margin-top:10px;">卷轴仙籍 · 万世不易</div>
     </div>
 
-    <div class="toast" id="toast"></div>
-
     <script>
-        // ========== 跨域存储桥（与父页面原生存储通信，回退localStorage） ==========
-        const StorageBridge = (function() {
-            const hasNativeBridge = (() => {
-                try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; }
-            })();
-            if (!hasNativeBridge) {
-                return {
-                    getItem: async (key, def = null) => localStorage.getItem(key) ?? def,
-                    setItem: async (key, val) => { localStorage.setItem(key, val); },
-                    removeItem: async (key) => { localStorage.removeItem(key); },
-                    clear: async () => { localStorage.clear(); }
-                };
-            }
-            let id = 0, pending = {};
-            window.addEventListener('message', (e) => {
-                const d = e.data;
-                if (d && d.id && pending[d.id]) {
-                    d.error ? pending[d.id].reject(new Error(d.error)) : pending[d.id].resolve(d.result);
-                    delete pending[d.id];
+        // ========== 配置解密（Base64混淆） ==========
+        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        let CONFIG = null;
+        function getConfig() {
+            if (!CONFIG) {
+                try {
+                    CONFIG = JSON.parse(atob(ENCODED_CONFIG));
+                } catch(e) {
+                    console.error('配置解密失败，请检查完整性');
+                    return {};
                 }
-            });
-            function send(action, key, value, def) {
-                return new Promise((resolve, reject) => {
-                    const i = ++id;
-                    pending[i] = { resolve, reject };
-                    window.parent.postMessage({ id:i, action, key, value, defaultValue:def }, '*');
-                });
             }
-            return {
-                getItem: (k, d) => send('get', k, null, d),
-                setItem: (k, v) => send('set', k, v),
-                removeItem: (k) => send('remove', k),
-                clear: () => send('clear')
-            };
-        })();
+            return CONFIG;
+        }
 
-        // ========== 成就定义（40项） ==========
+        // ========== 成就定义 ==========
         const achievementIcons = [
             { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
             { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
@@ -540,16 +310,17 @@
             { id: 'time_loop', title: '时光倒流', icon: '循环', legendary: false },
             { id: 'destiny_symphony', title: '命运交响', icon: '命', legendary: false },
             { id: 'fate_encounter', title: '因缘际会', icon: '会', legendary: false },
-            { id: 'suspicious', title: '疑心失缘', icon: '疑', legendary: false },
+            { id: 'suspicious', title: '疑心失缘', icon: '疑', legendary: false }
         ];
 
         const STORAGE_KEY = 'huangdaxian_achievements';
         const ORDER_KEY = 'huangdaxian_achievement_order';
         let cachedAchievements = null, cachedOrder = null;
 
-        async function loadAchievements() {
+        // ========== 成就存储（直接使用localStorage，兼容iframe父窗口） ==========
+        function getAchievements() {
             if (cachedAchievements) return cachedAchievements;
-            const raw = await StorageBridge.getItem(STORAGE_KEY);
+            const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 try {
                     const data = JSON.parse(raw);
@@ -559,250 +330,312 @@
                     }
                 } catch(e) {}
             }
+            // 尝试从父窗口读取
+            try {
+                if (window.parent && window.parent !== window) {
+                    const pRaw = window.parent.localStorage.getItem(STORAGE_KEY);
+                    if (pRaw) {
+                        const data = JSON.parse(pRaw);
+                        if (data && typeof data === 'object') {
+                            cachedAchievements = data;
+                            return data;
+                        }
+                    }
+                }
+            } catch(e) {}
             return {};
         }
 
-        async function saveAchievements(ach) {
+        function saveAchievements(ach) {
             cachedAchievements = ach;
-            await StorageBridge.setItem(STORAGE_KEY, JSON.stringify(ach));
+            const json = JSON.stringify(ach);
+            localStorage.setItem(STORAGE_KEY, json);
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.localStorage.setItem(STORAGE_KEY, json);
+                }
+            } catch(e) {}
         }
 
-        async function loadOrder() {
+        function getOrder() {
             if (cachedOrder) return cachedOrder;
-            const raw = await StorageBridge.getItem(ORDER_KEY);
+            const raw = localStorage.getItem(ORDER_KEY);
             if (raw) {
                 try {
                     const arr = JSON.parse(raw);
-                    if (Array.isArray(arr)) { cachedOrder = arr; return arr; }
+                    if (Array.isArray(arr)) {
+                        cachedOrder = arr;
+                        return arr;
+                    }
                 } catch(e) {}
             }
-            return null;
+            return [];
         }
 
-        async function saveOrder(order) {
+        function saveOrder(order) {
             cachedOrder = order;
-            await StorageBridge.setItem(ORDER_KEY, JSON.stringify(order));
+            localStorage.setItem(ORDER_KEY, JSON.stringify(order));
         }
 
-        async function getSortedAchievements() {
-            const achievements = await loadAchievements();
-            let order = await loadOrder();
-            const unlockedIds = Object.keys(achievements).filter(id => achievements[id] === true);
-            if (!order) {
-                order = unlockedIds.slice();
-                await saveOrder(order);
-            } else {
+        function getAchievementTitles() {
+            const ach = getAchievements();
+            return Object.keys(ach).filter(id => ach[id]).map(id => {
+                const found = achievementIcons.find(a => a.id === id);
+                return found ? found.title : id;
+            });
+        }
+
+        // ========== 渲染成就列表 ==========
+        function renderAchievements() {
+            const ach = getAchievements();
+            const order = getOrder();
+            const unlockedIds = Object.keys(ach).filter(id => ach[id]);
+            let sortedUnlocked = [];
+            if (order.length) {
+                sortedUnlocked = order.filter(id => unlockedIds.includes(id));
                 const newIds = unlockedIds.filter(id => !order.includes(id));
-                if (newIds.length) order = [...newIds, ...order];
-                order = order.filter(id => unlockedIds.includes(id));
-                await saveOrder(order);
+                sortedUnlocked = [...newIds, ...sortedUnlocked];
+            } else {
+                sortedUnlocked = unlockedIds;
             }
+            const lockedAll = achievementIcons.filter(a => !unlockedIds.includes(a.id));
 
-            const allOrdered = [...new Set([...order, ...unlockedIds])];
-            const unlocked = [], locked = [];
-            achievementIcons.forEach(ach => {
-                if (allOrdered.includes(ach.id)) unlocked.push(ach);
-                else locked.push(ach);
-            });
-            unlocked.sort((a,b) => allOrdered.indexOf(a.id) - allOrdered.indexOf(b.id));
-            return { unlockedAchievements: unlocked, lockedAchievements: locked };
-        }
-
-        async function exportAllData() {
-            const ach = await loadAchievements();
-            const order = await loadOrder();
-            const payload = {
-                version: 2,
-                exportTime: new Date().toISOString(),
-                achievements: ach,
-                order: order || [],
-                totalUnlocked: Object.keys(ach).filter(k => ach[k]).length
-            };
-            return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-        }
-
-        async function importAllData(str) {
-            let json;
-            try { json = decodeURIComponent(escape(atob(str))); } catch { json = str; }
-            try {
-                const payload = JSON.parse(json);
-                if (!payload || !payload.achievements) return { success: false, message: '格式错误' };
-                const current = await loadAchievements();
-                const merged = { ...current };
-                Object.keys(payload.achievements).forEach(id => { if(payload.achievements[id]) merged[id] = true; });
-                await saveAchievements(merged);
-                if (payload.order) await saveOrder(payload.order.filter(id => merged[id]));
-                return { success: true, message: `合并完成，${Object.keys(merged).filter(k=>merged[k]).length} 个成就` };
-            } catch(e) {
-                return { success: false, message: '解析失败' };
-            }
-        }
-
-        // ★ 新增：导入旧版双重Base64密文存档
-        async function importLegacyData(encStr) {
-            let json;
-            try {
-                // 尝试双重Base64解码
-                json = decodeURIComponent(escape(atob(atob(encStr))));
-            } catch(e1) {
-                try {
-                    // 尝试单层Base64解码
-                    json = decodeURIComponent(escape(atob(encStr)));
-                } catch(e2) {
-                    try {
-                        // 直接当JSON解析
-                        JSON.parse(encStr);
-                        json = encStr;
-                    } catch(e3) {
-                        return { success: false, message: '无法解密旧版存档，请检查粘贴的内容是否完整' };
-                    }
-                }
-            }
-            try {
-                const data = JSON.parse(json);
-                if (!data.achievements || typeof data.achievements !== 'object') {
-                    return { success: false, message: '旧版存档格式无效，缺少成就数据' };
-                }
-                const current = await loadAchievements();
-                const merged = { ...current };
-                Object.keys(data.achievements).forEach(id => {
-                    if (data.achievements[id] === true) merged[id] = true;
-                });
-                await saveAchievements(merged);
-                if (Array.isArray(data.order)) {
-                    const filteredOrder = data.order.filter(id => merged[id] === true);
-                    await saveOrder(filteredOrder);
-                }
-                return { success: true, message: `旧版存档导入成功！已合并 ${Object.keys(merged).filter(k=>merged[k]).length} 个成就` };
-            } catch(e) {
-                return { success: false, message: '解析JSON失败：' + e.message };
-            }
-        }
-
-        let toastTimer;
-        function showToast(msg, isError=false) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            clearTimeout(toastTimer);
-            t.textContent = msg;
-            t.className = 'toast ' + (isError ? 'error' : '');
-            t.classList.add('show');
-            toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-        }
-
-        function copyText(text) {
-            return navigator.clipboard ? navigator.clipboard.writeText(text) : new Promise((res,rej) => {
-                const ta = document.createElement('textarea');
-                ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
-                document.body.appendChild(ta); ta.select();
-                try { document.execCommand('copy'); res(); } catch(e) { rej(e); }
-                document.body.removeChild(ta);
-            });
-        }
-
-        function createRow(ach, unlocked) {
-            const row = document.createElement('div');
-            row.className = 'achievement-row ' + (unlocked ? (ach.legendary ? 'unlocked legendary' : 'unlocked') : 'locked');
-            row.innerHTML = `
-                <div class="achievement-icon-cell">${unlocked ? ach.icon : '?'}</div>
-                <div class="achievement-info"><span class="achievement-name">${ach.title}</span></div>
-                <span class="achievement-badge">${unlocked ? (ach.legendary ? '传说' : '已解锁') : '未解锁'}</span>
-            `;
-            return row;
-        }
-
-        async function renderAll() {
-            const { unlockedAchievements, lockedAchievements } = await getSortedAchievements();
             const unlockedList = document.getElementById('unlockedList');
-            const lockedList = document.getElementById('lockedList');
-            unlockedList.innerHTML = ''; lockedList.innerHTML = '';
-
-            const legendUnlocked = unlockedAchievements.filter(a => a.legendary);
-            const totalLegend = achievementIcons.filter(a => a.legendary).length;
-
-            if (unlockedAchievements.length) {
+            unlockedList.innerHTML = '';
+            if (sortedUnlocked.length) {
                 document.getElementById('unlockedTitle').style.display = 'block';
                 document.getElementById('unlockedEmpty').style.display = 'none';
-                unlockedAchievements.forEach(a => unlockedList.appendChild(createRow(a, true)));
+                sortedUnlocked.forEach(id => {
+                    const achItem = achievementIcons.find(a => a.id === id);
+                    if (achItem) unlockedList.appendChild(createRow(achItem, true));
+                });
             } else {
                 document.getElementById('unlockedTitle').style.display = 'none';
                 document.getElementById('unlockedEmpty').style.display = 'block';
             }
 
-            if (lockedAchievements.length) {
+            const lockedList = document.getElementById('lockedList');
+            lockedList.innerHTML = '';
+            if (lockedAll.length) {
                 document.getElementById('lockedTitle').style.display = 'block';
-                lockedAchievements.forEach(a => lockedList.appendChild(createRow(a, false)));
+                lockedAll.forEach(a => lockedList.appendChild(createRow(a, false)));
             } else {
-                document.getElementById('lockedTitle').style.display = unlockedAchievements.length ? 'block' : 'none';
-                if (unlockedAchievements.length) {
-                    const div = document.createElement('div');
-                    div.className = 'empty-state';
-                    div.textContent = '🎉 功德圆满，万法归一';
-                    lockedList.appendChild(div);
-                }
+                document.getElementById('lockedTitle').style.display = 'none';
             }
 
-            document.getElementById('unlockedCount').textContent = unlockedAchievements.length;
+            document.getElementById('unlockedCount').textContent = sortedUnlocked.length;
             document.getElementById('totalCount').textContent = achievementIcons.length;
+            const legendUnlocked = sortedUnlocked.filter(id => achievementIcons.find(a => a.id === id)?.legendary).length;
+            const totalLegend = achievementIcons.filter(a => a.legendary).length;
             const ls = document.getElementById('legendaryStat');
-            if (legendUnlocked.length) {
+            if (legendUnlocked) {
                 ls.style.display = 'inline-flex';
-                document.getElementById('legendaryCount').textContent = legendUnlocked.length + '/' + totalLegend;
+                document.getElementById('legendaryCount').textContent = legendUnlocked + '/' + totalLegend;
             } else ls.style.display = 'none';
-
-            document.getElementById('refreshNote').textContent = '卷轴仙籍 · 即时更新';
         }
 
-        async function init() {
-            await renderAll();
-
-            window.addEventListener('message', (e) => {
-                if (e.data && e.data.type === 'achievements-updated') {
-                    cachedAchievements = null; cachedOrder = null;
-                    renderAll();
-                }
-            });
-
-            document.getElementById('btnExportTop').addEventListener('click', async () => {
-                const data = await exportAllData();
-                try { await copyText(data); showToast('✅ 仙籍已复制至剪贴板'); }
-                catch { prompt('请手动复制：', data); showToast('请手动复制', true); }
-            });
-
-            document.getElementById('btnImportTop').addEventListener('click', async () => {
-                const input = prompt('请粘贴新版仙籍备份：');
-                if (!input) return;
-                const res = await importAllData(input.trim());
-                showToast(res.message, !res.success);
-                if (res.success) {
-                    cachedAchievements = null; cachedOrder = null;
-                    await renderAll();
-                }
-            });
-
-            // ★ 旧版存档导入按钮
-            document.getElementById('btnImportLegacy').addEventListener('click', async () => {
-                const input = prompt('请粘贴旧版存档密文（以ZX或ey开头）：');
-                if (!input) return;
-                const trimmed = input.trim();
-                if (!trimmed) {
-                    showToast('输入为空', true);
-                    return;
-                }
-                const res = await importLegacyData(trimmed);
-                showToast(res.message, !res.success);
-                if (res.success) {
-                    cachedAchievements = null; cachedOrder = null;
-                    await renderAll();
-                }
-            });
+        function createRow(achItem, unlocked) {
+            const row = document.createElement('div');
+            const classNames = ['achievement-row'];
+            if (unlocked) {
+                classNames.push('unlocked');
+                if (achItem.legendary) classNames.push('legendary');
+            } else {
+                classNames.push('locked');
+            }
+            row.className = classNames.join(' ');
+            row.innerHTML = `
+                <div class="achievement-icon-cell">${unlocked ? achItem.icon : '?'}</div>
+                <div class="achievement-name">${achItem.title}</div>
+                <span class="achievement-badge">${unlocked ? (achItem.legendary ? '传说' : '已解锁') : '未解锁'}</span>
+            `;
+            return row;
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
+        // ========== 道主信息 & 云端操作 ==========
+        let playerName = '';
+        let cloudDocId = '';
+
+        function updateUserInfo() {
+            document.getElementById('display-daoHao').textContent = playerName || '未登录';
+            document.getElementById('display-lingYun').textContent = localStorage.getItem('lingYun') || '100';
+            document.getElementById('display-zhuoNian').textContent = localStorage.getItem('zhuoNian') || '0';
+            document.getElementById('display-storyNode').textContent = localStorage.getItem('storyNode') || 'start';
+            const last = localStorage.getItem('lastCloudSaveTime');
+            if (last) {
+                document.getElementById('lastSaveTime').innerHTML = `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>`;
+            }
         }
+
+        async function findDocByTitle() {
+            const cfg = getConfig();
+            const url = `${cfg.apiList}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
+            const res = await fetch(url);
+            const result = await res.json();
+            return (result.code == 1 && result.list) ? result.list.find(i => i.title === playerName)?.id : null;
+        }
+
+        async function pushCloudSave() {
+            if (!playerName) return alert('道号未知，无法封存');
+            const achievements = getAchievementTitles();
+            const saveData = {
+                achievements: achievements,
+                storyNode: localStorage.getItem('storyNode') || 'start',
+                lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
+                zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
+                updateTime: Date.now()
+            };
+            const contentStr = JSON.stringify(saveData);
+            const cfg = getConfig();
+            try {
+                if (!cloudDocId) {
+                    const existingId = await findDocByTitle();
+                    if (existingId) {
+                        cloudDocId = existingId;
+                        localStorage.setItem('cloudDocId', cloudDocId);
+                    }
+                }
+                let url, options;
+                if (cloudDocId) {
+                    url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}`
+                    };
+                } else {
+                    url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}`
+                    };
+                }
+                const res = await fetch(url, options);
+                const result = await res.json();
+                if (result.code == 1) {
+                    if (!cloudDocId) {
+                        let newId = result.id || result.data || await findDocByTitle();
+                        if (newId) {
+                            cloudDocId = newId;
+                            localStorage.setItem('cloudDocId', newId);
+                        }
+                    }
+                    localStorage.setItem('lastCloudSaveTime', Date.now());
+                    updateUserInfo();
+                    alert('修为已封存至云端！');
+                } else {
+                    alert('封存失败：' + (result.msg || '未知错误'));
+                }
+            } catch(e) {
+                alert('网络错误：' + e.message);
+            }
+        }
+
+        async function pullCloudSave() {
+            if (!cloudDocId) return alert('未找到仙籍ID');
+            const cfg = getConfig();
+            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            try {
+                const res = await fetch(url);
+                const result = await res.json();
+                if (result.code == 1) {
+                    const data = JSON.parse(result.content);
+                    const titles = data.achievements || [];
+                    const achObj = {};
+                    titles.forEach(title => {
+                        const found = achievementIcons.find(a => a.title === title);
+                        if (found) achObj[found.id] = true;
+                    });
+                    saveAchievements(achObj);
+                    localStorage.setItem('storyNode', data.storyNode || 'start');
+                    localStorage.setItem('lingYun', data.lingYun || 100);
+                    localStorage.setItem('zhuoNian', data.zhuoNian || 0);
+                    localStorage.setItem('lastCloudSaveTime', Date.now());
+                    renderAchievements();
+                    updateUserInfo();
+                    alert('仙缘已接续！');
+                } else {
+                    alert('接续失败：' + result.msg);
+                }
+            } catch(e) {
+                alert('网络错误：' + e.message);
+            }
+        }
+
+        // ========== 导出/导入 ==========
+        async function exportAllData() {
+            const ach = getAchievements();
+            const order = getOrder();
+            const payload = {
+                version: 2,
+                exportTime: new Date().toISOString(),
+                achievements: ach,
+                order: order,
+                playerName: playerName,
+                storyNode: localStorage.getItem('storyNode'),
+                lingYun: localStorage.getItem('lingYun'),
+                zhuoNian: localStorage.getItem('zhuoNian')
+            };
+            const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            try {
+                await navigator.clipboard.writeText(str);
+                alert('仙籍已复制至剪贴板');
+            } catch(e) {
+                prompt('请手动复制：', str);
+            }
+        }
+
+        async function importAllDataPrompt() {
+            const input = prompt('请粘贴仙籍备份：');
+            if (!input) return;
+            let json;
+            try { json = decodeURIComponent(escape(atob(input))); } catch { json = input; }
+            try {
+                const data = JSON.parse(json);
+                if (data.achievements) {
+                    const merged = { ...getAchievements(), ...data.achievements };
+                    saveAchievements(merged);
+                }
+                if (data.order) saveOrder(data.order);
+                if (data.playerName) { playerName = data.playerName; localStorage.setItem('playerName', playerName); }
+                if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
+                if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
+                if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
+                renderAchievements();
+                updateUserInfo();
+                alert('仙籍导入成功！');
+            } catch(e) {
+                alert('导入失败：格式错误');
+            }
+        }
+
+        function logout() {
+            if (confirm('确定重入轮回？所有本地数据将被清除。')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // ========== 初始化 ==========
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(location.search);
+            playerName = params.get('player') || localStorage.getItem('playerName') || '';
+            cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
+            if (!playerName) {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        playerName = window.parent.localStorage.getItem('playerName') || '';
+                        cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || '';
+                    }
+                } catch(e) {}
+            }
+            if (playerName) localStorage.setItem('playerName', playerName);
+            if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+
+            updateUserInfo();
+            renderAchievements();
+        });
     </script>
 </body>
 </html>

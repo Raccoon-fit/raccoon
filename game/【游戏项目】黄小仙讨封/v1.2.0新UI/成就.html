@@ -17,7 +17,11 @@
             --legendary-glow: rgba(139, 69, 19, 0.5);
             --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background-color: var(--scroll-bg);
             color: var(--scroll-text);
@@ -27,9 +31,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-image:
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,69,19,0.03) 2px, rgba(139,69,19,0.03) 4px),
-                radial-gradient(ellipse at 50% 0%, rgba(210,180,140,0.2) 0%, transparent 60%);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210, 180, 140, 0.2) 0%, transparent 60%);
         }
         .page-container {
             max-width: 720px;
@@ -38,13 +41,34 @@
             background: rgba(255, 248, 220, 0.5);
             border-left: 4px solid var(--scroll-dark);
             border-right: 4px solid var(--scroll-dark);
-            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
             position: relative;
         }
-        .header { text-align: center; border-bottom: 2px solid var(--scroll-dark); margin-bottom: 20px; padding-bottom: 10px; }
-        .header h1 { color: var(--scroll-gold); font-size: 36px; letter-spacing: 6px; text-shadow: 2px 2px 0 var(--scroll-dark); }
-        .subtitle { color: #5D4037; font-size: 14px; letter-spacing: 4px; font-style: italic; }
-        .stats-row { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--scroll-dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            color: var(--scroll-gold);
+            font-size: 36px;
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 var(--scroll-dark);
+        }
+        .subtitle {
+            color: #5D4037;
+            font-size: 14px;
+            letter-spacing: 4px;
+            font-style: italic;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
         .stat-item {
             background: linear-gradient(180deg, #D2B48C, #A0522D);
             border: 2px solid var(--scroll-dark);
@@ -53,46 +77,343 @@
             font-size: 14px;
             color: var(--scroll-light);
             letter-spacing: 1px;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
         }
-        .stat-count { font-weight: bold; font-size: 24px; color: #FFE4B5; }
-        .btn-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 20px 0; }
+        .stat-count {
+            font-weight: bold;
+            font-size: 24px;
+            color: #FFE4B5;
+        }
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
         .seal-btn {
-            padding: 12px 8px; font-size: 1em; font-weight: bold; color: #f5e8c9;
-            background: #8B4513; border: none; border-radius: 5px; cursor: pointer;
-            transition: all 0.3s; font-family: var(--font-stack);
-            box-shadow: 0 4px 0 #5D2906; text-align: center; letter-spacing: 1px;
+            padding: 12px 8px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #f5e8c9;
+            background: #8B4513;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-stack);
+            box-shadow: 0 4px 0 #5D2906;
+            text-align: center;
+            letter-spacing: 1px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
-        .seal-btn:hover { transform: translateY(-2px); }
-        .red-seal { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
-        .gray-seal { background: #696969; box-shadow: 0 4px 0 #3D3D3D; }
-        .section-title { color: var(--scroll-dark); font-size: 14px; letter-spacing: 4px; text-align: center; padding: 16px 0 10px; border-top: 2px solid var(--scroll-dark); margin-top: 10px; font-weight: bold; }
-        .achievement-list { display: flex; flex-direction: column; gap: 0; }
+        .seal-btn:hover {
+            transform: translateY(-2px);
+        }
+        .seal-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #5D2906;
+        }
+        .red-seal {
+            background: #A52A2A;
+            box-shadow: 0 4px 0 #5D1F1F;
+        }
+        .red-seal:active {
+            box-shadow: 0 2px 0 #5D1F1F;
+        }
+        .gray-seal {
+            background: #696969;
+            box-shadow: 0 4px 0 #3D3D3D;
+        }
+        .gray-seal:active {
+            box-shadow: 0 2px 0 #3D3D3D;
+        }
+        .section-title {
+            color: var(--scroll-dark);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-align: center;
+            padding: 16px 0 10px;
+            border-top: 2px solid var(--scroll-dark);
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .achievement-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
         .achievement-row {
-            display: flex; align-items: center; padding: 10px 16px;
-            border-bottom: 1px dashed var(--scroll-dark); min-height: 60px; gap: 16px;
-            background: var(--card-bg); margin-bottom: 4px; border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px dashed var(--scroll-dark);
+            min-height: 60px;
+            gap: 16px;
+            background: var(--card-bg);
+            margin-bottom: 4px;
+            border-radius: 6px;
         }
-        .achievement-row:last-child { border-bottom: none; }
+        .achievement-row:last-child {
+            border-bottom: none;
+        }
         .achievement-icon-cell {
-            flex-shrink: 0; width: 44px; height: 44px; border: 2px solid var(--scroll-dark);
-            border-radius: 6px; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; background: linear-gradient(135deg, #F5DEB3, #DEB887);
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, #F5DEB3, #DEB887);
         }
-        .achievement-row.unlocked .achievement-icon-cell { border-color: var(--scroll-gold); box-shadow: 0 0 10px var(--unlocked-glow); }
-        .achievement-row.locked .achievement-icon-cell { opacity: 0.4; filter: grayscale(0.4); }
-        .achievement-row.legendary .achievement-icon-cell { border-color: var(--scroll-dark); background: linear-gradient(135deg, #FFE4B5, #D2B48C); box-shadow: 0 0 16px var(--legendary-glow); }
-        .achievement-name { flex: 1; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .achievement-row.locked .achievement-name { color: #8B7355; font-style: italic; font-weight: normal; }
-        .achievement-badge { font-size: 10px; letter-spacing: 1px; padding: 4px 12px; border-radius: 14px; border: 1px solid; }
-        .unlocked .achievement-badge { border-color: var(--scroll-gold); color: var(--scroll-dark); background: rgba(184,134,11,0.15); }
-        .legendary .achievement-badge { background: #8B4513; color: #FFE4B5; }
-        .locked .achievement-badge { border-color: var(--scroll-dark); color: #8B7355; opacity: 0.6; }
-        .empty-state { text-align: center; padding: 30px; color: var(--scroll-dark); font-style: italic; }
-        .save-time { text-align: center; color: #8b5a2b; font-size: 0.85em; margin: 10px 0; padding: 8px; background: rgba(139,90,43,0.1); border-radius: 4px; }
-        .edit-link { font-size: 12px; color: var(--scroll-gold); cursor: pointer; margin-left: 8px; text-decoration: underline; }
-        .achievement-note { font-size: 10px; color: var(--scroll-gold); margin-left: 8px; font-style: italic; }
+        .achievement-row.unlocked .achievement-icon-cell {
+            border-color: var(--scroll-gold);
+            box-shadow: 0 0 10px var(--unlocked-glow);
+        }
+        .achievement-row.locked .achievement-icon-cell {
+            opacity: 0.4;
+            filter: grayscale(0.4);
+        }
+        .achievement-row.legendary .achievement-icon-cell {
+            border-color: var(--scroll-dark);
+            background: linear-gradient(135deg, #FFE4B5, #D2B48C);
+            box-shadow: 0 0 16px var(--legendary-glow);
+        }
+        .achievement-name {
+            flex: 1;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .achievement-row.locked .achievement-name {
+            color: #8B7355;
+            font-style: italic;
+            font-weight: normal;
+        }
+        .achievement-badge {
+            font-size: 10px;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 14px;
+            border: 1px solid;
+            white-space: nowrap;
+        }
+        .unlocked .achievement-badge {
+            border-color: var(--scroll-gold);
+            color: var(--scroll-dark);
+            background: rgba(184, 134, 11, 0.15);
+        }
+        .legendary .achievement-badge {
+            background: #8B4513;
+            color: #FFE4B5;
+        }
+        .locked .achievement-badge {
+            border-color: var(--scroll-dark);
+            color: #8B7355;
+            opacity: 0.6;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--scroll-dark);
+            font-style: italic;
+        }
+        .save-time {
+            text-align: center;
+            color: #8b5a2b;
+            font-size: 0.85em;
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(139, 90, 43, 0.1);
+            border-radius: 4px;
+        }
+        .edit-link {
+            font-size: 12px;
+            color: var(--scroll-gold);
+            cursor: pointer;
+            margin-left: 8px;
+            text-decoration: underline;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .achievement-note {
+            font-size: 10px;
+            color: var(--scroll-gold);
+            margin-left: 8px;
+            font-style: italic;
+        }
+
+        /* ==================== 自定义弹窗样式 ==================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-dialog {
+            background: linear-gradient(180deg, #FFF8DC, #F5DEB3);
+            border: 3px solid var(--scroll-dark);
+            border-radius: 12px;
+            padding: 24px 20px 20px;
+            max-width: 400px;
+            width: 88%;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(139, 69, 19, 0.25);
+            text-align: center;
+            animation: slideUp 0.25s ease;
+            font-family: var(--font-stack);
+            position: relative;
+        }
+        .modal-dialog::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #D2B48C, #8B4513);
+            border-radius: 50%;
+            border: 2px solid var(--scroll-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        .modal-dialog .modal-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-dialog .modal-message {
+            color: var(--scroll-text);
+            font-size: 15px;
+            line-height: 1.7;
+            margin: 8px 0 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-dialog .modal-input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-family: var(--font-stack);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            background: #FFFEF5;
+            color: var(--scroll-text);
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-dialog .modal-input:focus {
+            border-color: var(--scroll-gold);
+            box-shadow: 0 0 8px rgba(184, 134, 11, 0.3);
+        }
+        .modal-dialog .modal-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: var(--font-stack);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            background: #FFFEF5;
+            color: var(--scroll-text);
+            margin-bottom: 16px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-dialog .modal-textarea:focus {
+            border-color: var(--scroll-gold);
+            box-shadow: 0 0 8px rgba(184, 134, 11, 0.3);
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-btn {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: var(--font-stack);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-width: 80px;
+        }
+        .modal-btn:active {
+            transform: translateY(1px);
+        }
+        .modal-btn-confirm {
+            background: #8B4513;
+            color: #f5e8c9;
+            box-shadow: 0 3px 0 #5D2906;
+        }
+        .modal-btn-confirm:active {
+            box-shadow: 0 1px 0 #5D2906;
+        }
+        .modal-btn-cancel {
+            background: #696969;
+            color: #f5e8c9;
+            box-shadow: 0 3px 0 #3D3D3D;
+        }
+        .modal-btn-cancel:active {
+            box-shadow: 0 1px 0 #3D3D3D;
+        }
+        .modal-btn-danger {
+            background: #A52A2A;
+            color: #f5e8c9;
+            box-shadow: 0 3px 0 #5D1F1F;
+        }
+        .modal-btn-danger:active {
+            box-shadow: 0 1px 0 #5D1F1F;
+        }
     </style>
 </head>
 <body>
@@ -111,10 +432,7 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
                 <span>道号：</span>
                 <strong id="display-daoHao">-</strong>
-                
-<!--
-<span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
--->
+                <span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
             </div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>灵韵：</span><strong id="display-lingYun">-</strong></div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>浊念：</span><strong id="display-zhuoNian">-</strong></div>
@@ -154,11 +472,192 @@
         <div style="text-align:center; font-size:11px; color:#5D4037; margin-top:10px;">卷轴仙籍 · 万世不易</div>
     </div>
 
+    <!-- ==================== 自定义弹窗容器 ==================== -->
+    <div id="modalContainer"></div>
+
     <script>
+        // ==================== 自定义弹窗系统 ====================
+        function createModalOverlay() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.id = 'modalOverlay';
+            return overlay;
+        }
+
+        function createModalDialog(icon, messageHtml, inputConfig, buttons) {
+            const dialog = document.createElement('div');
+            dialog.className = 'modal-dialog';
+
+            if (icon) {
+                const iconEl = document.createElement('span');
+                iconEl.className = 'modal-icon';
+                iconEl.textContent = icon;
+                dialog.appendChild(iconEl);
+            }
+
+            const msgEl = document.createElement('div');
+            msgEl.className = 'modal-message';
+            msgEl.innerHTML = messageHtml;
+            dialog.appendChild(msgEl);
+
+            let inputEl = null;
+            if (inputConfig) {
+                if (inputConfig.type === 'textarea') {
+                    inputEl = document.createElement('textarea');
+                    inputEl.className = 'modal-textarea';
+                    inputEl.placeholder = inputConfig.placeholder || '';
+                    inputEl.value = inputConfig.defaultValue || '';
+                    inputEl.rows = inputConfig.rows || 3;
+                } else {
+                    inputEl = document.createElement('input');
+                    inputEl.type = inputConfig.type || 'text';
+                    inputEl.className = 'modal-input';
+                    inputEl.placeholder = inputConfig.placeholder || '';
+                    inputEl.value = inputConfig.defaultValue || '';
+                }
+                inputEl.id = 'modalInput';
+                dialog.appendChild(inputEl);
+            }
+
+            const btnRow = document.createElement('div');
+            btnRow.className = 'modal-btn-row';
+            buttons.forEach(btn => {
+                const btnEl = document.createElement('button');
+                btnEl.className = 'modal-btn ' + (btn.cls || 'modal-btn-confirm');
+                btnEl.textContent = btn.text;
+                btnEl.addEventListener('click', () => {
+                    const inputValue = inputEl ? inputEl.value : null;
+                    removeModal();
+                    if (btn.callback) btn.callback(inputValue);
+                });
+                btnRow.appendChild(btnEl);
+            });
+            dialog.appendChild(btnRow);
+
+            return dialog;
+        }
+
+        function removeModal() {
+            const existing = document.getElementById('modalOverlay');
+            if (existing) {
+                existing.style.opacity = '0';
+                existing.style.transition = 'opacity 0.15s ease';
+                setTimeout(() => {
+                    if (existing.parentNode) existing.parentNode.removeChild(existing);
+                }, 150);
+            }
+        }
+
+        function showModal({ icon, message, inputConfig, buttons, onBackgroundClick } = {}) {
+            removeModal();
+            const overlay = createModalOverlay();
+            const dialog = createModalDialog(icon || '', message || '', inputConfig || null, buttons || []);
+            overlay.appendChild(dialog);
+            document.getElementById('modalContainer').appendChild(overlay);
+
+            const inputEl = document.getElementById('modalInput');
+            if (inputEl) {
+                setTimeout(() => inputEl.focus(), 300);
+            }
+
+            if (onBackgroundClick !== false) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        removeModal();
+                        if (onBackgroundClick && typeof onBackgroundClick === 'function') {
+                            onBackgroundClick();
+                        }
+                    }
+                });
+            }
+        }
+
+        function modalAlert(message, icon = '📜') {
+            return new Promise((resolve) => {
+                showModal({
+                    icon: icon,
+                    message: message,
+                    buttons: [{
+                        text: '确 认',
+                        cls: 'modal-btn-confirm',
+                        callback: () => resolve(true)
+                    }],
+                    onBackgroundClick: () => resolve(true)
+                });
+            });
+        }
+
+        function modalPrompt(message, options = {}) {
+            const {
+                defaultValue = '',
+                    placeholder = '',
+                    icon = '✍️',
+                    type = 'text',
+                    textarea = false,
+                    rows = 3
+            } = options;
+            return new Promise((resolve) => {
+                showModal({
+                    icon: icon,
+                    message: message,
+                    inputConfig: textarea ? {
+                        type: 'textarea',
+                        placeholder: placeholder,
+                        defaultValue: defaultValue,
+                        rows: rows
+                    } : {
+                        type: type,
+                        placeholder: placeholder,
+                        defaultValue: defaultValue
+                    },
+                    buttons: [{
+                        text: '确 认',
+                        cls: 'modal-btn-confirm',
+                        callback: (val) => resolve(val !== null ? val : defaultValue)
+                    }, {
+                        text: '取 消',
+                        cls: 'modal-btn-cancel',
+                        callback: () => resolve(null)
+                    }],
+                    onBackgroundClick: () => resolve(null)
+                });
+            });
+        }
+
+        function modalConfirm(message, options = {}) {
+            const {
+                confirmText = '确 认',
+                    cancelText = '取 消',
+                    icon = '⚠️',
+                    dangerConfirm = false
+            } = options;
+            return new Promise((resolve) => {
+                showModal({
+                    icon: icon,
+                    message: message,
+                    buttons: [{
+                        text: confirmText,
+                        cls: dangerConfirm ? 'modal-btn-danger' : 'modal-btn-confirm',
+                        callback: () => resolve(true)
+                    }, {
+                        text: cancelText,
+                        cls: 'modal-btn-cancel',
+                        callback: () => resolve(false)
+                    }],
+                    onBackgroundClick: () => resolve(false)
+                });
+            });
+        }
+
         // ==================== 配置解密 ====================
-        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        const ENCODED_CONFIG =
+            "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
         let CONFIG = null;
-        function getConfig() { if(!CONFIG) try { CONFIG = JSON.parse(atob(ENCODED_CONFIG)); } catch(e) { return {}; } return CONFIG; }
+
+        function getConfig() {
+            if (!CONFIG) try { CONFIG = JSON.parse(atob(ENCODED_CONFIG)); } catch (e) { return {}; }
+            return CONFIG;
+        }
 
         // ==================== 成就定义 ====================
         const achievementIcons = [
@@ -209,7 +708,11 @@
         const SPECIAL_KEY = 'huangdaxian_special_achievements';
         const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes';
         const USED_CODES_KEY = 'huangdaxian_used_codes';
-        let cachedAchievements = null, cachedOrder = null, cachedSpecial = null, cachedNotes = null, cachedUsedCodes = null;
+        let cachedAchievements = null,
+            cachedOrder = null,
+            cachedSpecial = null,
+            cachedNotes = null,
+            cachedUsedCodes = null;
 
         // ---------- 动态兑换码映射 ----------
         let VALID_CODES = {};
@@ -266,62 +769,83 @@
         function getAchievements() {
             if (cachedAchievements) return cachedAchievements;
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) { try { const d = JSON.parse(raw); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } catch(e) {} }
-            try { if (window.parent && window.parent !== window) { const p = window.parent.localStorage.getItem(STORAGE_KEY); if (p) { const d = JSON.parse(p); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } } } catch(e) {}
+            if (raw) { try { const d = JSON.parse(raw); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } catch (
+                e) {} }
+            try { if (window.parent && window.parent !== window) { const p = window.parent.localStorage.getItem(
+                    STORAGE_KEY); if (p) { const d = JSON.parse(p); if (d && typeof d === 'object') { cachedAchievements =
+                        d; return d; } } } } catch (e) {}
             return {};
         }
+
         function saveAchievements(ach) {
-            cachedAchievements = ach; const json = JSON.stringify(ach);
+            cachedAchievements = ach;
+            const json = JSON.stringify(ach);
             localStorage.setItem(STORAGE_KEY, json);
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(STORAGE_KEY, json); } catch(e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(STORAGE_KEY, json); } catch (
+                e) {}
         }
+
         function getOrder() {
             if (cachedOrder) return cachedOrder;
             const raw = localStorage.getItem(ORDER_KEY);
-            if (raw) { try { const a = JSON.parse(raw); if (Array.isArray(a)) { cachedOrder = a; return a; } } catch(e) {} }
+            if (raw) { try { const a = JSON.parse(raw); if (Array.isArray(a)) { cachedOrder = a; return a; } } catch (e) {} }
             return [];
         }
-        function saveOrder(order) { cachedOrder = order; localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
+
+        function saveOrder(order) { cachedOrder = order;
+            localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
 
         function getSpecialAchievements() {
             if (cachedSpecial) return cachedSpecial;
             const raw = localStorage.getItem(SPECIAL_KEY);
-            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedSpecial = arr; return arr; } } catch(e) {} }
+            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedSpecial = arr; return arr; } } catch (
+                e) {} }
             return [];
         }
+
         function saveSpecialAchievements(arr) {
             cachedSpecial = arr;
             localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr)); } catch(e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_KEY, JSON.stringify(
+                    arr)); } catch (e) {}
         }
+
         function getSpecialNotes() {
             if (cachedNotes) return cachedNotes;
             const raw = localStorage.getItem(SPECIAL_NOTES_KEY);
-            if (raw) { try { const obj = JSON.parse(raw); if (typeof obj === 'object') { cachedNotes = obj; return obj; } } catch(e) {} }
+            if (raw) { try { const obj = JSON.parse(raw); if (typeof obj === 'object') { cachedNotes = obj; return obj; } } catch (
+                e) {} }
             return {};
         }
+
         function saveSpecialNotes(obj) {
             cachedNotes = obj;
             localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj)); } catch(e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_NOTES_KEY,
+                    JSON.stringify(obj)); } catch (e) {}
         }
+
         function getUsedCodes() {
             if (cachedUsedCodes) return cachedUsedCodes;
             const raw = localStorage.getItem(USED_CODES_KEY);
-            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedUsedCodes = arr; return arr; } } catch(e) {} }
+            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedUsedCodes = arr; return arr; } } catch (
+                e) {} }
             return [];
         }
+
         function addUsedCode(code) {
             const arr = getUsedCodes();
             arr.push(code);
             cachedUsedCodes = arr;
             localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr)); } catch(e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(USED_CODES_KEY, JSON.stringify(
+                    arr)); } catch (e) {}
         }
 
         function getAchievementTitles() {
             const ach = getAchievements();
-            return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id); return f ? f.title : id; });
+            return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id);
+                return f ? f.title : id; });
         }
 
         // ---------- 渲染成就 ----------
@@ -330,8 +854,8 @@
             const order = getOrder();
             const unlockedIds = Object.keys(ach).filter(id => ach[id]);
             let sorted = [];
-            if (order.length) { sorted = order.filter(id => unlockedIds.includes(id)); sorted = [...unlockedIds.filter(id => !order.includes(id)), ...sorted]; }
-            else sorted = unlockedIds;
+            if (order.length) { sorted = order.filter(id => unlockedIds.includes(id));
+                sorted = [...unlockedIds.filter(id => !order.includes(id)), ...sorted]; } else sorted = unlockedIds;
             const lockedAll = achievementIcons.filter(a => !unlockedIds.includes(a.id));
 
             const unlockedList = document.getElementById('unlockedList');
@@ -339,7 +863,8 @@
             if (sorted.length) {
                 document.getElementById('unlockedTitle').style.display = 'block';
                 document.getElementById('unlockedEmpty').style.display = 'none';
-                sorted.forEach(id => { const item = achievementIcons.find(a => a.id === id); if (item) unlockedList.appendChild(createRow(item, true)); });
+                sorted.forEach(id => { const item = achievementIcons.find(a => a.id === id); if (item) unlockedList.appendChild(
+                        createRow(item, true)); });
             } else {
                 document.getElementById('unlockedTitle').style.display = 'none';
                 document.getElementById('unlockedEmpty').style.display = 'block';
@@ -356,8 +881,8 @@
             const leg = sorted.filter(id => achievementIcons.find(a => a.id === id)?.legendary).length;
             const totalLeg = achievementIcons.filter(a => a.legendary).length;
             const ls = document.getElementById('legendaryStat');
-            if (leg) { ls.style.display = 'inline-flex'; document.getElementById('legendaryCount').textContent = leg + '/' + totalLeg; }
-            else ls.style.display = 'none';
+            if (leg) { ls.style.display = 'inline-flex';
+                document.getElementById('legendaryCount').textContent = leg + '/' + totalLeg; } else ls.style.display = 'none';
 
             renderSpecial();
         }
@@ -374,7 +899,8 @@
                     const row = document.createElement('div');
                     row.className = 'achievement-row unlocked';
                     const noteText = notes[title] || '';
-                    row.innerHTML = `<div class="achievement-icon-cell">⭐</div><div class="achievement-name">${title}${noteText ? `<span class="achievement-note">${noteText}</span>` : ''}</div><span class="achievement-badge">特殊</span>`;
+                    row.innerHTML =
+                        `<div class="achievement-icon-cell">⭐</div><div class="achievement-name">${title}${noteText ? `<span class="achievement-note">${noteText}</span>` : ''}</div><span class="achievement-badge">特殊</span>`;
                     list.appendChild(row);
                 });
             } else {
@@ -385,7 +911,8 @@
         function createRow(item, unlocked) {
             const row = document.createElement('div');
             row.className = 'achievement-row ' + (unlocked ? (item.legendary ? 'unlocked legendary' : 'unlocked') : 'locked');
-            row.innerHTML = `<div class="achievement-icon-cell">${unlocked ? item.icon : '?'}</div><div class="achievement-name">${item.title}</div><span class="achievement-badge">${unlocked ? (item.legendary ? '传说' : '已解锁') : '未解锁'}</span>`;
+            row.innerHTML =
+                `<div class="achievement-icon-cell">${unlocked ? item.icon : '?'}</div><div class="achievement-name">${item.title}</div><span class="achievement-badge">${unlocked ? (item.legendary ? '传说' : '已解锁') : '未解锁'}</span>`;
             return row;
         }
 
@@ -397,12 +924,17 @@
             if (!name || !name.trim()) return;
             playerName = name.trim();
             localStorage.setItem('playerName', playerName);
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem('playerName', playerName); } catch(e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem('playerName',
+                playerName); } catch (e) {}
             updateUserInfo();
         }
 
-        function promptSetPlayerName() {
-            const name = prompt('请输入您的道号（仙家名号）：', playerName || '');
+        async function promptSetPlayerName() {
+            const name = await modalPrompt('请输入您的道号（仙家名号）：', {
+                defaultValue: playerName || '',
+                placeholder: '道号',
+                icon: '📛'
+            });
             if (name && name.trim()) setPlayerName(name);
         }
 
@@ -412,44 +944,49 @@
             document.getElementById('display-zhuoNian').textContent = localStorage.getItem('zhuoNian') || '0';
             document.getElementById('display-storyNode').textContent = localStorage.getItem('storyNode') || 'start';
             const last = localStorage.getItem('lastCloudSaveTime');
-            document.getElementById('lastSaveTime').innerHTML = last ? `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` : '上次云端同步：<strong>从未同步</strong>';
+            document.getElementById('lastSaveTime').innerHTML = last ?
+                `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` :
+                '上次云端同步：<strong>从未同步</strong>';
         }
 
         // ==================== 兑换码逻辑 ====================
-        function redeemCode() {
-            const code = prompt('请输入兑换码：');
+        async function redeemCode() {
+            const code = await modalPrompt('请输入兑换码：', {
+                placeholder: '兑换码',
+                icon: '🎁'
+            });
             if (!code || !code.trim()) return;
             const trimmedCode = code.trim().toUpperCase();
-            
+
             if (!VALID_CODES[trimmedCode]) {
-                alert('无效的兑换码！');
+                await modalAlert('无效的兑换码！', '❌');
                 return;
             }
-            
+
             const used = getUsedCodes();
             if (used.includes(trimmedCode)) {
-                alert('该兑换码已被使用！');
+                await modalAlert('该兑换码已被使用！', '⚠️');
                 return;
             }
-            
+
             const reward = VALID_CODES[trimmedCode];
-            
+
             if (reward.type === 'lingYun') {
                 const current = parseInt(localStorage.getItem('lingYun') || '100');
                 localStorage.setItem('lingYun', current + reward.amount);
                 addUsedCode(trimmedCode);
                 updateUserInfo();
-                alert(`兑换成功！灵韵 +${reward.amount}（当前：${current + reward.amount}）`);
+                await modalAlert(`兑换成功！灵韵 +${reward.amount}（当前：${current + reward.amount}）`, '✨');
             } else if (reward.type === 'zhuoNian') {
                 const current = parseInt(localStorage.getItem('zhuoNian') || '0');
                 localStorage.setItem('zhuoNian', current + reward.amount);
                 addUsedCode(trimmedCode);
                 updateUserInfo();
-                alert(`兑换成功！浊念 +${reward.amount}（当前：${current + reward.amount}）`);
+                await modalAlert(`兑换成功！浊念 +${reward.amount}（当前：${current + reward.amount}）`, '✨');
             } else if (reward.type === 'achievement') {
                 const special = getSpecialAchievements();
                 if (special.includes(reward.title)) {
-                    alert('该成就已存在！');
+                    await modalAlert('该成就已存在！', '⚠️');
                     return;
                 }
                 const updated = [...special, reward.title];
@@ -459,7 +996,7 @@
                 saveSpecialNotes(notes);
                 addUsedCode(trimmedCode);
                 renderAchievements();
-                alert(`兑换成功！获得特殊成就：${reward.title}`);
+                await modalAlert(`兑换成功！获得特殊成就：${reward.title}`, '🌟');
             }
         }
 
@@ -475,7 +1012,8 @@
         async function getRemoteAchievementCount() {
             if (!cloudDocId) return -1;
             const cfg = getConfig();
-            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            const url =
+            `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
                 const res = await fetch(url);
                 const result = await res.json();
@@ -486,35 +1024,44 @@
                     return remoteAchievements.length + remoteSpecial.length;
                 }
                 return -2;
-            } catch(e) { return -3; }
+            } catch (e) { return -3; }
         }
 
         async function pushCloudSave() {
-            if (!playerName) { alert('请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
-            
+            if (!playerName) {
+                await modalAlert('请先设置道号！', '📛');
+                await promptSetPlayerName();
+                if (!playerName) return;
+            }
+
             const achievements = getAchievementTitles();
             const special = getSpecialAchievements();
             const notes = getSpecialNotes();
             const usedCodes = getUsedCodes();
             const totalLocal = achievements.length + special.length;
-            
+
             if (!cloudDocId) {
                 const existing = await findDocByTitle();
-                if (existing) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); }
+                if (existing) { cloudDocId = existing;
+                    localStorage.setItem('cloudDocId', existing); }
             }
-            
+
             if (cloudDocId) {
                 const remoteCount = await getRemoteAchievementCount();
                 if (remoteCount > totalLocal) {
-                    const msg = `⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入“确认覆盖”后继续：`;
-                    const input = prompt(msg);
+                    const msg =
+                        `⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入"确认覆盖"后继续：`;
+                    const input = await modalPrompt(msg, {
+                        placeholder: '输入"确认覆盖"',
+                        icon: '⚠️'
+                    });
                     if (input !== '确认覆盖') {
-                        alert('已取消上传，云端数据未受影响。');
+                        await modalAlert('已取消上传，云端数据未受影响。', '↩️');
                         return;
                     }
                 }
             }
-            
+
             const saveData = {
                 playerName: playerName,
                 achievements: achievements,
@@ -531,11 +1078,14 @@
             try {
                 let url, options;
                 if (cloudDocId) {
-                    url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
-                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    url =
+                        `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 } else {
                     url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
-                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 }
                 const res = await fetch(url, options);
                 const result = await res.json();
@@ -543,17 +1093,22 @@
                     if (!cloudDocId) {
                         let newId = result.id || result.data;
                         if (!newId) { newId = await findDocByTitle(); }
-                        if (newId) { cloudDocId = newId; localStorage.setItem('cloudDocId', newId); }
+                        if (newId) { cloudDocId = newId;
+                            localStorage.setItem('cloudDocId', newId); }
                     }
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     updateUserInfo();
-                    alert('修为已上传至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''));
-                } else alert('上传失败：' + (result.msg || '未知'));
-            } catch(e) { alert('网络错误：' + e.message); }
+                    await modalAlert('修为已上传至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''), '☁️');
+                } else await modalAlert('上传失败：' + (result.msg || '未知'), '❌');
+            } catch (e) { await modalAlert('网络错误：' + e.message, '❌'); }
         }
 
         async function pullCloudSave() {
-            if (!playerName) { alert('道号为空，请先设置道号！'); promptSetPlayerName(); if(!playerName) return; }
+            if (!playerName) {
+                await modalAlert('道号为空，请先设置道号！', '📛');
+                await promptSetPlayerName();
+                if (!playerName) return;
+            }
 
             if (!cloudDocId) {
                 const foundId = await findDocByTitle();
@@ -561,7 +1116,10 @@
                     cloudDocId = foundId;
                     localStorage.setItem('cloudDocId', cloudDocId);
                 } else {
-                    const manualId = prompt('未找到云端仙籍，请手动输入文档ID：');
+                    const manualId = await modalPrompt('未找到云端仙籍，请手动输入文档ID：', {
+                        placeholder: '文档ID',
+                        icon: '🔍'
+                    });
                     if (manualId && manualId.trim()) {
                         cloudDocId = manualId.trim();
                         localStorage.setItem('cloudDocId', cloudDocId);
@@ -570,13 +1128,15 @@
             }
 
             const cfg = getConfig();
-            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            const url =
+            `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
                 const res = await fetch(url);
                 const result = await res.json();
                 if (result.code == 1) {
                     let data;
-                    try { data = JSON.parse(result.content); } catch(e) { alert('云端数据损坏！'); return; }
+                    try { data = JSON.parse(result.content); } catch (e) { await modalAlert('云端数据损坏！', '❌');
+                        return; }
                     const titles = data.achievements || [];
                     const achObj = {};
                     const notFound = [];
@@ -600,36 +1160,57 @@
                     renderAchievements();
                     updateUserInfo();
                     let msg = '仙缘已接续！';
-                    if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
-                    alert(msg);
-                } else alert('下载失败：' + (result.msg || '未知错误'));
-            } catch(e) { alert('网络错误：' + e.message); }
+                    if (notFound.length) msg +=
+                        `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
+                    await modalAlert(msg, '☁️');
+                } else await modalAlert('下载失败：' + (result.msg || '未知错误'), '❌');
+            } catch (e) { await modalAlert('网络错误：' + e.message, '❌'); }
         }
 
         // 导出/导入
         async function exportAllData() {
             const payload = {
-                version:2,
-                exportTime:new Date().toISOString(),
-                achievements:getAchievements(),
-                order:getOrder(),
+                version: 2,
+                exportTime: new Date().toISOString(),
+                achievements: getAchievements(),
+                order: getOrder(),
                 specialAchievements: getSpecialAchievements(),
                 specialNotes: getSpecialNotes(),
                 usedCodes: getUsedCodes(),
                 playerName,
-                storyNode:localStorage.getItem('storyNode'),
-                lingYun:localStorage.getItem('lingYun'),
-                zhuoNian:localStorage.getItem('zhuoNian')
+                storyNode: localStorage.getItem('storyNode'),
+                lingYun: localStorage.getItem('lingYun'),
+                zhuoNian: localStorage.getItem('zhuoNian')
             };
             const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-            try { await navigator.clipboard.writeText(str); alert('仙籍已复制'); } catch(e) { prompt('请手动复制：', str); }
+            try {
+                await navigator.clipboard.writeText(str);
+                await modalAlert('仙籍已复制到剪贴板！', '📋');
+            } catch (e) {
+                await modalPrompt('请手动复制仙籍：', {
+                    defaultValue: str,
+                    textarea: true,
+                    rows: 5,
+                    icon: '📋',
+                    placeholder: ''
+                });
+            }
         }
+
         async function importAllDataPrompt() {
-            const input = prompt('请粘贴仙籍备份：'); if (!input) return;
-            let json; try { json = decodeURIComponent(escape(atob(input))); } catch { json = input; }
+            const input = await modalPrompt('请粘贴仙籍备份：', {
+                placeholder: '粘贴仙籍备份内容',
+                textarea: true,
+                rows: 5,
+                icon: '📥'
+            });
+            if (!input) return;
+            let json;
+            try { json = decodeURIComponent(escape(atob(input))); } catch { json = input; }
             try {
                 const data = JSON.parse(json);
-                if (data.achievements) { const merged = { ...getAchievements(), ...data.achievements }; saveAchievements(merged); }
+                if (data.achievements) { const merged = { ...getAchievements(), ...data.achievements };
+                    saveAchievements(merged); }
                 if (data.order) saveOrder(data.order);
                 if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
                 if (data.specialNotes) saveSpecialNotes(data.specialNotes);
@@ -641,12 +1222,24 @@
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
                 if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
-                renderAchievements(); updateUserInfo();
-                alert('仙籍导入成功！');
-            } catch(e) { alert('导入失败：格式错误'); }
+                renderAchievements();
+                updateUserInfo();
+                await modalAlert('仙籍导入成功！', '✅');
+            } catch (e) { await modalAlert('导入失败：格式错误', '❌'); }
         }
 
-        function logout() { if (confirm('确定重入轮回？')) { localStorage.clear(); location.reload(); } }
+        async function logout() {
+            const confirmed = await modalConfirm('确定重入轮回？此操作将清除所有本地数据！', {
+                confirmText: '确 定',
+                cancelText: '取 消',
+                icon: '🔥',
+                dangerConfirm: true
+            });
+            if (confirmed) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
 
         // ==================== 初始化 ====================
         window.addEventListener('load', async () => {
@@ -657,7 +1250,10 @@
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
             if (!playerName) {
-                try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch(e) {}
+                try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem(
+                            'playerName') || '';
+                        cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch (
+                e) {}
             }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);

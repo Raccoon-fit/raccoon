@@ -5,731 +5,658 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仙籍核验 - 黄小仙讨封</title>
     <style>
-        /* 完整还原古风样式 */
-        body {
-            background: #3e2723;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'SimSun', serif;
+        body { 
+            background: #3e2723; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            font-family: 'SimSun', serif; 
         }
-        .scroll-container {
-            width: 90%;
-            max-width: 450px;
-            padding: 40px 30px;
-            background: linear-gradient(#f5e8c9, #e8d8a9);
-            border: 15px solid transparent;
-            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path fill="%238B4513" d="M0,0 L50,0 L50,50 L0,50 Z" /><path fill="%23A0522D" d="M5,5 L45,5 L45,45 L5,45 Z" /></svg>') 30 stretch;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            animation: unfold 1.5s ease-out;
+        .scroll-container { 
+            width: 90%; 
+            max-width: 450px; 
+            padding: 40px 30px; 
+            background: linear-gradient(#f5e8c9, #e8d8a9); 
+            border: 15px solid transparent; 
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path fill="%238B4513" d="M0,0 L50,0 L50,50 L0,50 Z" /><path fill="%23A0522D" d="M5,5 L45,5 L45,45 L5,45 Z" /></svg>') 30 stretch; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
+            animation: unfold 1.5s ease-out; 
             position: relative;
-            min-height: 380px;
-            transition: min-height 0.5s ease;
+            min-height: 300px;
         }
-        @keyframes unfold {
-            from {
-                transform: scaleY(0.1) translateY(-50%);
-                opacity: 0;
-            }
-            to {
-                transform: scaleY(1) translateY(0);
-                opacity: 1;
-            }
+        @keyframes unfold { 
+            from { transform: scaleY(0.1) translateY(-50%); opacity: 0; } 
+            to { transform: scaleY(1) translateY(0); opacity: 1; } 
         }
-        .title {
+        .title { 
+            text-align: center; 
+            color: #5c3a21; 
+            font-size: 2.2em; 
+            margin-bottom: 10px; 
+            text-shadow: 2px 2px 0px #d2b48c; 
+            letter-spacing: 5px; 
+        }
+        .subtitle { 
+            text-align: center; 
+            color: #8b5a2b; 
+            font-size: 0.9em; 
+            margin-bottom: 30px; 
+            border-bottom: 1px dashed #8b5a2b; 
+            padding-bottom: 15px; 
+        }
+        .input-group { margin-bottom: 15px; }
+        .ink-input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            font-size: 1.1em; 
+            color: #5c3a21; 
+            background: rgba(255,255,255,0.7); 
+            border: none; 
+            border-bottom: 2px solid #8b5a2b; 
+            outline: none; 
+            box-sizing: border-box; 
+            font-family: 'KaiTi'; 
+        }
+        .ink-input:focus { 
+            background: rgba(255,255,255,0.9); 
+            border-bottom-color: #d2691e; 
+        }
+        .ink-input::placeholder { 
+            color: #a0522d; 
+            font-style: italic; 
+        }
+        .btn-group { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-top: 30px; 
+        }
+        .seal-btn { 
+            padding: 12px 25px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            color: #f5e8c9; 
+            background: #8B4513; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-family: 'SimHei'; 
+            box-shadow: 0 4px 0 #5D2906; 
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .seal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #5D2906; }
+        .seal-btn:active { transform: translateY(1px); box-shadow: 0 2px 0 #5D2906; }
+        .red-seal { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
+        .red-seal:hover { box-shadow: 0 6px 0 #5D1F1F; }
+        .footer-hint { text-align: center; color: #8b5a2b; font-size: 0.8em; margin-top: 25px; }
+        .loading-tip { 
+            color: #8b5a2b; 
+            font-size: 0.9em; 
+            text-align: center; 
+            margin-top: 15px; 
+            display: none; 
+        }
+        .loading-spinner { 
+            display: inline-block; 
+            width: 16px; 
+            height: 16px; 
+            border: 2px solid #8b5a2b; 
+            border-top-color: transparent; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-right: 8px; 
+            vertical-align: middle; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 用户信息面板（嵌入用，简洁文字版） */
+        .user-info-panel {
+            display: none;
             text-align: center;
+            animation: fadeInPanel 0.6s ease-out;
+        }
+        @keyframes fadeInPanel {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user-info-panel .welcome-line {
             color: #5c3a21;
+            font-size: 1.4em;
+            letter-spacing: 3px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .user-info-panel .dao-hao-display {
+            color: #A52A2A;
             font-size: 2.2em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 0px #d2b48c;
-            letter-spacing: 5px;
-        }
-        .subtitle {
-            text-align: center;
-            color: #8b5a2b;
-            font-size: 0.9em;
-            margin-bottom: 30px;
-            border-bottom: 1px dashed #8b5a2b;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 0px #d2b48c;
+            border-bottom: 2px dotted #c4a87c;
             padding-bottom: 15px;
+            display: inline-block;
+            min-width: 120px;
         }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .ink-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 1.1em;
-            color: #5c3a21;
-            background: rgba(255, 255, 255, 0.7);
-            border: none;
-            border-bottom: 2px solid #8b5a2b;
-            outline: none;
-            box-sizing: border-box;
+        .info-simple-row {
+            color: #3e2723;
+            font-size: 0.95em;
+            margin: 8px 0;
             font-family: 'KaiTi';
+            letter-spacing: 1px;
         }
-        .ink-input:focus {
-            background: rgba(255, 255, 255, 0.9);
-            border-bottom-color: #d2691e;
+        .info-simple-row span {
+            color: #8b5a2b;
+            font-weight: bold;
         }
-        .ink-input::placeholder {
-            color: #a0522d;
-            font-style: italic;
-        }
-        .btn-group {
-            display: flex;
-            justify-content: space-around;
+        .logout-mini-btn {
             margin-top: 30px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .seal-btn {
-            padding: 12px 25px;
-            font-size: 1em;
+            padding: 10px 25px;
+            font-size: 0.9em;
             font-weight: bold;
             color: #f5e8c9;
-            background: #8B4513;
+            background: #6b4c3b;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-family: 'SimHei';
-            box-shadow: 0 4px 0 #5D2906;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .seal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #5D2906;
-        }
-        .seal-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 0 #5D2906;
-        }
-        .red-seal {
-            background: #A52A2A;
-            box-shadow: 0 4px 0 #5D1F1F;
-        }
-        .red-seal:hover {
-            box-shadow: 0 6px 0 #5D1F1F;
-        }
-        .gold-seal {
-            background: #8B7500;
-            box-shadow: 0 4px 0 #5C4E00;
-        }
-        .gold-seal:hover {
-            box-shadow: 0 6px 0 #5C4E00;
-        }
-        .footer-hint {
-            text-align: center;
-            color: #8b5a2b;
-            font-size: 0.8em;
-            margin-top: 25px;
-        }
-        .loading-tip {
-            color: #8b5a2b;
-            font-size: 0.9em;
-            text-align: center;
-            margin-top: 15px;
-            display: none;
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #8b5a2b;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ==================== 用户信息面板样式 ==================== */
-        .user-info-panel {
-            display: none;
-            animation: fadeInPanel 0.6s ease-out;
-        }
-        @keyframes fadeInPanel {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .user-info-panel .welcome-line {
-            text-align: center;
-            color: #5c3a21;
-            font-size: 1.4em;
-            margin-bottom: 8px;
-            letter-spacing: 3px;
-            font-weight: bold;
-        }
-        .user-info-panel .dao-hao-display {
-            text-align: center;
-            color: #A52A2A;
-            font-size: 2em;
-            font-weight: bold;
-            letter-spacing: 4px;
-            margin-bottom: 25px;
-            text-shadow: 1px 1px 0px #d2b48c;
-            border-bottom: 2px dotted #c4a87c;
-            padding-bottom: 18px;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 9px 12px;
-            margin: 6px 0;
-            background: rgba(255, 255, 255, 0.35);
-            border-radius: 4px;
-            border-left: 4px solid #8b5a2b;
-        }
-        .info-label {
-            color: #5c3a21;
-            font-weight: bold;
-            font-size: 0.95em;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-        .info-value {
-            color: #3e2723;
-            font-family: 'KaiTi';
-            font-size: 0.95em;
-            text-align: right;
-            word-break: break-all;
-        }
-        .info-value.lingyun {
-            color: #b8860b;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .info-value.zhuonian {
-            color: #5c3a21;
-            font-weight: bold;
-        }
-        .info-value.node {
-            color: #6b3a2a;
-            font-style: italic;
-        }
-        .info-value.days {
-            color: #8b5a2b;
-        }
-        .achievements-section {
-            margin-top: 16px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            border: 1px dashed #b8976e;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-        .achievements-section .ach-title {
-            color: #5c3a21;
-            font-weight: bold;
-            font-size: 0.9em;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .achievements-section .ach-item {
-            display: inline-block;
-            background: #c4a87c;
-            color: #3e2723;
-            padding: 3px 10px;
-            margin: 3px 4px;
-            border-radius: 10px;
-            font-size: 0.8em;
-            font-family: 'KaiTi';
-            letter-spacing: 1px;
-        }
-        .achievements-section .ach-empty {
-            text-align: center;
-            color: #a09080;
-            font-size: 0.85em;
-            font-style: italic;
-        }
-        .divider-line {
-            border: none;
-            border-top: 1px dashed #c4a87c;
-            margin: 18px 0;
-        }
-        .logout-btn {
-            background: #6b4c3b;
             box-shadow: 0 4px 0 #3e2723;
+            transition: all 0.2s;
         }
-        .logout-btn:hover {
+        .logout-mini-btn:hover {
+            transform: translateY(-2px);
             box-shadow: 0 6px 0 #3e2723;
             background: #7d5a45;
         }
+
+        /* 自定义古风弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .modal-content {
+            background: linear-gradient(#faf0dc, #ecd9b4);
+            border: 8px solid #8B4513;
+            border-radius: 12px;
+            padding: 30px 25px;
+            max-width: 320px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            font-family: 'KaiTi', serif;
+            color: #4a2c17;
+        }
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #A52A2A;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #8b5a2b;
+            padding-bottom: 10px;
+        }
+        .modal-message {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #3e2723;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .modal-btn {
+            padding: 10px 28px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'SimHei';
+            color: #f5e8c9;
+            box-shadow: 0 4px 0 #5D2906;
+            transition: all 0.2s;
+        }
+        .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #5D2906; }
+        .modal-btn:active { transform: translateY(1px); box-shadow: 0 2px 0 #5D2906; }
+        .modal-btn.confirm { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
+        .modal-btn.cancel { background: #6b4c3b; box-shadow: 0 4px 0 #3e2723; }
     </style>
 </head>
 <body>
     <div class="scroll-container">
-        <!-- ==================== 登录表单区域 ==================== -->
+        <!-- 登录表单区域 -->
         <div id="loginSection">
             <h1 class="title">仙籍核验</h1>
             <p class="subtitle">道号即为凭证，入我仙府者，仙途永续。</p>
-
             <div class="input-group">
                 <input type="text" id="daoHao" class="ink-input" placeholder="请输入你的道号…" maxlength="12">
             </div>
             <div class="input-group" id="passwordGroup" style="display:none;">
                 <input type="password" id="miMa" class="ink-input" placeholder="请输入密令…">
             </div>
-
             <div class="btn-group">
                 <button id="submit-name" class="seal-btn red-seal">踏入仙府</button>
             </div>
-
             <div class="loading-tip" id="loadingTip">
                 <span class="loading-spinner"></span>
                 <span id="loadingText">正在核验仙籍...</span>
             </div>
-
             <p class="footer-hint">道号一旦确立，便与仙途绑定，慎之。</p>
         </div>
 
-        <!-- ==================== 用户信息面板（默认隐藏） ==================== -->
+        <!-- 用户信息面板（嵌入式，仅显示文字） -->
         <div class="user-info-panel" id="userInfoPanel">
             <p class="welcome-line">✨ 仙籍在册，道友安好 ✨</p>
-            <p class="dao-hao-display" id="displayDaoHao"></p>
+            <div class="dao-hao-display" id="displayDaoHao"></div>
+            <div class="info-simple-row"><span>灵韵：</span><span id="displayLingYun">--</span></div>
+            <div class="info-simple-row"><span>浊念：</span><span id="displayZhuoNian">--</span></div>
+            <div class="info-simple-row"><span>境界：</span><span id="displayStoryNode">--</span></div>
+            <div class="info-simple-row" id="cultivateRow" style="display:none;"><span>修行：</span><span id="displayDays">--</span></div>
+            <button class="logout-mini-btn" id="logoutBtn">断绝仙缘</button>
+        </div>
+    </div>
 
-            <div class="info-row">
-                <span class="info-label">灵韵</span>
-                <span class="info-value lingyun" id="displayLingYun">--</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">浊念</span>
-                <span class="info-value zhuonian" id="displayZhuoNian">--</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">当前境界</span>
-                <span class="info-value node" id="displayStoryNode">--</span>
-            </div>
-            <div class="info-row" id="cultivateDaysRow" style="display:none;">
-                <span class="info-label">修行时日</span>
-                <span class="info-value days" id="displayDays">--</span>
-            </div>
-
-            <div class="achievements-section">
-                <p class="ach-title">🏆 仙绩录</p>
-                <div id="achievementsList"></div>
-            </div>
-
-            <hr class="divider-line">
-
-            <div class="btn-group">
-                <button id="continueGame" class="seal-btn gold-seal">步入仙途</button>
-                <button id="logoutBtn" class="seal-btn logout-btn">断绝仙缘</button>
-            </div>
+    <!-- 自定义弹窗 -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">黄小仙</div>
+            <div class="modal-message" id="modalMessage"></div>
+            <div class="modal-buttons" id="modalButtons"></div>
         </div>
     </div>
 
     <script>
-        const YUJU_CONFIG = {
-            user: '2051775505',
-            pass: 'Raccoon',
-            appid: '1121',
-            apiCreate: 'https://yuju.99kpk.top:81/api/file_api_establish.php',
-            apiModify: 'https://yuju.99kpk.top:81/api/file_api_modify.php',
-            apiList: 'https://yuju.99kpk.top:81/api/file_obtain_list.php',
-            apiQuery: 'https://yuju.99kpk.top:81/api/file_api_query.php'
-        };
+        (function() {
+            // ==================== 诊断开关 ====================
+            const DEBUG = false; // 上线时可设为 false
+            function log(msg, data) { if (DEBUG) console.log(`[仙籍] ${msg}`, data || ''); }
+            function logError(msg, err) { if (DEBUG) console.error(`[仙籍❌] ${msg}`, err || ''); }
 
-        // DOM元素 - 登录相关
-        const loginSection = document.getElementById('loginSection');
-        const daoHaoInput = document.getElementById('daoHao');
-        const miMaInput = document.getElementById('miMa');
-        const passwordGroup = document.getElementById('passwordGroup');
-        const submitBtn = document.getElementById('submit-name');
-        const loadingTip = document.getElementById('loadingTip');
-        const loadingText = document.getElementById('loadingText');
+            // ==================== 配置 ====================
+            const YUJU_CONFIG = {
+                user: '2051775505',
+                pass: 'Raccoon',
+                appid: '1121',
+                apiCreate: 'https://yuju.99kpk.top:81/api/file_api_establish.php',
+                apiModify: 'https://yuju.99kpk.top:81/api/file_api_modify.php',
+                apiList: 'https://yuju.99kpk.top:81/api/file_obtain_list.php',
+                apiQuery: 'https://yuju.99kpk.top:81/api/file_api_query.php'
+            };
 
-        // DOM元素 - 用户信息面板
-        const userInfoPanel = document.getElementById('userInfoPanel');
-        const displayDaoHao = document.getElementById('displayDaoHao');
-        const displayLingYun = document.getElementById('displayLingYun');
-        const displayZhuoNian = document.getElementById('displayZhuoNian');
-        const displayStoryNode = document.getElementById('displayStoryNode');
-        const displayDays = document.getElementById('displayDays');
-        const cultivateDaysRow = document.getElementById('cultivateDaysRow');
-        const achievementsList = document.getElementById('achievementsList');
-        const continueGameBtn = document.getElementById('continueGame');
-        const logoutBtn = document.getElementById('logoutBtn');
+            // DOM元素
+            const loginSection = document.getElementById('loginSection');
+            const daoHaoInput = document.getElementById('daoHao');
+            const miMaInput = document.getElementById('miMa');
+            const passwordGroup = document.getElementById('passwordGroup');
+            const submitBtn = document.getElementById('submit-name');
+            const loadingTip = document.getElementById('loadingTip');
+            const loadingText = document.getElementById('loadingText');
+            const footerHint = document.querySelector('.footer-hint');
 
-        // 故事节点友好名称映射
-        const storyNodeNames = {
-            'start': '初入仙途',
-            'forest': '迷踪森林',
-            'temple': '古刹问道',
-            'cliff': '断崖悟道',
-            'cave': '洞天福地',
-            'village': '桃源村落',
-            'peak': '凌霄绝顶',
-            'abyss': '幽冥深渊',
-            'palace': '仙宫大殿',
-            'end': '功德圆满'
-        };
+            const userInfoPanel = document.getElementById('userInfoPanel');
+            const displayDaoHao = document.getElementById('displayDaoHao');
+            const displayLingYun = document.getElementById('displayLingYun');
+            const displayZhuoNian = document.getElementById('displayZhuoNian');
+            const displayStoryNode = document.getElementById('displayStoryNode');
+            const displayDays = document.getElementById('displayDays');
+            const cultivateRow = document.getElementById('cultivateRow');
+            const logoutBtn = document.getElementById('logoutBtn');
 
-        function getFriendlyNodeName(node) {
-            return storyNodeNames[node] || node || '未知';
-        }
+            // 自定义弹窗元素
+            const modalOverlay = document.getElementById('customModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalButtons = document.getElementById('modalButtons');
 
-        // 密码哈希
-        function hashPassword(pwd) {
-            let hash = 0;
-            for (let i = 0; i < pwd.length; i++) {
-                hash = (hash << 5) - hash + pwd.charCodeAt(i);
-                hash |= 0;
-            }
-            return hash.toString();
-        }
+            const storyNodeNames = {
+                'start': '初入仙途',
+                'forest': '迷踪森林',
+                'temple': '古刹问道',
+                'cliff': '断崖悟道',
+                'cave': '洞天福地',
+                'village': '桃源村落',
+                'peak': '凌霄绝顶',
+                'abyss': '幽冥深渊',
+                'palace': '仙宫大殿',
+                'end': '功德圆满'
+            };
+            function getFriendlyNodeName(node) { return storyNodeNames[node] || node || '未知'; }
 
-        // ==================== 合规接口封装 ====================
-        async function getDocList() {
-            const params = new URLSearchParams({
-                user: YUJU_CONFIG.user,
-                pass: YUJU_CONFIG.pass,
-                appid: YUJU_CONFIG.appid
-            });
-            const res = await fetch(`${YUJU_CONFIG.apiList}?${params.toString()}`);
-            const data = await res.json();
-            return String(data.code) === '1' ? data.list : [];
-        }
-
-        async function getDocInfoByTitle(daoHao) {
-            const list = await getDocList();
-            const doc = list.find(item => item.title === daoHao);
-            return doc ? { id: doc.id, title: doc.title } : null;
-        }
-
-        async function getDocContentById(docId) {
-            const params = new URLSearchParams({
-                user: YUJU_CONFIG.user,
-                appid: YUJU_CONFIG.appid,
-                id: docId
-            });
-            const res = await fetch(`${YUJU_CONFIG.apiQuery}?${params.toString()}`);
-            const data = await res.json();
-            return String(data.code) === '1' ? JSON.parse(data.content) : null;
-        }
-
-        async function modifyDoc(docId, originalTitle, contentObj) {
-            const formData = new URLSearchParams();
-            formData.append('user', YUJU_CONFIG.user);
-            formData.append('pass', YUJU_CONFIG.pass);
-            formData.append('appid', YUJU_CONFIG.appid);
-            formData.append('id', docId);
-            formData.append('title', originalTitle);
-            formData.append('content', JSON.stringify(contentObj));
-            const res = await fetch(YUJU_CONFIG.apiModify, { method: 'POST', body: formData });
-            const result = await res.json();
-            return String(result.code) === '1';
-        }
-
-        async function createDoc(daoHao, contentObj) {
-            const formData = new URLSearchParams();
-            formData.append('user', YUJU_CONFIG.user);
-            formData.append('pass', YUJU_CONFIG.pass);
-            formData.append('appid', YUJU_CONFIG.appid);
-            formData.append('title', daoHao);
-            formData.append('content', JSON.stringify(contentObj));
-            const res = await fetch(YUJU_CONFIG.apiCreate, { method: 'POST', body: formData });
-            const result = await res.json();
-            return String(result.code) === '1';
-        }
-
-        // ==================== 本地数据同步 ====================
-        function syncLocalData(content, daoHao, docId) {
-            localStorage.setItem('playerName', daoHao);
-            localStorage.setItem('achieves', JSON.stringify(content.achievements || []));
-            localStorage.setItem('storyNode', content.storyNode || 'start');
-            localStorage.setItem('lingYun', content.lingYun || 100);
-            localStorage.setItem('zhuoNian', content.zhuoNian || 0);
-            localStorage.setItem('lastCloudSaveTime', Date.now());
-            localStorage.setItem('cloudDocId', docId);
-        }
-
-        // ==================== 显示用户信息面板 ====================
-        function showUserInfo(content, daoHao, docId) {
-            // 隐藏登录区域和加载提示
-            loginSection.style.display = 'none';
-            loadingTip.style.display = 'none';
-
-            // 填充用户信息
-            displayDaoHao.textContent = daoHao;
-            displayLingYun.textContent = content.lingYun !== undefined ? content.lingYun : 100;
-            displayZhuoNian.textContent = content.zhuoNian !== undefined ? content.zhuoNian : 0;
-            displayStoryNode.textContent = getFriendlyNodeName(content.storyNode || 'start');
-
-            // 修行时日
-            if (content.createTime) {
-                const days = Math.floor((Date.now() - content.createTime) / (1000 * 60 * 60 * 24));
-                displayDays.textContent = days + ' 日';
-                cultivateDaysRow.style.display = 'flex';
-            } else {
-                cultivateDaysRow.style.display = 'none';
-            }
-
-            // 成就列表
-            const achievements = content.achievements || [];
-            if (achievements.length === 0) {
-                achievementsList.innerHTML = '<span class="ach-empty">暂无仙绩，修行之路尚远</span>';
-            } else {
-                let html = '';
-                const maxShow = 10;
-                const showItems = achievements.slice(0, maxShow);
-                showItems.forEach(ach => {
-                    let name = '';
-                    if (typeof ach === 'string') {
-                        name = ach;
-                    } else if (typeof ach === 'object' && ach !== null) {
-                        name = ach.name || ach.title || ach.id || JSON.stringify(ach);
-                    } else {
-                        name = String(ach);
-                    }
-                    html += `<span class="ach-item">${name}</span>`;
-                });
-                if (achievements.length > maxShow) {
-                    html +=
-                        `<span class="ach-item">…等${achievements.length}项</span>`;
+            function hashPassword(pwd) {
+                let hash = 0;
+                for (let i = 0; i < pwd.length; i++) {
+                    hash = (hash << 5) - hash + pwd.charCodeAt(i);
+                    hash |= 0;
                 }
-                achievementsList.innerHTML = html;
+                return hash.toString();
             }
 
-            // 显示用户信息面板
-            userInfoPanel.style.display = 'block';
-
-            // 保存云端文档ID供后续使用
-            localStorage.setItem('cloudDocId', docId);
-        }
-
-        // ==================== 退出登录 ====================
-        function logout() {
-            // 清除所有相关缓存
-            localStorage.removeItem('playerName');
-            localStorage.removeItem('achieves');
-            localStorage.removeItem('storyNode');
-            localStorage.removeItem('lingYun');
-            localStorage.removeItem('zhuoNian');
-            localStorage.removeItem('lastCloudSaveTime');
-            localStorage.removeItem('cloudDocId');
-            localStorage.removeItem('savedDaoHao');
-            localStorage.removeItem('savedPasswordHash');
-            localStorage.removeItem('rememberTime');
-
-            // 隐藏用户信息面板
-            userInfoPanel.style.display = 'none';
-
-            // 恢复登录表单
-            loginSection.style.display = 'block';
-            daoHaoInput.value = '';
-            miMaInput.value = '';
-            passwordGroup.style.display = 'none';
-            submitBtn.textContent = '踏入仙府';
-            submitBtn.disabled = false;
-            loadingTip.style.display = 'none';
-            daoHaoInput.focus();
-
-            // 恢复卷轴高度
-            document.querySelector('.scroll-container').style.minHeight = '380px';
-        }
-
-        // ==================== 继续游戏 ====================
-        continueGameBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-
-        // ==================== 退出登录按钮 ====================
-        logoutBtn.addEventListener('click', () => {
-            if (confirm('黄小仙：道友当真要断绝仙缘？此去一别，需重新核验密令方可归来。')) {
-                logout();
+            // ==================== 自定义弹窗（替代alert/confirm） ====================
+            function showModal(message, type, callback) {
+                modalMessage.textContent = message;
+                modalButtons.innerHTML = '';
+                if (type === 'confirm') {
+                    modalTitle.textContent = '黄小仙';
+                    const confirmBtn = document.createElement('button');
+                    confirmBtn.className = 'modal-btn confirm';
+                    confirmBtn.textContent = '确 定';
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'modal-btn cancel';
+                    cancelBtn.textContent = '取 消';
+                    confirmBtn.onclick = () => { closeModal(); if(callback) callback(true); };
+                    cancelBtn.onclick = () => { closeModal(); if(callback) callback(false); };
+                    modalButtons.appendChild(confirmBtn);
+                    modalButtons.appendChild(cancelBtn);
+                } else {
+                    modalTitle.textContent = '黄小仙';
+                    const okBtn = document.createElement('button');
+                    okBtn.className = 'modal-btn confirm';
+                    okBtn.textContent = '知 晓';
+                    okBtn.onclick = () => { closeModal(); if(callback) callback(); };
+                    modalButtons.appendChild(okBtn);
+                }
+                modalOverlay.style.display = 'flex';
             }
-        });
+            function closeModal() {
+                modalOverlay.style.display = 'none';
+            }
+            // 便捷方法
+            function customAlert(msg, callback) { showModal(msg, 'alert', callback); }
+            function customConfirm(msg, callback) { showModal(msg, 'confirm', callback); }
 
-        // ==================== 核心逻辑：自动登录 ====================
-        async function tryAutoLoginAfterClick(daoHao) {
-            const savedDaoHao = localStorage.getItem('savedDaoHao');
-            const savedHash = localStorage.getItem('savedPasswordHash');
-            const rememberTime = localStorage.getItem('rememberTime');
+            // ==================== API封装 ====================
+            async function safeFetch(url, options = {}) {
+                log(`📡 请求: ${options.method || 'GET'} ${url}`);
+                const res = await fetch(url, options);
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    logError('响应非JSON:', text.substring(0, 200));
+                    throw new Error('仙途通讯紊乱，请稍后再试');
+                }
+            }
 
-            if (savedDaoHao !== daoHao) return false;
-            if (!rememberTime || Date.now() - parseInt(rememberTime) > 7 * 24 * 60 * 60 * 1000) {
+            async function getDocList() {
+                const params = new URLSearchParams({
+                    user: YUJU_CONFIG.user, pass: YUJU_CONFIG.pass, appid: YUJU_CONFIG.appid
+                });
+                const data = await safeFetch(`${YUJU_CONFIG.apiList}?${params.toString()}`);
+                return String(data.code) === '1' ? data.list : [];
+            }
+
+            async function getDocInfoByTitle(daoHao) {
+                const list = await getDocList();
+                const doc = list.find(item => item.title === daoHao);
+                return doc ? { id: doc.id, title: doc.title } : null;
+            }
+
+            async function getDocContentById(docId) {
+                const params = new URLSearchParams({
+                    user: YUJU_CONFIG.user, appid: YUJU_CONFIG.appid, id: docId
+                });
+                const data = await safeFetch(`${YUJU_CONFIG.apiQuery}?${params.toString()}`);
+                if (String(data.code) !== '1') throw new Error(data.msg || '读取仙籍失败');
+                return JSON.parse(data.content);
+            }
+
+            async function modifyDoc(docId, originalTitle, contentObj) {
+                const formData = new URLSearchParams();
+                formData.append('user', YUJU_CONFIG.user);
+                formData.append('pass', YUJU_CONFIG.pass);
+                formData.append('appid', YUJU_CONFIG.appid);
+                formData.append('id', docId);
+                formData.append('title', originalTitle);
+                formData.append('content', JSON.stringify(contentObj));
+                const result = await safeFetch(YUJU_CONFIG.apiModify, { method: 'POST', body: formData });
+                return String(result.code) === '1';
+            }
+
+            async function createDoc(daoHao, contentObj) {
+                const formData = new URLSearchParams();
+                formData.append('user', YUJU_CONFIG.user);
+                formData.append('pass', YUJU_CONFIG.pass);
+                formData.append('appid', YUJU_CONFIG.appid);
+                formData.append('title', daoHao);
+                formData.append('content', JSON.stringify(contentObj));
+                const result = await safeFetch(YUJU_CONFIG.apiCreate, { method: 'POST', body: formData });
+                return String(result.code) === '1';
+            }
+
+            // ==================== 本地存储 ====================
+            function syncLocalData(content, daoHao, docId) {
+                localStorage.setItem('playerName', daoHao);
+                localStorage.setItem('achieves', JSON.stringify(content.achievements || []));
+                localStorage.setItem('storyNode', content.storyNode || 'start');
+                localStorage.setItem('lingYun', content.lingYun || 100);
+                localStorage.setItem('zhuoNian', content.zhuoNian || 0);
+                localStorage.setItem('lastCloudSaveTime', Date.now());
+                localStorage.setItem('cloudDocId', docId);
+            }
+
+            function clearLoginCache() {
+                localStorage.removeItem('savedDaoHao');
                 localStorage.removeItem('savedPasswordHash');
                 localStorage.removeItem('rememberTime');
-                return false;
             }
-            if (!savedHash) return false;
 
-            // 显示加载状态
-            loadingTip.style.display = 'block';
-            loadingText.textContent = '正在核验仙籍...';
-            daoHaoInput.style.display = 'none';
-            passwordGroup.style.display = 'none';
-            submitBtn.style.display = 'none';
-            document.querySelector('.footer-hint').style.display = 'none';
-
-            try {
-                const docInfo = await getDocInfoByTitle(daoHao);
-                if (!docInfo) throw new Error();
-                const content = await getDocContentById(docInfo.id);
-                if (!content || content.passwordHash !== savedHash) throw new Error();
-
-                // 验证成功
-                syncLocalData(content, daoHao, docInfo.id);
-                localStorage.setItem('rememberTime', Date.now().toString());
-                loadingText.textContent = '仙籍核验通过，道友请观...';
-
-                // 短暂延迟后显示用户信息面板
-                setTimeout(() => {
-                    // 恢复被隐藏的元素（showUserInfo会整体隐藏loginSection）
-                    daoHaoInput.style.display = 'block';
-                    submitBtn.style.display = 'block';
-                    document.querySelector('.footer-hint').style.display = '';
-                    showUserInfo(content, daoHao, docInfo.id);
-                }, 800);
-                return true;
-            } catch {
+            // ==================== 界面切换 ====================
+            function resetLoginForm() {
+                submitBtn.disabled = false;
+                loadingTip.style.display = 'none';
+                passwordGroup.style.display = 'none';
                 daoHaoInput.style.display = 'block';
                 submitBtn.style.display = 'block';
-                document.querySelector('.footer-hint').style.display = '';
+                if (footerHint) footerHint.style.display = '';
+                submitBtn.textContent = '踏入仙府';
+                miMaInput.value = '';
+            }
+
+            function showEmbeddedInfo(content, daoHao, docId) {
+                // 隐藏登录区，显示简洁信息面板
+                loginSection.style.display = 'none';
                 loadingTip.style.display = 'none';
-                return false;
-            }
-        }
+                userInfoPanel.style.display = 'block';
 
-        // ==================== 按钮点击事件 ====================
-        submitBtn.addEventListener('click', async () => {
-            const daoHao = daoHaoInput.value.trim();
-            if (!daoHao) {
-                alert('黄小仙：道号不可为空！');
-                return;
-            }
+                displayDaoHao.textContent = daoHao;
+                displayLingYun.textContent = content.lingYun !== undefined ? content.lingYun : 100;
+                displayZhuoNian.textContent = content.zhuoNian !== undefined ? content.zhuoNian : 0;
+                displayStoryNode.textContent = getFriendlyNodeName(content.storyNode || 'start');
 
-            // 第一步：尝试自动登录
-            const autoLoginSuccess = await tryAutoLoginAfterClick(daoHao);
-            if (autoLoginSuccess) return;
-
-            // 第二步：自动登录失败，走手动流程
-            if (passwordGroup.style.display === 'none') {
-                const docInfo = await getDocInfoByTitle(daoHao);
-                passwordGroup.style.display = 'block';
-                miMaInput.focus();
-                submitBtn.textContent = docInfo ? '验证密令' : '录入仙籍';
-                return;
+                if (content.createTime) {
+                    const days = Math.floor((Date.now() - content.createTime) / (1000 * 60 * 60 * 24));
+                    displayDays.textContent = days + ' 日';
+                    cultivateRow.style.display = 'block';
+                } else {
+                    cultivateRow.style.display = 'none';
+                }
+                localStorage.setItem('cloudDocId', docId);
             }
 
-            const miMa = miMaInput.value;
-            if (!miMa || miMa.length < 4) {
-                alert('黄小仙：密令至少4位！');
-                return;
+            function logout() {
+                clearLoginCache();
+                localStorage.removeItem('playerName');
+                localStorage.removeItem('achieves');
+                localStorage.removeItem('storyNode');
+                localStorage.removeItem('lingYun');
+                localStorage.removeItem('zhuoNian');
+                localStorage.removeItem('lastCloudSaveTime');
+                localStorage.removeItem('cloudDocId');
+                userInfoPanel.style.display = 'none';
+                loginSection.style.display = 'block';
+                resetLoginForm();
+                daoHaoInput.focus();
             }
 
-            // 手动验证/注册逻辑
-            submitBtn.disabled = true;
-            loadingTip.style.display = 'block';
-            loadingText.textContent = '正在核验密令...';
+            // ==================== 自动登录逻辑 ====================
+            async function tryAutoLoginAfterClick(daoHao) {
+                const savedDaoHao = localStorage.getItem('savedDaoHao');
+                const savedHash = localStorage.getItem('savedPasswordHash');
+                const rememberTime = localStorage.getItem('rememberTime');
 
-            const docInfo = await getDocInfoByTitle(daoHao);
-            const passwordHash = hashPassword(miMa);
+                if (savedDaoHao !== daoHao) return false;
+                if (!rememberTime || Date.now() - parseInt(rememberTime) > 7 * 24 * 60 * 60 * 1000) {
+                    clearLoginCache();
+                    return false;
+                }
+                if (!savedHash) return false;
 
-            // 新账号注册
-            if (!docInfo) {
-                const newContent = {
-                    achievements: [],
-                    storyNode: 'start',
-                    lingYun: 100,
-                    zhuoNian: 0,
-                    createTime: Date.now(),
-                    passwordHash: passwordHash
-                };
-                const success = await createDoc(daoHao, newContent);
-                if (success) {
-                    const newDocInfo = await getDocInfoByTitle(daoHao);
-                    if (newDocInfo) {
+                loadingTip.style.display = 'block';
+                daoHaoInput.style.display = 'none';
+                passwordGroup.style.display = 'none';
+                submitBtn.style.display = 'none';
+                if (footerHint) footerHint.style.display = 'none';
+
+                try {
+                    const docInfo = await getDocInfoByTitle(daoHao);
+                    if (!docInfo) throw new Error();
+                    const content = await getDocContentById(docInfo.id);
+                    if (!content || content.passwordHash !== savedHash) throw new Error();
+
+                    syncLocalData(content, daoHao, docInfo.id);
+                    localStorage.setItem('rememberTime', Date.now().toString());
+                    loadingText.textContent = '仙籍核验通过，道友请观...';
+                    setTimeout(() => showEmbeddedInfo(content, daoHao, docInfo.id), 800);
+                    return true;
+                } catch (e) {
+                    resetLoginForm();
+                    return false;
+                }
+            }
+
+            // ==================== 主按钮交互 ====================
+            submitBtn.addEventListener('click', async () => {
+                if (submitBtn.disabled) return;
+                const daoHao = daoHaoInput.value.trim();
+                if (!daoHao) {
+                    customAlert('黄小仙：道号不可为空！');
+                    return;
+                }
+
+                // 自动登录尝试
+                try {
+                    const autoOk = await tryAutoLoginAfterClick(daoHao);
+                    if (autoOk) return;
+                } catch (e) {
+                    resetLoginForm();
+                    customAlert('黄小仙：仙途感应紊乱，请稍后再试');
+                    return;
+                }
+
+                // 手动流程
+                if (passwordGroup.style.display === 'none') {
+                    try {
+                        const docInfo = await getDocInfoByTitle(daoHao);
+                        passwordGroup.style.display = 'block';
+                        miMaInput.focus();
+                        submitBtn.textContent = docInfo ? '验证密令' : '录入仙籍';
+                    } catch (e) {
+                        customAlert('黄小仙：无法连接仙籍库，请检查网络。');
+                        resetLoginForm();
+                    }
+                    return;
+                }
+
+                const miMa = miMaInput.value;
+                if (!miMa || miMa.length < 4) {
+                    customAlert('黄小仙：密令至少4位！');
+                    miMaInput.focus();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                loadingTip.style.display = 'block';
+                loadingText.textContent = '正在核验密令...';
+
+                try {
+                    const docInfo = await getDocInfoByTitle(daoHao);
+                    const passwordHash = hashPassword(miMa);
+
+                    if (!docInfo) {
+                        // 注册
+                        const newContent = {
+                            achievements: [],
+                            storyNode: 'start',
+                            lingYun: 100,
+                            zhuoNian: 0,
+                            createTime: Date.now(),
+                            passwordHash: passwordHash
+                        };
+                        const success = await createDoc(daoHao, newContent);
+                        if (!success) throw new Error('录入失败');
+                        const newDocInfo = await getDocInfoByTitle(daoHao);
+                        if (!newDocInfo) throw new Error('录入后未能寻得仙籍');
                         localStorage.setItem('savedDaoHao', daoHao);
                         localStorage.setItem('savedPasswordHash', passwordHash);
                         localStorage.setItem('rememberTime', Date.now().toString());
-                        localStorage.setItem('cloudDocId', newDocInfo.id);
                         syncLocalData(newContent, daoHao, newDocInfo.id);
                         loadingText.textContent = '仙籍录入成功，道友请观...';
-                        setTimeout(() => {
-                            showUserInfo(newContent, daoHao, newDocInfo.id);
-                        }, 800);
+                        setTimeout(() => showEmbeddedInfo(newContent, daoHao, newDocInfo.id), 800);
+                        return;
                     }
-                } else {
-                    alert('黄小仙：仙籍录入失败！');
-                    submitBtn.disabled = false;
-                    loadingTip.style.display = 'none';
+
+                    // 老用户
+                    const content = await getDocContentById(docInfo.id);
+                    if (!content) throw new Error('读取仙籍失败');
+
+                    if (!content.passwordHash) {
+                        content.passwordHash = passwordHash;
+                        const success = await modifyDoc(docInfo.id, docInfo.title, content);
+                        if (!success) throw new Error('补全密令失败');
+                        localStorage.setItem('savedDaoHao', daoHao);
+                        localStorage.setItem('savedPasswordHash', passwordHash);
+                        localStorage.setItem('rememberTime', Date.now().toString());
+                        syncLocalData(content, daoHao, docInfo.id);
+                        loadingText.textContent = '已补全密令，道友请观...';
+                        setTimeout(() => showEmbeddedInfo(content, daoHao, docInfo.id), 800);
+                    } else if (content.passwordHash === passwordHash) {
+                        localStorage.setItem('savedDaoHao', daoHao);
+                        localStorage.setItem('savedPasswordHash', passwordHash);
+                        localStorage.setItem('rememberTime', Date.now().toString());
+                        syncLocalData(content, daoHao, docInfo.id);
+                        loadingText.textContent = '密令验证通过，道友请观...';
+                        setTimeout(() => showEmbeddedInfo(content, daoHao, docInfo.id), 800);
+                    } else {
+                        throw new Error('密令错误');
+                    }
+                } catch (e) {
+                    resetLoginForm();
+                    if (e.message.includes('密令错误')) {
+                        customAlert('黄小仙：密令错误！');
+                        miMaInput.value = '';
+                        miMaInput.focus();
+                    } else {
+                        customAlert('黄小仙：' + (e.message || '仙途感应紊乱，请稍后再试'));
+                    }
                 }
-                return;
-            }
+            });
 
-            // 老账号验证
-            const content = await getDocContentById(docInfo.id);
-            if (!content) {
-                alert('黄小仙：读取仙籍失败！');
-                submitBtn.disabled = false;
-                loadingTip.style.display = 'none';
-                return;
-            }
+            // 退出登录
+            logoutBtn.addEventListener('click', () => {
+                customConfirm('黄小仙：道友当真要断绝仙缘？此去一别，需重新核验密令方可归来。', (result) => {
+                    if (result) logout();
+                });
+            });
 
-            if (!content.passwordHash) {
-                // 旧档补全密码
-                content.passwordHash = passwordHash;
-                const success = await modifyDoc(docInfo.id, docInfo.title, content);
-                if (success) {
-                    localStorage.setItem('savedDaoHao', daoHao);
-                    localStorage.setItem('savedPasswordHash', passwordHash);
-                    localStorage.setItem('rememberTime', Date.now().toString());
-                    localStorage.setItem('cloudDocId', docInfo.id);
-                    syncLocalData(content, daoHao, docInfo.id);
-                    loadingText.textContent = '已补全密令，道友请观...';
-                    setTimeout(() => {
-                        showUserInfo(content, daoHao, docInfo.id);
-                    }, 800);
-                } else {
-                    alert('黄小仙：补全密令失败！');
-                    submitBtn.disabled = false;
-                    loadingTip.style.display = 'none';
+            // 统计上报（无感）
+            (function() {
+                const STAT_API = 'https://yuju.99kpk.top:81/api/statistics_add.php';
+                const params = new URLSearchParams({ user: '2051775505', appid: '1121' });
+                if (window.location.protocol !== 'file:') {
+                    fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
                 }
-            } else if (content.passwordHash === passwordHash) {
-                // 密码正确
-                localStorage.setItem('savedDaoHao', daoHao);
-                localStorage.setItem('savedPasswordHash', passwordHash);
-                localStorage.setItem('rememberTime', Date.now().toString());
-                localStorage.setItem('cloudDocId', docInfo.id);
-                syncLocalData(content, daoHao, docInfo.id);
-                loadingText.textContent = '密令验证通过，道友请观...';
-                setTimeout(() => {
-                    showUserInfo(content, daoHao, docInfo.id);
-                }, 800);
-            } else {
-                alert('黄小仙：密令错误！');
-                miMaInput.value = '';
-                miMaInput.focus();
-                submitBtn.disabled = false;
-                loadingTip.style.display = 'none';
-            }
-        });
-
-        // 统计上报（无感执行，不影响界面）
-        (function() {
-            const STAT_API = 'https://yuju.99kpk.top:81/api/statistics_add.php';
-            const params = new URLSearchParams({ user: '2051775505', appid: '1121' });
-            if (window.location.protocol !== 'file:') {
-                fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
-            }
+            })();
         })();
     </script>
 </body>

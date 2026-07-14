@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -410,6 +411,110 @@
                 fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(()=>{});
             }
         })();
+    </script>
+</body>
+</html>
+
+
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>此刻</title>
+    <style>
+        /* 全局重置，确保没有任何多余边距 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial, sans-serif;
+            /* 页面加载淡入 */
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        /* 核心文字样式 */
+        .time {
+            font-size: clamp(2.8rem, 10vw, 7rem);
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            /* 渐变色：青 → 紫 → 粉 */
+            background: linear-gradient(135deg, #00d2ff, #7a2ffc, #ff6fd8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* 呼吸动画：3秒循环 */
+            animation: breathe 3s ease-in-out infinite;
+            /* 柔和发光 */
+            filter: drop-shadow(0 0 40px rgba(122, 47, 252, 0.25));
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* 呼吸动画：轻微缩放 + 透明度微变 */
+        @keyframes breathe {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.85;
+                transform: scale(1.03);
+            }
+        }
+
+        /* 页面淡入 */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 极窄屏幕（比如手表）下确保不溢出 */
+        @media (max-width: 360px) {
+            .time {
+                font-size: 2.2rem;
+                letter-spacing: 0.06em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 初始文字会在 JS 加载后立即更新，所以这里写一个占位 -->
+    <div class="time" id="timeDisplay">此刻 · 00:00:00</div>
+
+    <script>
+        // 更新时间的函数
+        function updateTime() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('timeDisplay').textContent =
+                `此刻 · ${h}:${m}:${s}`;
+        }
+
+        // 立即执行一次，避免占位文字停留
+        updateTime();
+        // 每秒更新
+        setInterval(updateTime, 1000);
     </script>
 </body>
 </html>

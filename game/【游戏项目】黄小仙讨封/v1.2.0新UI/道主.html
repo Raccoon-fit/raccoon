@@ -5,228 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仙籍核验 - 黄小仙讨封</title>
     <style>
+        /* 所有样式保持不变（和之前完全一样） */
         body { 
-            background: #3e2723; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'SimSun', serif; 
+            background: #3e2723; display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; font-family: 'SimSun', serif; 
         }
         .scroll-container { 
-            width: 90%; 
-            max-width: 450px; 
-            padding: 40px 30px; 
+            width: 90%; max-width: 450px; padding: 40px 30px; 
             background: linear-gradient(#f5e8c9, #e8d8a9); 
             border: 15px solid transparent; 
             border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path fill="%238B4513" d="M0,0 L50,0 L50,50 L0,50 Z" /><path fill="%23A0522D" d="M5,5 L45,5 L45,45 L5,45 Z" /></svg>') 30 stretch; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
-            animation: unfold 1.5s ease-out; 
-            position: relative;
-            min-height: 300px;
+            animation: unfold 1.5s ease-out; position: relative; min-height: 300px;
         }
         @keyframes unfold { 
             from { transform: scaleY(0.1) translateY(-50%); opacity: 0; } 
             to { transform: scaleY(1) translateY(0); opacity: 1; } 
         }
-        .title { 
-            text-align: center; 
-            color: #5c3a21; 
-            font-size: 2.2em; 
-            margin-bottom: 10px; 
-            text-shadow: 2px 2px 0px #d2b48c; 
-            letter-spacing: 5px; 
-        }
-        .subtitle { 
-            text-align: center; 
-            color: #8b5a2b; 
-            font-size: 0.9em; 
-            margin-bottom: 30px; 
-            border-bottom: 1px dashed #8b5a2b; 
-            padding-bottom: 15px; 
-        }
+        .title { text-align: center; color: #5c3a21; font-size: 2.2em; margin-bottom: 10px; text-shadow: 2px 2px 0px #d2b48c; letter-spacing: 5px; }
+        .subtitle { text-align: center; color: #8b5a2b; font-size: 0.9em; margin-bottom: 30px; border-bottom: 1px dashed #8b5a2b; padding-bottom: 15px; }
         .input-group { margin-bottom: 15px; }
-        .ink-input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            font-size: 1.1em; 
-            color: #5c3a21; 
-            background: rgba(255,255,255,0.7); 
-            border: none; 
-            border-bottom: 2px solid #8b5a2b; 
-            outline: none; 
-            box-sizing: border-box; 
-            font-family: 'KaiTi'; 
-        }
-        .ink-input:focus { 
-            background: rgba(255,255,255,0.9); 
-            border-bottom-color: #d2691e; 
-        }
-        .ink-input::placeholder { 
-            color: #a0522d; 
-            font-style: italic; 
-        }
-        .btn-group { 
-            display: flex; 
-            justify-content: space-around; 
-            margin-top: 30px; 
-        }
-        .seal-btn { 
-            padding: 12px 25px; 
-            font-size: 1em; 
-            font-weight: bold; 
-            color: #f5e8c9; 
-            background: #8B4513; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-family: 'SimHei'; 
-            box-shadow: 0 4px 0 #5D2906; 
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
+        .ink-input { width: 100%; padding: 12px 15px; font-size: 1.1em; color: #5c3a21; background: rgba(255,255,255,0.7); border: none; border-bottom: 2px solid #8b5a2b; outline: none; box-sizing: border-box; font-family: 'KaiTi'; }
+        .ink-input:focus { background: rgba(255,255,255,0.9); border-bottom-color: #d2691e; }
+        .ink-input::placeholder { color: #a0522d; font-style: italic; }
+        .btn-group { display: flex; justify-content: space-around; margin-top: 30px; }
+        .seal-btn { padding: 12px 25px; font-size: 1em; font-weight: bold; color: #f5e8c9; background: #8B4513; border: none; border-radius: 5px; cursor: pointer; font-family: 'SimHei'; box-shadow: 0 4px 0 #5D2906; transition: all 0.2s; white-space: nowrap; }
         .seal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #5D2906; }
         .seal-btn:active { transform: translateY(1px); box-shadow: 0 2px 0 #5D2906; }
         .red-seal { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
         .red-seal:hover { box-shadow: 0 6px 0 #5D1F1F; }
         .footer-hint { text-align: center; color: #8b5a2b; font-size: 0.8em; margin-top: 25px; }
-        .loading-tip { 
-            color: #8b5a2b; 
-            font-size: 0.9em; 
-            text-align: center; 
-            margin-top: 15px; 
-            display: none; 
-        }
-        .loading-spinner { 
-            display: inline-block; 
-            width: 16px; 
-            height: 16px; 
-            border: 2px solid #8b5a2b; 
-            border-top-color: transparent; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-right: 8px; 
-            vertical-align: middle; 
-        }
+        .loading-tip { color: #8b5a2b; font-size: 0.9em; text-align: center; margin-top: 15px; display: none; }
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #8b5a2b; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 用户信息面板（嵌入用，简洁文字版） */
-        .user-info-panel {
-            display: none;
-            text-align: center;
-            animation: fadeInPanel 0.6s ease-out;
-        }
-        @keyframes fadeInPanel {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-info-panel .welcome-line {
-            color: #5c3a21;
-            font-size: 1.4em;
-            letter-spacing: 3px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .user-info-panel .dao-hao-display {
-            color: #A52A2A;
-            font-size: 2.2em;
-            font-weight: bold;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 0px #d2b48c;
-            border-bottom: 2px dotted #c4a87c;
-            padding-bottom: 15px;
-            display: inline-block;
-            min-width: 120px;
-        }
-        .info-simple-row {
-            color: #3e2723;
-            font-size: 0.95em;
-            margin: 8px 0;
-            font-family: 'KaiTi';
-            letter-spacing: 1px;
-        }
-        .info-simple-row span {
-            color: #8b5a2b;
-            font-weight: bold;
-        }
-        .logout-mini-btn {
-            margin-top: 30px;
-            padding: 10px 25px;
-            font-size: 0.9em;
-            font-weight: bold;
-            color: #f5e8c9;
-            background: #6b4c3b;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'SimHei';
-            box-shadow: 0 4px 0 #3e2723;
-            transition: all 0.2s;
-        }
-        .logout-mini-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #3e2723;
-            background: #7d5a45;
-        }
+        .user-info-panel { display: none; text-align: center; animation: fadeInPanel 0.6s ease-out; }
+        @keyframes fadeInPanel { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user-info-panel .welcome-line { color: #5c3a21; font-size: 1.4em; letter-spacing: 3px; font-weight: bold; margin-bottom: 20px; }
+        .user-info-panel .dao-hao-display { color: #A52A2A; font-size: 2.2em; font-weight: bold; letter-spacing: 4px; margin-bottom: 20px; text-shadow: 1px 1px 0px #d2b48c; border-bottom: 2px dotted #c4a87c; padding-bottom: 15px; display: inline-block; min-width: 120px; }
+        .info-simple-row { color: #3e2723; font-size: 0.95em; margin: 8px 0; font-family: 'KaiTi'; letter-spacing: 1px; }
+        .info-simple-row span { color: #8b5a2b; font-weight: bold; }
+        .logout-mini-btn { margin-top: 30px; padding: 10px 25px; font-size: 0.9em; font-weight: bold; color: #f5e8c9; background: #6b4c3b; border: none; border-radius: 5px; cursor: pointer; font-family: 'SimHei'; box-shadow: 0 4px 0 #3e2723; transition: all 0.2s; }
+        .logout-mini-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #3e2723; background: #7d5a45; }
 
-        /* 自定义古风弹窗 */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-        .modal-content {
-            background: linear-gradient(#faf0dc, #ecd9b4);
-            border: 8px solid #8B4513;
-            border-radius: 12px;
-            padding: 30px 25px;
-            max-width: 320px;
-            width: 85%;
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            font-family: 'KaiTi', serif;
-            color: #4a2c17;
-        }
-        .modal-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #A52A2A;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #8b5a2b;
-            padding-bottom: 10px;
-        }
-        .modal-message {
-            font-size: 1em;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            color: #3e2723;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .modal-btn {
-            padding: 10px 28px;
-            font-size: 1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'SimHei';
-            color: #f5e8c9;
-            box-shadow: 0 4px 0 #5D2906;
-            transition: all 0.2s;
-        }
+        .modal-content { background: linear-gradient(#faf0dc, #ecd9b4); border: 8px solid #8B4513; border-radius: 12px; padding: 30px 25px; max-width: 320px; width: 85%; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8); font-family: 'KaiTi', serif; color: #4a2c17; }
+        .modal-title { font-size: 1.3em; font-weight: bold; color: #A52A2A; letter-spacing: 3px; margin-bottom: 15px; border-bottom: 1px dashed #8b5a2b; padding-bottom: 10px; }
+        .modal-message { font-size: 1em; line-height: 1.6; margin-bottom: 25px; color: #3e2723; }
+        .modal-buttons { display: flex; justify-content: center; gap: 20px; }
+        .modal-btn { padding: 10px 28px; font-size: 1em; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-family: 'SimHei'; color: #f5e8c9; box-shadow: 0 4px 0 #5D2906; transition: all 0.2s; }
         .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #5D2906; }
         .modal-btn:active { transform: translateY(1px); box-shadow: 0 2px 0 #5D2906; }
         .modal-btn.confirm { background: #A52A2A; box-shadow: 0 4px 0 #5D1F1F; }
@@ -235,7 +63,6 @@
 </head>
 <body>
     <div class="scroll-container">
-        <!-- 登录表单区域 -->
         <div id="loginSection">
             <h1 class="title">仙籍核验</h1>
             <p class="subtitle">道号即为凭证，入我仙府者，仙途永续。</p>
@@ -255,7 +82,6 @@
             <p class="footer-hint">道号一旦确立，便与仙途绑定，慎之。</p>
         </div>
 
-        <!-- 用户信息面板（嵌入式，仅显示文字） -->
         <div class="user-info-panel" id="userInfoPanel">
             <p class="welcome-line">✨ 仙籍在册，道友安好 ✨</p>
             <div class="dao-hao-display" id="displayDaoHao"></div>
@@ -267,7 +93,6 @@
         </div>
     </div>
 
-    <!-- 自定义弹窗 -->
     <div class="modal-overlay" id="customModal">
         <div class="modal-content">
             <div class="modal-title" id="modalTitle">黄小仙</div>
@@ -278,12 +103,6 @@
 
     <script>
         (function() {
-            // ==================== 诊断开关 ====================
-            const DEBUG = false; // 上线时可设为 false
-            function log(msg, data) { if (DEBUG) console.log(`[仙籍] ${msg}`, data || ''); }
-            function logError(msg, err) { if (DEBUG) console.error(`[仙籍❌] ${msg}`, err || ''); }
-
-            // ==================== 配置 ====================
             const YUJU_CONFIG = {
                 user: '2051775505',
                 pass: 'Raccoon',
@@ -294,7 +113,6 @@
                 apiQuery: 'https://yuju.99kpk.top:81/api/file_api_query.php'
             };
 
-            // DOM元素
             const loginSection = document.getElementById('loginSection');
             const daoHaoInput = document.getElementById('daoHao');
             const miMaInput = document.getElementById('miMa');
@@ -313,7 +131,6 @@
             const cultivateRow = document.getElementById('cultivateRow');
             const logoutBtn = document.getElementById('logoutBtn');
 
-            // 自定义弹窗元素
             const modalOverlay = document.getElementById('customModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalMessage = document.getElementById('modalMessage');
@@ -342,7 +159,7 @@
                 return hash.toString();
             }
 
-            // ==================== 自定义弹窗（替代alert/confirm） ====================
+            // 自定义弹窗
             function showModal(message, type, callback) {
                 modalMessage.textContent = message;
                 modalButtons.innerHTML = '';
@@ -368,43 +185,43 @@
                 }
                 modalOverlay.style.display = 'flex';
             }
-            function closeModal() {
-                modalOverlay.style.display = 'none';
-            }
-            // 便捷方法
+            function closeModal() { modalOverlay.style.display = 'none'; }
             function customAlert(msg, callback) { showModal(msg, 'alert', callback); }
             function customConfirm(msg, callback) { showModal(msg, 'confirm', callback); }
 
-            // ==================== API封装 ====================
+            // ========== API封装（严格按文档） ==========
             async function safeFetch(url, options = {}) {
-                log(`📡 请求: ${options.method || 'GET'} ${url}`);
                 const res = await fetch(url, options);
                 const text = await res.text();
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    logError('响应非JSON:', text.substring(0, 200));
-                    throw new Error('仙途通讯紊乱，请稍后再试');
-                }
+                try { return JSON.parse(text); } catch (e) { throw new Error('仙途通讯紊乱'); }
             }
 
+            // 1. 获取文档列表（需 pass）
             async function getDocList() {
                 const params = new URLSearchParams({
-                    user: YUJU_CONFIG.user, pass: YUJU_CONFIG.pass, appid: YUJU_CONFIG.appid
+                    user: YUJU_CONFIG.user,
+                    pass: YUJU_CONFIG.pass,
+                    appid: YUJU_CONFIG.appid
                 });
                 const data = await safeFetch(`${YUJU_CONFIG.apiList}?${params.toString()}`);
-                return String(data.code) === '1' ? data.list : [];
+                if (String(data.code) !== '1') throw new Error(data.msg || '获取列表失败');
+                return data.list || [];
             }
 
+            // 2. 根据道号从列表中找 id
             async function getDocInfoByTitle(daoHao) {
                 const list = await getDocList();
                 const doc = list.find(item => item.title === daoHao);
                 return doc ? { id: doc.id, title: doc.title } : null;
             }
 
+            // 3. 查询单个文档（★ 不需要 pass！）
             async function getDocContentById(docId) {
                 const params = new URLSearchParams({
-                    user: YUJU_CONFIG.user, appid: YUJU_CONFIG.appid, id: docId
+                    user: YUJU_CONFIG.user,
+                    appid: YUJU_CONFIG.appid,
+                    id: docId
+                    // 注意：此处不应包含 pass
                 });
                 const data = await safeFetch(`${YUJU_CONFIG.apiQuery}?${params.toString()}`);
                 if (String(data.code) !== '1') throw new Error(data.msg || '读取仙籍失败');
@@ -434,7 +251,7 @@
                 return String(result.code) === '1';
             }
 
-            // ==================== 本地存储 ====================
+            // 本地存储相关
             function syncLocalData(content, daoHao, docId) {
                 localStorage.setItem('playerName', daoHao);
                 localStorage.setItem('achieves', JSON.stringify(content.achievements || []));
@@ -451,7 +268,6 @@
                 localStorage.removeItem('rememberTime');
             }
 
-            // ==================== 界面切换 ====================
             function resetLoginForm() {
                 submitBtn.disabled = false;
                 loadingTip.style.display = 'none';
@@ -464,16 +280,13 @@
             }
 
             function showEmbeddedInfo(content, daoHao, docId) {
-                // 隐藏登录区，显示简洁信息面板
                 loginSection.style.display = 'none';
                 loadingTip.style.display = 'none';
                 userInfoPanel.style.display = 'block';
-
                 displayDaoHao.textContent = daoHao;
                 displayLingYun.textContent = content.lingYun !== undefined ? content.lingYun : 100;
                 displayZhuoNian.textContent = content.zhuoNian !== undefined ? content.zhuoNian : 0;
                 displayStoryNode.textContent = getFriendlyNodeName(content.storyNode || 'start');
-
                 if (content.createTime) {
                     const days = Math.floor((Date.now() - content.createTime) / (1000 * 60 * 60 * 24));
                     displayDays.textContent = days + ' 日';
@@ -486,25 +299,18 @@
 
             function logout() {
                 clearLoginCache();
-                localStorage.removeItem('playerName');
-                localStorage.removeItem('achieves');
-                localStorage.removeItem('storyNode');
-                localStorage.removeItem('lingYun');
-                localStorage.removeItem('zhuoNian');
-                localStorage.removeItem('lastCloudSaveTime');
-                localStorage.removeItem('cloudDocId');
+                ['playerName','achieves','storyNode','lingYun','zhuoNian','lastCloudSaveTime','cloudDocId'].forEach(k => localStorage.removeItem(k));
                 userInfoPanel.style.display = 'none';
                 loginSection.style.display = 'block';
                 resetLoginForm();
                 daoHaoInput.focus();
             }
 
-            // ==================== 自动登录逻辑 ====================
+            // 自动登录尝试
             async function tryAutoLoginAfterClick(daoHao) {
                 const savedDaoHao = localStorage.getItem('savedDaoHao');
                 const savedHash = localStorage.getItem('savedPasswordHash');
                 const rememberTime = localStorage.getItem('rememberTime');
-
                 if (savedDaoHao !== daoHao) return false;
                 if (!rememberTime || Date.now() - parseInt(rememberTime) > 7 * 24 * 60 * 60 * 1000) {
                     clearLoginCache();
@@ -519,11 +325,10 @@
                 if (footerHint) footerHint.style.display = 'none';
 
                 try {
-                    const docInfo = await getDocInfoByTitle(daoHao);
+                    const docInfo = await getDocInfoByTitle(daoHao);   // 先列表找id
                     if (!docInfo) throw new Error();
-                    const content = await getDocContentById(docInfo.id);
+                    const content = await getDocContentById(docInfo.id); // 查询内容
                     if (!content || content.passwordHash !== savedHash) throw new Error();
-
                     syncLocalData(content, daoHao, docInfo.id);
                     localStorage.setItem('rememberTime', Date.now().toString());
                     loadingText.textContent = '仙籍核验通过，道友请观...';
@@ -535,7 +340,7 @@
                 }
             }
 
-            // ==================== 主按钮交互 ====================
+            // 主按钮交互
             submitBtn.addEventListener('click', async () => {
                 if (submitBtn.disabled) return;
                 const daoHao = daoHaoInput.value.trim();
@@ -544,7 +349,6 @@
                     return;
                 }
 
-                // 自动登录尝试
                 try {
                     const autoOk = await tryAutoLoginAfterClick(daoHao);
                     if (autoOk) return;
@@ -554,7 +358,6 @@
                     return;
                 }
 
-                // 手动流程
                 if (passwordGroup.style.display === 'none') {
                     try {
                         const docInfo = await getDocInfoByTitle(daoHao);
@@ -584,7 +387,7 @@
                     const passwordHash = hashPassword(miMa);
 
                     if (!docInfo) {
-                        // 注册
+                        // 新用户注册
                         const newContent = {
                             achievements: [],
                             storyNode: 'start',
@@ -606,7 +409,7 @@
                         return;
                     }
 
-                    // 老用户
+                    // 已有文档，验证密码
                     const content = await getDocContentById(docInfo.id);
                     if (!content) throw new Error('读取仙籍失败');
 
@@ -642,21 +445,11 @@
                 }
             });
 
-            // 退出登录
             logoutBtn.addEventListener('click', () => {
                 customConfirm('黄小仙：道友当真要断绝仙缘？此去一别，需重新核验密令方可归来。', (result) => {
                     if (result) logout();
                 });
             });
-
-            // 统计上报（无感）
-            (function() {
-                const STAT_API = 'https://yuju.99kpk.top:81/api/statistics_add.php';
-                const params = new URLSearchParams({ user: '2051775505', appid: '1121' });
-                if (window.location.protocol !== 'file:') {
-                    fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
-                }
-            })();
         })();
     </script>
 </body>

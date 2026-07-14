@@ -248,7 +248,7 @@
             font-style: italic;
         }
 
-        /* ==================== 自定义弹窗样式 ==================== */
+        /* 自定义弹窗样式 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -264,22 +264,12 @@
             -webkit-tap-highlight-color: transparent;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .modal-dialog {
             background: linear-gradient(180deg, #FFF8DC, #F5DEB3);
@@ -432,6 +422,10 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
                 <span>道号：</span>
                 <strong id="display-daoHao">-</strong>
+                <!--
+                <span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
+                
+                -->
             </div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>灵韵：</span><strong id="display-lingYun">-</strong></div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>浊念：</span><strong id="display-zhuoNian">-</strong></div>
@@ -471,7 +465,7 @@
         <div style="text-align:center; font-size:11px; color:#5D4037; margin-top:10px;">卷轴仙籍 · 万世不易</div>
     </div>
 
-    <!-- ==================== 自定义弹窗容器 ==================== -->
+    <!-- 自定义弹窗容器 -->
     <div id="modalContainer"></div>
 
     <script>
@@ -576,87 +570,47 @@
                 showModal({
                     icon: icon,
                     message: message,
-                    buttons: [{
-                        text: '确 认',
-                        cls: 'modal-btn-confirm',
-                        callback: () => resolve(true)
-                    }],
+                    buttons: [{ text: '确 认', cls: 'modal-btn-confirm', callback: () => resolve(true) }],
                     onBackgroundClick: () => resolve(true)
                 });
             });
         }
 
         function modalPrompt(message, options = {}) {
-            const {
-                defaultValue = '',
-                    placeholder = '',
-                    icon = '✍️',
-                    type = 'text',
-                    textarea = false,
-                    rows = 3
-            } = options;
+            const { defaultValue = '', placeholder = '', icon = '✍️', type = 'text', textarea = false, rows = 3 } = options;
             return new Promise((resolve) => {
                 showModal({
                     icon: icon,
                     message: message,
-                    inputConfig: textarea ? {
-                        type: 'textarea',
-                        placeholder: placeholder,
-                        defaultValue: defaultValue,
-                        rows: rows
-                    } : {
-                        type: type,
-                        placeholder: placeholder,
-                        defaultValue: defaultValue
-                    },
-                    buttons: [{
-                        text: '确 认',
-                        cls: 'modal-btn-confirm',
-                        callback: (val) => resolve(val !== null ? val : defaultValue)
-                    }, {
-                        text: '取 消',
-                        cls: 'modal-btn-cancel',
-                        callback: () => resolve(null)
-                    }],
+                    inputConfig: textarea ? { type: 'textarea', placeholder: placeholder, defaultValue: defaultValue, rows: rows } : { type: type, placeholder: placeholder, defaultValue: defaultValue },
+                    buttons: [
+                        { text: '确 认', cls: 'modal-btn-confirm', callback: (val) => resolve(val !== null ? val : defaultValue) },
+                        { text: '取 消', cls: 'modal-btn-cancel', callback: () => resolve(null) }
+                    ],
                     onBackgroundClick: () => resolve(null)
                 });
             });
         }
 
         function modalConfirm(message, options = {}) {
-            const {
-                confirmText = '确 认',
-                    cancelText = '取 消',
-                    icon = '⚠️',
-                    dangerConfirm = false
-            } = options;
+            const { confirmText = '确 认', cancelText = '取 消', icon = '⚠️', dangerConfirm = false } = options;
             return new Promise((resolve) => {
                 showModal({
                     icon: icon,
                     message: message,
-                    buttons: [{
-                        text: confirmText,
-                        cls: dangerConfirm ? 'modal-btn-danger' : 'modal-btn-confirm',
-                        callback: () => resolve(true)
-                    }, {
-                        text: cancelText,
-                        cls: 'modal-btn-cancel',
-                        callback: () => resolve(false)
-                    }],
+                    buttons: [
+                        { text: confirmText, cls: dangerConfirm ? 'modal-btn-danger' : 'modal-btn-confirm', callback: () => resolve(true) },
+                        { text: cancelText, cls: 'modal-btn-cancel', callback: () => resolve(false) }
+                    ],
                     onBackgroundClick: () => resolve(false)
                 });
             });
         }
 
         // ==================== 配置解密 ====================
-        const ENCODED_CONFIG =
-            "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
         let CONFIG = null;
-
-        function getConfig() {
-            if (!CONFIG) try { CONFIG = JSON.parse(atob(ENCODED_CONFIG)); } catch (e) { return {}; }
-            return CONFIG;
-        }
+        function getConfig() { if (!CONFIG) try { CONFIG = JSON.parse(atob(ENCODED_CONFIG)); } catch (e) { return {}; } return CONFIG; }
 
         // ==================== 成就定义 ====================
         const achievementIcons = [
@@ -707,54 +661,70 @@
         const SPECIAL_KEY = 'huangdaxian_special_achievements';
         const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes';
         const USED_CODES_KEY = 'huangdaxian_used_codes';
-        let cachedAchievements = null,
-            cachedOrder = null,
-            cachedSpecial = null,
-            cachedNotes = null,
-            cachedUsedCodes = null;
+        let cachedAchievements = null, cachedOrder = null, cachedSpecial = null, cachedNotes = null, cachedUsedCodes = null;
 
-        // ---------- 动态兑换码映射 ----------
-        let VALID_CODES = {};
+        // ==================== 兑换码配置 ====================
+        // 新远程链接（您提供的最新地址）
+        const CODES_URL = 'https://raccoon.fit/game%2F%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81%2F%E5%85%91%E6%8D%A2%E7%A0%81%E6%95%B0%E6%8D%AE%2Fly_all.txt';
+        
+        // 默认后备兑换码（远程加载失败时使用）
         const DEFAULT_CODES = {
             'LY001A': { type: 'lingYun', amount: 1 },
             'LY002B': { type: 'lingYun', amount: 1 },
-            'LY003C': { type: 'lingYun', amount: 1 },
-            'LY004D': { type: 'lingYun', amount: 1 },
             'ZN001E': { type: 'zhuoNian', amount: 1 },
-            'ZN002F': { type: 'zhuoNian', amount: 1 },
             'QD77SG': { type: 'achievement', title: '签达之人', note: '参与7日签到活动获得' }
         };
-        const CODES_URL = 'https://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=abf0c30306e2';
 
+        let VALID_CODES = {};
+
+        // 增强版远程兑换码加载（兼容换行、空格分隔，处理BOM及特殊字符）
         async function loadCodesFromRemote() {
             try {
                 const res = await fetch(CODES_URL);
                 if (!res.ok) throw new Error('网络错误');
-                const text = await res.text();
-                const lines = text.split('\n');
+                let text = await res.text();
+
+                // 去除 UTF-8 BOM
+                if (text.charCodeAt(0) === 0xFEFF) {
+                    text = text.slice(1);
+                }
+
+                // 将换行、制表、回车等统一替换为空格，然后按空格分割
+                const tokens = text.replace(/[\r\n\t]+/g, ' ').split(' ');
                 const newCodes = {};
-                for (let line of lines) {
-                    line = line.trim();
-                    if (!line || line.startsWith('#')) continue;
-                    const parts = line.split(':');
+
+                for (let token of tokens) {
+                    token = token.trim();
+                    if (!token || token.startsWith('#')) continue;
+
+                    // 每个token格式应为 CODE:type:value
+                    const parts = token.split(':');
                     if (parts.length < 3) continue;
+
                     const code = parts[0].trim().toUpperCase();
                     const type = parts[1].trim();
-                    const param = parts.slice(2).join(':').trim();
+                    const valuePart = parts.slice(2).join(':').trim();
+
                     if (type === 'lingYun' || type === 'zhuoNian') {
-                        const amount = parseInt(param);
-                        if (!isNaN(amount)) newCodes[code] = { type, amount };
+                        const amount = parseInt(valuePart);
+                        if (!isNaN(amount)) {
+                            newCodes[code] = { type, amount };
+                        }
                     } else if (type === 'achievement') {
-                        const titleAndNote = param.split('|');
+                        const titleAndNote = valuePart.split('|');
                         const title = titleAndNote[0].trim();
                         const note = titleAndNote[1] ? titleAndNote[1].trim() : '';
-                        if (title) newCodes[code] = { type, title, note };
+                        if (title) {
+                            newCodes[code] = { type, title, note };
+                        }
                     }
                 }
+
                 if (Object.keys(newCodes).length === 0) {
-                    console.warn('远程兑换码为空，使用默认码');
+                    console.warn('远程兑换码列表为空，使用默认码');
                     return false;
                 }
+
                 VALID_CODES = newCodes;
                 console.log('✅ 已从远程加载兑换码', Object.keys(newCodes).length, '个');
                 return true;
@@ -768,83 +738,23 @@
         function getAchievements() {
             if (cachedAchievements) return cachedAchievements;
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) { try { const d = JSON.parse(raw); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } catch (
-                e) {} }
-            try { if (window.parent && window.parent !== window) { const p = window.parent.localStorage.getItem(
-                    STORAGE_KEY); if (p) { const d = JSON.parse(p); if (d && typeof d === 'object') { cachedAchievements =
-                        d; return d; } } } } catch (e) {}
+            if (raw) { try { const d = JSON.parse(raw); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } catch (e) {} }
+            try { if (window.parent && window.parent !== window) { const p = window.parent.localStorage.getItem(STORAGE_KEY); if (p) { const d = JSON.parse(p); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } } } catch (e) {}
             return {};
         }
-
-        function saveAchievements(ach) {
-            cachedAchievements = ach;
-            const json = JSON.stringify(ach);
-            localStorage.setItem(STORAGE_KEY, json);
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(STORAGE_KEY, json); } catch (
-                e) {}
-        }
-
-        function getOrder() {
-            if (cachedOrder) return cachedOrder;
-            const raw = localStorage.getItem(ORDER_KEY);
-            if (raw) { try { const a = JSON.parse(raw); if (Array.isArray(a)) { cachedOrder = a; return a; } } catch (e) {} }
-            return [];
-        }
-
-        function saveOrder(order) { cachedOrder = order;
-            localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
-
-        function getSpecialAchievements() {
-            if (cachedSpecial) return cachedSpecial;
-            const raw = localStorage.getItem(SPECIAL_KEY);
-            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedSpecial = arr; return arr; } } catch (
-                e) {} }
-            return [];
-        }
-
-        function saveSpecialAchievements(arr) {
-            cachedSpecial = arr;
-            localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_KEY, JSON.stringify(
-                    arr)); } catch (e) {}
-        }
-
-        function getSpecialNotes() {
-            if (cachedNotes) return cachedNotes;
-            const raw = localStorage.getItem(SPECIAL_NOTES_KEY);
-            if (raw) { try { const obj = JSON.parse(raw); if (typeof obj === 'object') { cachedNotes = obj; return obj; } } catch (
-                e) {} }
-            return {};
-        }
-
-        function saveSpecialNotes(obj) {
-            cachedNotes = obj;
-            localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_NOTES_KEY,
-                    JSON.stringify(obj)); } catch (e) {}
-        }
-
-        function getUsedCodes() {
-            if (cachedUsedCodes) return cachedUsedCodes;
-            const raw = localStorage.getItem(USED_CODES_KEY);
-            if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedUsedCodes = arr; return arr; } } catch (
-                e) {} }
-            return [];
-        }
-
-        function addUsedCode(code) {
-            const arr = getUsedCodes();
-            arr.push(code);
-            cachedUsedCodes = arr;
-            localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr));
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(USED_CODES_KEY, JSON.stringify(
-                    arr)); } catch (e) {}
-        }
+        function saveAchievements(ach) { cachedAchievements = ach; const json = JSON.stringify(ach); localStorage.setItem(STORAGE_KEY, json); try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(STORAGE_KEY, json); } catch (e) {} }
+        function getOrder() { if (cachedOrder) return cachedOrder; const raw = localStorage.getItem(ORDER_KEY); if (raw) { try { const a = JSON.parse(raw); if (Array.isArray(a)) { cachedOrder = a; return a; } } catch (e) {} } return []; }
+        function saveOrder(order) { cachedOrder = order; localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
+        function getSpecialAchievements() { if (cachedSpecial) return cachedSpecial; const raw = localStorage.getItem(SPECIAL_KEY); if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedSpecial = arr; return arr; } } catch (e) {} } return []; }
+        function saveSpecialAchievements(arr) { cachedSpecial = arr; localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr)); try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr)); } catch (e) {} }
+        function getSpecialNotes() { if (cachedNotes) return cachedNotes; const raw = localStorage.getItem(SPECIAL_NOTES_KEY); if (raw) { try { const obj = JSON.parse(raw); if (typeof obj === 'object') { cachedNotes = obj; return obj; } } catch (e) {} } return {}; }
+        function saveSpecialNotes(obj) { cachedNotes = obj; localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj)); try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj)); } catch (e) {} }
+        function getUsedCodes() { if (cachedUsedCodes) return cachedUsedCodes; const raw = localStorage.getItem(USED_CODES_KEY); if (raw) { try { const arr = JSON.parse(raw); if (Array.isArray(arr)) { cachedUsedCodes = arr; return arr; } } catch (e) {} } return []; }
+        function addUsedCode(code) { const arr = getUsedCodes(); arr.push(code); cachedUsedCodes = arr; localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr)); try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr)); } catch (e) {} }
 
         function getAchievementTitles() {
             const ach = getAchievements();
-            return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id);
-                return f ? f.title : id; });
+            return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id); return f ? f.title : id; });
         }
 
         // ---------- 渲染成就 ----------
@@ -853,8 +763,7 @@
             const order = getOrder();
             const unlockedIds = Object.keys(ach).filter(id => ach[id]);
             let sorted = [];
-            if (order.length) { sorted = order.filter(id => unlockedIds.includes(id));
-                sorted = [...unlockedIds.filter(id => !order.includes(id)), ...sorted]; } else sorted = unlockedIds;
+            if (order.length) { sorted = order.filter(id => unlockedIds.includes(id)); sorted = [...unlockedIds.filter(id => !order.includes(id)), ...sorted]; } else sorted = unlockedIds;
             const lockedAll = achievementIcons.filter(a => !unlockedIds.includes(a.id));
 
             const unlockedList = document.getElementById('unlockedList');
@@ -862,8 +771,7 @@
             if (sorted.length) {
                 document.getElementById('unlockedTitle').style.display = 'block';
                 document.getElementById('unlockedEmpty').style.display = 'none';
-                sorted.forEach(id => { const item = achievementIcons.find(a => a.id === id); if (item) unlockedList.appendChild(
-                        createRow(item, true)); });
+                sorted.forEach(id => { const item = achievementIcons.find(a => a.id === id); if (item) unlockedList.appendChild(createRow(item, true)); });
             } else {
                 document.getElementById('unlockedTitle').style.display = 'none';
                 document.getElementById('unlockedEmpty').style.display = 'block';
@@ -880,9 +788,7 @@
             const leg = sorted.filter(id => achievementIcons.find(a => a.id === id)?.legendary).length;
             const totalLeg = achievementIcons.filter(a => a.legendary).length;
             const ls = document.getElementById('legendaryStat');
-            if (leg) { ls.style.display = 'inline-flex';
-                document.getElementById('legendaryCount').textContent = leg + '/' + totalLeg; } else ls.style.display = 'none';
-
+            if (leg) { ls.style.display = 'inline-flex'; document.getElementById('legendaryCount').textContent = leg + '/' + totalLeg; } else ls.style.display = 'none';
             renderSpecial();
         }
 
@@ -898,8 +804,7 @@
                     const row = document.createElement('div');
                     row.className = 'achievement-row unlocked';
                     const noteText = notes[title] || '';
-                    row.innerHTML =
-                        `<div class="achievement-icon-cell">⭐</div><div class="achievement-name">${title}${noteText ? `<span class="achievement-note">${noteText}</span>` : ''}</div><span class="achievement-badge">特殊</span>`;
+                    row.innerHTML = `<div class="achievement-icon-cell">⭐</div><div class="achievement-name">${title}${noteText ? `<span class="achievement-note">${noteText}</span>` : ''}</div><span class="achievement-badge">特殊</span>`;
                     list.appendChild(row);
                 });
             } else {
@@ -910,8 +815,7 @@
         function createRow(item, unlocked) {
             const row = document.createElement('div');
             row.className = 'achievement-row ' + (unlocked ? (item.legendary ? 'unlocked legendary' : 'unlocked') : 'locked');
-            row.innerHTML =
-                `<div class="achievement-icon-cell">${unlocked ? item.icon : '?'}</div><div class="achievement-name">${item.title}</div><span class="achievement-badge">${unlocked ? (item.legendary ? '传说' : '已解锁') : '未解锁'}</span>`;
+            row.innerHTML = `<div class="achievement-icon-cell">${unlocked ? item.icon : '?'}</div><div class="achievement-name">${item.title}</div><span class="achievement-badge">${unlocked ? (item.legendary ? '传说' : '已解锁') : '未解锁'}</span>`;
             return row;
         }
 
@@ -923,17 +827,12 @@
             if (!name || !name.trim()) return;
             playerName = name.trim();
             localStorage.setItem('playerName', playerName);
-            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem('playerName',
-                playerName); } catch (e) {}
+            try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem('playerName', playerName); } catch (e) {}
             updateUserInfo();
         }
 
         async function promptSetPlayerName() {
-            const name = await modalPrompt('请输入您的道号（仙家名号）：', {
-                defaultValue: playerName || '',
-                placeholder: '道号',
-                icon: '📛'
-            });
+            const name = await modalPrompt('请输入您的道号（仙家名号）：', { defaultValue: playerName || '', placeholder: '道号', icon: '📛' });
             if (name && name.trim()) setPlayerName(name);
         }
 
@@ -943,17 +842,12 @@
             document.getElementById('display-zhuoNian').textContent = localStorage.getItem('zhuoNian') || '0';
             document.getElementById('display-storyNode').textContent = localStorage.getItem('storyNode') || 'start';
             const last = localStorage.getItem('lastCloudSaveTime');
-            document.getElementById('lastSaveTime').innerHTML = last ?
-                `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` :
-                '上次云端同步：<strong>从未同步</strong>';
+            document.getElementById('lastSaveTime').innerHTML = last ? `上次云端同步：<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` : '上次云端同步：<strong>从未同步</strong>';
         }
 
         // ==================== 兑换码逻辑 ====================
         async function redeemCode() {
-            const code = await modalPrompt('请输入兑换码：', {
-                placeholder: '兑换码',
-                icon: '🎁'
-            });
+            const code = await modalPrompt('请输入兑换码：', { placeholder: '兑换码', icon: '🎁' });
             if (!code || !code.trim()) return;
             const trimmedCode = code.trim().toUpperCase();
 
@@ -969,7 +863,6 @@
             }
 
             const reward = VALID_CODES[trimmedCode];
-
             if (reward.type === 'lingYun') {
                 const current = parseInt(localStorage.getItem('lingYun') || '100');
                 localStorage.setItem('lingYun', current + reward.amount);
@@ -1011,8 +904,7 @@
         async function getRemoteAchievementCount() {
             if (!cloudDocId) return -1;
             const cfg = getConfig();
-            const url =
-            `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
                 const res = await fetch(url);
                 const result = await res.json();
@@ -1027,74 +919,39 @@
         }
 
         async function pushCloudSave() {
-            if (!playerName) {
-                await modalAlert('请先设置道号！', '📛');
-                await promptSetPlayerName();
-                if (!playerName) return;
-            }
-
+            if (!playerName) { await modalAlert('请先设置道号！', '📛'); await promptSetPlayerName(); if (!playerName) return; }
             const achievements = getAchievementTitles();
             const special = getSpecialAchievements();
             const notes = getSpecialNotes();
             const usedCodes = getUsedCodes();
             const totalLocal = achievements.length + special.length;
 
-            if (!cloudDocId) {
-                const existing = await findDocByTitle();
-                if (existing) { cloudDocId = existing;
-                    localStorage.setItem('cloudDocId', existing); }
-            }
+            if (!cloudDocId) { const existing = await findDocByTitle(); if (existing) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); } }
 
             if (cloudDocId) {
                 const remoteCount = await getRemoteAchievementCount();
                 if (remoteCount > totalLocal) {
-                    const msg =
-                        `⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入"确认覆盖"后继续：`;
-                    const input = await modalPrompt(msg, {
-                        placeholder: '输入"确认覆盖"',
-                        icon: '⚠️'
-                    });
-                    if (input !== '确认覆盖') {
-                        await modalAlert('已取消上传，云端数据未受影响。', '↩️');
-                        return;
-                    }
+                    const input = await modalPrompt(`⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入“确认覆盖”后继续：`, { placeholder: '输入“确认覆盖”', icon: '⚠️' });
+                    if (input !== '确认覆盖') { await modalAlert('已取消上传，云端数据未受影响。', '↩️'); return; }
                 }
             }
 
-            const saveData = {
-                playerName: playerName,
-                achievements: achievements,
-                specialAchievements: special,
-                specialNotes: notes,
-                usedCodes: usedCodes,
-                storyNode: localStorage.getItem('storyNode') || 'start',
-                lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
-                zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
-                updateTime: Date.now()
-            };
+            const saveData = { playerName, achievements, specialAchievements: special, specialNotes: notes, usedCodes, storyNode: localStorage.getItem('storyNode') || 'start', lingYun: parseInt(localStorage.getItem('lingYun') || '100'), zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'), updateTime: Date.now() };
             const contentStr = JSON.stringify(saveData);
             const cfg = getConfig();
             try {
                 let url, options;
                 if (cloudDocId) {
-                    url =
-                        `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
-                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 } else {
                     url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
-                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 }
                 const res = await fetch(url, options);
                 const result = await res.json();
                 if (result.code == 1) {
-                    if (!cloudDocId) {
-                        let newId = result.id || result.data;
-                        if (!newId) { newId = await findDocByTitle(); }
-                        if (newId) { cloudDocId = newId;
-                            localStorage.setItem('cloudDocId', newId); }
-                    }
+                    if (!cloudDocId) { let newId = result.id || result.data; if (!newId) newId = await findDocByTitle(); if (newId) { cloudDocId = newId; localStorage.setItem('cloudDocId', newId); } }
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     updateUserInfo();
                     await modalAlert('修为已上传至云端！' + (cloudDocId ? `（文档ID：${cloudDocId}）` : ''), '☁️');
@@ -1103,141 +960,70 @@
         }
 
         async function pullCloudSave() {
-            if (!playerName) {
-                await modalAlert('道号为空，请先设置道号！', '📛');
-                await promptSetPlayerName();
-                if (!playerName) return;
-            }
-
+            if (!playerName) { await modalAlert('道号为空，请先设置道号！', '📛'); await promptSetPlayerName(); if (!playerName) return; }
             if (!cloudDocId) {
                 const foundId = await findDocByTitle();
-                if (foundId) {
-                    cloudDocId = foundId;
-                    localStorage.setItem('cloudDocId', cloudDocId);
-                } else {
-                    const manualId = await modalPrompt('未找到云端仙籍，请手动输入文档ID：', {
-                        placeholder: '文档ID',
-                        icon: '🔍'
-                    });
-                    if (manualId && manualId.trim()) {
-                        cloudDocId = manualId.trim();
-                        localStorage.setItem('cloudDocId', cloudDocId);
-                    } else return;
+                if (foundId) { cloudDocId = foundId; localStorage.setItem('cloudDocId', cloudDocId); }
+                else {
+                    const manualId = await modalPrompt('未找到云端仙籍，请手动输入文档ID：', { placeholder: '文档ID', icon: '🔍' });
+                    if (manualId && manualId.trim()) { cloudDocId = manualId.trim(); localStorage.setItem('cloudDocId', cloudDocId); } else return;
                 }
             }
-
             const cfg = getConfig();
-            const url =
-            `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
                 const res = await fetch(url);
                 const result = await res.json();
                 if (result.code == 1) {
-                    let data;
-                    try { data = JSON.parse(result.content); } catch (e) { await modalAlert('云端数据损坏！', '❌');
-                        return; }
+                    let data; try { data = JSON.parse(result.content); } catch (e) { await modalAlert('云端数据损坏！', '❌'); return; }
                     const titles = data.achievements || [];
-                    const achObj = {};
-                    const notFound = [];
-                    titles.forEach(title => {
-                        const found = achievementIcons.find(a => a.title === title);
-                        if (found) achObj[found.id] = true;
-                        else notFound.push(title);
-                    });
+                    const achObj = {}; const notFound = [];
+                    titles.forEach(title => { const found = achievementIcons.find(a => a.title === title); if (found) achObj[found.id] = true; else notFound.push(title); });
                     saveAchievements(achObj);
                     if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
                     if (data.specialNotes) saveSpecialNotes(data.specialNotes);
-                    if (data.usedCodes) {
-                        cachedUsedCodes = data.usedCodes;
-                        localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes));
-                    }
+                    if (data.usedCodes) { cachedUsedCodes = data.usedCodes; localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes)); }
                     if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                     if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
                     if (data.playerName) setPlayerName(data.playerName);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
-                    renderAchievements();
-                    updateUserInfo();
-                    let msg = '仙缘已接续！';
-                    if (notFound.length) msg +=
-                        `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
+                    renderAchievements(); updateUserInfo();
+                    let msg = '仙缘已接续！'; if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
                     await modalAlert(msg, '☁️');
                 } else await modalAlert('下载失败：' + (result.msg || '未知错误'), '❌');
             } catch (e) { await modalAlert('网络错误：' + e.message, '❌'); }
         }
 
-        // 导出/导入
         async function exportAllData() {
-            const payload = {
-                version: 2,
-                exportTime: new Date().toISOString(),
-                achievements: getAchievements(),
-                order: getOrder(),
-                specialAchievements: getSpecialAchievements(),
-                specialNotes: getSpecialNotes(),
-                usedCodes: getUsedCodes(),
-                playerName,
-                storyNode: localStorage.getItem('storyNode'),
-                lingYun: localStorage.getItem('lingYun'),
-                zhuoNian: localStorage.getItem('zhuoNian')
-            };
+            const payload = { version:2, exportTime:new Date().toISOString(), achievements:getAchievements(), order:getOrder(), specialAchievements: getSpecialAchievements(), specialNotes: getSpecialNotes(), usedCodes: getUsedCodes(), playerName, storyNode:localStorage.getItem('storyNode'), lingYun:localStorage.getItem('lingYun'), zhuoNian:localStorage.getItem('zhuoNian') };
             const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-            try {
-                await navigator.clipboard.writeText(str);
-                await modalAlert('仙籍已复制到剪贴板！', '📋');
-            } catch (e) {
-                await modalPrompt('请手动复制仙籍：', {
-                    defaultValue: str,
-                    textarea: true,
-                    rows: 5,
-                    icon: '📋',
-                    placeholder: ''
-                });
-            }
+            try { await navigator.clipboard.writeText(str); await modalAlert('仙籍已复制到剪贴板！', '📋'); } catch (e) { await modalPrompt('请手动复制仙籍：', { defaultValue: str, textarea: true, rows: 5, icon: '📋' }); }
         }
 
         async function importAllDataPrompt() {
-            const input = await modalPrompt('请粘贴仙籍备份：', {
-                placeholder: '粘贴仙籍备份内容',
-                textarea: true,
-                rows: 5,
-                icon: '📥'
-            });
+            const input = await modalPrompt('请粘贴仙籍备份：', { placeholder: '粘贴仙籍备份内容', textarea: true, rows: 5, icon: '📥' });
             if (!input) return;
-            let json;
-            try { json = decodeURIComponent(escape(atob(input))); } catch { json = input; }
+            let json; try { json = decodeURIComponent(escape(atob(input))); } catch { json = input; }
             try {
                 const data = JSON.parse(json);
-                if (data.achievements) { const merged = { ...getAchievements(), ...data.achievements };
-                    saveAchievements(merged); }
+                if (data.achievements) { const merged = { ...getAchievements(), ...data.achievements }; saveAchievements(merged); }
                 if (data.order) saveOrder(data.order);
                 if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
                 if (data.specialNotes) saveSpecialNotes(data.specialNotes);
-                if (data.usedCodes) {
-                    cachedUsedCodes = data.usedCodes;
-                    localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes));
-                }
+                if (data.usedCodes) { cachedUsedCodes = data.usedCodes; localStorage.setItem(USED_CODES_KEY, JSON.stringify(data.usedCodes)); }
                 if (data.playerName) setPlayerName(data.playerName);
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
                 if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
-                renderAchievements();
-                updateUserInfo();
+                renderAchievements(); updateUserInfo();
                 await modalAlert('仙籍导入成功！', '✅');
             } catch (e) { await modalAlert('导入失败：格式错误', '❌'); }
         }
 
         async function logout() {
-            const confirmed = await modalConfirm('确定重入轮回？此操作将清除所有本地数据！', {
-                confirmText: '确 定',
-                cancelText: '取 消',
-                icon: '🔥',
-                dangerConfirm: true
-            });
-            if (confirmed) {
-                localStorage.clear();
-                location.reload();
-            }
+            const confirmed = await modalConfirm('确定重入轮回？此操作将清除所有本地数据！', { confirmText: '确 定', cancelText: '取 消', icon: '🔥', dangerConfirm: true });
+            if (confirmed) { localStorage.clear(); location.reload(); }
         }
 
         // ==================== 初始化 ====================
@@ -1248,12 +1034,7 @@
             const params = new URLSearchParams(location.search);
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
-            if (!playerName) {
-                try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem(
-                            'playerName') || '';
-                        cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch (
-                e) {}
-            }
+            if (!playerName) { try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch (e) {} }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
             updateUserInfo();

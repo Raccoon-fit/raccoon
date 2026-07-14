@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -6,156 +5,333 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仙籍核验 - 黄小仙讨封</title>
     <style>
-        /* 完整还原你之前的古风样式，无任何调试相关代码 */
-        body { 
-            background: #3e2723; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            font-family: 'SimSun', serif; 
+        /* 完整还原古风样式 */
+        body {
+            background: #3e2723;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'SimSun', serif;
         }
-        .scroll-container { 
-            width: 90%; 
-            max-width: 450px; 
-            padding: 40px 30px; 
-            background: linear-gradient(#f5e8c9, #e8d8a9); 
-            border: 15px solid transparent; 
-            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path fill="%238B4513" d="M0,0 L50,0 L50,50 L0,50 Z" /><path fill="%23A0522D" d="M5,5 L45,5 L45,45 L5,45 Z" /></svg>') 30 stretch; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
-            animation: unfold 1.5s ease-out; 
+        .scroll-container {
+            width: 90%;
+            max-width: 450px;
+            padding: 40px 30px;
+            background: linear-gradient(#f5e8c9, #e8d8a9);
+            border: 15px solid transparent;
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path fill="%238B4513" d="M0,0 L50,0 L50,50 L0,50 Z" /><path fill="%23A0522D" d="M5,5 L45,5 L45,45 L5,45 Z" /></svg>') 30 stretch;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            animation: unfold 1.5s ease-out;
             position: relative;
+            min-height: 380px;
+            transition: min-height 0.5s ease;
         }
-        @keyframes unfold { 
-            from { transform: scaleY(0.1) translateY(-50%); opacity: 0; } 
-            to { transform: scaleY(1) translateY(0); opacity: 1; } 
+        @keyframes unfold {
+            from {
+                transform: scaleY(0.1) translateY(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: scaleY(1) translateY(0);
+                opacity: 1;
+            }
         }
-        .title { 
-            text-align: center; 
-            color: #5c3a21; 
-            font-size: 2.2em; 
-            margin-bottom: 10px; 
-            text-shadow: 2px 2px 0px #d2b48c; 
-            letter-spacing: 5px; 
+        .title {
+            text-align: center;
+            color: #5c3a21;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0px #d2b48c;
+            letter-spacing: 5px;
         }
-        .subtitle { 
-            text-align: center; 
-            color: #8b5a2b; 
-            font-size: 0.9em; 
-            margin-bottom: 30px; 
-            border-bottom: 1px dashed #8b5a2b; 
-            padding-bottom: 15px; 
+        .subtitle {
+            text-align: center;
+            color: #8b5a2b;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+            border-bottom: 1px dashed #8b5a2b;
+            padding-bottom: 15px;
         }
-        .input-group { 
-            margin-bottom: 15px; 
+        .input-group {
+            margin-bottom: 15px;
         }
-        .ink-input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            font-size: 1.1em; 
-            color: #5c3a21; 
-            background: rgba(255,255,255,0.7); 
-            border: none; 
-            border-bottom: 2px solid #8b5a2b; 
-            outline: none; 
-            box-sizing: border-box; 
-            font-family: 'KaiTi'; 
+        .ink-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.1em;
+            color: #5c3a21;
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-bottom: 2px solid #8b5a2b;
+            outline: none;
+            box-sizing: border-box;
+            font-family: 'KaiTi';
         }
-        .ink-input:focus { 
-            background: rgba(255,255,255,0.9); 
-            border-bottom-color: #d2691e; 
+        .ink-input:focus {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom-color: #d2691e;
         }
-        .ink-input::placeholder { 
-            color: #a0522d; 
-            font-style: italic; 
+        .ink-input::placeholder {
+            color: #a0522d;
+            font-style: italic;
         }
-        .btn-group { 
-            display: flex; 
-            justify-content: space-around; 
-            margin-top: 30px; 
+        .btn-group {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .seal-btn { 
-            padding: 12px 25px; 
-            font-size: 1em; 
-            font-weight: bold; 
-            color: #f5e8c9; 
-            background: #8B4513; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-family: 'SimHei'; 
-            box-shadow: 0 4px 0 #5D2906; 
+        .seal-btn {
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #f5e8c9;
+            background: #8B4513;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'SimHei';
+            box-shadow: 0 4px 0 #5D2906;
             transition: all 0.2s;
+            white-space: nowrap;
         }
-        .seal-btn:hover { 
-            transform: translateY(-2px); 
+        .seal-btn:hover {
+            transform: translateY(-2px);
             box-shadow: 0 6px 0 #5D2906;
         }
         .seal-btn:active {
             transform: translateY(1px);
             box-shadow: 0 2px 0 #5D2906;
         }
-        .red-seal { 
-            background: #A52A2A; 
-            box-shadow: 0 4px 0 #5D1F1F; 
+        .red-seal {
+            background: #A52A2A;
+            box-shadow: 0 4px 0 #5D1F1F;
         }
         .red-seal:hover {
             box-shadow: 0 6px 0 #5D1F1F;
         }
-        .footer-hint { 
-            text-align: center; 
-            color: #8b5a2b; 
-            font-size: 0.8em; 
-            margin-top: 25px; 
+        .gold-seal {
+            background: #8B7500;
+            box-shadow: 0 4px 0 #5C4E00;
         }
-        /* 加载提示样式（和古风界面融合，非调试用） */
-        .loading-tip { 
-            color: #8b5a2b; 
-            font-size: 0.9em; 
-            text-align: center; 
-            margin-top: 15px; 
-            display: none; 
+        .gold-seal:hover {
+            box-shadow: 0 6px 0 #5C4E00;
         }
-        .loading-spinner { 
-            display: inline-block; 
-            width: 16px; 
-            height: 16px; 
-            border: 2px solid #8b5a2b; 
-            border-top-color: transparent; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-right: 8px; 
-            vertical-align: middle; 
+        .footer-hint {
+            text-align: center;
+            color: #8b5a2b;
+            font-size: 0.8em;
+            margin-top: 25px;
         }
-        @keyframes spin { 
-            to { transform: rotate(360deg); } 
+        .loading-tip {
+            color: #8b5a2b;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #8b5a2b;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ==================== 用户信息面板样式 ==================== */
+        .user-info-panel {
+            display: none;
+            animation: fadeInPanel 0.6s ease-out;
+        }
+        @keyframes fadeInPanel {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .user-info-panel .welcome-line {
+            text-align: center;
+            color: #5c3a21;
+            font-size: 1.4em;
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        .user-info-panel .dao-hao-display {
+            text-align: center;
+            color: #A52A2A;
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 0px #d2b48c;
+            border-bottom: 2px dotted #c4a87c;
+            padding-bottom: 18px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 12px;
+            margin: 6px 0;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
+            border-left: 4px solid #8b5a2b;
+        }
+        .info-label {
+            color: #5c3a21;
+            font-weight: bold;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+        .info-value {
+            color: #3e2723;
+            font-family: 'KaiTi';
+            font-size: 0.95em;
+            text-align: right;
+            word-break: break-all;
+        }
+        .info-value.lingyun {
+            color: #b8860b;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .info-value.zhuonian {
+            color: #5c3a21;
+            font-weight: bold;
+        }
+        .info-value.node {
+            color: #6b3a2a;
+            font-style: italic;
+        }
+        .info-value.days {
+            color: #8b5a2b;
+        }
+        .achievements-section {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            border: 1px dashed #b8976e;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .achievements-section .ach-title {
+            color: #5c3a21;
+            font-weight: bold;
+            font-size: 0.9em;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .achievements-section .ach-item {
+            display: inline-block;
+            background: #c4a87c;
+            color: #3e2723;
+            padding: 3px 10px;
+            margin: 3px 4px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-family: 'KaiTi';
+            letter-spacing: 1px;
+        }
+        .achievements-section .ach-empty {
+            text-align: center;
+            color: #a09080;
+            font-size: 0.85em;
+            font-style: italic;
+        }
+        .divider-line {
+            border: none;
+            border-top: 1px dashed #c4a87c;
+            margin: 18px 0;
+        }
+        .logout-btn {
+            background: #6b4c3b;
+            box-shadow: 0 4px 0 #3e2723;
+        }
+        .logout-btn:hover {
+            box-shadow: 0 6px 0 #3e2723;
+            background: #7d5a45;
         }
     </style>
 </head>
 <body>
     <div class="scroll-container">
-        <h1 class="title">仙籍核验</h1>
-        <p class="subtitle">道号即为凭证，入我仙府者，仙途永续。</p>
-        
-        <div class="input-group">
-            <input type="text" id="daoHao" class="ink-input" placeholder="请输入你的道号…" maxlength="12">
+        <!-- ==================== 登录表单区域 ==================== -->
+        <div id="loginSection">
+            <h1 class="title">仙籍核验</h1>
+            <p class="subtitle">道号即为凭证，入我仙府者，仙途永续。</p>
+
+            <div class="input-group">
+                <input type="text" id="daoHao" class="ink-input" placeholder="请输入你的道号…" maxlength="12">
+            </div>
+            <div class="input-group" id="passwordGroup" style="display:none;">
+                <input type="password" id="miMa" class="ink-input" placeholder="请输入密令…">
+            </div>
+
+            <div class="btn-group">
+                <button id="submit-name" class="seal-btn red-seal">踏入仙府</button>
+            </div>
+
+            <div class="loading-tip" id="loadingTip">
+                <span class="loading-spinner"></span>
+                <span id="loadingText">正在核验仙籍...</span>
+            </div>
+
+            <p class="footer-hint">道号一旦确立，便与仙途绑定，慎之。</p>
         </div>
-        <div class="input-group" id="passwordGroup" style="display:none;">
-            <input type="password" id="miMa" class="ink-input" placeholder="请输入密令…">
+
+        <!-- ==================== 用户信息面板（默认隐藏） ==================== -->
+        <div class="user-info-panel" id="userInfoPanel">
+            <p class="welcome-line">✨ 仙籍在册，道友安好 ✨</p>
+            <p class="dao-hao-display" id="displayDaoHao"></p>
+
+            <div class="info-row">
+                <span class="info-label">灵韵</span>
+                <span class="info-value lingyun" id="displayLingYun">--</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">浊念</span>
+                <span class="info-value zhuonian" id="displayZhuoNian">--</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">当前境界</span>
+                <span class="info-value node" id="displayStoryNode">--</span>
+            </div>
+            <div class="info-row" id="cultivateDaysRow" style="display:none;">
+                <span class="info-label">修行时日</span>
+                <span class="info-value days" id="displayDays">--</span>
+            </div>
+
+            <div class="achievements-section">
+                <p class="ach-title">🏆 仙绩录</p>
+                <div id="achievementsList"></div>
+            </div>
+
+            <hr class="divider-line">
+
+            <div class="btn-group">
+                <button id="logoutBtn" class="seal-btn logout-btn">断绝仙缘</button>
+            </div>
         </div>
-        
-        <div class="btn-group">
-            <button id="submit-name" class="seal-btn red-seal">踏入仙府</button>
-        </div>
-        
-        <!-- 仅保留用户可见的加载提示，无调试面板 -->
-        <div class="loading-tip" id="loadingTip">
-            <span class="loading-spinner"></span>
-            <span id="loadingText">正在核验仙籍...</span>
-        </div>
-        
-        <p class="footer-hint">道号一旦确立，便与仙途绑定，慎之。</p>
     </div>
 
     <script>
@@ -169,7 +345,8 @@
             apiQuery: 'https://yuju.99kpk.top:81/api/file_api_query.php'
         };
 
-        // DOM元素
+        // DOM元素 - 登录相关
+        const loginSection = document.getElementById('loginSection');
         const daoHaoInput = document.getElementById('daoHao');
         const miMaInput = document.getElementById('miMa');
         const passwordGroup = document.getElementById('passwordGroup');
@@ -177,7 +354,37 @@
         const loadingTip = document.getElementById('loadingTip');
         const loadingText = document.getElementById('loadingText');
 
-        // 密码哈希（本地仅存哈希，无明文）
+        // DOM元素 - 用户信息面板
+        const userInfoPanel = document.getElementById('userInfoPanel');
+        const displayDaoHao = document.getElementById('displayDaoHao');
+        const displayLingYun = document.getElementById('displayLingYun');
+        const displayZhuoNian = document.getElementById('displayZhuoNian');
+        const displayStoryNode = document.getElementById('displayStoryNode');
+        const displayDays = document.getElementById('displayDays');
+        const cultivateDaysRow = document.getElementById('cultivateDaysRow');
+        const achievementsList = document.getElementById('achievementsList');
+        const continueGameBtn = document.getElementById('continueGame');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // 故事节点友好名称映射
+        const storyNodeNames = {
+            'start': '初入仙途',
+            'forest': '迷踪森林',
+            'temple': '古刹问道',
+            'cliff': '断崖悟道',
+            'cave': '洞天福地',
+            'village': '桃源村落',
+            'peak': '凌霄绝顶',
+            'abyss': '幽冥深渊',
+            'palace': '仙宫大殿',
+            'end': '功德圆满'
+        };
+
+        function getFriendlyNodeName(node) {
+            return storyNodeNames[node] || node || '未知';
+        }
+
+        // 密码哈希
         function hashPassword(pwd) {
             let hash = 0;
             for (let i = 0; i < pwd.length; i++) {
@@ -187,7 +394,7 @@
             return hash.toString();
         }
 
-        // ==================== 合规接口封装（严格按你给的文档）====================
+        // ==================== 合规接口封装 ====================
         async function getDocList() {
             const params = new URLSearchParams({
                 user: YUJU_CONFIG.user,
@@ -252,13 +459,109 @@
             localStorage.setItem('cloudDocId', docId);
         }
 
-        // ==================== 核心逻辑：点按钮触发自动登录 ====================
+        // ==================== 显示用户信息面板 ====================
+        function showUserInfo(content, daoHao, docId) {
+            // 隐藏登录区域和加载提示
+            loginSection.style.display = 'none';
+            loadingTip.style.display = 'none';
+
+            // 填充用户信息
+            displayDaoHao.textContent = daoHao;
+            displayLingYun.textContent = content.lingYun !== undefined ? content.lingYun : 100;
+            displayZhuoNian.textContent = content.zhuoNian !== undefined ? content.zhuoNian : 0;
+            displayStoryNode.textContent = getFriendlyNodeName(content.storyNode || 'start');
+
+            // 修行时日
+            if (content.createTime) {
+                const days = Math.floor((Date.now() - content.createTime) / (1000 * 60 * 60 * 24));
+                displayDays.textContent = days + ' 日';
+                cultivateDaysRow.style.display = 'flex';
+            } else {
+                cultivateDaysRow.style.display = 'none';
+            }
+
+            // 成就列表
+            const achievements = content.achievements || [];
+            if (achievements.length === 0) {
+                achievementsList.innerHTML = '<span class="ach-empty">暂无仙绩，修行之路尚远</span>';
+            } else {
+                let html = '';
+                const maxShow = 10;
+                const showItems = achievements.slice(0, maxShow);
+                showItems.forEach(ach => {
+                    let name = '';
+                    if (typeof ach === 'string') {
+                        name = ach;
+                    } else if (typeof ach === 'object' && ach !== null) {
+                        name = ach.name || ach.title || ach.id || JSON.stringify(ach);
+                    } else {
+                        name = String(ach);
+                    }
+                    html += `<span class="ach-item">${name}</span>`;
+                });
+                if (achievements.length > maxShow) {
+                    html +=
+                        `<span class="ach-item">…等${achievements.length}项</span>`;
+                }
+                achievementsList.innerHTML = html;
+            }
+
+            // 显示用户信息面板
+            userInfoPanel.style.display = 'block';
+
+            // 保存云端文档ID供后续使用
+            localStorage.setItem('cloudDocId', docId);
+        }
+
+        // ==================== 退出登录 ====================
+        function logout() {
+            // 清除所有相关缓存
+            localStorage.removeItem('playerName');
+            localStorage.removeItem('achieves');
+            localStorage.removeItem('storyNode');
+            localStorage.removeItem('lingYun');
+            localStorage.removeItem('zhuoNian');
+            localStorage.removeItem('lastCloudSaveTime');
+            localStorage.removeItem('cloudDocId');
+            localStorage.removeItem('savedDaoHao');
+            localStorage.removeItem('savedPasswordHash');
+            localStorage.removeItem('rememberTime');
+
+            // 隐藏用户信息面板
+            userInfoPanel.style.display = 'none';
+
+            // 恢复登录表单
+            loginSection.style.display = 'block';
+            daoHaoInput.value = '';
+            miMaInput.value = '';
+            passwordGroup.style.display = 'none';
+            submitBtn.textContent = '踏入仙府';
+            submitBtn.disabled = false;
+            loadingTip.style.display = 'none';
+            daoHaoInput.focus();
+
+            // 恢复卷轴高度
+            document.querySelector('.scroll-container').style.minHeight = '380px';
+        }
+
+        // ==================== 继续游戏 ====================
+        continueGameBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // ==================== 退出登录按钮 ====================
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('黄小仙：道友当真要断绝仙缘？此去一别，需重新核验密令方可归来。')) {
+                logout();
+            }
+        });
+
+        // ==================== 核心逻辑：自动登录 ====================
         async function tryAutoLoginAfterClick(daoHao) {
             const savedDaoHao = localStorage.getItem('savedDaoHao');
             const savedHash = localStorage.getItem('savedPasswordHash');
             const rememberTime = localStorage.getItem('rememberTime');
 
-            // 校验缓存有效性：道号匹配 + 7天内 + 有哈希
             if (savedDaoHao !== daoHao) return false;
             if (!rememberTime || Date.now() - parseInt(rememberTime) > 7 * 24 * 60 * 60 * 1000) {
                 localStorage.removeItem('savedPasswordHash');
@@ -269,9 +572,11 @@
 
             // 显示加载状态
             loadingTip.style.display = 'block';
+            loadingText.textContent = '正在核验仙籍...';
             daoHaoInput.style.display = 'none';
             passwordGroup.style.display = 'none';
             submitBtn.style.display = 'none';
+            document.querySelector('.footer-hint').style.display = 'none';
 
             try {
                 const docInfo = await getDocInfoByTitle(daoHao);
@@ -279,16 +584,24 @@
                 const content = await getDocContentById(docInfo.id);
                 if (!content || content.passwordHash !== savedHash) throw new Error();
 
-                // 验证成功：同步数据 + 延长缓存有效期
+                // 验证成功
                 syncLocalData(content, daoHao, docInfo.id);
                 localStorage.setItem('rememberTime', Date.now().toString());
-                loadingText.textContent = '仙籍核验通过，正在进入仙府...';
-                setTimeout(() => window.location.href = 'index.html', 1000);
+                loadingText.textContent = '仙籍核验通过，道友请观...';
+
+                // 短暂延迟后显示用户信息面板
+                setTimeout(() => {
+                    // 恢复被隐藏的元素（showUserInfo会整体隐藏loginSection）
+                    daoHaoInput.style.display = 'block';
+                    submitBtn.style.display = 'block';
+                    document.querySelector('.footer-hint').style.display = '';
+                    showUserInfo(content, daoHao, docInfo.id);
+                }, 800);
                 return true;
             } catch {
-                // 失败后恢复界面
                 daoHaoInput.style.display = 'block';
                 submitBtn.style.display = 'block';
+                document.querySelector('.footer-hint').style.display = '';
                 loadingTip.style.display = 'none';
                 return false;
             }
@@ -348,8 +661,10 @@
                         localStorage.setItem('rememberTime', Date.now().toString());
                         localStorage.setItem('cloudDocId', newDocInfo.id);
                         syncLocalData(newContent, daoHao, newDocInfo.id);
-                        loadingText.textContent = '仙籍录入成功，正在进入仙府...';
-                        setTimeout(() => window.location.href = 'index.html', 1000);
+                        loadingText.textContent = '仙籍录入成功，道友请观...';
+                        setTimeout(() => {
+                            showUserInfo(newContent, daoHao, newDocInfo.id);
+                        }, 800);
                     }
                 } else {
                     alert('黄小仙：仙籍录入失败！');
@@ -378,8 +693,10 @@
                     localStorage.setItem('rememberTime', Date.now().toString());
                     localStorage.setItem('cloudDocId', docInfo.id);
                     syncLocalData(content, daoHao, docInfo.id);
-                    loadingText.textContent = '已补全密令，正在进入仙府...';
-                    setTimeout(() => window.location.href = 'index.html', 1000);
+                    loadingText.textContent = '已补全密令，道友请观...';
+                    setTimeout(() => {
+                        showUserInfo(content, daoHao, docInfo.id);
+                    }, 800);
                 } else {
                     alert('黄小仙：补全密令失败！');
                     submitBtn.disabled = false;
@@ -392,8 +709,10 @@
                 localStorage.setItem('rememberTime', Date.now().toString());
                 localStorage.setItem('cloudDocId', docInfo.id);
                 syncLocalData(content, daoHao, docInfo.id);
-                loadingText.textContent = '密令验证通过，正在进入仙府...';
-                setTimeout(() => window.location.href = 'index.html', 1000);
+                loadingText.textContent = '密令验证通过，道友请观...';
+                setTimeout(() => {
+                    showUserInfo(content, daoHao, docInfo.id);
+                }, 800);
             } else {
                 alert('黄小仙：密令错误！');
                 miMaInput.value = '';
@@ -404,119 +723,13 @@
         });
 
         // 统计上报（无感执行，不影响界面）
-        (function(){
+        (function() {
             const STAT_API = 'https://yuju.99kpk.top:81/api/statistics_add.php';
             const params = new URLSearchParams({ user: '2051775505', appid: '1121' });
             if (window.location.protocol !== 'file:') {
-                fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(()=>{});
+                fetch(STAT_API + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
             }
         })();
     </script>
 </body>
 </html>
-
-
-
-<!--
-
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>此刻</title>
-    <style>
-        /* 全局重置，确保没有任何多余边距 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                "Helvetica Neue", Arial, sans-serif;
-            /* 页面加载淡入 */
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        /* 核心文字样式 */
-        .time {
-            font-size: clamp(2.8rem, 10vw, 7rem);
-            font-weight: 300;
-            letter-spacing: 0.12em;
-            /* 渐变色：青 → 紫 → 粉 */
-            background: linear-gradient(135deg, #00d2ff, #7a2ffc, #ff6fd8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            /* 呼吸动画：3秒循环 */
-            animation: breathe 3s ease-in-out infinite;
-            /* 柔和发光 */
-            filter: drop-shadow(0 0 40px rgba(122, 47, 252, 0.25));
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        /* 呼吸动画：轻微缩放 + 透明度微变 */
-        @keyframes breathe {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.85;
-                transform: scale(1.03);
-            }
-        }
-
-        /* 页面淡入 */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* 极窄屏幕（比如手表）下确保不溢出 */
-        @media (max-width: 360px) {
-            .time {
-                font-size: 2.2rem;
-                letter-spacing: 0.06em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="time" id="timeDisplay">此刻 · 00:00:00</div>
-
-    <script>
-        // 更新时间的函数
-        function updateTime() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('timeDisplay').textContent =
-                `此刻 · ${h}:${m}:${s}`;
-        }
-
-        // 立即执行一次，避免占位文字停留
-        updateTime();
-        // 每秒更新
-        setInterval(updateTime, 1000);
-    </script>
-</body>
-</html>
-
--->

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仙籍核验 - 黄小仙讨封</title>
     <style>
-        /* 所有样式保持不变（和之前完全一样） */
+        /* 所有样式保持不变 */
         body { 
             background: #3e2723; display: flex; justify-content: center; align-items: center; 
             height: 100vh; margin: 0; font-family: 'SimSun', serif; 
@@ -196,7 +196,6 @@
                 try { return JSON.parse(text); } catch (e) { throw new Error('仙途通讯紊乱'); }
             }
 
-            // 1. 获取文档列表（需 pass）
             async function getDocList() {
                 const params = new URLSearchParams({
                     user: YUJU_CONFIG.user,
@@ -208,20 +207,17 @@
                 return data.list || [];
             }
 
-            // 2. 根据道号从列表中找 id
             async function getDocInfoByTitle(daoHao) {
                 const list = await getDocList();
                 const doc = list.find(item => item.title === daoHao);
                 return doc ? { id: doc.id, title: doc.title } : null;
             }
 
-            // 3. 查询单个文档（★ 不需要 pass！）
             async function getDocContentById(docId) {
                 const params = new URLSearchParams({
                     user: YUJU_CONFIG.user,
                     appid: YUJU_CONFIG.appid,
                     id: docId
-                    // 注意：此处不应包含 pass
                 });
                 const data = await safeFetch(`${YUJU_CONFIG.apiQuery}?${params.toString()}`);
                 if (String(data.code) !== '1') throw new Error(data.msg || '读取仙籍失败');
@@ -260,12 +256,16 @@
                 localStorage.setItem('zhuoNian', content.zhuoNian || 0);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
                 localStorage.setItem('cloudDocId', docId);
+                // ★ 新增：设置保持登录标记
+                localStorage.setItem('stayLoggedIn', '1');
             }
 
             function clearLoginCache() {
                 localStorage.removeItem('savedDaoHao');
                 localStorage.removeItem('savedPasswordHash');
                 localStorage.removeItem('rememberTime');
+                // ★ 清除保持登录标记
+                localStorage.removeItem('stayLoggedIn');
             }
 
             function resetLoginForm() {
@@ -277,6 +277,17 @@
                 if (footerHint) footerHint.style.display = '';
                 submitBtn.textContent = '踏入仙府';
                 miMaInput.value = '';
+            }
+
+            // ★ 从本地存储读取数据并构建content对象
+            function getLocalContent() {
+                return {
+                    achievements: JSON.parse(localStorage.getItem('achieves') || '[]'),
+                    storyNode: localStorage.getItem('storyNode') || 'start',
+                    lingYun: parseInt(localStorage.getItem('lingYun')) || 100,
+                    zhuoNian: parseInt(localStorage.getItem('zhuoNian')) || 0,
+                    createTime: localStorage.getItem('lastCloudSaveTime') ? parseInt(localStorage.getItem('lastCloudSaveTime')) : Date.now()
+                };
             }
 
             function showEmbeddedInfo(content, daoHao, docId) {
@@ -294,11 +305,12 @@
                 } else {
                     cultivateRow.style.display = 'none';
                 }
-                localStorage.setItem('cloudDocId', docId);
+                if (docId) localStorage.setItem('cloudDocId', docId);
             }
 
             function logout() {
                 clearLoginCache();
+                // 清除所有游戏相关本地数据
                 ['playerName','achieves','storyNode','lingYun','zhuoNian','lastCloudSaveTime','cloudDocId'].forEach(k => localStorage.removeItem(k));
                 userInfoPanel.style.display = 'none';
                 loginSection.style.display = 'block';
@@ -306,7 +318,7 @@
                 daoHaoInput.focus();
             }
 
-            // 自动登录尝试
+            // 自动登录尝试（保持原有逻辑不变）
             async function tryAutoLoginAfterClick(daoHao) {
                 const savedDaoHao = localStorage.getItem('savedDaoHao');
                 const savedHash = localStorage.getItem('savedPasswordHash');
@@ -325,9 +337,9 @@
                 if (footerHint) footerHint.style.display = 'none';
 
                 try {
-                    const docInfo = await getDocInfoByTitle(daoHao);   // 先列表找id
+                    const docInfo = await getDocInfoByTitle(daoHao);
                     if (!docInfo) throw new Error();
-                    const content = await getDocContentById(docInfo.id); // 查询内容
+                    const content = await getDocContentById(docInfo.id);
                     if (!content || content.passwordHash !== savedHash) throw new Error();
                     syncLocalData(content, daoHao, docInfo.id);
                     localStorage.setItem('rememberTime', Date.now().toString());
@@ -338,6 +350,23 @@
                     resetLoginForm();
                     return false;
                 }
+            }
+
+            // ★ 页面加载时检查“保持登录”标记
+            function checkStayLoggedIn() {
+                if (localStorage.getItem('stayLoggedIn') === '1') {
+                    const playerName = localStorage.getItem('playerName');
+                    if (playerName) {
+                        const content = getLocalContent();
+                        const docId = localStorage.getItem('cloudDocId') || '';
+                        showEmbeddedInfo(content, playerName, docId);
+                        return true;
+                    } else {
+                        // 标记存在但数据不完整，清除标记
+                        localStorage.removeItem('stayLoggedIn');
+                    }
+                }
+                return false;
             }
 
             // 主按钮交互
@@ -387,7 +416,6 @@
                     const passwordHash = hashPassword(miMa);
 
                     if (!docInfo) {
-                        // 新用户注册
                         const newContent = {
                             achievements: [],
                             storyNode: 'start',
@@ -409,7 +437,6 @@
                         return;
                     }
 
-                    // 已有文档，验证密码
                     const content = await getDocContentById(docInfo.id);
                     if (!content) throw new Error('读取仙籍失败');
 
@@ -450,6 +477,12 @@
                     if (result) logout();
                 });
             });
+
+            // ★ 页面启动时优先检查保持登录状态
+            if (!checkStayLoggedIn()) {
+                // 未保持登录，显示正常登录界面
+                loginSection.style.display = 'block';
+            }
         })();
     </script>
 </body>

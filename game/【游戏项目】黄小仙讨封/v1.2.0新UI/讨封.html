@@ -1,1396 +1,701 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content, viewport-fit=cover">
-  <title>黄小仙 · 讨封之卷</title>
-  <meta name="theme-color" content="#5D4037">
-  <style>
-    /* ===== 界面样式 — 修改此处不影响剧情 ===== */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --scroll-bg: #F5DEB3;
-      --scroll-dark: #8B4513;
-      --scroll-gold: #B8860B;
-      --scroll-text: #3E2723;
-      --scroll-light: #FFF8DC;
-      --accent-color: #A93226;
-    }
-    body {
-      background-color: var(--scroll-bg);
-      color: var(--scroll-text);
-      font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
-      line-height: 1.8;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      position: relative;
-      background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,69,19,0.03) 2px, rgba(139,69,19,0.03) 4px),
-                        radial-gradient(ellipse at 50% 0%, rgba(210,180,140,0.15) 0%, transparent 60%),
-                        radial-gradient(ellipse at 50% 100%, rgba(210,180,140,0.1) 0%, transparent 60%);
-    }
-    #particleCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .game-container {
-      max-width: 600px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-      border-left: 6px solid var(--scroll-dark);
-      border-right: 6px solid var(--scroll-dark);
-      background: rgba(255,248,220,0.6);
-      box-shadow: 0 0 30px rgba(0,0,0,0.2);
-    }
-    .game-container::before,
-    .game-container::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 12px;
-      background: linear-gradient(to bottom, var(--scroll-dark), #A0522D, var(--scroll-dark));
-      box-shadow: inset 2px 0 5px rgba(0,0,0,0.3), inset -2px 0 5px rgba(0,0,0,0.2);
-      z-index: -1;
-      pointer-events: none;
-    }
-    .game-container::before { left: -6px; border-radius: 4px 0 0 4px; }
-    .game-container::after { right: -6px; border-radius: 0 4px 4px 0; }
-    .status-bar {
-      flex-shrink: 0;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(245,222,179,0.95) 75%, rgba(240,220,170,0.8) 92%, transparent);
-      padding: 12px 20px 10px;
-      border-bottom: 1px solid var(--scroll-dark);
-      box-sizing: border-box;
-    }
-    .cultivation {
-      font-size: 14px;
-      color: #5D4037;
-    }
-    .cultivation span {
-      color: var(--scroll-gold);
-      font-weight: bold;
-    }
-    .karma-display {
-      display: flex;
-      gap: 12px;
-      font-size: 12px;
-    }
-    .karma-lingyun {
-      color: #2E7D32;
-    }
-    .karma-zhuonian {
-      color: #C62828;
-    }
-
-    .env-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
-      margin-top: 6px;
-      font-size: 12px;
-      color: #5D4037;
-    }
-    .env-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      padding: 2px 8px;
-      background: rgba(139,69,19,0.1);
-      border-radius: 10px;
-      border: 1px solid rgba(139,69,19,0.2);
-    }
-    .env-item .env-icon { font-size: 14px; }
-    .env-item .env-label { color: #8B4513; font-weight: bold; }
-    .env-item.moon .env-icon { color: var(--scroll-gold); }
-    .env-effect {
-      width: 100%;
-      font-size: 11px;
-      color: #A0522D;
-      font-style: italic;
-      margin-top: 2px;
-    }
-    .story-text.env {
-      color: #6D4C41;
-      text-align: center;
-      font-size: 14px;
-      padding: 8px 12px;
-      margin: 12px 0;
-      background: rgba(139,69,19,0.06);
-      border-left: 3px solid var(--scroll-gold);
-      border-radius: 0 4px 4px 0;
-      font-style: italic;
-      letter-spacing: 1px;
-    }
-
-    .story-container {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 16px 20px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--scroll-dark) rgba(245,222,179,0.5);
-    }
-    .story-container::-webkit-scrollbar { width: 6px; }
-    .story-container::-webkit-scrollbar-track { background: rgba(245,222,179,0.5); }
-    .story-container::-webkit-scrollbar-thumb { background: var(--scroll-dark); border-radius: 3px; }
-    .choices-container {
-      flex-shrink: 0;
-      z-index: 100;
-      background: linear-gradient(to top, rgba(245,222,179,0.95) 75%, rgba(240,220,170,0.8) 92%, transparent);
-      padding: 14px 20px 10px;
-      border-top: 1px solid var(--scroll-dark);
-      display: flex;
-      flex-wrap: wrap;
-      box-sizing: border-box;
-      min-height: 60px;
-    }
-    .choices-container .choice-btn {
-      width: calc(50% - 6px);
-      margin-bottom: 12px;
-      box-sizing: border-box;
-    }
-    .choices-container .choice-btn:nth-child(odd) { margin-right: 12px; }
-    .choices-container.single-col .choice-btn { width: 100%; margin-right: 0; }
-    .story-text {
-      font-size: 17px;
-      margin-bottom: 15px;
-      opacity: 0;
-      animation: fadeIn 0.8s ease forwards;
-    }
-    .story-text.narrator { color: #4E342E; font-style: italic; }
-    .story-text.speaker { color: #3E2723; font-weight: bold; }
-    .story-text.system {
-      color: var(--accent-color);
-      text-align: center;
-      padding: 20px 0;
-      border-top: 1px solid var(--scroll-dark);
-      border-bottom: 1px solid var(--scroll-dark);
-      margin: 20px 0;
-    }
-    .story-text.witness {
-      color: var(--scroll-gold);
-      font-weight: bold;
-      text-align: center;
-      letter-spacing: 1px;
-      padding: 10px 0;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .choice-btn, .start-btn, .settings-btn-action, .modal-btn {
-      background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
-      border: 2px solid var(--scroll-dark);
-      color: var(--scroll-light);
-      text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.3);
-      border-radius: 6px;
-      font-family: inherit;
-      letter-spacing: 2px;
-      font-weight: bold;
-      padding: 15px 20px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .choice-btn::after, .start-btn::after {
-      content: "";
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      right: 4px;
-      bottom: 4px;
-      border: 1px dashed rgba(255,255,255,0.3);
-      border-radius: 4px;
-      pointer-events: none;
-    }
-    .choice-btn:hover, .start-btn:hover {
-      background: linear-gradient(180deg, #E0C090 0%, #B06030 100%);
-      transform: translateY(-3px);
-      box-shadow: 5px 5px 0 rgba(0,0,0,0.4), inset 2px 2px 6px rgba(255,255,255,0.3), inset -2px -2px 6px rgba(0,0,0,0.4);
-    }
-    .choice-btn:active, .start-btn:active {
-      transform: translateY(1px);
-      box-shadow: 1px 1px 0 rgba(0,0,0,0.3), inset 2px 2px 6px rgba(0,0,0,0.4);
-    }
-    .footer {
-      flex-shrink: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 20px;
-      font-size: 12px;
-      color: #5D4037;
-      background: rgba(245,222,179,0.9);
-      border-top: 1px solid var(--scroll-dark);
-    }
-    .start-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      z-index: 2000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: #B0B0B0;
-      transition: opacity 0.3s;
-    }
-    .start-content {
-      text-align: center;
-      max-width: 80%;
-    }
-    .start-content h1 {
-      font-family: 'Ma Shan Zheng', 'KaiTi', serif;
-      color: var(--scroll-gold);
-      font-size: 56px;
-      margin-bottom: 16px;
-      text-shadow: 2px 2px 0 var(--scroll-dark);
-      letter-spacing: 8px;
-    }
-    .start-subtitle {
-      font-size: 18px;
-      margin-bottom: 48px;
-      color: #5D4037;
-      font-style: italic;
-      letter-spacing: 2px;
-    }
-    .settings-btn {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(180deg, #D2B48C, #A0522D);
-      border: 2px solid var(--scroll-dark);
-      color: var(--scroll-light);
-      border-radius: 50%;
-      font-size: 18px;
-      cursor: pointer;
-      z-index: 1500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-    }
-    .settings-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 3000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    .settings-overlay.show { display: flex; }
-    .settings-modal {
-      background: #F5DEB3;
-      border: 2px solid var(--scroll-dark);
-      border-radius: 8px;
-      padding: 28px;
-      max-width: 360px;
-      width: 90%;
-      color: #3E2723;
-    }
-    .settings-modal h3 {
-      color: var(--scroll-gold);
-      text-align: center;
-      border-bottom: 1px solid var(--scroll-dark);
-      padding-bottom: 10px;
-      margin-bottom: 18px;
-    }
-    .settings-item {
-      margin-bottom: 12px;
-    }
-    .settings-item .label {
-      color: #5D4037;
-      font-size: 13px;
-      display: block;
-      margin-bottom: 6px;
-    }
-    .settings-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .settings-btn-action {
-      flex: 1;
-      padding: 12px 16px;
-      font-size: 14px;
-    }
-    .settings-btn-action.danger {
-      border-color: #A93226;
-      color: #FFD2D2;
-      background: linear-gradient(180deg, #8B4513, #5D4037);
-    }
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 60px;
-      transform: translateX(-50%) translateY(40px);
-      background: #3E2723;
-      border: 2px solid var(--scroll-gold);
-      color: #FFE4B5;
-      padding: 12px 24px;
-      border-radius: 5px;
-      font-size: 14px;
-      z-index: 5000;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .confirm-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 4000;
-      display: none;
-      justify-content: center;
-      align-items: center;
-    }
-    .confirm-overlay.show { display: flex; }
-    .confirm-modal {
-      background: #F5DEB3;
-      border: 2px solid #A93226;
-      border-radius: 8px;
-      padding: 24px 28px;
-      max-width: 320px;
-      width: 90%;
-      color: #3E2723;
-    }
-    .confirm-modal h4 { color: #A93226; margin-bottom: 12px; }
-    .confirm-row { display: flex; gap: 10px; }
-    .float-jump-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 80px;
-      z-index: 90;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: rgba(26,21,16,0.85);
-      border: 2px solid var(--scroll-gold);
-      color: var(--scroll-gold);
-      font-size: 20px;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-    .float-jump-btn.show { display: flex; }
-    .tv-focus {
-      outline: 3px solid #FFD700 !important;
-      outline-offset: 2px;
-      box-shadow: 0 0 20px rgba(255,215,0,0.5) !important;
-    }
-    @media (max-width: 480px) {
-      .story-text { font-size: 15px; }
-    }
-    .achievement-popup {
-      position: fixed;
-      bottom: 140px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #2C1810;
-      border: 2px solid var(--scroll-gold);
-      color: #FFE4B5;
-      padding: 14px 28px;
-      border-radius: 8px;
-      font-size: 15px;
-      z-index: 6000;
-      opacity: 0;
-      transition: all 0.4s ease;
-      pointer-events: none;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      max-width: 85%;
-    }
-    .achievement-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .achievement-popup.golden {
-      border-color: #FFD700;
-      background: #3D2B1F;
-      box-shadow: 0 0 40px rgba(255,215,0,0.3);
-    }
-    .achievement-popup .title { font-weight: bold; font-size: 17px; }
-    .achievement-popup .icon { font-size: 24px; margin-right: 10px; }
-    .version-btn {
-      background: none;
-      border: none;
-      color: #5D4037;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      transition: background 0.2s;
-    }
-    .version-btn:hover { background: rgba(139,69,19,0.15); }
-    .changelog-popup {
-      position: fixed;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #F5DEB3;
-      border: 2px solid var(--scroll-dark);
-      border-radius: 8px;
-      padding: 16px 24px;
-      max-width: 340px;
-      width: 90%;
-      z-index: 7000;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      color: #3E2723;
-      font-size: 13px;
-      max-height: 50vh;
-      overflow-y: auto;
-    }
-    .changelog-popup.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-    .changelog-popup h4 {
-      color: var(--scroll-gold);
-      margin-bottom: 8px;
-      text-align: center;
-      border-bottom: 1px solid var(--scroll-dark);
-      padding-bottom: 6px;
-    }
-    .changelog-popup ul { padding-left: 18px; margin: 6px 0; }
-    .changelog-popup li { margin-bottom: 4px; }
-    .changelog-popup .close-changelog {
-      display: block;
-      margin: 10px auto 0;
-      background: var(--scroll-dark);
-      color: var(--scroll-light);
-      border: none;
-      padding: 6px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-    }
-    .tablet-mode .game-container { max-width: 800px; border-left-width: 4px; border-right-width: 4px; }
-    .tablet-mode .choice-btn { padding: 18px 24px; font-size: 17px; }
-    .tablet-mode .story-text { font-size: 19px; line-height: 2; }
-    .tablet-mode .status-bar { padding: 16px 28px; }
-    .tablet-mode .choices-container { padding: 18px 28px 14px; }
-    .tablet-mode .story-container { padding: 20px 28px; }
-    .tablet-mode .footer { padding: 10px 28px; }
-    .tablet-mode .start-content h1 { font-size: 72px; }
-    .tablet-mode .start-subtitle { font-size: 22px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, interactive-widget=resizes-content, viewport-fit=cover">
+    <title>黄小仙 · 讨封之卷</title>
+    <meta name="theme-color" content="#5D4037">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+            --accent-color: #A93226;
+        }
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,69,19,0.03) 2px, rgba(139,69,19,0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210,180,140,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(210,180,140,0.1) 0%, transparent 60%);
+        }
+        #particleCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .game-container {
+            max-width: 600px; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            position: relative; z-index: 1; border-left: 6px solid var(--scroll-dark); border-right: 6px solid var(--scroll-dark);
+            background: rgba(255,248,220,0.6); box-shadow: 0 0 30px rgba(0,0,0,0.2);
+        }
+        .game-container::before, .game-container::after {
+            content: ""; position: absolute; top: 0; bottom: 0; width: 12px;
+            background: linear-gradient(to bottom, var(--scroll-dark), #A0522D, var(--scroll-dark));
+            box-shadow: inset 2px 0 5px rgba(0,0,0,0.3), inset -2px 0 5px rgba(0,0,0,0.2); z-index: -1; pointer-events: none;
+        }
+        .game-container::before { left: -6px; border-radius: 4px 0 0 4px; }
+        .game-container::after { right: -6px; border-radius: 0 4px 4px 0; }
+        .status-bar {
+            flex-shrink: 0; z-index: 100; background: linear-gradient(to bottom, rgba(245,222,179,0.95) 75%, rgba(240,220,170,0.8) 92%, transparent);
+            padding: 12px 20px 10px; border-bottom: 1px solid var(--scroll-dark);
+        }
+        .cultivation { font-size: 14px; color: #5D4037; }
+        .cultivation span { color: var(--scroll-gold); font-weight: bold; }
+        .karma-display { display: flex; gap: 12px; font-size: 12px; }
+        .karma-lingyun { color: #2E7D32; }
+        .karma-zhuonian { color: #C62828; }
+        .env-bar { display: flex; flex-wrap: wrap; gap: 6px 10px; margin-top: 6px; font-size: 12px; color: #5D4037; }
+        .env-item { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; background: rgba(139,69,19,0.1); border-radius: 10px; border: 1px solid rgba(139,69,19,0.2); }
+        .env-item .env-icon { font-size: 14px; }
+        .env-item .env-label { color: #8B4513; font-weight: bold; }
+        .env-item.moon .env-icon { color: var(--scroll-gold); }
+        .env-effect { width: 100%; font-size: 11px; color: #A0522D; font-style: italic; margin-top: 2px; }
+        .story-container {
+            flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 20px;
+            scrollbar-width: thin; scrollbar-color: var(--scroll-dark) rgba(245,222,179,0.5);
+        }
+        .story-container::-webkit-scrollbar { width: 6px; }
+        .story-container::-webkit-scrollbar-track { background: rgba(245,222,179,0.5); }
+        .story-container::-webkit-scrollbar-thumb { background: var(--scroll-dark); border-radius: 3px; }
+        .choices-container {
+            flex-shrink: 0; z-index: 100; background: linear-gradient(to top, rgba(245,222,179,0.95) 75%, rgba(240,220,170,0.8) 92%, transparent);
+            padding: 14px 20px 10px; border-top: 1px solid var(--scroll-dark); display: flex; flex-wrap: wrap;
+        }
+        .choices-container .choice-btn { width: calc(50% - 6px); margin-bottom: 12px; }
+        .choices-container .choice-btn:nth-child(odd) { margin-right: 12px; }
+        .choices-container.single-col .choice-btn { width: 100%; margin-right: 0; }
+        .story-text { font-size: 17px; margin-bottom: 15px; opacity: 0; animation: fadeIn 0.8s ease forwards; }
+        .story-text.narrator { color: #4E342E; font-style: italic; }
+        .story-text.speaker { color: #3E2723; font-weight: bold; }
+        .story-text.system { color: var(--accent-color); text-align: center; padding: 20px 0; border-top: 1px solid var(--scroll-dark); border-bottom: 1px solid var(--scroll-dark); margin: 20px 0; }
+        .story-text.witness { color: var(--scroll-gold); font-weight: bold; text-align: center; letter-spacing: 1px; padding: 10px 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .choice-btn, .start-btn, .settings-btn-action {
+            background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%); border: 2px solid var(--scroll-dark);
+            color: var(--scroll-light); text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.3), inset 2px 2px 4px rgba(255,255,255,0.2), inset -2px -2px 4px rgba(0,0,0,0.3);
+            border-radius: 6px; font-family: inherit; letter-spacing: 2px; font-weight: bold;
+            padding: 15px 20px; font-size: 15px; cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .choice-btn::after, .start-btn::after {
+            content: ""; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px dashed rgba(255,255,255,0.3); border-radius: 4px; pointer-events: none;
+        }
+        .choice-btn:hover, .start-btn:hover { background: linear-gradient(180deg, #E0C090 0%, #B06030 100%); transform: translateY(-3px); box-shadow: 5px 5px 0 rgba(0,0,0,0.4), inset 2px 2px 6px rgba(255,255,255,0.3), inset -2px -2px 6px rgba(0,0,0,0.4); }
+        .choice-btn:active, .start-btn:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(0,0,0,0.3), inset 2px 2px 6px rgba(0,0,0,0.4); }
+        .footer { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; font-size: 12px; color: #5D4037; background: rgba(245,222,179,0.9); border-top: 1px solid var(--scroll-dark); }
+        .start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column; color: #B0B0B0; transition: opacity 0.3s; }
+        .start-content { text-align: center; max-width: 80%; }
+        .start-content h1 { font-family: 'Ma Shan Zheng', 'KaiTi', serif; color: var(--scroll-gold); font-size: 56px; margin-bottom: 16px; text-shadow: 2px 2px 0 var(--scroll-dark); letter-spacing: 8px; }
+        .start-subtitle { font-size: 18px; margin-bottom: 48px; color: #5D4037; font-style: italic; letter-spacing: 2px; }
+        .settings-btn { position: fixed; top: 12px; right: 12px; width: 40px; height: 40px; background: linear-gradient(180deg, #D2B48C, #A0522D); border: 2px solid var(--scroll-dark); color: var(--scroll-light); border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 1500; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+        .settings-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        .settings-overlay.show { display: flex; }
+        .settings-modal { background: #F5DEB3; border: 2px solid var(--scroll-dark); border-radius: 8px; padding: 28px; max-width: 360px; width: 90%; color: #3E2723; }
+        .settings-modal h3 { color: var(--scroll-gold); text-align: center; border-bottom: 1px solid var(--scroll-dark); padding-bottom: 10px; margin-bottom: 18px; }
+        .settings-item { margin-bottom: 12px; }
+        .settings-item .label { color: #5D4037; font-size: 13px; display: block; margin-bottom: 6px; }
+        .settings-row { display: flex; gap: 10px; margin-top: 20px; }
+        .settings-btn-action { flex: 1; padding: 12px 16px; font-size: 14px; }
+        .settings-btn-action.danger { border-color: #A93226; color: #FFD2D2; background: linear-gradient(180deg, #8B4513, #5D4037); }
+        .toast { position: fixed; left: 50%; bottom: 60px; transform: translateX(-50%) translateY(40px); background: #3E2723; border: 2px solid var(--scroll-gold); color: #FFE4B5; padding: 12px 24px; border-radius: 5px; font-size: 14px; z-index: 5000; opacity: 0; transition: all 0.3s; pointer-events: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .confirm-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; display: none; justify-content: center; align-items: center; }
+        .confirm-overlay.show { display: flex; }
+        .confirm-modal { background: #F5DEB3; border: 2px solid #A93226; border-radius: 8px; padding: 24px 28px; max-width: 320px; width: 90%; color: #3E2723; }
+        .confirm-modal h4 { color: #A93226; margin-bottom: 12px; }
+        .confirm-row { display: flex; gap: 10px; }
+        .float-jump-btn { position: fixed; right: 16px; bottom: 80px; z-index: 90; width: 44px; height: 44px; border-radius: 50%; background: rgba(26,21,16,0.85); border: 2px solid var(--scroll-gold); color: var(--scroll-gold); font-size: 20px; cursor: pointer; display: none; align-items: center; justify-content: center; }
+        .float-jump-btn.show { display: flex; }
+        .tv-focus { outline: 3px solid #FFD700 !important; outline-offset: 2px; box-shadow: 0 0 20px rgba(255,215,0,0.5) !important; }
+        .achievement-popup { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2C1810; border: 2px solid var(--scroll-gold); color: #FFE4B5; padding: 14px 28px; border-radius: 8px; font-size: 15px; z-index: 6000; opacity: 0; transition: all 0.4s ease; pointer-events: none; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.6); max-width: 85%; }
+        .achievement-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .achievement-popup.golden { border-color: #FFD700; background: #3D2B1F; box-shadow: 0 0 40px rgba(255,215,0,0.3); }
+        .achievement-popup .title { font-weight: bold; font-size: 17px; }
+        .achievement-popup .icon { font-size: 24px; margin-right: 10px; }
+        .version-btn { background: none; border: none; color: #5D4037; cursor: pointer; font-family: inherit; font-size: 12px; padding: 2px 6px; border-radius: 3px; transition: background 0.2s; }
+        .version-btn:hover { background: rgba(139,69,19,0.15); }
+        .changelog-popup { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(20px); background: #F5DEB3; border: 2px solid var(--scroll-dark); border-radius: 8px; padding: 16px 24px; max-width: 340px; width: 90%; z-index: 7000; opacity: 0; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.4); color: #3E2723; font-size: 13px; max-height: 50vh; overflow-y: auto; }
+        .changelog-popup.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        .changelog-popup h4 { color: var(--scroll-gold); margin-bottom: 8px; text-align: center; border-bottom: 1px solid var(--scroll-dark); padding-bottom: 6px; }
+        .changelog-popup ul { padding-left: 18px; margin: 6px 0; }
+        .changelog-popup li { margin-bottom: 4px; }
+        .changelog-popup .close-changelog { display: block; margin: 10px auto 0; background: var(--scroll-dark); color: var(--scroll-light); border: none; padding: 6px 20px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 13px; }
+        .tablet-mode .game-container { max-width: 800px; border-left-width: 4px; border-right-width: 4px; }
+        .tablet-mode .choice-btn { padding: 18px 24px; font-size: 17px; }
+        .tablet-mode .story-text { font-size: 19px; line-height: 2; }
+        .tablet-mode .status-bar { padding: 16px 28px; }
+        .tablet-mode .choices-container { padding: 18px 28px 14px; }
+        .tablet-mode .story-container { padding: 20px 28px; }
+        .tablet-mode .footer { padding: 10px 28px; }
+        .tablet-mode .start-content h1 { font-size: 72px; }
+        .tablet-mode .start-subtitle { font-size: 22px; }
+        @media (max-width: 480px) { .story-text { font-size: 15px; } }
+    </style>
 </head>
 <body>
+    <canvas id="particleCanvas"></canvas>
 
-  <canvas id="particleCanvas"></canvas>
-
-  <!-- ===== 成就弹窗 ===== -->
-  <div class="achievement-popup" id="achievementPopup">
-    <span class="icon" id="achIcon">✦</span>
-    <span class="title" id="achTitle">成就</span>
-  </div>
-
-  <!-- ===== 更新日志 ===== -->
-  <div class="changelog-popup" id="changelogPopup">
-    <h4>📜 更新日志</h4>
-    <ul>
-      <li><b>v2.0.0</b> — 剧情与界面完全分离，修改文案不再影响UI</li>
-      <li><b>v1.6.1</b> — 修复存储桥，成就系统稳定</li>
-      <li><b>v1.6.0</b> — 新增剑客、精怪、老宅等剧情线</li>
-      <li><b>v1.5.0</b> — 加入道行系统与善恶值</li>
-    </ul>
-    <button class="close-changelog" onclick="document.getElementById('changelogPopup').classList.remove('show')">关闭</button>
-  </div>
-
-  <!-- ===== 开始界面 ===== -->
-  <div class="start-overlay" id="startOverlay">
-    <div class="start-content">
-      <h1>黄小仙</h1>
-      <p class="start-subtitle">五百年修为一念之间</p>
-      <button class="start-btn focusable" id="startBtn" onclick="startGame()">开始讨封</button>
-      <div style="color:#5D4037; margin-top:36px; font-size:13px;">
-        剧情页面：<b style="color:var(--scroll-gold);">↑↓</b> 滚动　<b style="color:var(--scroll-gold);">←→</b> 切换选项　<b style="color:var(--scroll-gold);">Enter</b> 确认　<b style="color:var(--scroll-gold);">Esc</b> 后退
-      </div>
+    <div class="achievement-popup" id="achievementPopup">
+        <span class="icon" id="achIcon">✦</span>
+        <span class="title" id="achTitle">成就</span>
     </div>
-  </div>
 
-  <!-- ===== 游戏容器 ===== -->
-  <div class="game-container">
-    <div class="status-bar">
-      <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
-      <div class="karma-display" id="karmaDisplay"></div>
-      <div class="env-bar" id="envBar"></div>
+    <div class="changelog-popup" id="changelogPopup">
+        <h4>📜 更新日志</h4>
+        <ul>
+            <li><b>v2.0.0</b> — 剧情与界面完全分离，修改文案不再影响UI</li>
+            <li><b>v1.6.1</b> — 修复存储桥，成就系统稳定</li>
+            <li><b>v1.6.0</b> — 新增剑客、精怪、老宅等剧情线</li>
+            <li><b>v1.5.0</b> — 加入道行系统与善恶值</li>
+        </ul>
+        <button class="close-changelog" onclick="document.getElementById('changelogPopup').classList.remove('show')">关闭</button>
     </div>
-    <div class="story-container" id="story-container"></div>
-    <div class="choices-container" id="choices-container"></div>
-    <div class="footer">
-      <div>
-        <button class="version-btn" id="versionBtn">v2.0.0</button>
-      </div>
-      <div><a href="https://raccoon.fit/" target="_blank" style="color:#5D4037;text-decoration:none;">2026 软软的小窝</a></div>
+
+    <div class="start-overlay" id="startOverlay">
+        <div class="start-content">
+            <h1>黄小仙</h1>
+            <p class="start-subtitle">五百年修为一念之间</p>
+            <button class="start-btn focusable" id="startBtn" onclick="startGame()">开始讨封</button>
+            <div style="color:#5D4037; margin-top:36px; font-size:13px;">
+                剧情页面：<b style="color:var(--scroll-gold);">↑↓</b> 滚动　<b style="color:var(--scroll-gold);">←→</b> 切换选项　<b style="color:var(--scroll-gold);">Enter</b> 确认　<b style="color:var(--scroll-gold);">Esc</b> 后退
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- ===== 设置按钮 ===== -->
-  <button class="settings-btn" id="settingsBtn" title="设置">⚙</button>
-
-  <!-- ===== 设置面板 ===== -->
-  <div class="settings-overlay" id="settingsOverlay">
-    <div class="settings-modal">
-      <h3>设置</h3>
-      <div class="settings-item">
-        <span class="label">当前进度</span>
-        <div id="progressInfo" style="color:var(--scroll-gold);">加载中...</div>
-      </div>
-      <div class="settings-item">
-        <span class="label">显示模式</span>
-        <button class="settings-btn-action focusable" id="tabletModeBtn">切换平板模式</button>
-      </div>
-      <div class="settings-row">
-        <button class="settings-btn-action focusable" id="closeSettingsBtn">关闭</button>
-        <button class="settings-btn-action danger focusable" id="clearProgressBtn">清除进度</button>
-      </div>
+    <div class="game-container">
+        <div class="status-bar">
+            <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
+            <div class="karma-display" id="karmaDisplay"></div>
+            <div class="env-bar" id="envBar"></div>
+        </div>
+        <div class="story-container" id="story-container"></div>
+        <div class="choices-container" id="choices-container"></div>
+        <div class="footer">
+            <div><button class="version-btn" id="versionBtn">v2.0.0</button></div>
+            <div><a href="https://raccoon.fit/" target="_blank" style="color:#5D4037;text-decoration:none;">2026 软软的小窝</a></div>
+        </div>
     </div>
-  </div>
 
-  <!-- ===== 确认对话框 ===== -->
-  <div class="confirm-overlay" id="confirmOverlay">
-    <div class="confirm-modal">
-      <h4 id="confirmTitle">确认操作</h4>
-      <p id="confirmMessage"></p>
-      <div class="confirm-row">
-        <button class="settings-btn-action focusable" id="confirmCancelBtn">取消</button>
-        <button class="settings-btn-action danger focusable" id="confirmOkBtn">确定</button>
-      </div>
+    <button class="settings-btn" id="settingsBtn" title="设置">⚙</button>
+
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <h3>设置</h3>
+            <div class="settings-item">
+                <span class="label">当前进度</span>
+                <div id="progressInfo" style="color:var(--scroll-gold);">加载中...</div>
+            </div>
+            <div class="settings-item">
+                <span class="label">显示模式</span>
+                <button class="settings-btn-action focusable" id="tabletModeBtn">切换平板模式</button>
+            </div>
+            <div class="settings-row">
+                <button class="settings-btn-action focusable" id="closeSettingsBtn">关闭</button>
+                <button class="settings-btn-action danger focusable" id="clearProgressBtn">清除进度</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- ===== Toast ===== -->
-  <div class="toast" id="toast"></div>
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-modal">
+            <h4 id="confirmTitle">确认操作</h4>
+            <p id="confirmMessage"></p>
+            <div class="confirm-row">
+                <button class="settings-btn-action focusable" id="confirmCancelBtn">取消</button>
+                <button class="settings-btn-action danger focusable" id="confirmOkBtn">确定</button>
+            </div>
+        </div>
+    </div>
 
-  <!-- ===== 浮动跳转按钮 ===== -->
-  <button class="float-jump-btn" id="floatJumpBtn" title="跳至选项">↓</button>
+    <div class="toast" id="toast"></div>
+    <button class="float-jump-btn" id="floatJumpBtn" title="跳至选项">↓</button>
 
-  <!-- ============================================================ -->
-  <!-- 加载剧情数据（独立文件）                                     -->
-  <!-- ============================================================ -->
-  <script src="story.js"></script>
+    <script src="story.js"></script>
+    <script>
+        // ==================== 云居API配置 ====================
+        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        const CONFIG = JSON.parse(atob(ENCODED_CONFIG));
 
-  <!-- ============================================================ -->
-  <!-- 游戏引擎（交互逻辑，与数据分离）                             -->
-  <!-- ============================================================ -->
-  <script>
-    // ================================================================
-    //  🧠 游戏状态（运行时）
-    // ================================================================
-    const gameState = {
-      currentScene: 'start',
-      storyHistory: [],
-      sceneHistory: [],
-      typingTimer: null,
-      checkpointScene: 'start',
-      skipMode: false,
-      achievements: { ...window.ACHIEVEMENTS_INIT },
-      // 灵韵/浊念 从存储读取，并在游戏中基于当前值增减
-      playerLingYun: 0,
-      playerZhuoNian: 0,
-      playerDifficulty: 'normal'
-    };
+        let playerName = localStorage.getItem('playerName') || '';
+        let cloudDocId = localStorage.getItem('cloudDocId') || '';
+        try {
+            if (!playerName && window.parent !== window) playerName = window.parent.localStorage.getItem('playerName') || '';
+            if (!cloudDocId && window.parent !== window) cloudDocId = window.parent.localStorage.getItem('cloudDocId') || '';
+        } catch(e) {}
 
-    // ================================================================
-    //  🔌 StorageBridge
-    // ================================================================
-    const StorageBridge = (function() {
-      const hasNative = (() => { try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; } })();
-      if (!hasNative) {
-        return {
-          getItem: async (k, d = null) => localStorage.getItem(k) ?? d,
-          setItem: async (k, v) => { localStorage.setItem(k, v); },
-          removeItem: async (k) => { localStorage.removeItem(k); },
-          clear: async () => { localStorage.clear(); }
+        const gameState = {
+            currentScene: 'start',
+            storyHistory: [],
+            sceneHistory: [],
+            typingTimer: null,
+            checkpointScene: 'start',
+            achievements: { ...window.ACHIEVEMENTS_INIT },
+            playerLingYun: 0,
+            playerZhuoNian: 0,
+            playerDifficulty: 'normal'
         };
-      }
-      let id = 0;
-      const pending = {};
-      window.addEventListener('message', (e) => {
-        const d = e.data;
-        if (d && d.id && pending[d.id]) {
-          d.error ? pending[d.id].reject(new Error(d.error)) : pending[d.id].resolve(d.result);
-          delete pending[d.id];
-        }
-      });
-      function send(action, key, value, def) {
-        return new Promise((resolve, reject) => {
-          const i = ++id;
-          pending[i] = { resolve, reject };
-          window.parent.postMessage({ id:i, action, key, value, defaultValue:def }, '*');
-        });
-      }
-      return {
-        getItem: (k, d) => send('get', k, null, d),
-        setItem: (k, v) => send('set', k, v),
-        removeItem: (k) => send('remove', k),
-        clear: () => send('clear')
-      };
-    })();
 
-    // ================================================================
-    //  🎮 核心函数
-    // ================================================================
-
-    function getScene(id) { return window.SCENES[id] || null; }
-    function getCultivation(sceneId) { return window.CULTIVATION_MAP[sceneId] || '五百年'; }
-
-    // ===== 灵韵/浊念 基于当前值增减（不重置） =====
-    async function updateLingYun(delta) {
-      gameState.playerLingYun = Math.max(0, Math.min(100, gameState.playerLingYun + delta));
-      await StorageBridge.setItem('huangdaxian_lingYun', String(gameState.playerLingYun));
-      localStorage.setItem('lingYun', String(gameState.playerLingYun));
-      updateKarmaUI();
-    }
-
-    async function updateZhuoNian(delta) {
-      gameState.playerZhuoNian = Math.max(0, Math.min(100, gameState.playerZhuoNian + delta));
-      await StorageBridge.setItem('huangdaxian_zhuoNian', String(gameState.playerZhuoNian));
-      localStorage.setItem('zhuoNian', String(gameState.playerZhuoNian));
-      updateKarmaUI();
-    }
-
-    function getKarmaDisplay() {
-      const ly = gameState.playerLingYun;
-      const zn = gameState.playerZhuoNian;
-      let lingYunLabel = '';
-      let zhuoNianLabel = '';
-      if (ly >= 80) lingYunLabel = '仙光护体';
-      else if (ly >= 50) lingYunLabel = '心怀慈悲';
-      else if (ly >= 20) lingYunLabel = '心存善念';
-      else lingYunLabel = '初入道途';
-      if (zn >= 80) zhuoNianLabel = '魔障缠身';
-      else if (zn >= 50) zhuoNianLabel = '心魔暗生';
-      else if (zn >= 20) zhuoNianLabel = '偶生恶念';
-      else zhuoNianLabel = '心台明净';
-      return { lingYun: ly, zhuoNian: zn, lingYunLabel, zhuoNianLabel };
-    }
-
-    function updateKarmaUI() {
-      const el = document.getElementById('karmaDisplay');
-      if (!el) return;
-      const d = getKarmaDisplay();
-      el.innerHTML = '<span class="karma-lingyun">☯ 灵韵 ' + d.lingYun + ' · ' + d.lingYunLabel + '</span>'
-        + '<span class="karma-zhuonian">☠ 浊念 ' + d.zhuoNian + ' · ' + d.zhuoNianLabel + '</span>';
-    }
-
-    async function loadKarma() {
-      const savedLy = await StorageBridge.getItem('huangdaxian_lingYun');
-      if (savedLy) gameState.playerLingYun = parseInt(savedLy, 10) || 0;
-      else gameState.playerLingYun = 10; // 初始灵韵
-      const savedZn = await StorageBridge.getItem('huangdaxian_zhuoNian');
-      if (savedZn) gameState.playerZhuoNian = parseInt(savedZn, 10) || 0;
-      else gameState.playerZhuoNian = 0; // 初始浊念
-      localStorage.setItem('lingYun', String(gameState.playerLingYun));
-      localStorage.setItem('zhuoNian', String(gameState.playerZhuoNian));
-      const savedDiff = await StorageBridge.getItem('huangdaxian_difficulty');
-      if (savedDiff) gameState.playerDifficulty = savedDiff;
-      updateKarmaUI();
-    }
-
-    function updateCultivationUI(sceneId) {
-      const el = document.getElementById('cultivation-level');
-      if (el) el.textContent = getCultivation(sceneId);
-    }
-
-    // ===== 环境/时间状态栏更新 =====
-    function updateEnvUI(scene) {
-      const bar = document.getElementById('envBar');
-      if (!bar) return;
-      if (!scene || !scene.env) { bar.innerHTML = ''; return; }
-      const env = scene.env;
-      const w = window.WEATHER_TYPES[env.weather] || { name: '—', icon: '·' };
-      const t = window.TIME_OF_DAY[env.timeOfDay] || { name: '—', icon: '·' };
-      const m = window.MOON_PHASES[env.moonPhase] || { name: '—', icon: '·' };
-      const day = env.day || '—';
-      let eff = '';
-      if (window.ENV_EFFECTS[env.weather]) eff = window.ENV_EFFECTS[env.weather];
-      else if (env.moonPhase === 'full_moon' && window.ENV_EFFECTS['full_moon']) eff = window.ENV_EFFECTS['full_moon'];
-      else if (env.moonPhase === 'new_moon' && window.ENV_EFFECTS['new_moon']) eff = window.ENV_EFFECTS['new_moon'];
-      let html = '<span class="env-item"><span class="env-icon">' + w.icon + '</span><span class="env-label">' + w.name + '</span></span>';
-      html += '<span class="env-item"><span class="env-icon">' + t.icon + '</span><span class="env-label">' + t.name + '</span></span>';
-      html += '<span class="env-item"><span class="env-label">第' + day + '日</span></span>';
-      html += '<span class="env-item moon"><span class="env-icon">' + m.icon + '</span><span class="env-label">' + m.name + '</span></span>';
-      if (eff) html += '<span class="env-effect">' + eff + '</span>';
-      bar.innerHTML = html;
-    }
-
-    // ===== 成就系统 =====
-    async function unlockAchievement(id) {
-      if (!gameState.achievements[id]) {
-        gameState.achievements[id] = true;
-        await StorageBridge.setItem('huangdaxian_achievements', JSON.stringify(gameState.achievements));
-        const name = window.ACHIEVEMENT_NAME_MAP[id] || id;
-        const golden = window.GOLDEN_ACHIEVEMENTS && window.GOLDEN_ACHIEVEMENTS.includes(id);
-        showAchievementPopup(name, golden);
-        if (window.parent) window.parent.postMessage({ type: 'achievements-updated' }, '*');
-      }
-    }
-
-    function showAchievementPopup(name, golden) {
-      const popup = document.getElementById('achievementPopup');
-      const titleEl = document.getElementById('achTitle');
-      const iconEl = document.getElementById('achIcon');
-      if (!popup || !titleEl) return;
-      titleEl.textContent = name;
-      iconEl.textContent = '✦';
-      popup.className = 'achievement-popup';
-      if (golden) popup.classList.add('golden');
-      popup.classList.add('show');
-      clearTimeout(popup._timer);
-      popup._timer = setTimeout(() => popup.classList.remove('show'), 3500);
-    }
-
-    async function loadAchievements() {
-      const saved = await StorageBridge.getItem('huangdaxian_achievements');
-      if (saved) {
-        const data = JSON.parse(saved);
-        Object.keys(data).forEach(k => { if (data[k]) gameState.achievements[k] = true; });
-      }
-    }
-
-    function getUnlockedCount() {
-      return Object.values(gameState.achievements).filter(v => v).length;
-    }
-
-    // ===== 场景渲染 =====
-    function renderScene(sceneId) {
-      if (gameState.typingTimer) clearTimeout(gameState.typingTimer);
-      const scene = getScene(sceneId);
-      if (!scene) { console.warn('场景不存在:', sceneId); return; }
-      gameState.currentScene = sceneId;
-      updateCultivationUI(sceneId);
-      updateEnvUI(scene);
-
-      if (scene.choices) {
-        const valid = scene.choices.filter(c => c.text !== '重新开始' && c.text !== '回到上一个选择点');
-        if (valid.length >= 2) gameState.checkpointScene = sceneId;
-      }
-
-      const storyContainer = document.getElementById('story-container');
-      const choicesContainer = document.getElementById('choices-container');
-      storyContainer.innerHTML = '';
-      choicesContainer.innerHTML = '';
-
-      let textIndex = 0;
-      const total = scene.texts.length;
-
-      function showNextText() {
-        if (textIndex >= total) {
-          showChoicesDirect(scene);
-          window.dispatchEvent(new Event('scene-rendered'));
-          return;
-        }
-        const obj = scene.texts[textIndex];
-        const p = document.createElement('p');
-        p.className = 'story-text ' + obj.type;
-        storyContainer.appendChild(p);
-        storyContainer.scrollTop = storyContainer.scrollHeight;
-
-        const speed = obj.type === 'speaker' ? 40 :
-                      obj.type === 'system' ? 20 :
-                      obj.type === 'witness' ? 50 : 30;
-        let ci = 0;
-        const txt = obj.content;
-
-        function typeChar() {
-          if (ci < txt.length) {
-            p.textContent += txt[ci];
-            ci++;
-            storyContainer.scrollTop = storyContainer.scrollHeight;
-            gameState.typingTimer = setTimeout(typeChar, speed);
-          } else {
-            textIndex++;
-            gameState.typingTimer = setTimeout(showNextText, obj.type === 'witness' ? 600 : 300);
-          }
-        }
-        typeChar();
-      }
-      showNextText();
-    }
-
-    function showChoicesDirect(scene) {
-      const container = document.getElementById('choices-container');
-      let html = '';
-      scene.choices.forEach((choice, idx) => {
-        if (choice.nextScene === 'checkpoint') {
-          const label = gameState.checkpointScene ? '回到上一个选择点' : '重新开始';
-          const target = gameState.checkpointScene || 'start';
-          html += `<button class="choice-btn focusable" onclick="handleChoice('${target}',null)" style="animation-delay:${idx*0.1}s">${label}</button>`;
-        } else {
-          const actionParam = choice.action ? `'${choice.action}'` : 'null';
-          html += `<button class="choice-btn focusable" onclick="handleChoice('${choice.nextScene}',${actionParam})" style="animation-delay:${idx*0.1}s">${choice.text}</button>`;
-        }
-      });
-      container.innerHTML = html;
-      container.classList.toggle('single-col', container.querySelectorAll('.choice-btn').length === 1);
-      setTimeout(() => {
-        const first = container.querySelector('.choice-btn');
-        if (first) focusElement(first);
-      }, 50);
-    }
-
-    // ===== 选择处理（恢复灵韵/浊念增减） =====
-    window.handleChoice = async function(nextScene, action) {
-      // 灵韵/浊念 增减处理
-      if (action && action.startsWith('lingyun_')) {
-        const val = parseInt(action.replace('lingyun_', ''), 10);
-        if (!isNaN(val)) await updateLingYun(val);
-      }
-      if (action && action.startsWith('zhuonian_')) {
-        const val = parseInt(action.replace('zhuonian_', ''), 10);
-        if (!isNaN(val)) await updateZhuoNian(val);
-      }
-      // 兼容旧的 karma_ 前缀
-      if (action && action.startsWith('karma_plus_')) {
-        const val = parseInt(action.replace('karma_plus_', ''), 10);
-        if (!isNaN(val)) await updateLingYun(val);
-      }
-      if (action && action.startsWith('karma_minus_')) {
-        const val = parseInt(action.replace('karma_minus_', '').replace('-', ''), 10);
-        if (!isNaN(val)) await updateZhuoNian(val);
-      }
-
-      // 成就解锁映射
-      const unlockMap = {
-        'unlock_god': 'god',
-        'unlock_fail_scholar': 'fail_scholar',
-        'unlock_fail_kid': 'fail_kid',
-        'unlock_farmer': 'farmer',
-        'unlock_star': 'star',
-        'unlock_mortal': 'mortal',
-        'unlock_demon_king': 'demon_king',
-        'unlock_sacrifice': 'sacrifice',
-        'unlock_mad': 'mad',
-        'unlock_love': 'love',
-        'unlock_guardian': 'guardian',
-        'unlock_lost': 'lost',
-        'unlock_severed': 'severed',
-        'unlock_dawn': 'dawn',
-        'unlock_witness': 'witness',
-        'unlock_suspicious': 'suspicious',
-        'unlock_sword_friend': 'sword_friend',
-        'unlock_sword_master': 'sword_master',
-        'unlock_green_fate': 'green_memory',
-        'unlock_ghost_friend': 'ghost_friend',
-        'unlock_seven_days': 'seven_days',
-        'unlock_moon_fox': 'moon_fox',
-        'unlock_drought_hero': 'drought_hero',
-        'unlock_well_insight': 'well_insight',
-        'unlock_chess_sage': 'chess_sage',
-        'unlock_empty_face': 'empty_face'
-      };
-      if (action && unlockMap[action]) await unlockAchievement(unlockMap[action]);
-
-      // 新结局特殊处理
-      const endingUnlockMap = {
-        'unlock_seven_days': 'seven_days',
-        'unlock_moon_fox': 'moon_fox',
-        'unlock_drought_hero': 'drought_hero',
-        'unlock_well_insight': 'well_insight',
-        'unlock_chess_sage': 'chess_sage',
-        'unlock_empty_face': 'empty_face',
-        'unlock_ghost_friend': 'ghost_friend',
-        'unlock_guardian': 'guardian'
-      };
-      if (action && endingUnlockMap[action]) {
-        await unlockAchievement(endingUnlockMap[action]);
-        if (nextScene === 'start') {
-          resetGame(false);
-          return;
-        }
-      }
-
-      if (action === 'reset' || action === 'reset_suspicious') {
-        if (action === 'reset_suspicious') await unlockAchievement('suspicious');
-        resetGame(false);
-        return;
-      }
-
-      if (gameState.currentScene && nextScene && gameState.currentScene !== nextScene) {
-        gameState.sceneHistory.push(gameState.currentScene);
-        if (gameState.sceneHistory.length > 50) gameState.sceneHistory.shift();
-      }
-      setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
-    };
-
-    // ===== 重置（不再重置灵韵/浊念） =====
-    async function resetGame(fullReset) {
-      document.getElementById('startOverlay').style.display = 'none';
-      if (fullReset) {
-        gameState.achievements = { ...window.ACHIEVEMENTS_INIT };
-        await StorageBridge.removeItem('huangdaxian_achievements');
-        // 灵韵/浊念 不重置，从存储重新加载（保持原值）
-        await loadKarma();
-        gameState.playerDifficulty = 'normal';
-        await StorageBridge.removeItem('huangdaxian_difficulty');
-        updateKarmaUI();
-      }
-      gameState.checkpointScene = 'start';
-      gameState.sceneHistory = [];
-      renderScene('start');
-    }
-
-    // ===== 开始游戏 =====
-    window.startGame = function() {
-      gameState.playerDifficulty = 'normal';
-      StorageBridge.setItem('huangdaxian_difficulty', 'normal');
-      document.getElementById('startOverlay').style.display = 'none';
-      renderScene('start');
-      setTimeout(() => {
-        const first = document.querySelector('#choices-container .choice-btn');
-        if (first) focusElement(first);
-      }, 200);
-    };
-
-    // ================================================================
-    //  🖥️ UI 控制（焦点、设置、滚动等）
-    // ================================================================
-
-    let currentFocusIndex = 0;
-
-    function getFocusableElements() {
-      const confirmEl = document.getElementById('confirmOverlay');
-      if (confirmEl && confirmEl.classList.contains('show')) {
-        return Array.from(confirmEl.querySelectorAll('.focusable'));
-      }
-      const overlay = document.getElementById('settingsOverlay');
-      if (overlay && overlay.classList.contains('show')) {
-        return Array.from(overlay.querySelectorAll('.focusable'));
-      }
-      const startOverlay = document.getElementById('startOverlay');
-      if (startOverlay && startOverlay.style.display !== 'none') {
-        return Array.from(startOverlay.querySelectorAll('.focusable'));
-      }
-      return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
-    }
-
-    function focusElement(el) {
-      if (!el) return;
-      document.querySelectorAll('.tv-focus').forEach(e => e.classList.remove('tv-focus'));
-      el.classList.add('tv-focus');
-      el.focus({ preventScroll: false });
-      if (el.scrollIntoView) {
-        try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e) { el.scrollIntoView(); }
-      }
-      const list = getFocusableElements();
-      currentFocusIndex = list.indexOf(el);
-    }
-
-    function focusNext(direction) {
-      const list = getFocusableElements();
-      if (!list.length) return;
-      if (currentFocusIndex < 0) currentFocusIndex = 0;
-      let next = (currentFocusIndex + direction + list.length) % list.length;
-      focusElement(list[next]);
-    }
-
-    function activateCurrent() {
-      const list = getFocusableElements();
-      const el = list[currentFocusIndex];
-      if (el) el.click();
-    }
-
-    function isMenuKey(e) {
-      const k = e.key || '';
-      const c = e.keyCode || 0;
-      const menuKeys = ['Menu','ContextMenu','Settings','Info','F1','Keyboard',
-                        'ShowSettings','MediaContextMenu','ColorF0Red','ColorF1',
-                        'ChannelUp','ChannelDown','Guide','Tv','TvInput','Live','Search','Voice'];
-      if (menuKeys.includes(k)) return true;
-      if ([93,101,102,122,139,164,166,167,168,169].includes(c)) return true;
-      if (k.startsWith('ColorF')) return true;
-      return false;
-    }
-
-    function isBackKey(e) {
-      const k = e.key || '';
-      const c = e.keyCode || 0;
-      return ['Escape','Back','GoBack','BrowserBack','Cancel'].includes(k) || [4,27,8].includes(c);
-    }
-
-    function handleRemoteKey(e) {
-      const key = e.key;
-      const settingsOverlay = document.getElementById('settingsOverlay');
-      const inSettings = settingsOverlay && settingsOverlay.classList.contains('show');
-      const startOverlay = document.getElementById('startOverlay');
-      const inStart = startOverlay && startOverlay.style.display !== 'none';
-
-      if (isMenuKey(e)) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (inSettings) {
-          closeSettings();
-        } else {
-          const confirmEl = document.getElementById('confirmOverlay');
-          if (confirmEl && confirmEl.classList.contains('show')) closeConfirm();
-          else openSettings();
-        }
-        return;
-      }
-
-      if (inStart) {
-        if (key === 'ArrowDown' || key === 'ArrowRight') { e.preventDefault(); focusNext(1); return; }
-        if (key === 'ArrowUp' || key === 'ArrowLeft') { e.preventDefault(); focusNext(-1); return; }
-        if (['Enter',' ','OK','Select'].includes(key) || key === '') {
-          e.preventDefault();
-          const btn = document.getElementById('startBtn');
-          if (btn) btn.click();
-          return;
-        }
-        return;
-      }
-
-      if (inSettings) {
-        if (isBackKey(e)) { e.preventDefault(); closeSettings(); return; }
-        if (key === 'ArrowDown') { e.preventDefault(); focusNext(1); return; }
-        if (key === 'ArrowUp') { e.preventDefault(); focusNext(-1); return; }
-        if (['ArrowLeft','ArrowRight'].includes(key)) { e.preventDefault(); focusNext(1); return; }
-        if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
-        return;
-      }
-
-      const confirmOverlay = document.getElementById('confirmOverlay');
-      if (confirmOverlay && confirmOverlay.classList.contains('show')) {
-        if (isBackKey(e)) { e.preventDefault(); closeConfirm(); return; }
-        if (['ArrowDown','ArrowRight','ArrowUp','ArrowLeft'].includes(key)) {
-          e.preventDefault();
-          focusNext(['ArrowUp','ArrowLeft'].includes(key) ? -1 : 1);
-          return;
-        }
-        if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
-        return;
-      }
-
-      // 正常游戏界面
-      const storyEl = document.getElementById('story-container');
-      const storyCanScroll = storyEl && (storyEl.scrollHeight > storyEl.clientHeight + 4);
-      const atBottom = storyEl && (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 4);
-      const atTop = storyEl && storyEl.scrollTop < 4;
-
-      if (key === 'ArrowDown' || key === 'ArrowRight') {
-        e.preventDefault();
-        if (key === 'ArrowDown' && storyEl && storyCanScroll && !atBottom) {
-          storyEl.scrollTop += 120;
-          setTimeout(() => {
-            if (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 10) {
-              const first = document.querySelector('#choices-container .choice-btn');
-              if (first) focusElement(first);
+        // StorageBridge 用于成就等数据
+        const StorageBridge = (function() {
+            const hasNative = (() => { try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; } })();
+            if (!hasNative) {
+                return {
+                    getItem: async (k, d = null) => localStorage.getItem(k) ?? d,
+                    setItem: async (k, v) => { localStorage.setItem(k, v); },
+                    removeItem: async (k) => { localStorage.removeItem(k); },
+                    clear: async () => { localStorage.clear(); }
+                };
             }
-          }, 100);
-        } else {
-          focusNext(1);
-        }
-        return;
-      }
-      if (key === 'ArrowUp' || key === 'ArrowLeft') {
-        e.preventDefault();
-        if (key === 'ArrowUp' && storyEl && storyCanScroll && !atTop) {
-          storyEl.scrollTop -= 120;
-          setTimeout(() => {
-            if (storyEl.scrollTop < 10) {
-              const list = getFocusableElements();
-              if (list.length > 0) focusElement(list[list.length - 1]);
+            let id = 0;
+            const pending = {};
+            window.addEventListener('message', (e) => {
+                const d = e.data;
+                if (d && d.id && pending[d.id]) {
+                    d.error ? pending[d.id].reject(new Error(d.error)) : pending[d.id].resolve(d.result);
+                    delete pending[d.id];
+                }
+            });
+            function send(action, key, value, def) {
+                return new Promise((resolve, reject) => {
+                    const i = ++id;
+                    pending[i] = { resolve, reject };
+                    window.parent.postMessage({ id:i, action, key, value, defaultValue:def }, '*');
+                });
             }
-          }, 100);
-        } else {
-          focusNext(-1);
+            return {
+                getItem: (k, d) => send('get', k, null, d),
+                setItem: (k, v) => send('set', k, v),
+                removeItem: (k) => send('remove', k),
+                clear: () => send('clear')
+            };
+        })();
+
+        // ========== 云居API 函数 ==========
+        async function apiListDocuments() {
+            const url = `${CONFIG.apiList}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '获取列表失败');
+            return data.list || [];
         }
-        return;
-      }
-      if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
-      if (isBackKey(e)) {
-        e.preventDefault();
-        if (gameState.sceneHistory && gameState.sceneHistory.length > 0) {
-          const prev = gameState.sceneHistory.pop();
-          const tmp = gameState.sceneHistory;
-          gameState.sceneHistory = [];
-          renderScene(prev);
-          setTimeout(() => { gameState.sceneHistory = tmp; }, 250);
-        } else if (gameState.checkpointScene && gameState.checkpointScene !== 'start') {
-          renderScene(gameState.checkpointScene);
+
+        async function apiQueryDocument(docId) {
+            const url = `${CONFIG.apiQuery}?user=${CONFIG.user}&appid=${CONFIG.appid}&id=${docId}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '查询文档失败');
+            return { title: data.title, content: JSON.parse(data.content) };
         }
-        return;
-      }
-      if (key === '0') {
-        e.preventDefault();
-        const first = document.querySelector('#choices-container .choice-btn');
-        if (first) focusElement(first);
-        return;
-      }
-      if (/^[1-9]$/.test(key)) {
-        e.preventDefault();
-        const list = getFocusableElements();
-        const idx = parseInt(key,10) - 1;
-        if (idx >= 0 && idx < list.length) {
-          focusElement(list[idx]);
-          setTimeout(activateCurrent, 200);
+
+        async function apiModifyDocument(docId, title, contentObj) {
+            const url = `${CONFIG.apiModify}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}&id=${docId}`;
+            const body = `title=${encodeURIComponent(title)}&content=${encodeURIComponent(JSON.stringify(contentObj))}`;
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '修改文档失败');
         }
-        return;
-      }
-    }
 
-    // ===== 设置面板 =====
-    function openSettings() {
-      const total = window.ACHIEVEMENT_ICONS ? window.ACHIEVEMENT_ICONS.length : 0;
-      const unlocked = getUnlockedCount();
-      document.getElementById('progressInfo').textContent = '已解锁 ' + unlocked + ' / ' + total + ' 项成就';
-      document.getElementById('settingsOverlay').classList.add('show');
-      setTimeout(() => {
-        const first = document.querySelector('#settingsOverlay .focusable');
-        if (first) focusElement(first);
-      }, 50);
-    }
-
-    function closeSettings() {
-      document.getElementById('settingsOverlay').classList.remove('show');
-    }
-
-    async function clearAllProgress() {
-      customConfirm('确认清除进度', '将清除所有已解锁的成就和游戏进度，灵韵/浊念保持不变。', async () => {
-        gameState.achievements = { ...window.ACHIEVEMENTS_INIT };
-        await StorageBridge.removeItem('huangdaxian_achievements');
-        // 不重置灵韵/浊念存储
-        gameState.playerDifficulty = 'normal';
-        await StorageBridge.removeItem('huangdaxian_difficulty');
-        updateKarmaUI();
-        closeSettings();
-        showToast('已清除所有进度，即将重新开始');
-        gameState.currentScene = 'start';
-        gameState.checkpointScene = 'start';
-        document.getElementById('story-container').innerHTML = '';
-        document.getElementById('choices-container').innerHTML = '';
-        updateCultivationUI('start');
-        gameState.sceneHistory = [];
-        setTimeout(() => {
-          document.getElementById('startOverlay').style.display = 'flex';
-        }, 1200);
-      });
-    }
-
-    let _confirmCallback = null;
-    function customConfirm(title, message, onOk) {
-      document.getElementById('confirmTitle').textContent = title;
-      document.getElementById('confirmMessage').textContent = message;
-      _confirmCallback = onOk;
-      document.getElementById('confirmOverlay').classList.add('show');
-      setTimeout(() => {
-        const cancel = document.getElementById('confirmCancelBtn');
-        if (cancel) focusElement(cancel);
-      }, 50);
-    }
-
-    function closeConfirm() {
-      document.getElementById('confirmOverlay').classList.remove('show');
-      _confirmCallback = null;
-    }
-
-    let _toastTimer = null;
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.classList.add('show');
-      if (_toastTimer) clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
-    }
-
-    function toggleTabletMode() {
-      document.body.classList.toggle('tablet-mode');
-      const enabled = document.body.classList.contains('tablet-mode');
-      StorageBridge.setItem('huangdaxian_tablet_mode', enabled ? '1' : '0');
-      document.getElementById('tabletModeBtn').textContent = enabled ? '切换普通模式' : '切换平板模式';
-    }
-
-    async function loadTabletMode() {
-      const saved = await StorageBridge.getItem('huangdaxian_tablet_mode');
-      if (saved === '1') document.body.classList.add('tablet-mode');
-      document.getElementById('tabletModeBtn').textContent = document.body.classList.contains('tablet-mode') ? '切换普通模式' : '切换平板模式';
-    }
-
-    // ===== 滚动辅助 =====
-    function setupScrollAssist() {
-      const storyContainer = document.getElementById('story-container');
-      const floatBtn = document.getElementById('floatJumpBtn');
-      if (!storyContainer || !floatBtn) return;
-
-      function updateFloatBtn() {
-        const canScroll = storyContainer.scrollHeight > storyContainer.clientHeight + 4;
-        if (!canScroll) {
-          floatBtn.classList.remove('show');
-          return;
+        async function findDocByPlayerName() {
+            if (!playerName) return null;
+            const list = await apiListDocuments();
+            const found = list.find(item => item.title === playerName);
+            return found ? found.id : null;
         }
-        floatBtn.classList.add('show');
-        const atTop = storyContainer.scrollTop < 40;
-        const atBottom = storyContainer.scrollTop + storyContainer.clientHeight >= storyContainer.scrollHeight - 40;
-        floatBtn.textContent = atBottom ? '↑' : '↓';
-        floatBtn.dataset.mode = atBottom ? 'up' : 'down';
-      }
 
-      floatBtn.addEventListener('click', () => {
-        if (floatBtn.dataset.mode === 'down') {
-          storyContainer.scrollTop = storyContainer.scrollHeight;
-          setTimeout(() => {
-            const first = document.querySelector('#choices-container .choice-btn');
-            if (first) focusElement(first);
-          }, 100);
-        } else {
-          storyContainer.scrollTop = 0;
+        async function loadKarmaFromCloud() {
+            if (!cloudDocId && playerName) {
+                cloudDocId = await findDocByPlayerName();
+                if (cloudDocId) {
+                    localStorage.setItem('cloudDocId', cloudDocId);
+                    try { if (window.parent) window.parent.localStorage.setItem('cloudDocId', cloudDocId); } catch(e) {}
+                }
+            }
+            if (!cloudDocId) {
+                updateKarmaUI();
+                return;
+            }
+            try {
+                const doc = await apiQueryDocument(cloudDocId);
+                gameState.playerLingYun = doc.content.lingYun || 0;
+                gameState.playerZhuoNian = doc.content.zhuoNian || 0;
+                playerName = doc.title;
+                localStorage.setItem('playerName', playerName);
+                try { if (window.parent) window.parent.localStorage.setItem('playerName', playerName); } catch(e) {}
+            } catch(e) { console.warn('云端加载灵韵/浊念失败：', e.message); }
+            updateKarmaUI();
         }
-      });
 
-      storyContainer.addEventListener('scroll', updateFloatBtn);
-      window.addEventListener('scene-rendered', () => setTimeout(updateFloatBtn, 100));
-      updateFloatBtn();
-    }
-
-    // ===== 初始化 =====
-    function initControls() {
-      document.getElementById('versionBtn').addEventListener('click', () => {
-        document.getElementById('changelogPopup').classList.toggle('show');
-      });
-      document.addEventListener('click', (e) => {
-        const popup = document.getElementById('changelogPopup');
-        if (!popup.contains(e.target) && e.target !== document.getElementById('versionBtn')) {
-          popup.classList.remove('show');
+        async function updateLingYun(delta) {
+            if (!cloudDocId) return;
+            try {
+                const doc = await apiQueryDocument(cloudDocId);
+                const newVal = Math.max(0, Math.min(100, (doc.content.lingYun || 0) + delta));
+                doc.content.lingYun = newVal;
+                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                gameState.playerLingYun = newVal;
+                updateKarmaUI();
+            } catch(e) { console.error('更新灵韵失败：', e.message); }
         }
-      });
 
-      document.getElementById('settingsBtn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openSettings();
-      });
-      document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
-      document.getElementById('clearProgressBtn').addEventListener('click', clearAllProgress);
-      document.getElementById('tabletModeBtn').addEventListener('click', toggleTabletMode);
-      document.getElementById('settingsOverlay').addEventListener('click', (e) => {
-        if (e.target.id === 'settingsOverlay') closeSettings();
-      });
-
-      document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
-      document.getElementById('confirmOkBtn').addEventListener('click', () => {
-        const cb = _confirmCallback;
-        closeConfirm();
-        if (cb) cb();
-      });
-      document.getElementById('confirmOverlay').addEventListener('click', (e) => {
-        if (e.target.id === 'confirmOverlay') closeConfirm();
-      });
-
-      document.addEventListener('keydown', handleRemoteKey);
-      document.addEventListener('click', (e) => {
-        const target = e.target.closest('.focusable');
-        if (target) {
-          const list = getFocusableElements();
-          currentFocusIndex = list.indexOf(target);
+        async function updateZhuoNian(delta) {
+            if (!cloudDocId) return;
+            try {
+                const doc = await apiQueryDocument(cloudDocId);
+                const newVal = Math.max(0, Math.min(100, (doc.content.zhuoNian || 0) + delta));
+                doc.content.zhuoNian = newVal;
+                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                gameState.playerZhuoNian = newVal;
+                updateKarmaUI();
+            } catch(e) { console.error('更新浊念失败：', e.message); }
         }
-      });
-    }
 
-    // ===== 启动 =====
-    window.onload = async function() {
-      if (!window.SCENES) {
-        console.warn('剧情数据未加载，请确保 story.js 已引入');
-        return;
-      }
-
-      await loadAchievements();
-      await loadKarma();
-      await loadTabletMode();
-
-      const overlay = document.getElementById('startOverlay');
-      overlay.style.display = 'flex';
-      setTimeout(() => {
-        const startBtn = document.getElementById('startBtn');
-        if (startBtn) focusElement(startBtn);
-      }, 100);
-
-      initControls();
-      setupScrollAssist();
-    };
-
-    window.resetGame = resetGame;
-  </script>
-
-  <script>
-    (function() {
-      const canvas = document.getElementById('particleCanvas');
-      const ctx = canvas.getContext('2d');
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      const particles = [];
-      for (let i = 0; i < 80; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          size: Math.random() * 2.5 + 0.5,
-          alpha: Math.random() * 0.5 + 0.2
-        });
-      }
-
-      function update() {
-        for (let p of particles) {
-          p.x = (p.x + p.vx + canvas.width) % canvas.width;
-          p.y = (p.y + p.vy + canvas.height) % canvas.height;
+        function getKarmaDisplay() {
+            const ly = gameState.playerLingYun, zn = gameState.playerZhuoNian;
+            let lyL = '', znL = '';
+            if (ly >= 80) lyL = '仙光护体'; else if (ly >= 50) lyL = '心怀慈悲'; else if (ly >= 20) lyL = '心存善念'; else lyL = '初入道途';
+            if (zn >= 80) znL = '魔障缠身'; else if (zn >= 50) znL = '心魔暗生'; else if (zn >= 20) znL = '偶生恶念'; else znL = '心台明净';
+            return { lingYun: ly, zhuoNian: zn, lingYunLabel: lyL, zhuoNianLabel: znL };
         }
-      }
 
-      function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let p of particles) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(184, 134, 11, ${p.alpha})`;
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(184, 134, 11, ${p.alpha * 0.2})`;
-          ctx.fill();
+        function updateKarmaUI() {
+            const el = document.getElementById('karmaDisplay');
+            if (!el) return;
+            const d = getKarmaDisplay();
+            el.innerHTML = `<span class="karma-lingyun">☯ 灵韵 ${d.lingYun} · ${d.lingYunLabel}</span><span class="karma-zhuonian">☠ 浊念 ${d.zhuoNian} · ${d.zhuoNianLabel}</span>`;
         }
-        requestAnimationFrame(() => { update(); draw(); });
-      }
-      draw();
-    })();
-  </script>
+
+        function getScene(id) { return window.SCENES[id] || null; }
+        function getCultivation(sceneId) { return window.CULTIVATION_MAP[sceneId] || '五百年'; }
+        function updateCultivationUI(sceneId) { const el = document.getElementById('cultivation-level'); if (el) el.textContent = getCultivation(sceneId); }
+
+        function updateEnvUI(scene) {
+            const bar = document.getElementById('envBar');
+            if (!bar || !scene || !scene.env) { bar.innerHTML = ''; return; }
+            const env = scene.env;
+            const w = window.WEATHER_TYPES[env.weather] || { name: '—', icon: '·' };
+            const t = window.TIME_OF_DAY[env.timeOfDay] || { name: '—', icon: '·' };
+            const m = window.MOON_PHASES[env.moonPhase] || { name: '—', icon: '·' };
+            let eff = window.ENV_EFFECTS[env.weather] || (env.moonPhase === 'full_moon' && window.ENV_EFFECTS['full_moon']) || (env.moonPhase === 'new_moon' && window.ENV_EFFECTS['new_moon']) || '';
+            let html = `<span class="env-item"><span class="env-icon">${w.icon}</span><span class="env-label">${w.name}</span></span><span class="env-item"><span class="env-icon">${t.icon}</span><span class="env-label">${t.name}</span></span><span class="env-item"><span class="env-label">第${env.day||'—'}日</span></span><span class="env-item moon"><span class="env-icon">${m.icon}</span><span class="env-label">${m.name}</span></span>`;
+            if (eff) html += `<span class="env-effect">${eff}</span>`;
+            bar.innerHTML = html;
+        }
+
+        async function unlockAchievement(id) {
+            if (!gameState.achievements[id]) {
+                gameState.achievements[id] = true;
+                await StorageBridge.setItem('huangdaxian_achievements', JSON.stringify(gameState.achievements));
+                const name = window.ACHIEVEMENT_NAME_MAP[id] || id;
+                const golden = window.GOLDEN_ACHIEVEMENTS && window.GOLDEN_ACHIEVEMENTS.includes(id);
+                showAchievementPopup(name, golden);
+                if (window.parent) window.parent.postMessage({ type: 'achievements-updated' }, '*');
+            }
+        }
+
+        function showAchievementPopup(name, golden) {
+            const popup = document.getElementById('achievementPopup'), title = document.getElementById('achTitle'), icon = document.getElementById('achIcon');
+            if (!popup) return;
+            title.textContent = name; icon.textContent = '✦';
+            popup.className = 'achievement-popup' + (golden ? ' golden' : '');
+            popup.classList.add('show');
+            clearTimeout(popup._timer);
+            popup._timer = setTimeout(() => popup.classList.remove('show'), 3500);
+        }
+
+        async function loadAchievements() {
+            const saved = await StorageBridge.getItem('huangdaxian_achievements');
+            if (saved) { const data = JSON.parse(saved); Object.keys(data).forEach(k => { if (data[k]) gameState.achievements[k] = true; }); }
+        }
+
+        function getUnlockedCount() { return Object.values(gameState.achievements).filter(v => v).length; }
+
+        function renderScene(sceneId) {
+            if (gameState.typingTimer) clearTimeout(gameState.typingTimer);
+            const scene = getScene(sceneId);
+            if (!scene) return;
+            gameState.currentScene = sceneId;
+            updateCultivationUI(sceneId);
+            updateEnvUI(scene);
+            if (scene.choices) { const valid = scene.choices.filter(c => c.text !== '重新开始' && c.text !== '回到上一个选择点'); if (valid.length >= 2) gameState.checkpointScene = sceneId; }
+            const storyContainer = document.getElementById('story-container'), choicesContainer = document.getElementById('choices-container');
+            storyContainer.innerHTML = ''; choicesContainer.innerHTML = '';
+            let textIndex = 0, total = scene.texts.length;
+            function showNextText() {
+                if (textIndex >= total) { showChoicesDirect(scene); window.dispatchEvent(new Event('scene-rendered')); return; }
+                const obj = scene.texts[textIndex], p = document.createElement('p');
+                p.className = 'story-text ' + obj.type; storyContainer.appendChild(p); storyContainer.scrollTop = storyContainer.scrollHeight;
+                const speed = obj.type === 'speaker' ? 40 : obj.type === 'system' ? 20 : obj.type === 'witness' ? 50 : 30;
+                let ci = 0; const txt = obj.content;
+                function typeChar() {
+                    if (ci < txt.length) { p.textContent += txt[ci]; ci++; storyContainer.scrollTop = storyContainer.scrollHeight; gameState.typingTimer = setTimeout(typeChar, speed); }
+                    else { textIndex++; gameState.typingTimer = setTimeout(showNextText, obj.type === 'witness' ? 600 : 300); }
+                }
+                typeChar();
+            }
+            showNextText();
+        }
+
+        function showChoicesDirect(scene) {
+            const container = document.getElementById('choices-container'); let html = '';
+            scene.choices.forEach((choice, idx) => {
+                if (choice.nextScene === 'checkpoint') {
+                    const label = gameState.checkpointScene ? '回到上一个选择点' : '重新开始', target = gameState.checkpointScene || 'start';
+                    html += `<button class="choice-btn focusable" onclick="handleChoice('${target}',null)" style="animation-delay:${idx*0.1}s">${label}</button>`;
+                } else {
+                    html += `<button class="choice-btn focusable" onclick="handleChoice('${choice.nextScene}','${choice.action||''}')" style="animation-delay:${idx*0.1}s">${choice.text}</button>`;
+                }
+            });
+            container.innerHTML = html;
+            container.classList.toggle('single-col', container.querySelectorAll('.choice-btn').length === 1);
+            setTimeout(() => { const first = container.querySelector('.choice-btn'); if (first) focusElement(first); }, 50);
+        }
+
+        window.handleChoice = async function(nextScene, action) {
+            if (action && action.startsWith('lingyun_')) { const v = parseInt(action.replace('lingyun_',''),10); if (!isNaN(v)) await updateLingYun(v); }
+            if (action && action.startsWith('zhuonian_')) { const v = parseInt(action.replace('zhuonian_',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
+            if (action && action.startsWith('karma_plus_')) { const v = parseInt(action.replace('karma_plus_',''),10); if (!isNaN(v)) await updateLingYun(v); }
+            if (action && action.startsWith('karma_minus_')) { const v = parseInt(action.replace('karma_minus_','').replace('-',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
+            const unlockMap = { 'unlock_god':'god','unlock_fail_scholar':'fail_scholar','unlock_fail_kid':'fail_kid','unlock_farmer':'farmer','unlock_star':'star','unlock_mortal':'mortal','unlock_demon_king':'demon_king','unlock_sacrifice':'sacrifice','unlock_mad':'mad','unlock_love':'love','unlock_guardian':'guardian','unlock_lost':'lost','unlock_severed':'severed','unlock_dawn':'dawn','unlock_witness':'witness','unlock_suspicious':'suspicious','unlock_sword_friend':'sword_friend','unlock_sword_master':'sword_master','unlock_green_fate':'green_memory','unlock_ghost_friend':'ghost_friend','unlock_seven_days':'seven_days','unlock_moon_fox':'moon_fox','unlock_drought_hero':'drought_hero','unlock_well_insight':'well_insight','unlock_chess_sage':'chess_sage','unlock_empty_face':'empty_face' };
+            if (action && unlockMap[action]) await unlockAchievement(unlockMap[action]);
+            if (action === 'reset' || action === 'reset_suspicious') { if (action==='reset_suspicious') await unlockAchievement('suspicious'); resetGame(false); return; }
+            if (gameState.currentScene && nextScene && gameState.currentScene!==nextScene) { gameState.sceneHistory.push(gameState.currentScene); if (gameState.sceneHistory.length>50) gameState.sceneHistory.shift(); }
+            setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
+        };
+
+        async function resetGame(fullReset) {
+            document.getElementById('startOverlay').style.display = 'none';
+            if (fullReset) { gameState.achievements = { ...window.ACHIEVEMENTS_INIT }; await StorageBridge.removeItem('huangdaxian_achievements'); gameState.playerDifficulty='normal'; await StorageBridge.removeItem('huangdaxian_difficulty'); }
+            gameState.checkpointScene = 'start'; gameState.sceneHistory = [];
+            renderScene('start');
+        }
+
+        window.startGame = function() {
+            gameState.playerDifficulty = 'normal';
+            StorageBridge.setItem('huangdaxian_difficulty', 'normal');
+            document.getElementById('startOverlay').style.display = 'none';
+            renderScene('start');
+            setTimeout(() => { const first = document.querySelector('#choices-container .choice-btn'); if (first) focusElement(first); }, 200);
+        };
+
+        // ========== UI 控制 ==========
+        let currentFocusIndex = 0;
+        function getFocusableElements() {
+            const confirmEl = document.getElementById('confirmOverlay');
+            if (confirmEl && confirmEl.classList.contains('show')) return Array.from(confirmEl.querySelectorAll('.focusable'));
+            const overlay = document.getElementById('settingsOverlay');
+            if (overlay && overlay.classList.contains('show')) return Array.from(overlay.querySelectorAll('.focusable'));
+            const startOverlay = document.getElementById('startOverlay');
+            if (startOverlay && startOverlay.style.display !== 'none') return Array.from(startOverlay.querySelectorAll('.focusable'));
+            return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
+        }
+        function focusElement(el) {
+            if (!el) return;
+            document.querySelectorAll('.tv-focus').forEach(e => e.classList.remove('tv-focus'));
+            el.classList.add('tv-focus');
+            el.focus({ preventScroll: false });
+            try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e) { el.scrollIntoView(); }
+            const list = getFocusableElements();
+            currentFocusIndex = list.indexOf(el);
+        }
+        function focusNext(direction) {
+            const list = getFocusableElements(); if (!list.length) return;
+            if (currentFocusIndex < 0) currentFocusIndex = 0;
+            let next = (currentFocusIndex + direction + list.length) % list.length;
+            focusElement(list[next]);
+        }
+        function activateCurrent() { const list = getFocusableElements(); const el = list[currentFocusIndex]; if (el) el.click(); }
+        function isMenuKey(e) {
+            const k = e.key || '', c = e.keyCode || 0;
+            const menuKeys = ['Menu','ContextMenu','Settings','Info','F1','Keyboard','ShowSettings','MediaContextMenu','ColorF0Red','ColorF1','ChannelUp','ChannelDown','Guide','Tv','TvInput','Live','Search','Voice'];
+            if (menuKeys.includes(k)) return true;
+            if ([93,101,102,122,139,164,166,167,168,169].includes(c)) return true;
+            if (k.startsWith('ColorF')) return true;
+            return false;
+        }
+        function isBackKey(e) { const k = e.key || '', c = e.keyCode || 0; return ['Escape','Back','GoBack','BrowserBack','Cancel'].includes(k) || [4,27,8].includes(c); }
+        function handleRemoteKey(e) {
+            const key = e.key;
+            const settingsOverlay = document.getElementById('settingsOverlay'), inSettings = settingsOverlay && settingsOverlay.classList.contains('show');
+            const startOverlay = document.getElementById('startOverlay'), inStart = startOverlay && startOverlay.style.display !== 'none';
+            if (isMenuKey(e)) { e.preventDefault(); e.stopPropagation(); if (inSettings) closeSettings(); else { const c = document.getElementById('confirmOverlay'); if (c && c.classList.contains('show')) closeConfirm(); else openSettings(); } return; }
+            if (inStart) {
+                if (key === 'ArrowDown' || key === 'ArrowRight') { e.preventDefault(); focusNext(1); return; }
+                if (key === 'ArrowUp' || key === 'ArrowLeft') { e.preventDefault(); focusNext(-1); return; }
+                if (['Enter',' ','OK','Select'].includes(key) || key === '') { e.preventDefault(); document.getElementById('startBtn').click(); return; }
+                return;
+            }
+            if (inSettings) {
+                if (isBackKey(e)) { e.preventDefault(); closeSettings(); return; }
+                if (key === 'ArrowDown') { e.preventDefault(); focusNext(1); return; }
+                if (key === 'ArrowUp') { e.preventDefault(); focusNext(-1); return; }
+                if (['ArrowLeft','ArrowRight'].includes(key)) { e.preventDefault(); focusNext(1); return; }
+                if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
+                return;
+            }
+            const confirmOverlay = document.getElementById('confirmOverlay');
+            if (confirmOverlay && confirmOverlay.classList.contains('show')) {
+                if (isBackKey(e)) { e.preventDefault(); closeConfirm(); return; }
+                if (['ArrowDown','ArrowRight','ArrowUp','ArrowLeft'].includes(key)) { e.preventDefault(); focusNext(['ArrowUp','ArrowLeft'].includes(key) ? -1 : 1); return; }
+                if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
+                return;
+            }
+            const storyEl = document.getElementById('story-container'), storyCanScroll = storyEl && (storyEl.scrollHeight > storyEl.clientHeight + 4);
+            const atBottom = storyEl && (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 4), atTop = storyEl && storyEl.scrollTop < 4;
+            if (key === 'ArrowDown' || key === 'ArrowRight') {
+                e.preventDefault();
+                if (key === 'ArrowDown' && storyEl && storyCanScroll && !atBottom) {
+                    storyEl.scrollTop += 120;
+                    setTimeout(() => { if (storyEl.scrollTop + storyEl.clientHeight >= storyEl.scrollHeight - 10) { const first = document.querySelector('#choices-container .choice-btn'); if (first) focusElement(first); } }, 100);
+                } else focusNext(1);
+                return;
+            }
+            if (key === 'ArrowUp' || key === 'ArrowLeft') {
+                e.preventDefault();
+                if (key === 'ArrowUp' && storyEl && storyCanScroll && !atTop) {
+                    storyEl.scrollTop -= 120;
+                    setTimeout(() => { if (storyEl.scrollTop < 10) { const list = getFocusableElements(); if (list.length > 0) focusElement(list[list.length - 1]); } }, 100);
+                } else focusNext(-1);
+                return;
+            }
+            if (['Enter',' ','OK','Select'].includes(key)) { e.preventDefault(); activateCurrent(); return; }
+            if (isBackKey(e)) {
+                e.preventDefault();
+                if (gameState.sceneHistory && gameState.sceneHistory.length > 0) { const prev = gameState.sceneHistory.pop(); const tmp = gameState.sceneHistory; gameState.sceneHistory = []; renderScene(prev); setTimeout(() => { gameState.sceneHistory = tmp; }, 250); }
+                else if (gameState.checkpointScene && gameState.checkpointScene !== 'start') renderScene(gameState.checkpointScene);
+                return;
+            }
+            if (key === '0') { e.preventDefault(); const first = document.querySelector('#choices-container .choice-btn'); if (first) focusElement(first); return; }
+            if (/^[1-9]$/.test(key)) { e.preventDefault(); const list = getFocusableElements(); const idx = parseInt(key,10)-1; if (idx>=0 && idx<list.length) { focusElement(list[idx]); setTimeout(activateCurrent, 200); } }
+        }
+
+        function openSettings() {
+            const total = window.ACHIEVEMENT_ICONS ? window.ACHIEVEMENT_ICONS.length : 0;
+            document.getElementById('progressInfo').textContent = `已解锁 ${getUnlockedCount()} / ${total} 项成就`;
+            document.getElementById('settingsOverlay').classList.add('show');
+            setTimeout(() => { const first = document.querySelector('#settingsOverlay .focusable'); if (first) focusElement(first); }, 50);
+        }
+        function closeSettings() { document.getElementById('settingsOverlay').classList.remove('show'); }
+        async function clearAllProgress() {
+            customConfirm('确认清除进度', '将清除所有已解锁的成就和游戏进度，灵韵/浊念不变。', async () => {
+                gameState.achievements = { ...window.ACHIEVEMENTS_INIT };
+                await StorageBridge.removeItem('huangdaxian_achievements');
+                gameState.playerDifficulty = 'normal';
+                await StorageBridge.removeItem('huangdaxian_difficulty');
+                updateKarmaUI();
+                closeSettings();
+                showToast('已清除所有进度，即将重新开始');
+                gameState.currentScene = 'start'; gameState.checkpointScene = 'start';
+                document.getElementById('story-container').innerHTML = '';
+                document.getElementById('choices-container').innerHTML = '';
+                updateCultivationUI('start');
+                gameState.sceneHistory = [];
+                setTimeout(() => { document.getElementById('startOverlay').style.display = 'flex'; }, 1200);
+            });
+        }
+
+        let _confirmCallback = null;
+        function customConfirm(title, message, onOk) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            _confirmCallback = onOk;
+            document.getElementById('confirmOverlay').classList.add('show');
+            setTimeout(() => { const cancel = document.getElementById('confirmCancelBtn'); if (cancel) focusElement(cancel); }, 50);
+        }
+        function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); _confirmCallback = null; }
+        let _toastTimer = null;
+        function showToast(msg) {
+            const el = document.getElementById('toast'); if (!el) return;
+            el.textContent = msg; el.classList.add('show');
+            if (_toastTimer) clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+        }
+
+        function toggleTabletMode() {
+            document.body.classList.toggle('tablet-mode');
+            const enabled = document.body.classList.contains('tablet-mode');
+            StorageBridge.setItem('huangdaxian_tablet_mode', enabled ? '1' : '0');
+            document.getElementById('tabletModeBtn').textContent = enabled ? '切换普通模式' : '切换平板模式';
+        }
+        async function loadTabletMode() {
+            const saved = await StorageBridge.getItem('huangdaxian_tablet_mode');
+            if (saved === '1') document.body.classList.add('tablet-mode');
+            document.getElementById('tabletModeBtn').textContent = document.body.classList.contains('tablet-mode') ? '切换普通模式' : '切换平板模式';
+        }
+
+        function setupScrollAssist() {
+            const storyContainer = document.getElementById('story-container'), floatBtn = document.getElementById('floatJumpBtn');
+            if (!storyContainer || !floatBtn) return;
+            function updateFloatBtn() {
+                const canScroll = storyContainer.scrollHeight > storyContainer.clientHeight + 4;
+                if (!canScroll) { floatBtn.classList.remove('show'); return; }
+                floatBtn.classList.add('show');
+                const atBottom = storyContainer.scrollTop + storyContainer.clientHeight >= storyContainer.scrollHeight - 40;
+                floatBtn.textContent = atBottom ? '↑' : '↓';
+                floatBtn.dataset.mode = atBottom ? 'up' : 'down';
+            }
+            floatBtn.addEventListener('click', () => {
+                if (floatBtn.dataset.mode === 'down') { storyContainer.scrollTop = storyContainer.scrollHeight; setTimeout(() => { const first = document.querySelector('#choices-container .choice-btn'); if (first) focusElement(first); }, 100); }
+                else storyContainer.scrollTop = 0;
+            });
+            storyContainer.addEventListener('scroll', updateFloatBtn);
+            window.addEventListener('scene-rendered', () => setTimeout(updateFloatBtn, 100));
+            updateFloatBtn();
+        }
+
+        function initControls() {
+            document.getElementById('versionBtn').addEventListener('click', () => document.getElementById('changelogPopup').classList.toggle('show'));
+            document.addEventListener('click', (e) => { const popup = document.getElementById('changelogPopup'); if (!popup.contains(e.target) && e.target !== document.getElementById('versionBtn')) popup.classList.remove('show'); });
+            document.getElementById('settingsBtn').addEventListener('click', (e) => { e.stopPropagation(); openSettings(); });
+            document.getElementById('closeSettingsBtn').addEventListener('click', closeSettings);
+            document.getElementById('clearProgressBtn').addEventListener('click', clearAllProgress);
+            document.getElementById('tabletModeBtn').addEventListener('click', toggleTabletMode);
+            document.getElementById('settingsOverlay').addEventListener('click', (e) => { if (e.target.id === 'settingsOverlay') closeSettings(); });
+            document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
+            document.getElementById('confirmOkBtn').addEventListener('click', () => { const cb = _confirmCallback; closeConfirm(); if (cb) cb(); });
+            document.getElementById('confirmOverlay').addEventListener('click', (e) => { if (e.target.id === 'confirmOverlay') closeConfirm(); });
+            document.addEventListener('keydown', handleRemoteKey);
+            document.addEventListener('click', (e) => { const target = e.target.closest('.focusable'); if (target) { const list = getFocusableElements(); currentFocusIndex = list.indexOf(target); } });
+        }
+
+        // ===== 启动 =====
+        window.onload = async function() {
+            if (!window.SCENES) return;
+            await loadAchievements();
+            await loadKarmaFromCloud();
+            await loadTabletMode();
+            document.getElementById('startOverlay').style.display = 'flex';
+            setTimeout(() => { const btn = document.getElementById('startBtn'); if (btn) focusElement(btn); }, 100);
+            initControls();
+            setupScrollAssist();
+        };
+    </script>
+    <script>
+        // 粒子背景
+        (function() {
+            const canvas = document.getElementById('particleCanvas'), ctx = canvas.getContext('2d');
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+            const particles = [];
+            for (let i=0;i<80;i++) particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, size:Math.random()*2.5+0.5, alpha:Math.random()*0.5+0.2 });
+            function update() { for (let p of particles) { p.x=(p.x+p.vx+canvas.width)%canvas.width; p.y=(p.y+p.vy+canvas.height)%canvas.height; } }
+            function draw() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                for (let p of particles) { ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fillStyle=`rgba(184,134,11,${p.alpha})`; ctx.fill(); ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2); ctx.fillStyle=`rgba(184,134,11,${p.alpha*0.2})`; ctx.fill(); }
+                requestAnimationFrame(()=>{ update(); draw(); });
+            }
+            draw();
+        })();
+    </script>
 </body>
 </html>

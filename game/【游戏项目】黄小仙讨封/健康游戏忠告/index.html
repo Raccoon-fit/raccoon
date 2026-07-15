@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>健康游戏忠告</title>
+    <meta name="theme-color" content="#000000">
+    <style>
+        :root {
+            --gold: #C5963A;
+            --gold-light: #E0C080;
+            --text-soft: #D4C5A0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", "KaiTi", "STKaiti", serif;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            /* 整体渐隐过渡 */
+            transition: opacity 0.5s ease;
+        }
+
+        body.fade-out {
+            opacity: 0;
+        }
+
+        /* 微弱的径向光晕 — 模拟古纸在暗中的呼吸感 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vw;
+            height: 70vh;
+            background: radial-gradient(ellipse at center,
+                    rgba(180, 130, 50, 0.04) 0%,
+                    rgba(140, 100, 30, 0.015) 35%,
+                    transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 粒子画布 */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 中央文字容器 */
+        .notice-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 32px 28px;
+            max-width: 520px;
+            width: 88%;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+                transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .notice-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notice-container.hiding {
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.55s ease-in,
+                transform 0.55s ease-in;
+        }
+
+        /* 标题 */
+        .notice-title {
+            font-size: 15px;
+            letter-spacing: 4px;
+            color: var(--gold);
+            margin-bottom: 24px;
+            font-weight: normal;
+            text-shadow: 0 0 20px rgba(180, 130, 60, 0.35);
+        }
+
+        /* 忠告正文 */
+        .notice-text {
+            font-size: 17px;
+            line-height: 2.2;
+            color: var(--text-soft);
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 12px rgba(200, 160, 90, 0.2);
+        }
+
+        .notice-text p {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 底部小提示 */
+        .notice-hint {
+            margin-top: 28px;
+            font-size: 11px;
+            color: rgba(180, 150, 110, 0.5);
+            letter-spacing: 2px;
+            animation: hint-pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes hint-pulse {
+            0%,
+            100% {
+                opacity: 0.35;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .notice-container {
+                padding: 24px 18px;
+                width: 92%;
+            }
+            .notice-title {
+                font-size: 13px;
+                letter-spacing: 3px;
+                margin-bottom: 18px;
+            }
+            .notice-text {
+                font-size: 14.5px;
+                line-height: 2;
+                letter-spacing: 1px;
+            }
+            .notice-hint {
+                font-size: 10px;
+                margin-top: 22px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .notice-text {
+                font-size: 18px;
+                line-height: 2.3;
+            }
+            .notice-title {
+                font-size: 16px;
+                letter-spacing: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子画布 -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- 健康游戏忠告 -->
+    <div class="notice-container" id="noticeContainer">
+        <h2 class="notice-title">健 康 游 戏 忠 告</h2>
+        <div class="notice-text">
+            <p>抵制不良游戏，拒绝盗版游戏。</p>
+            <p>注意自我保护，谨防受骗上当。</p>
+            <p>适度游戏益脑，沉迷游戏伤身。</p>
+            <p>合理安排时间，享受健康生活。</p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ================================================================
+            //  🎑 金色粒子动画（与主游戏风格呼应，但更简约）
+            // ================================================================
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let animFrameId;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            // 创建粒子 — 数量少、速度慢，营造静谧感
+            const particles = [];
+            const PARTICLE_COUNT = 22;
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.25,
+                    vy: (Math.random() - 0.5) * 0.25 - 0.08, // 微微上浮
+                    size: Math.random() * 1.8 + 0.4,
+                    alpha: Math.random() * 0.4 + 0.15,
+                    alphaSpeed: (Math.random() - 0.5) * 0.006,
+                    glowSize: Math.random() * 2.5 + 1.5,
+                });
+            }
+
+            function updateParticles() {
+                for (let p of particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha += p.alphaSpeed;
+
+                    // 边界环绕
+                    if (p.x < -10) p.x = canvas.width + 10;
+                    if (p.x > canvas.width + 10) p.x = -10;
+                    if (p.y < -10) p.y = canvas.height + 10;
+                    if (p.y > canvas.height + 10) p.y = -10;
+
+                    // alpha 在范围内波动
+                    if (p.alpha < 0.08) p.alphaSpeed = Math.abs(p.alphaSpeed);
+                    if (p.alpha > 0.5) p.alphaSpeed = -Math.abs(p.alphaSpeed);
+                }
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let p of particles) {
+                    // 外层光晕
+                    const glowGradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.glowSize * 3);
+                    glowGradient.addColorStop(0, `rgba(200,155,60,${p.alpha * 0.7})`);
+                    glowGradient.addColorStop(0.4, `rgba(180,130,40,${p.alpha * 0.25})`);
+                    glowGradient.addColorStop(1, 'rgba(180,130,40,0)');
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.glowSize * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = glowGradient;
+                    ctx.fill();
+
+                    // 核心亮点
+                    const coreGradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+                    coreGradient.addColorStop(0, `rgba(240,210,130,${p.alpha})`);
+                    coreGradient.addColorStop(0.5, `rgba(200,155,60,${p.alpha * 0.8})`);
+                    coreGradient.addColorStop(1, 'rgba(180,130,40,0)');
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = coreGradient;
+                    ctx.fill();
+                }
+            }
+
+            function animateParticles() {
+                updateParticles();
+                drawParticles();
+                animFrameId = requestAnimationFrame(animateParticles);
+            }
+
+            // 启动粒子动画
+            animateParticles();
+
+            // ================================================================
+            //  ⏱️ 文字渐显 → 保持 → 渐隐 → 跳转
+            // ================================================================
+            const noticeContainer = document.getElementById('noticeContainer');
+            const body = document.body;
+            let hasJumped = false;
+            const TARGET_URL = 'https://raccoon.fit/game/【游戏项目】黄小仙讨封/v1.2.0新UI/讨封.html'; // 目标页面，可根据需要修改
+
+            function jumpToGame() {
+                if (hasJumped) return;
+                hasJumped = true;
+
+                // 取消粒子动画
+                if (animFrameId) cancelAnimationFrame(animFrameId);
+
+                // 整体渐隐
+                body.classList.add('fade-out');
+
+                // 渐隐完成后跳转
+                setTimeout(() => {
+                    window.location.href = TARGET_URL;
+                }, 480);
+            }
+
+            // 点击任意位置立即跳转
+            document.addEventListener('click', (e) => {
+                // 防止重复触发
+                if (hasJumped) return;
+                jumpToGame();
+            });
+
+            // 触摸事件（移动端）
+            document.addEventListener('touchstart', (e) => {
+                if (hasJumped) return;
+                // 不阻止默认行为，但触发跳转
+                jumpToGame();
+            }, { passive: true });
+
+            // 自动动画时间线
+            function startAutoSequence() {
+                // 阶段1：渐显（约0.65s）
+                setTimeout(() => {
+                    noticeContainer.classList.add('visible');
+                }, 190);
+
+                // 阶段2：保持可见约1.1秒后开始渐隐
+                setTimeout(() => {
+                    if (hasJumped) return;
+                    noticeContainer.classList.add('hiding');
+                }, 6050);
+
+                // 阶段3：渐隐完成后跳转（hiding transition 0.55s）
+                setTimeout(() => {
+                    if (hasJumped) return;
+                    jumpToGame();
+                }, 2720);
+            }
+
+            // 启动
+            startAutoSequence();
+
+            // ================================================================
+            //  ⌨️ 键盘支持：任意键跳过
+            // ================================================================
+            document.addEventListener('keydown', (e) => {
+                if (hasJumped) return;
+                // 任意键均可跳过
+                jumpToGame();
+            });
+
+            console.log('🏮 黄小仙 · 讨封之卷 — 启动页已就绪');
+            console.log('   点击任意位置或按任意键可直接进入游戏');
+        })();
+    </script>
+</body>
+</html>

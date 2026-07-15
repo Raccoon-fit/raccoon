@@ -68,6 +68,7 @@
             gap: 12px;
             margin-top: 16px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .stat-item {
             background: linear-gradient(180deg, #D2B48C, #A0522D);
@@ -247,6 +248,28 @@
             margin-left: 8px;
             font-style: italic;
         }
+        .sync-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-left: 6px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+        .sync-indicator.inactive {
+            background: #9E9E9E;
+            animation: none;
+        }
 
         /* 自定义弹窗样式 */
         .modal-overlay {
@@ -264,12 +287,22 @@
             -webkit-tap-highlight-color: transparent;
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
         @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
         .modal-dialog {
             background: linear-gradient(180deg, #FFF8DC, #F5DEB3);
@@ -410,10 +443,11 @@
     <div class="page-container">
         <div class="header">
             <h1>道主仙府</h1>
-            <p class="subtitle">功德卷 · 成就图鉴</p>
+            <p class="subtitle">功德卷 · 成就图鉴 <span class="sync-indicator" id="syncIndicator" title="实时同步中"></span></p>
             <div class="stats-row">
                 <div class="stat-item">已解锁 <span class="stat-count" id="unlockedCount">0</span> / <span id="totalCount">40</span></div>
                 <div class="stat-item" id="legendaryStat" style="display:none;">传说 <span class="stat-count" id="legendaryCount">0</span></div>
+                <button class="seal-btn gray-seal" onclick="refreshAchievements()" style="padding:6px 14px;font-size:12px;min-width:auto;">🔄 刷新</button>
             </div>
         </div>
 
@@ -422,10 +456,7 @@
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:8px;">
                 <span>道号：</span>
                 <strong id="display-daoHao">-</strong>
-                <!--
                 <span class="edit-link" id="editPlayerName" title="修改道号">✎</span>
-                
-                -->
             </div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>灵韵：</span><strong id="display-lingYun">-</strong></div>
             <div style="display:flex; justify-content: space-between; margin-bottom:8px;"><span>浊念：</span><strong id="display-zhuoNian">-</strong></div>
@@ -612,10 +643,12 @@
         let CONFIG = null;
         function getConfig() { if (!CONFIG) try { CONFIG = JSON.parse(atob(ENCODED_CONFIG)); } catch (e) { return {}; } return CONFIG; }
 
-        // ==================== 成就定义 ====================
+        // ==================== 成就定义（已修复，包含v2.0新增成就） ====================
         const achievementIcons = [
             { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
             { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
+            { id: 'seven_days', title: '七日圆满，本相归真', icon: '🌟', legendary: true },
+            { id: 'empty_face', title: '空相无相', icon: '○', legendary: true },
             { id: 'true', title: '本相自在', icon: '◯', legendary: false },
             { id: 'god', title: '点化成仙', icon: '☀', legendary: false },
             { id: 'mortal', title: '尘世轮回', icon: '人', legendary: false },
@@ -633,11 +666,15 @@
             { id: 'sword_friend', title: '剑影知交', icon: '⚔', legendary: false },
             { id: 'sword_master', title: '剑道传承', icon: '剑', legendary: false },
             { id: 'green_memory', title: '前尘往事', icon: '记', legendary: false },
-            { id: 'green_fate', title: '三世因缘', icon: '缘', legendary: false },
             { id: 'great_good', title: '大善若水', icon: '☯', legendary: false },
             { id: 'great_evil', title: '大恶如魔', icon: '💀', legendary: false },
             { id: 'balance_sage', title: '中庸之道', icon: '⚖', legendary: false },
             { id: 'ghost_friend', title: '鬼魂之交', icon: '👻', legendary: false },
+            { id: 'suspicious', title: '疑心失缘', icon: '疑', legendary: false },
+            { id: 'moon_fox', title: '月下同行', icon: '🦊', legendary: false },
+            { id: 'drought_hero', title: '润物无声', icon: '🌧', legendary: false },
+            { id: 'well_insight', title: '井中悟道', icon: '🕳', legendary: false },
+            { id: 'chess_sage', title: '棋道天成', icon: '♟', legendary: false },
             { id: 'star_seeker', title: '星辰指引', icon: '星', legendary: false },
             { id: 'hermit', title: '隐士之道', icon: '隐', legendary: false },
             { id: 'treasure', title: '寻宝猎人', icon: '宝', legendary: false },
@@ -652,8 +689,7 @@
             { id: 'dream_ending', title: '黄粱一梦', icon: '梦', legendary: false },
             { id: 'time_loop', title: '时光倒流', icon: '循环', legendary: false },
             { id: 'destiny_symphony', title: '命运交响', icon: '命', legendary: false },
-            { id: 'fate_encounter', title: '因缘际会', icon: '会', legendary: false },
-            { id: 'suspicious', title: '疑心失缘', icon: '疑', legendary: false }
+            { id: 'fate_encounter', title: '因缘际会', icon: '会', legendary: false }
         ];
 
         const STORAGE_KEY = 'huangdaxian_achievements';
@@ -664,77 +700,56 @@
         let cachedAchievements = null, cachedOrder = null, cachedSpecial = null, cachedNotes = null, cachedUsedCodes = null;
 
         // ==================== 兑换码配置 ====================
-        // 新远程链接（您提供的最新地址）
         const CODES_URL = 'https://raccoon.fit/game%2F%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81%2F%E5%85%91%E6%8D%A2%E7%A0%81%E6%95%B0%E6%8D%AE%2Fly_all.txt';
-        
-        // 默认后备兑换码（远程加载失败时使用）
         const DEFAULT_CODES = {
             'LY001A': { type: 'lingYun', amount: 1 },
             'LY002B': { type: 'lingYun', amount: 1 },
             'ZN001E': { type: 'zhuoNian', amount: 1 },
             'QD77SG': { type: 'achievement', title: '签达之人', note: '参与7日签到活动获得' }
         };
-
         let VALID_CODES = {};
 
-        // 增强版远程兑换码加载（兼容换行、空格分隔，处理BOM及特殊字符）
         async function loadCodesFromRemote() {
             try {
                 const res = await fetch(CODES_URL);
                 if (!res.ok) throw new Error('网络错误');
                 let text = await res.text();
-
-                // 去除 UTF-8 BOM
-                if (text.charCodeAt(0) === 0xFEFF) {
-                    text = text.slice(1);
-                }
-
-                // 将换行、制表、回车等统一替换为空格，然后按空格分割
+                if (text.charCodeAt(0) === 0xFEFF) { text = text.slice(1); }
                 const tokens = text.replace(/[\r\n\t]+/g, ' ').split(' ');
                 const newCodes = {};
-
                 for (let token of tokens) {
                     token = token.trim();
                     if (!token || token.startsWith('#')) continue;
-
-                    // 每个token格式应为 CODE:type:value
                     const parts = token.split(':');
                     if (parts.length < 3) continue;
-
                     const code = parts[0].trim().toUpperCase();
                     const type = parts[1].trim();
                     const valuePart = parts.slice(2).join(':').trim();
-
                     if (type === 'lingYun' || type === 'zhuoNian') {
                         const amount = parseInt(valuePart);
-                        if (!isNaN(amount)) {
-                            newCodes[code] = { type, amount };
-                        }
+                        if (!isNaN(amount)) { newCodes[code] = { type, amount }; }
                     } else if (type === 'achievement') {
                         const titleAndNote = valuePart.split('|');
                         const title = titleAndNote[0].trim();
                         const note = titleAndNote[1] ? titleAndNote[1].trim() : '';
-                        if (title) {
-                            newCodes[code] = { type, title, note };
-                        }
+                        if (title) { newCodes[code] = { type, title, note }; }
                     }
                 }
-
-                if (Object.keys(newCodes).length === 0) {
-                    console.warn('远程兑换码列表为空，使用默认码');
-                    return false;
-                }
-
+                if (Object.keys(newCodes).length === 0) { console.warn('远程兑换码列表为空，使用默认码'); return false; }
                 VALID_CODES = newCodes;
                 console.log('✅ 已从远程加载兑换码', Object.keys(newCodes).length, '个');
                 return true;
-            } catch (e) {
-                console.warn('远程兑换码加载失败，使用默认码', e);
-                return false;
-            }
+            } catch (e) { console.warn('远程兑换码加载失败，使用默认码', e); return false; }
         }
 
-        // ---------- 成就读写 ----------
+        function clearAchievementCache() {
+            cachedAchievements = null;
+            cachedOrder = null;
+            cachedSpecial = null;
+            cachedNotes = null;
+            cachedUsedCodes = null;
+        }
+
         function getAchievements() {
             if (cachedAchievements) return cachedAchievements;
             const raw = localStorage.getItem(STORAGE_KEY);
@@ -742,6 +757,7 @@
             try { if (window.parent && window.parent !== window) { const p = window.parent.localStorage.getItem(STORAGE_KEY); if (p) { const d = JSON.parse(p); if (d && typeof d === 'object') { cachedAchievements = d; return d; } } } } catch (e) {}
             return {};
         }
+
         function saveAchievements(ach) { cachedAchievements = ach; const json = JSON.stringify(ach); localStorage.setItem(STORAGE_KEY, json); try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem(STORAGE_KEY, json); } catch (e) {} }
         function getOrder() { if (cachedOrder) return cachedOrder; const raw = localStorage.getItem(ORDER_KEY); if (raw) { try { const a = JSON.parse(raw); if (Array.isArray(a)) { cachedOrder = a; return a; } } catch (e) {} } return []; }
         function saveOrder(order) { cachedOrder = order; localStorage.setItem(ORDER_KEY, JSON.stringify(order)); }
@@ -757,7 +773,6 @@
             return Object.keys(ach).filter(id => ach[id]).map(id => { const f = achievementIcons.find(a => a.id === id); return f ? f.title : id; });
         }
 
-        // ---------- 渲染成就 ----------
         function renderAchievements() {
             const ach = getAchievements();
             const order = getOrder();
@@ -817,6 +832,12 @@
             row.className = 'achievement-row ' + (unlocked ? (item.legendary ? 'unlocked legendary' : 'unlocked') : 'locked');
             row.innerHTML = `<div class="achievement-icon-cell">${unlocked ? item.icon : '?'}</div><div class="achievement-name">${item.title}</div><span class="achievement-badge">${unlocked ? (item.legendary ? '传说' : '已解锁') : '未解锁'}</span>`;
             return row;
+        }
+
+        function refreshAchievements(silent = false) {
+            clearAchievementCache();
+            renderAchievements();
+            updateUserInfo();
         }
 
         // ==================== 道号管理 ====================
@@ -931,7 +952,7 @@
             if (cloudDocId) {
                 const remoteCount = await getRemoteAchievementCount();
                 if (remoteCount > totalLocal) {
-                    const input = await modalPrompt(`⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入“确认覆盖”后继续：`, { placeholder: '输入“确认覆盖”', icon: '⚠️' });
+                    const input = await modalPrompt(`⚠️ 云端有 ${remoteCount} 个成就，本地仅有 ${totalLocal} 个！\n封存会用本地数据覆盖云端，可能导致成就丢失。\n\n请输入"确认覆盖"后继续：`, { placeholder: '输入"确认覆盖"', icon: '⚠️' });
                     if (input !== '确认覆盖') { await modalAlert('已取消上传，云端数据未受影响。', '↩️'); return; }
                 }
             }
@@ -943,10 +964,10 @@
                 let url, options;
                 if (cloudDocId) {
                     url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
-                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 } else {
                     url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
-                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
                 }
                 const res = await fetch(url, options);
                 const result = await res.json();
@@ -963,8 +984,7 @@
             if (!playerName) { await modalAlert('道号为空，请先设置道号！', '📛'); await promptSetPlayerName(); if (!playerName) return; }
             if (!cloudDocId) {
                 const foundId = await findDocByTitle();
-                if (foundId) { cloudDocId = foundId; localStorage.setItem('cloudDocId', cloudDocId); }
-                else {
+                if (foundId) { cloudDocId = foundId; localStorage.setItem('cloudDocId', cloudDocId); } else {
                     const manualId = await modalPrompt('未找到云端仙籍，请手动输入文档ID：', { placeholder: '文档ID', icon: '🔍' });
                     if (manualId && manualId.trim()) { cloudDocId = manualId.trim(); localStorage.setItem('cloudDocId', cloudDocId); } else return;
                 }
@@ -977,7 +997,8 @@
                 if (result.code == 1) {
                     let data; try { data = JSON.parse(result.content); } catch (e) { await modalAlert('云端数据损坏！', '❌'); return; }
                     const titles = data.achievements || [];
-                    const achObj = {}; const notFound = [];
+                    const achObj = {};
+                    const notFound = [];
                     titles.forEach(title => { const found = achievementIcons.find(a => a.title === title); if (found) achObj[found.id] = true; else notFound.push(title); });
                     saveAchievements(achObj);
                     if (data.specialAchievements) saveSpecialAchievements(data.specialAchievements);
@@ -988,7 +1009,9 @@
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
                     if (data.playerName) setPlayerName(data.playerName);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
-                    renderAchievements(); updateUserInfo();
+                    clearAchievementCache();
+                    renderAchievements();
+                    updateUserInfo();
                     let msg = '仙缘已接续！'; if (notFound.length) msg += `\n⚠️ ${notFound.length} 个成就标题未识别：${notFound.join('、')}`;
                     await modalAlert(msg, '☁️');
                 } else await modalAlert('下载失败：' + (result.msg || '未知错误'), '❌');
@@ -996,7 +1019,7 @@
         }
 
         async function exportAllData() {
-            const payload = { version:2, exportTime:new Date().toISOString(), achievements:getAchievements(), order:getOrder(), specialAchievements: getSpecialAchievements(), specialNotes: getSpecialNotes(), usedCodes: getUsedCodes(), playerName, storyNode:localStorage.getItem('storyNode'), lingYun:localStorage.getItem('lingYun'), zhuoNian:localStorage.getItem('zhuoNian') };
+            const payload = { version: 2, exportTime: new Date().toISOString(), achievements: getAchievements(), order: getOrder(), specialAchievements: getSpecialAchievements(), specialNotes: getSpecialNotes(), usedCodes: getUsedCodes(), playerName, storyNode: localStorage.getItem('storyNode'), lingYun: localStorage.getItem('lingYun'), zhuoNian: localStorage.getItem('zhuoNian') };
             const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
             try { await navigator.clipboard.writeText(str); await modalAlert('仙籍已复制到剪贴板！', '📋'); } catch (e) { await modalPrompt('请手动复制仙籍：', { defaultValue: str, textarea: true, rows: 5, icon: '📋' }); }
         }
@@ -1016,7 +1039,9 @@
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
                 if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
-                renderAchievements(); updateUserInfo();
+                clearAchievementCache();
+                renderAchievements();
+                updateUserInfo();
                 await modalAlert('仙籍导入成功！', '✅');
             } catch (e) { await modalAlert('导入失败：格式错误', '❌'); }
         }
@@ -1024,6 +1049,53 @@
         async function logout() {
             const confirmed = await modalConfirm('确定重入轮回？此操作将清除所有本地数据！', { confirmText: '确 定', cancelText: '取 消', icon: '🔥', dangerConfirm: true });
             if (confirmed) { localStorage.clear(); location.reload(); }
+        }
+
+        // ==================== 实时同步监听 ====================
+        function setupRealtimeSync() {
+            window.addEventListener('storage', function(e) {
+                if (e.key === STORAGE_KEY || e.key === SPECIAL_KEY || e.key === 'playerName' || e.key === 'lingYun' || e.key === 'zhuoNian' || e.key === 'storyNode' || e.key === 'lastCloudSaveTime') {
+                    refreshAchievements(true);
+                }
+            });
+
+            try {
+                const channel = new BroadcastChannel('huangdaxian_sync');
+                channel.addEventListener('message', function(e) {
+                    if (e.data && e.data.type === 'achievements-updated') {
+                        refreshAchievements(true);
+                    }
+                });
+                window.addEventListener('beforeunload', () => channel.close());
+            } catch (e) {}
+
+            window.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'achievements-updated') {
+                    refreshAchievements(true);
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    refreshAchievements(true);
+                }
+            });
+
+            let pollInterval = setInterval(() => {
+                if (!document.hidden) {
+                    const ach = getAchievements();
+                    const currentCount = Object.keys(ach).filter(id => ach[id]).length;
+                    const displayedCount = parseInt(document.getElementById('unlockedCount').textContent) || 0;
+                    const specialCount = getSpecialAchievements().length;
+                    const displayedSpecialCount = document.getElementById('specialList').children.length;
+                    if (currentCount + specialCount !== displayedCount + displayedSpecialCount) {
+                        clearAchievementCache();
+                        renderAchievements();
+                    }
+                }
+            }, 8000);
+
+            window.addEventListener('beforeunload', () => clearInterval(pollInterval));
         }
 
         // ==================== 初始化 ====================
@@ -1037,10 +1109,23 @@
             if (!playerName) { try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch (e) {} }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+
             updateUserInfo();
             renderAchievements();
+            setupRealtimeSync();
+
+            setTimeout(() => {
+                clearAchievementCache();
+                renderAchievements();
+                updateUserInfo();
+            }, 600);
+
             if (!playerName) setTimeout(() => { if (!playerName) promptSetPlayerName(); }, 800);
-            document.getElementById('editPlayerName').addEventListener('click', promptSetPlayerName);
+
+            const editBtn = document.getElementById('editPlayerName');
+            if (editBtn) {
+                editBtn.addEventListener('click', promptSetPlayerName);
+            }
         });
     </script>
 </body>

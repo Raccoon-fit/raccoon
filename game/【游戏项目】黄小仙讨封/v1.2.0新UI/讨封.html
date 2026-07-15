@@ -154,7 +154,7 @@
     <div class="changelog-popup" id="changelogPopup">
         <h4>📜 更新日志</h4>
         <ul>
-            <li><b>v2.0.1</b> — 修复成就映射，补全 missing 成就触发</li>
+            <li><b>v2.0.1</b> — 修复成就映射与复合动作，强制写入本地存储</li>
             <li><b>v2.0.0</b> — 剧情与界面完全分离，修改文案不再影响UI</li>
             <li><b>v1.6.1</b> — 修复存储桥，成就系统稳定</li>
             <li><b>v1.6.0</b> — 新增剑客、精怪、老宅等剧情线</li>
@@ -396,11 +396,20 @@
         async function unlockAchievement(id) {
             if (!gameState.achievements[id]) {
                 gameState.achievements[id] = true;
-                await StorageBridge.setItem('huangdaxian_achievements', JSON.stringify(gameState.achievements));
+                // 强制写入 localStorage，确保成就页面能立即读取
+                localStorage.setItem('huangdaxian_achievements', JSON.stringify(gameState.achievements));
+                // 同时通过 StorageBridge 写入（如果可用）
+                try {
+                    await StorageBridge.setItem('huangdaxian_achievements', JSON.stringify(gameState.achievements));
+                } catch(e) {}
                 const name = window.ACHIEVEMENT_NAME_MAP[id] || id;
                 const golden = window.GOLDEN_ACHIEVEMENTS && window.GOLDEN_ACHIEVEMENTS.includes(id);
                 showAchievementPopup(name, golden);
+                // 通知父窗口或同域页面
                 if (window.parent) window.parent.postMessage({ type: 'achievements-updated' }, '*');
+                try {
+                    new BroadcastChannel('huangdaxian_sync').postMessage({ type: 'achievements-updated' });
+                } catch(e) {}
             }
         }
 
@@ -462,43 +471,74 @@
             setTimeout(() => { const first = container.querySelector('.choice-btn'); if (first) focusElement(first); }, 50);
         }
 
+        // 核心修复：支持复合动作（用逗号分隔）
         window.handleChoice = async function(nextScene, action) {
-            if (action && action.startsWith('lingyun_')) { const v = parseInt(action.replace('lingyun_',''),10); if (!isNaN(v)) await updateLingYun(v); }
-            if (action && action.startsWith('zhuonian_')) { const v = parseInt(action.replace('zhuonian_',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
-            if (action && action.startsWith('karma_plus_')) { const v = parseInt(action.replace('karma_plus_',''),10); if (!isNaN(v)) await updateLingYun(v); }
-            if (action && action.startsWith('karma_minus_')) { const v = parseInt(action.replace('karma_minus_','').replace('-',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
-            const unlockMap = {
-                'unlock_god':'god',
-                'unlock_fail_scholar':'fail_scholar',
-                'unlock_fail_kid':'fail_kid',
-                'unlock_farmer':'farmer',
-                'unlock_star':'star',
-                'unlock_mortal':'mortal',
-                'unlock_demon_king':'demon_king',
-                'unlock_sacrifice':'sacrifice',
-                'unlock_mad':'mad',
-                'unlock_love':'love',
-                'unlock_guardian':'guardian',
-                'unlock_lost':'lost',
-                'unlock_severed':'severed',
-                'unlock_dawn':'dawn',
-                'unlock_witness':'witness',
-                'unlock_suspicious':'suspicious',
-                'unlock_sword_friend':'sword_friend',
-                'unlock_sword_master':'sword_master',
-                'unlock_green_fate':'green_memory',
-                'unlock_ghost_friend':'ghost_friend',
-                'unlock_seven_days':'seven_days',
-                'unlock_moon_fox':'moon_fox',
-                'unlock_drought_hero':'drought_hero',
-                'unlock_well_insight':'well_insight',
-                'unlock_chess_sage':'chess_sage',
-                'unlock_empty_face':'empty_face',
-                'unlock_true': 'true'
-            };
-            if (action && unlockMap[action]) await unlockAchievement(unlockMap[action]);
-            if (action === 'reset' || action === 'reset_suspicious') { if (action==='reset_suspicious') await unlockAchievement('suspicious'); resetGame(false); return; }
-            if (gameState.currentScene && nextScene && gameState.currentScene!==nextScene) { gameState.sceneHistory.push(gameState.currentScene); if (gameState.sceneHistory.length>50) gameState.sceneHistory.shift(); }
+            if (action) {
+                const actions = action.split(',').map(a => a.trim());
+                for (let act of actions) {
+                    // 处理灵韵/浊念增减
+                    if (act.startsWith('lingyun_')) {
+                        const v = parseInt(act.replace('lingyun_',''),10);
+                        if (!isNaN(v)) await updateLingYun(v);
+                    }
+                    else if (act.startsWith('zhuonian_')) {
+                        const v = parseInt(act.replace('zhuonian_',''),10);
+                        if (!isNaN(v)) await updateZhuoNian(v);
+                    }
+                    else if (act.startsWith('karma_plus_')) {
+                        const v = parseInt(act.replace('karma_plus_',''),10);
+                        if (!isNaN(v)) await updateLingYun(v);
+                    }
+                    else if (act.startsWith('karma_minus_')) {
+                        const v = parseInt(act.replace('karma_minus_','').replace('-',''),10);
+                        if (!isNaN(v)) await updateZhuoNian(v);
+                    }
+                    // 处理成就解锁
+                    const unlockMap = {
+                        'unlock_god':'god',
+                        'unlock_fail_scholar':'fail_scholar',
+                        'unlock_fail_kid':'fail_kid',
+                        'unlock_farmer':'farmer',
+                        'unlock_star':'star',
+                        'unlock_mortal':'mortal',
+                        'unlock_demon_king':'demon_king',
+                        'unlock_sacrifice':'sacrifice',
+                        'unlock_mad':'mad',
+                        'unlock_love':'love',
+                        'unlock_guardian':'guardian',
+                        'unlock_lost':'lost',
+                        'unlock_severed':'severed',
+                        'unlock_dawn':'dawn',
+                        'unlock_witness':'witness',
+                        'unlock_suspicious':'suspicious',
+                        'unlock_sword_friend':'sword_friend',
+                        'unlock_sword_master':'sword_master',
+                        'unlock_green_fate':'green_memory',
+                        'unlock_ghost_friend':'ghost_friend',
+                        'unlock_seven_days':'seven_days',
+                        'unlock_moon_fox':'moon_fox',
+                        'unlock_drought_hero':'drought_hero',
+                        'unlock_well_insight':'well_insight',
+                        'unlock_chess_sage':'chess_sage',
+                        'unlock_empty_face':'empty_face',
+                        'unlock_true': 'true'
+                    };
+                    if (unlockMap[act]) {
+                        await unlockAchievement(unlockMap[act]);
+                    }
+                    // 重置等特殊动作
+                    if (act === 'reset' || act === 'reset_suspicious') {
+                        if (act === 'reset_suspicious') await unlockAchievement('suspicious');
+                        resetGame(false);
+                        return;
+                    }
+                }
+            }
+            // 场景跳转
+            if (gameState.currentScene && nextScene && gameState.currentScene !== nextScene) {
+                gameState.sceneHistory.push(gameState.currentScene);
+                if (gameState.sceneHistory.length > 50) gameState.sceneHistory.shift();
+            }
             setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
         };
 

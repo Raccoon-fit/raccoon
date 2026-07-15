@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>仙府升维</title>
+    <title>仙府升维公告</title>
     <meta name="theme-color" content="#000000">
     <style>
         :root {
@@ -42,7 +42,6 @@
         h1 { color:#fff; font-size:24px; letter-spacing:4px; margin-bottom:6px; text-shadow:0 0 3px rgba(255,255,255,0.15); }
         .divider { width:60px; height:1px; background:linear-gradient(to right,transparent,var(--bronze),transparent); margin:0 auto 40px; }
         .hint { font-size:14px; color:#666; margin-bottom:50px; line-height:1.8; }
-        /* 和关于页隐私按钮一模一样的样式 */
         .enter-btn {
             display: inline-flex;
             align-items: center;
@@ -68,49 +67,46 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <span class="icon">✦</span>
-        <h1>仙府升维公告</h1>
-        <div class="divider"></div>
-        <p class="hint">
-            诸位道友安好：<br>
-            仙府已迭代至1.2.0版本，<br>
-            点击下方传送阵即可进入新境。<br>
-            <small>（真人点击后自动隐藏旧导航栏）</small>
-        </p>
-        <!-- 唯一入口：真人点击按钮 -->
-        <button class="enter-btn" id="enterBtn">
-            <span class="btn-icon">➤</span>
-            <span>进入1.2.0新仙府</span>
-        </button>
-        <p class="loading-text" id="loadingText">正在升维，请稍候...</p>
-        <button class="retry-btn" id="retryBtn">跳转失败？点击重试</button>
-    </div>
+<!-- 🔴 核心：和关于页一模一样的webapp三连指令（位置完全一致） -->
+<script>
+    webapp.关闭跳转打开(false);
+    // 关闭请求打开第三方APP用true打开
+    webapp.设置下拉刷新(false);
+    // 关闭下拉刷新true打开
+    webapp.清空浏览记录();
+    // 清空浏览历史访问记录
+    // 清空后返回键不回到上一页
+</script>
+
+<div class="container">
+    <span class="icon">✦</span>
+    <h1>仙府升维公告</h1>
+    <div class="divider"></div>
+    <p class="hint">
+        诸位道友安好：<br>
+        仙府已迭代至1.2.0版本，<br>
+        点击下方传送阵即可进入新境。<br>
+        <small>（真人点击后自动隐藏旧导航栏）</small>
+    </p>
+    <button class="enter-btn" id="enterBtn">
+        <span class="btn-icon">➤</span>
+        <span>进入1.2.0新仙府</span>
+    </button>
+    <p class="loading-text" id="loadingText">正在升维，请稍候...</p>
+    <button class="retry-btn" id="retryBtn">跳转失败？点击重试</button>
+</div>
 
 <script>
-    // 🔴 第一步：清死锁（解决之前的无限加载问题）
+    // 🔴 清死锁（解决之前的无限加载问题）
     if (location.search.includes('clear=1')) {
         sessionStorage.removeItem('hx_entered');
     }
 
-    // 🔴 第二步：等页面加载完，再调用webapp（避免JSBridge未就绪）
-    document.addEventListener('DOMContentLoaded', function() {
-        // 调用关于页同款webapp指令，等JSBridge就绪再调
-        try {
-            webapp.关闭跳转打开(false);
-            webapp.设置下拉刷新(false);
-            webapp.清空浏览记录();
-            console.log('webapp指令调用成功');
-        } catch(e) {
-            console.error('webapp调用失败：', e);
-        }
-    });
-
-    // 🔴 第三步：真人点击后才跳转（只有真人点击，webapp才会收导航栏）
+    // 🔴 防重复点击锁
+    let isJumping = false;
     const enterBtn = document.getElementById('enterBtn');
     const loadingText = document.getElementById('loadingText');
     const retryBtn = document.getElementById('retryBtn');
-    let isJumping = false; // 防止重复点击
 
     enterBtn.addEventListener('click', function() {
         if (isJumping) return;
@@ -120,14 +116,14 @@
         enterBtn.style.display = 'none';
         loadingText.style.display = 'block';
 
-        // 再次确认webapp指令（点击后调用更稳妥）
+        // 🔴 点击时再次确认webapp指令（和关于页隐私链接的触发逻辑一致）
         try {
             webapp.关闭跳转打开(false);
             webapp.设置下拉刷新(false);
             webapp.清空浏览记录();
         } catch(e) {}
 
-        // 跳1.2.0（给webapp 300ms时间收导航栏，足够用了）
+        // 🔴 300ms延迟跳转（给webapp足够时间隐藏导航栏）
         setTimeout(() => {
             const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
             try {
@@ -142,24 +138,24 @@
                 retryBtn.style.display = 'block';
                 isJumping = false;
             }
-        }, 300); // 300ms足够webapp收导航栏
-    });
+        }, 300);
 
-    // 🔴 兜底：3秒没跳走就显示重试按钮，绝不无限加载
-    setTimeout(() => {
-        if (isJumping) {
-            loadingText.style.display = 'none';
-            retryBtn.style.display = 'block';
-            enterBtn.style.display = 'flex';
-            isJumping = false;
-        }
-    }, 3000);
+        // 🔴 兜底：3秒没跳走就显示重试按钮，绝不无限加载
+        setTimeout(() => {
+            if (isJumping) {
+                loadingText.style.display = 'none';
+                retryBtn.style.display = 'block';
+                enterBtn.style.display = 'flex';
+                isJumping = false;
+            }
+        }, 3000);
+    });
 
     // 重试按钮逻辑
     retryBtn.addEventListener('click', function() {
         retryBtn.style.display = 'none';
         enterBtn.style.display = 'flex';
-        enterBtn.click(); // 重新触发点击逻辑
+        enterBtn.click();
     });
 </script>
 </body>

@@ -6,7 +6,6 @@
     <title>成就 · 候门仙友录</title>
     <meta name="theme-color" content="#000000">
     <style>
-        /* 样式跟之前保持一致，我就不重复贴了，只改关键部分 */
         :root {
             --bg-color: #000000;
             --text-color: #C0C0C0;
@@ -16,41 +15,23 @@
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color); color: var(--text-color);
             font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
-            line-height: 1.8;
-            min-height: 100vh;
-            width: 100vw;
-            padding: 30px 20px;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            background-image:
-                radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 60%);
+            line-height: 1.8; min-height: 100vh; width: 100vw;
+            padding: 30px 20px; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 50% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 60%);
         }
         .page-header { text-align:center; margin-bottom:40px; }
         .page-header .icon { font-size:40px; color:var(--golden); margin-bottom:12px; animation: goldenPulse 3s ease-in-out infinite; }
         @keyframes goldenPulse { 0%,100%{opacity:0.65;}50%{opacity:1;} }
         .page-header h1 { color:var(--highlight-color); font-size:26px; font-weight:300; letter-spacing:4px; margin-bottom:6px; text-shadow:0 0 3px rgba(255,255,255,0.15); }
         .page-header .divider { width:80px; height:1px; background:linear-gradient(to right,transparent,var(--bronze),transparent); margin:0 auto; }
-        
         .content-box {
-            max-width: 680px;
-            margin: 0 auto 40px;
-            padding: 25px;
-            border: 1px solid #1a1a1a;
-            border-radius: 4px;
-            background: rgba(10, 10, 10, 0.7);
+            max-width: 680px; margin: 0 auto 40px; padding: 25px;
+            border: 1px solid #1a1a1a; border-radius: 4px; background: rgba(10, 10, 10, 0.7);
         }
         .content-box h2 { color:var(--golden); font-size:20px; margin-bottom:15px; letter-spacing:2px; }
-        .content-box .achievement-item { 
-            display:flex; 
-            align-items:center; 
-            gap:15px; 
-            padding:12px 0; 
-            border-bottom:1px solid #1a1a1a;
-        }
+        .content-box .achievement-item { display:flex; align-items:center; gap:15px; padding:12px 0; border-bottom:1px solid #1a1a1a; }
         .content-box .achievement-item:last-child { border-bottom:none; }
         .content-box .achievement-icon { font-size:24px; color:var(--bronze); }
         .content-box .achievement-info { flex:1; }
@@ -58,43 +39,24 @@
         .content-box .achievement-desc { color:#777; font-size:13px; }
         .content-box .achievement-status { color:var(--golden); font-size:14px; }
         .content-box .locked { color:#555; }
-        
-        /* 新样式：旧版本提示条 */
-        .old-version-notice {
-            background: rgba(139, 115, 85, 0.1);
-            border: 1px dashed var(--bronze);
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 25px;
-            text-align: center;
-            color: #8B7355;
-            font-size: 14px;
-        }
-        
         .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #888;
-            text-decoration: none;
-            font-size: 17px;
-            letter-spacing: 2px;
-            padding: 16px 36px;
-            border: 1px solid #333;
-            border-radius: 3px;
-            cursor: pointer;
-            background: transparent;
-            transition: all 0.3s ease;
-            margin: 20px auto 0;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            color: #888; text-decoration: none; font-size: 17px; letter-spacing: 2px;
+            padding: 16px 36px; border: 1px solid #333; border-radius: 3px; cursor: pointer;
+            background: transparent; transition: all 0.3s ease; margin: 20px auto 0;
         }
         .action-btn .btn-icon { font-size: 20px; color: var(--bronze); transition: all 0.3s ease; }
         .action-btn:hover { color: var(--golden); border-color: var(--bronze); background: rgba(139, 115, 85, 0.08); }
         .action-btn:hover .btn-icon { color: var(--golden); transform: translateX(3px); }
-        
         .footer-hint { text-align:center; font-size:12px; color:#444; margin-top:40px; letter-spacing:1px; }
     </style>
 </head>
+<!-- 🔴 唯一一次webapp指令，三个页面完全一致 -->
+<script>
+    webapp.关闭跳转打开(false);
+    webapp.设置下拉刷新(false);
+    webapp.清空浏览记录();
+</script>
 <body>
     <div class="page-header">
         <span class="icon">🏆</span>
@@ -102,8 +64,7 @@
         <div class="divider"></div>
     </div>
 
-    <!-- 新增：旧版本提示条 -->
-    <div class="old-version-notice">
+    <div class="old-version-notice" style="background: rgba(139, 115, 85, 0.1); border: 1px dashed var(--bronze); border-radius: 4px; padding: 12px; margin: 0 auto 25px; max-width: 680px; text-align: center; color: #8B7355; font-size: 14px;">
         ⚠️ 此为V1.1.0旧版记录，最新成就与进度请在V1.2.0中查看
     </div>
 
@@ -135,41 +96,25 @@
         </div>
     </div>
 
-    <div class="content-box">
-        <h2>V1.2.0新增成就预告</h2>
-        <p>• 仙府扩建：解锁灵田与炼丹房</p>
-        <p>• 浊念净化：达成无浊念状态24小时</p>
-        <p>• 候门领袖：邀请好友回归人数达10人</p>
-    </div>
-
     <div style="text-align:center;">
-        <!-- 核心改动：按钮文案变了！ -->
         <button class="action-btn" id="jumpBtn">
             <span class="btn-icon">🚀</span>
             <span>前往1.2.0查看完整成就</span>
         </button>
-        <p style="color:#555; font-size:12px; margin-top:10px;">（点击后旧导航栏将自动隐藏）</p>
     </div>
 
     <p class="footer-hint">仙府出品 · 盗版必究</p>
 
 <script>
-    // 清死锁
+    // 🔴 清死锁
     if (location.search.includes('clear=1')) {
         sessionStorage.removeItem('hx_achieve_jumped');
     }
     if (sessionStorage.getItem('hx_achieve_jumped')) return;
     sessionStorage.setItem('hx_achieve_jumped', '1');
 
+    // 🔴 点击事件里完全没有webapp指令！只负责跳转！
     document.getElementById('jumpBtn').addEventListener('click', function() {
-        // 触发webapp隐藏导航栏
-        try {
-            webapp.关闭跳转打开(false);
-            webapp.设置下拉刷新(false);
-            webapp.清空浏览记录();
-        } catch(e) {}
-
-        // 跳转1.2.0
         setTimeout(() => {
             const targetUrl = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html';
             window.location.replace(targetUrl + '?t=' + Date.now());

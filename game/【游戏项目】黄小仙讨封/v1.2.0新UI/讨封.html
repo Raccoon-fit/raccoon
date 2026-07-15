@@ -505,18 +505,6 @@
     .tablet-mode .footer { padding: 10px 28px; }
     .tablet-mode .start-content h1 { font-size: 72px; }
     .tablet-mode .start-subtitle { font-size: 22px; }
-    /* 只读模式标识 */
-    .readonly-badge {
-      display: inline-block;
-      font-size: 10px;
-      background: rgba(139,69,19,0.15);
-      color: #8B4513;
-      padding: 1px 6px;
-      border-radius: 8px;
-      margin-left: 6px;
-      vertical-align: middle;
-      letter-spacing: 1px;
-    }
   </style>
 </head>
 <body>
@@ -565,7 +553,6 @@
     <div class="footer">
       <div>
         <button class="version-btn" id="versionBtn">v2.0.0</button>
-        <span class="readonly-badge">只读模式</span>
       </div>
       <div><a href="https://raccoon.fit/" target="_blank" style="color:#5D4037;text-decoration:none;">2026 软软的小窝</a></div>
     </div>
@@ -631,7 +618,7 @@
       checkpointScene: 'start',
       skipMode: false,
       achievements: { ...window.ACHIEVEMENTS_INIT },
-      // 灵韵和浊念改为只读，从存储中加载，不在游戏内修改
+      // 灵韵/浊念 从存储读取，并在游戏中基于当前值增减
       playerLingYun: 0,
       playerZhuoNian: 0,
       playerDifficulty: 'normal'
@@ -681,7 +668,21 @@
     function getScene(id) { return window.SCENES[id] || null; }
     function getCultivation(sceneId) { return window.CULTIVATION_MAP[sceneId] || '五百年'; }
 
-    // ===== 灵韵/浊念 只读取，不修改 =====
+    // ===== 灵韵/浊念 基于当前值增减（不重置） =====
+    async function updateLingYun(delta) {
+      gameState.playerLingYun = Math.max(0, Math.min(100, gameState.playerLingYun + delta));
+      await StorageBridge.setItem('huangdaxian_lingYun', String(gameState.playerLingYun));
+      localStorage.setItem('lingYun', String(gameState.playerLingYun));
+      updateKarmaUI();
+    }
+
+    async function updateZhuoNian(delta) {
+      gameState.playerZhuoNian = Math.max(0, Math.min(100, gameState.playerZhuoNian + delta));
+      await StorageBridge.setItem('huangdaxian_zhuoNian', String(gameState.playerZhuoNian));
+      localStorage.setItem('zhuoNian', String(gameState.playerZhuoNian));
+      updateKarmaUI();
+    }
+
     function getKarmaDisplay() {
       const ly = gameState.playerLingYun;
       const zn = gameState.playerZhuoNian;
@@ -698,25 +699,21 @@
       return { lingYun: ly, zhuoNian: zn, lingYunLabel, zhuoNianLabel };
     }
 
-    // 移除了 updateLingYun 和 updateZhuoNian 函数
-
     function updateKarmaUI() {
       const el = document.getElementById('karmaDisplay');
       if (!el) return;
       const d = getKarmaDisplay();
       el.innerHTML = '<span class="karma-lingyun">☯ 灵韵 ' + d.lingYun + ' · ' + d.lingYunLabel + '</span>'
-        + '<span class="karma-zhuonian">☠ 浊念 ' + d.zhuoNian + ' · ' + d.zhuoNianLabel + '</span>'
-        + '<span class="readonly-badge">只读</span>';
+        + '<span class="karma-zhuonian">☠ 浊念 ' + d.zhuoNian + ' · ' + d.zhuoNianLabel + '</span>';
     }
 
     async function loadKarma() {
       const savedLy = await StorageBridge.getItem('huangdaxian_lingYun');
       if (savedLy) gameState.playerLingYun = parseInt(savedLy, 10) || 0;
-      else gameState.playerLingYun = 10;
+      else gameState.playerLingYun = 10; // 初始灵韵
       const savedZn = await StorageBridge.getItem('huangdaxian_zhuoNian');
       if (savedZn) gameState.playerZhuoNian = parseInt(savedZn, 10) || 0;
-      else gameState.playerZhuoNian = 0;
-      // 同步到 localStorage 供成就页面读取
+      else gameState.playerZhuoNian = 0; // 初始浊念
       localStorage.setItem('lingYun', String(gameState.playerLingYun));
       localStorage.setItem('zhuoNian', String(gameState.playerZhuoNian));
       const savedDiff = await StorageBridge.getItem('huangdaxian_difficulty');
@@ -866,10 +863,26 @@
       }, 50);
     }
 
-    // ===== 选择处理（移除了所有灵韵/浊念修改逻辑）=====
+    // ===== 选择处理（恢复灵韵/浊念增减） =====
     window.handleChoice = async function(nextScene, action) {
-      // 灵韵/浊念相关修改已全部移除
-      // 此页面仅读取显示，不修改数值
+      // 灵韵/浊念 增减处理
+      if (action && action.startsWith('lingyun_')) {
+        const val = parseInt(action.replace('lingyun_', ''), 10);
+        if (!isNaN(val)) await updateLingYun(val);
+      }
+      if (action && action.startsWith('zhuonian_')) {
+        const val = parseInt(action.replace('zhuonian_', ''), 10);
+        if (!isNaN(val)) await updateZhuoNian(val);
+      }
+      // 兼容旧的 karma_ 前缀
+      if (action && action.startsWith('karma_plus_')) {
+        const val = parseInt(action.replace('karma_plus_', ''), 10);
+        if (!isNaN(val)) await updateLingYun(val);
+      }
+      if (action && action.startsWith('karma_minus_')) {
+        const val = parseInt(action.replace('karma_minus_', '').replace('-', ''), 10);
+        if (!isNaN(val)) await updateZhuoNian(val);
+      }
 
       // 成就解锁映射
       const unlockMap = {
@@ -934,13 +947,13 @@
       setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
     };
 
-    // ===== 重置 =====
+    // ===== 重置（不再重置灵韵/浊念） =====
     async function resetGame(fullReset) {
       document.getElementById('startOverlay').style.display = 'none';
       if (fullReset) {
         gameState.achievements = { ...window.ACHIEVEMENTS_INIT };
         await StorageBridge.removeItem('huangdaxian_achievements');
-        // 重置时不修改灵韵/浊念，只重新加载
+        // 灵韵/浊念 不重置，从存储重新加载（保持原值）
         await loadKarma();
         gameState.playerDifficulty = 'normal';
         await StorageBridge.removeItem('huangdaxian_difficulty');
@@ -1167,10 +1180,10 @@
     }
 
     async function clearAllProgress() {
-      customConfirm('确认清除进度', '将清除所有已解锁的成就和游戏进度，此操作不可恢复。', async () => {
+      customConfirm('确认清除进度', '将清除所有已解锁的成就和游戏进度，灵韵/浊念保持不变。', async () => {
         gameState.achievements = { ...window.ACHIEVEMENTS_INIT };
         await StorageBridge.removeItem('huangdaxian_achievements');
-        // 清除时不修改灵韵/浊念
+        // 不重置灵韵/浊念存储
         gameState.playerDifficulty = 'normal';
         await StorageBridge.removeItem('huangdaxian_difficulty');
         updateKarmaUI();
@@ -1266,7 +1279,6 @@
 
     // ===== 初始化 =====
     function initControls() {
-      // 版本按钮
       document.getElementById('versionBtn').addEventListener('click', () => {
         document.getElementById('changelogPopup').classList.toggle('show');
       });
@@ -1277,7 +1289,6 @@
         }
       });
 
-      // 设置
       document.getElementById('settingsBtn').addEventListener('click', (e) => {
         e.stopPropagation();
         openSettings();
@@ -1289,7 +1300,6 @@
         if (e.target.id === 'settingsOverlay') closeSettings();
       });
 
-      // 确认对话框
       document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
       document.getElementById('confirmOkBtn').addEventListener('click', () => {
         const cb = _confirmCallback;
@@ -1300,7 +1310,6 @@
         if (e.target.id === 'confirmOverlay') closeConfirm();
       });
 
-      // 键盘
       document.addEventListener('keydown', handleRemoteKey);
       document.addEventListener('click', (e) => {
         const target = e.target.closest('.focusable');
@@ -1313,7 +1322,6 @@
 
     // ===== 启动 =====
     window.onload = async function() {
-      // 等待 story.js 加载完成
       if (!window.SCENES) {
         console.warn('剧情数据未加载，请确保 story.js 已引入');
         return;
@@ -1334,11 +1342,9 @@
       setupScrollAssist();
     };
 
-    // 暴露重置函数
     window.resetGame = resetGame;
   </script>
 
-  <!-- ===== 粒子背景（纯视觉） ===== -->
   <script>
     (function() {
       const canvas = document.getElementById('particleCanvas');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>仙府升维中...</title>
+    <title>仙府升维</title>
     <meta name="theme-color" content="#000000">
     <style>
         :root {
@@ -20,84 +20,68 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            background-image: radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%);
+            font-family: "SimSun", "Songti SC", serif;
         }
-        /* 极简加载动画，用户只看到一闪而过的金圈，以为是加载1.2.0 */
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #4a2c17;
-            border-top-color: var(--golden);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .container { text-align: center; padding: 20px; }
+        .icon { font-size: 48px; color: var(--golden); margin-bottom: 20px; }
+        h1 { color: #fff; font-size: 26px; letter-spacing: 4px; margin-bottom: 10px; }
+        .divider { width: 80px; height: 1px; background: var(--bronze); margin: 0 auto 30px; }
+        .hint { color: #888; font-size: 15px; line-height: 1.8; margin-bottom: 40px; max-width: 300px; }
+        /* 和关于页隐私按钮一模一样的样式，webapp认这个脸 */
+        .enter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #888;
+            text-decoration: none;
+            font-size: 17px;
+            letter-spacing: 2px;
+            padding: 16px 36px;
+            border: 1px solid #333;
+            border-radius: 3px;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.3s ease;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        /* 手动按钮完全隐藏，兜底用，用户看不到 */
-        .fallback-btn { display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); padding:12px 28px; background:#222; color:#888; border:none; border-radius:3px; font-family:"SimSun"; letter-spacing:2px; }
+        .enter-btn .btn-icon { font-size: 20px; color: var(--bronze); transition: all 0.3s ease; }
+        .enter-btn:hover { color: var(--golden); border-color: var(--bronze); background: rgba(139, 115, 85, 0.08); }
+        .enter-btn:hover .btn-icon { color: var(--golden); transform: translateX(3px); }
     </style>
 </head>
 <body>
-    <div class="loader"></div>
-    <button class="fallback-btn" id="fallbackBtn">跳转失败？点击手动进入</button>
+    <div class="container">
+        <div class="icon">✦</div>
+        <h1>仙府升维</h1>
+        <div class="divider"></div>
+        <p class="hint">
+            仙府已迭代至1.2.0版本<br>
+            点击下方传送阵进入新境<br>
+            <small>（真人点击后自动隐藏旧导航栏）</small>
+        </p>
+        <button class="enter-btn" id="enterBtn">
+            <span class="btn-icon">➤</span>
+            <span>进入新仙府</span>
+        </button>
+    </div>
 
 <script>
-    // 🔒 清之前的死锁，避免无限加载
+    // 清死锁
     if (location.search.includes('clear=1')) {
-        sessionStorage.removeItem('hx_auto_jumped');
+        sessionStorage.removeItem('hx_entered');
     }
-    // 防重复跳转锁
-    if (sessionStorage.getItem('hx_auto_jumped')) return;
-    sessionStorage.setItem('hx_auto_jumped', '1');
 
-    // 🔴 核心：等WebView完全睡醒（所有资源加载完、JSBridge就绪）再下指令
-    window.addEventListener('load', function() {
-        // 第一步：先给webapp发“收导航栏”的指令（和手动点击时调用的方法完全一致）
+    document.getElementById('enterBtn').addEventListener('click', function() {
+        // 点击时才调用webapp指令，这时候JSBridge肯定就绪了
         try {
             webapp.关闭跳转打开(false);
             webapp.设置下拉刷新(false);
             webapp.清空浏览记录();
-            console.log('webapp指令发送成功，等待响应...');
-        } catch(e) {
-            console.error('webapp指令发送失败：', e);
-        }
+        } catch(e) {}
 
-        // 第二步：等0.5秒，给webapp足够时间收完导航栏（比手动点击的300ms多200ms，更稳妥）
+        // 给webapp 300ms收导航栏，然后直接跳
         setTimeout(() => {
-            const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
-            try {
-                // 优先在外层WebView跳转，确保全屏
-                if (self !== top) {
-                    top.location.replace(v120_url);
-                } else {
-                    window.location.replace(v120_url);
-                }
-                console.log('自动跳转1.2.0成功！');
-            } catch(e) {
-                // 极端情况兜底：跳转失败才显示手动按钮
-                document.querySelector('.loader').style.display = 'none';
-                document.getElementById('fallbackBtn').style.display = 'block';
-                console.error('自动跳转失败：', e);
-            }
-        }, 500); // 500ms足够webapp反应，不会卡，也不会跳太快导致导航栏露出来
-    });
-
-    // 🔴 兜底：3秒没跳走就显示手动按钮，绝对不无限加载
-    setTimeout(() => {
-        if (!sessionStorage.getItem('hx_jump_success')) {
-            document.querySelector('.loader').style.display = 'none';
-            document.getElementById('fallbackBtn').style.display = 'block';
-        }
-    }, 3000);
-
-    // 手动兜底按钮逻辑
-    document.getElementById('fallbackBtn').addEventListener('click', function() {
-        const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
-        if (self !== top) {
-            top.location.replace(v120_url);
-        } else {
-            window.location.replace(v120_url);
-        }
+            window.location.replace('https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now());
+        }, 300);
     });
 </script>
 </body>

@@ -1,15 +1,11 @@
-
 // ================================================================
 //  📜 story.js — 独立剧情数据，修改此处不影响界面
 //  使用方法：在 index.html 中用 <script src="story.js"></script> 引入
 //
-//  v2.0 新增：
-//    · 环境因素系统（weather / timeOfDay / day / moonPhase）
-//    · 天数/时间因素（七日轮回，昼夜交替）
-//    · 新剧情线：雾中樵夫、鬼魂苏芜、山神庙、古井镜、
-//      山顶棋局、满月试炼、老宅真相、七日终章、
-//      雪夜樵夫、旱灾祈雨、迷雾鬼市、月下狐会
-//    · 原剧情文案一字未改
+//  v2.0.1 修复：
+//    · 补全成就初始化和映射
+//    · 修复缺失的成就触发点
+//    · 新增“空相无相”剧情线
 // ================================================================
 
 // ================================================================
@@ -68,7 +64,6 @@ window.ENV_EFFECTS = {
 // ================================================================
 
 window.SCENES = {
-
 
   // ========== 起始 ==========
   'start': {
@@ -1186,7 +1181,6 @@ window.SCENES = {
   //  以下为全新剧情，原剧情文案未作任何改动
   // ================================================================
 
-  
   // ========== 新剧情：七日轮回入口 ==========
   'seven_days_intro': {
     texts: [
@@ -1205,7 +1199,6 @@ window.SCENES = {
 
   // ================================================================
   //  第一日：雾隐灵山 —— 初见机缘
-  //  随机文案池 20 条，善恶值影响 NPC 态度
   // ================================================================
   'day1_start': {
     texts: [
@@ -2244,7 +2237,8 @@ window.SCENES = {
     env: { weather: 'clear', timeOfDay: 'morning', day: 7, moonPhase: 'last_q' },
     choices: [
       { text: '重新开始', nextScene: 'start', action: 'unlock_true' },
-      { text: '回到上一个选择点', nextScene: 'checkpoint' }
+      { text: '回到上一个选择点', nextScene: 'checkpoint' },
+      { text: '在云海中入定，感受天地', nextScene: 'empty_face_trigger' }
     ]
   },
 
@@ -2328,8 +2322,24 @@ window.SCENES = {
     ],
     env: { weather: 'clear', timeOfDay: 'night', day: 5, moonPhase: 'full_moon' },
     choices: [
-      { text: '和她一起在月下奔跑', nextScene: 'day5_fullmoon_intro', action: 'lingyun_15' },
+      { text: '和她一起在月下奔跑', nextScene: 'day5_fullmoon_intro', action: 'lingyun_15, unlock_moon_fox' },
       { text: '道别，去参加满月试炼', nextScene: 'day5_fullmoon_intro' }
+    ]
+  },
+
+  // ========== 新增：空相无相触发场景 ==========
+  'empty_face_trigger': {
+    texts: [
+      { type: 'narrator', content: '你站在山巅，望向远方。云海翻涌，天地辽阔。' },
+      { type: 'narrator', content: '你忽然笑了。五百年的执念，像这云一样散了。' },
+      { type: 'speaker', content: '山风拂过，一个声音轻轻响起："你看自己像什么？"' },
+      { type: 'narrator', content: '你摇头，不再回答。因为你已经不需要任何答案。' },
+      { type: 'narrator', content: '无相即万相，空相即本相。你踏云而去，消失在晨光里。' },
+      { type: 'system', content: '成就：空相无相' }
+    ],
+    env: { weather: 'clear', timeOfDay: 'dawn', day: 7, moonPhase: 'new_moon' },
+    choices: [
+      { text: '重新开始', nextScene: 'start', action: 'unlock_empty_face' }
     ]
   }
 
@@ -2488,7 +2498,8 @@ window.CULTIVATION_MAP = {
   moon_fox_teach: '五百六十年',
   moon_fox_transform: '六百年（金毛本相）',
   moon_fox_run: '六百年',
-  moon_fox_ending: '六百年'
+  moon_fox_ending: '六百年',
+  empty_face_trigger: '∞'
 };
 
 // ================================================================
@@ -2616,4 +2627,4 @@ window.ACHIEVEMENT_ICONS = [
   { id: 'chess_sage', title: '棋道天成', icon: '♟' }
 ];
 
-console.log('✅ story.js v2.0 加载完成，共 ' + Object.keys(window.SCENES).length + ' 个场景，含环境/时间系统');
+console.log('✅ story.js v2.0.1 加载完成，共 ' + Object.keys(window.SCENES).length + ' 个场景，成就系统已修复');

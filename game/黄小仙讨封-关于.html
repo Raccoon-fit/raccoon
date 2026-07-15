@@ -15,62 +15,42 @@
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color); color: var(--text-color);
             font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
-            line-height: 1.8;
-            min-height: 100vh;
-            width: 100vw;
-            padding: 30px 20px;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            background-image:
-                radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 60%);
+            line-height: 1.8; min-height: 100vh; width: 100vw;
+            padding: 30px 20px; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 50% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 60%);
         }
         .page-header { text-align:center; margin-bottom:40px; }
         .page-header .icon { font-size:40px; color:var(--golden); margin-bottom:12px; animation: goldenPulse 3s ease-in-out infinite; }
         @keyframes goldenPulse { 0%,100%{opacity:0.65;}50%{opacity:1;} }
         .page-header h1 { color:var(--highlight-color); font-size:26px; font-weight:300; letter-spacing:4px; margin-bottom:6px; text-shadow:0 0 3px rgba(255,255,255,0.15); }
         .page-header .divider { width:80px; height:1px; background:linear-gradient(to right,transparent,var(--bronze),transparent); margin:0 auto; }
-        
         .content-box {
-            max-width: 680px;
-            margin: 0 auto 40px;
-            padding: 25px;
-            border: 1px solid #1a1a1a;
-            border-radius: 4px;
-            background: rgba(10, 10, 10, 0.7);
+            max-width: 680px; margin: 0 auto 40px; padding: 25px;
+            border: 1px solid #1a1a1a; border-radius: 4px; background: rgba(10, 10, 10, 0.7);
         }
         .content-box h2 { color:var(--golden); font-size:20px; margin-bottom:15px; letter-spacing:2px; }
         .content-box p { margin-bottom:12px; font-size:15px; color:#aaa; }
         .content-box .highlight { color:var(--golden); font-weight:bold; }
-        .content-box .version-tag { color:#666; font-size:13px; font-style:italic; margin-top:10px; }
-        
         .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #888;
-            text-decoration: none;
-            font-size: 17px;
-            letter-spacing: 2px;
-            padding: 16px 36px;
-            border: 1px solid #333;
-            border-radius: 3px;
-            cursor: pointer;
-            background: transparent;
-            transition: all 0.3s ease;
-            margin: 20px auto 0;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            color: #888; text-decoration: none; font-size: 17px; letter-spacing: 2px;
+            padding: 16px 36px; border: 1px solid #333; border-radius: 3px; cursor: pointer;
+            background: transparent; transition: all 0.3s ease; margin: 20px auto 0;
         }
         .action-btn .btn-icon { font-size: 20px; color: var(--bronze); transition: all 0.3s ease; }
         .action-btn:hover { color: var(--golden); border-color: var(--bronze); background: rgba(139, 115, 85, 0.08); }
         .action-btn:hover .btn-icon { color: var(--golden); transform: translateX(3px); }
-        
         .footer-hint { text-align:center; font-size:12px; color:#444; margin-top:40px; letter-spacing:1px; }
     </style>
 </head>
+<!-- 🔴 唯一一次webapp指令，和升维公告完全一致 -->
+<script>
+    webapp.关闭跳转打开(false);
+    webapp.设置下拉刷新(false);
+    webapp.清空浏览记录();
+</script>
 <body>
     <div class="page-header">
         <span class="icon">✦</span>
@@ -102,27 +82,18 @@
     <p class="footer-hint">仙府出品 · 盗版必究</p>
 
 <script>
-    // 清死锁（如果跳转卡了，在地址后加?clear=1刷新即可）
+    // 🔴 清死锁
     if (location.search.includes('clear=1')) {
         sessionStorage.removeItem('hx_about_jumped');
     }
-    // 防重复点击
     if (sessionStorage.getItem('hx_about_jumped')) return;
     sessionStorage.setItem('hx_about_jumped', '1');
 
+    // 🔴 点击事件里完全没有webapp指令！只负责跳转！
     document.getElementById('backBtn').addEventListener('click', function() {
-        // 触发webapp隐藏导航栏（和隐私页逻辑完全一致）
-        try {
-            webapp.关闭跳转打开(false);
-            webapp.设置下拉刷新(false);
-            webapp.清空浏览记录();
-        } catch(e) {}
-
-        // 300ms后跳转，给webapp足够反应时间
         setTimeout(() => {
-            // 👇 这里换成你的1.2.0首页地址！！！
             const targetUrl = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html';
-            window.location.replace(targetUrl + '?t=' + Date.now()); // 加时间戳防缓存
+            window.location.replace(targetUrl + '?t=' + Date.now());
         }, 300);
     });
 </script>

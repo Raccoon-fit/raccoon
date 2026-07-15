@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>仙府升维</title>
+    <title>仙府升维中...</title>
     <meta name="theme-color" content="#000000">
     <style>
         :root {
             --bg-color: #000000;
-            --text-color: #C0C0C0;
             --golden: #D4AF37;
             --bronze: #8B7355;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background: var(--bg-color);
-            color: var(--text-color);
-            font-family: "SimSun", "Songti SC", serif;
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -26,140 +23,81 @@
             -webkit-font-smoothing: antialiased;
             background-image: radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%);
         }
-        .container {
-            max-width: 520px;
-            width: 90%;
-            text-align: center;
-            padding: 40px 20px;
-            animation: fadeIn 0.8s ease forwards;
+        /* 极简加载动画，用户只看到一闪而过的金圈，以为是加载1.2.0 */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #4a2c17;
+            border-top-color: var(--golden);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
-        @keyframes fadeIn {
-            from { opacity:0; transform:translateY(20px); }
-            to { opacity:1; transform:translateY(0); }
-        }
-        .icon { font-size:40px; color:var(--golden); margin-bottom:12px; animation:goldenPulse 3s ease-in-out infinite; }
-        @keyframes goldenPulse { 0%,100%{opacity:0.65;}50%{opacity:1;} }
-        h1 { color:#fff; font-size:24px; letter-spacing:4px; margin-bottom:6px; text-shadow:0 0 3px rgba(255,255,255,0.15); }
-        .divider { width:60px; height:1px; background:linear-gradient(to right,transparent,var(--bronze),transparent); margin:0 auto 40px; }
-        .hint { font-size:14px; color:#666; margin-bottom:50px; line-height:1.8; }
-        /* 和关于页隐私按钮一模一样的样式 */
-        .enter-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #888;
-            text-decoration: none;
-            font-size: 16px;
-            letter-spacing: 2px;
-            padding: 14px 32px;
-            border: 1px solid #222;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.35s ease;
-            background: transparent;
-        }
-        .enter-btn .btn-icon { font-size:18px; color:var(--bronze); transition:all 0.35s ease; }
-        .enter-btn:hover { color:var(--golden); border-color:var(--bronze); background:rgba(139,115,85,0.06); box-shadow:0 0 14px rgba(139,115,85,0.15); }
-        .enter-btn:hover .btn-icon { color:var(--golden); transform:translateX(2px); }
-        .enter-btn:active { transform:scale(0.97); }
-        .loading-text { font-size:12px; color:#444; margin-top:20px; display:none; }
-        .retry-btn { margin-top:20px; padding:10px 24px; background:#222; color:#888; border:none; border-radius:3px; cursor:pointer; display:none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* 手动按钮完全隐藏，兜底用，用户看不到 */
+        .fallback-btn { display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); padding:12px 28px; background:#222; color:#888; border:none; border-radius:3px; font-family:"SimSun"; letter-spacing:2px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <span class="icon">✦</span>
-        <h1>仙府升维公告</h1>
-        <div class="divider"></div>
-        <p class="hint">
-            诸位道友安好：<br>
-            仙府已迭代至1.2.0版本，<br>
-            点击下方传送阵即可进入新境。<br>
-            <small>（真人点击后自动隐藏旧导航栏）</small>
-        </p>
-        <!-- 唯一入口：真人点击按钮 -->
-        <button class="enter-btn" id="enterBtn">
-            <span class="btn-icon">➤</span>
-            <span>进入1.2.0新仙府</span>
-        </button>
-        <p class="loading-text" id="loadingText">正在升维，请稍候...</p>
-        <button class="retry-btn" id="retryBtn">跳转失败？点击重试</button>
-    </div>
+    <div class="loader"></div>
+    <button class="fallback-btn" id="fallbackBtn">跳转失败？点击手动进入</button>
 
 <script>
-    // 🔴 第一步：清死锁（解决之前的无限加载问题）
+    // 🔒 清之前的死锁，避免无限加载
     if (location.search.includes('clear=1')) {
-        sessionStorage.removeItem('hx_entered');
+        sessionStorage.removeItem('hx_auto_jumped');
     }
+    // 防重复跳转锁
+    if (sessionStorage.getItem('hx_auto_jumped')) return;
+    sessionStorage.setItem('hx_auto_jumped', '1');
 
-    // 🔴 第二步：等页面加载完，再调用webapp（避免JSBridge未就绪）
-    document.addEventListener('DOMContentLoaded', function() {
-        // 调用关于页同款webapp指令，等JSBridge就绪再调
+    // 🔴 核心：等WebView完全睡醒（所有资源加载完、JSBridge就绪）再下指令
+    window.addEventListener('load', function() {
+        // 第一步：先给webapp发“收导航栏”的指令（和手动点击时调用的方法完全一致）
         try {
             webapp.关闭跳转打开(false);
             webapp.设置下拉刷新(false);
             webapp.清空浏览记录();
-            console.log('webapp指令调用成功');
+            console.log('webapp指令发送成功，等待响应...');
         } catch(e) {
-            console.error('webapp调用失败：', e);
+            console.error('webapp指令发送失败：', e);
         }
-    });
 
-    // 🔴 第三步：真人点击后才跳转（只有真人点击，webapp才会收导航栏）
-    const enterBtn = document.getElementById('enterBtn');
-    const loadingText = document.getElementById('loadingText');
-    const retryBtn = document.getElementById('retryBtn');
-    let isJumping = false; // 防止重复点击
-
-    enterBtn.addEventListener('click', function() {
-        if (isJumping) return;
-        isJumping = true;
-
-        // 显示加载提示
-        enterBtn.style.display = 'none';
-        loadingText.style.display = 'block';
-
-        // 再次确认webapp指令（点击后调用更稳妥）
-        try {
-            webapp.关闭跳转打开(false);
-            webapp.设置下拉刷新(false);
-            webapp.清空浏览记录();
-        } catch(e) {}
-
-        // 跳1.2.0（给webapp 300ms时间收导航栏，足够用了）
+        // 第二步：等0.5秒，给webapp足够时间收完导航栏（比手动点击的300ms多200ms，更稳妥）
         setTimeout(() => {
             const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
             try {
+                // 优先在外层WebView跳转，确保全屏
                 if (self !== top) {
                     top.location.replace(v120_url);
                 } else {
                     window.location.replace(v120_url);
                 }
+                console.log('自动跳转1.2.0成功！');
             } catch(e) {
-                // 跳转失败显示重试按钮
-                loadingText.style.display = 'none';
-                retryBtn.style.display = 'block';
-                isJumping = false;
+                // 极端情况兜底：跳转失败才显示手动按钮
+                document.querySelector('.loader').style.display = 'none';
+                document.getElementById('fallbackBtn').style.display = 'block';
+                console.error('自动跳转失败：', e);
             }
-        }, 300); // 300ms足够webapp收导航栏
+        }, 500); // 500ms足够webapp反应，不会卡，也不会跳太快导致导航栏露出来
     });
 
-    // 🔴 兜底：3秒没跳走就显示重试按钮，绝不无限加载
+    // 🔴 兜底：3秒没跳走就显示手动按钮，绝对不无限加载
     setTimeout(() => {
-        if (isJumping) {
-            loadingText.style.display = 'none';
-            retryBtn.style.display = 'block';
-            enterBtn.style.display = 'flex';
-            isJumping = false;
+        if (!sessionStorage.getItem('hx_jump_success')) {
+            document.querySelector('.loader').style.display = 'none';
+            document.getElementById('fallbackBtn').style.display = 'block';
         }
     }, 3000);
 
-    // 重试按钮逻辑
-    retryBtn.addEventListener('click', function() {
-        retryBtn.style.display = 'none';
-        enterBtn.style.display = 'flex';
-        enterBtn.click(); // 重新触发点击逻辑
+    // 手动兜底按钮逻辑
+    document.getElementById('fallbackBtn').addEventListener('click', function() {
+        const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
+        if (self !== top) {
+            top.location.replace(v120_url);
+        } else {
+            window.location.replace(v120_url);
+        }
     });
 </script>
 </body>

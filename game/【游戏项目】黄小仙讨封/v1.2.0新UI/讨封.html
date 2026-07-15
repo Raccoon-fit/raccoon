@@ -154,6 +154,7 @@
     <div class="changelog-popup" id="changelogPopup">
         <h4>📜 更新日志</h4>
         <ul>
+            <li><b>v2.0.1</b> — 修复成就映射，补全 missing 成就触发</li>
             <li><b>v2.0.0</b> — 剧情与界面完全分离，修改文案不再影响UI</li>
             <li><b>v1.6.1</b> — 修复存储桥，成就系统稳定</li>
             <li><b>v1.6.0</b> — 新增剑客、精怪、老宅等剧情线</li>
@@ -182,7 +183,7 @@
         <div class="story-container" id="story-container"></div>
         <div class="choices-container" id="choices-container"></div>
         <div class="footer">
-            <div><button class="version-btn" id="versionBtn">v2.0.0</button></div>
+            <div><button class="version-btn" id="versionBtn">v2.0.1</button></div>
             <div><a href="https://raccoon.fit/" target="_blank" style="color:#5D4037;text-decoration:none;">2026 软软的小窝</a></div>
         </div>
     </div>
@@ -466,7 +467,35 @@
             if (action && action.startsWith('zhuonian_')) { const v = parseInt(action.replace('zhuonian_',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
             if (action && action.startsWith('karma_plus_')) { const v = parseInt(action.replace('karma_plus_',''),10); if (!isNaN(v)) await updateLingYun(v); }
             if (action && action.startsWith('karma_minus_')) { const v = parseInt(action.replace('karma_minus_','').replace('-',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
-            const unlockMap = { 'unlock_god':'god','unlock_fail_scholar':'fail_scholar','unlock_fail_kid':'fail_kid','unlock_farmer':'farmer','unlock_star':'star','unlock_mortal':'mortal','unlock_demon_king':'demon_king','unlock_sacrifice':'sacrifice','unlock_mad':'mad','unlock_love':'love','unlock_guardian':'guardian','unlock_lost':'lost','unlock_severed':'severed','unlock_dawn':'dawn','unlock_witness':'witness','unlock_suspicious':'suspicious','unlock_sword_friend':'sword_friend','unlock_sword_master':'sword_master','unlock_green_fate':'green_memory','unlock_ghost_friend':'ghost_friend','unlock_seven_days':'seven_days','unlock_moon_fox':'moon_fox','unlock_drought_hero':'drought_hero','unlock_well_insight':'well_insight','unlock_chess_sage':'chess_sage','unlock_empty_face':'empty_face' };
+            const unlockMap = {
+                'unlock_god':'god',
+                'unlock_fail_scholar':'fail_scholar',
+                'unlock_fail_kid':'fail_kid',
+                'unlock_farmer':'farmer',
+                'unlock_star':'star',
+                'unlock_mortal':'mortal',
+                'unlock_demon_king':'demon_king',
+                'unlock_sacrifice':'sacrifice',
+                'unlock_mad':'mad',
+                'unlock_love':'love',
+                'unlock_guardian':'guardian',
+                'unlock_lost':'lost',
+                'unlock_severed':'severed',
+                'unlock_dawn':'dawn',
+                'unlock_witness':'witness',
+                'unlock_suspicious':'suspicious',
+                'unlock_sword_friend':'sword_friend',
+                'unlock_sword_master':'sword_master',
+                'unlock_green_fate':'green_memory',
+                'unlock_ghost_friend':'ghost_friend',
+                'unlock_seven_days':'seven_days',
+                'unlock_moon_fox':'moon_fox',
+                'unlock_drought_hero':'drought_hero',
+                'unlock_well_insight':'well_insight',
+                'unlock_chess_sage':'chess_sage',
+                'unlock_empty_face':'empty_face',
+                'unlock_true': 'true'
+            };
             if (action && unlockMap[action]) await unlockAchievement(unlockMap[action]);
             if (action === 'reset' || action === 'reset_suspicious') { if (action==='reset_suspicious') await unlockAchievement('suspicious'); resetGame(false); return; }
             if (gameState.currentScene && nextScene && gameState.currentScene!==nextScene) { gameState.sceneHistory.push(gameState.currentScene); if (gameState.sceneHistory.length>50) gameState.sceneHistory.shift(); }

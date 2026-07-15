@@ -26,83 +26,55 @@
             -webkit-font-smoothing: antialiased;
             background-image: radial-gradient(ellipse at 50% 30%, rgba(139, 115, 85, 0.06) 0%, transparent 60%);
         }
-        .container {
-            max-width: 520px;
-            width: 90%;
-            text-align: center;
-            padding: 40px 20px;
-            animation: fadeIn 0.8s ease forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity:0; transform:translateY(20px); }
-            to { opacity:1; transform:translateY(0); }
-        }
+        .container { max-width: 520px; width: 90%; text-align: center; padding: 40px 20px; animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
         .icon { font-size:40px; color:var(--golden); margin-bottom:12px; animation:goldenPulse 3s ease-in-out infinite; }
         @keyframes goldenPulse { 0%,100%{opacity:0.65;}50%{opacity:1;} }
         h1 { color:#fff; font-size:24px; letter-spacing:4px; margin-bottom:6px; text-shadow:0 0 3px rgba(255,255,255,0.15); }
         .divider { width:60px; height:1px; background:linear-gradient(to right,transparent,var(--bronze),transparent); margin:0 auto 40px; }
         .hint { font-size:14px; color:#666; margin-bottom:50px; line-height:1.8; }
         .enter-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #888;
-            text-decoration: none;
-            font-size: 16px;
-            letter-spacing: 2px;
-            padding: 14px 32px;
-            border: 1px solid #222;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.35s ease;
-            background: transparent;
+            display: inline-flex; align-items: center; gap: 8px; color: #888; text-decoration: none;
+            font-size: 16px; letter-spacing: 2px; padding: 14px 32px; border: 1px solid #222;
+            border-radius: 3px; cursor: pointer; font-family: inherit; transition: all 0.35s ease; background: transparent;
         }
         .enter-btn .btn-icon { font-size:18px; color:var(--bronze); transition:all 0.35s ease; }
         .enter-btn:hover { color:var(--golden); border-color:var(--bronze); background:rgba(139,115,85,0.06); box-shadow:0 0 14px rgba(139,115,85,0.15); }
         .enter-btn:hover .btn-icon { color:var(--golden); transform:translateX(2px); }
-        .enter-btn:active { transform:scale(0.97); }
         .loading-text { font-size:12px; color:#444; margin-top:20px; display:none; }
         .retry-btn { margin-top:20px; padding:10px 24px; background:#222; color:#888; border:none; border-radius:3px; cursor:pointer; display:none; }
     </style>
 </head>
-<body>
-<!-- 🔴 核心：和关于页一模一样的webapp三连指令（位置完全一致） -->
+<!-- 🔴 唯一一次webapp指令，裸写在这里，和原生效关于页完全一致 -->
 <script>
     webapp.关闭跳转打开(false);
-    // 关闭请求打开第三方APP用true打开
     webapp.设置下拉刷新(false);
-    // 关闭下拉刷新true打开
     webapp.清空浏览记录();
-    // 清空浏览历史访问记录
-    // 清空后返回键不回到上一页
 </script>
-
-<div class="container">
-    <span class="icon">✦</span>
-    <h1>仙府升维公告</h1>
-    <div class="divider"></div>
-    <p class="hint">
-        诸位道友安好：<br>
-        仙府已迭代至1.2.0版本，<br>
-        点击下方传送阵即可进入新境。<br>
-        <small>（真人点击后自动隐藏旧导航栏）</small>
-    </p>
-    <button class="enter-btn" id="enterBtn">
-        <span class="btn-icon">➤</span>
-        <span>进入1.2.0新仙府</span>
-    </button>
-    <p class="loading-text" id="loadingText">正在升维，请稍候...</p>
-    <button class="retry-btn" id="retryBtn">跳转失败？点击重试</button>
-</div>
+<body>
+    <div class="container">
+        <span class="icon">✦</span>
+        <h1>仙府升维公告</h1>
+        <div class="divider"></div>
+        <p class="hint">
+            诸位道友安好：<br>
+            仙府已迭代至1.2.0版本，<br>
+            点击下方传送阵即可进入新境。<br>
+            <small>（真人点击后自动隐藏旧导航栏）</small>
+        </p>
+        <button class="enter-btn" id="enterBtn">
+            <span class="btn-icon">➤</span>
+            <span>进入1.2.0新仙府</span>
+        </button>
+        <p class="loading-text" id="loadingText">正在升维，请稍候...</p>
+        <button class="retry-btn" id="retryBtn">跳转失败？点击重试</button>
+    </div>
 
 <script>
-    // 🔴 清死锁（解决之前的无限加载问题）
+    // 🔴 清死锁（只清跳转锁，不碰webapp指令）
     if (location.search.includes('clear=1')) {
         sessionStorage.removeItem('hx_entered');
     }
-
-    // 🔴 防重复点击锁
     let isJumping = false;
     const enterBtn = document.getElementById('enterBtn');
     const loadingText = document.getElementById('loadingText');
@@ -111,47 +83,24 @@
     enterBtn.addEventListener('click', function() {
         if (isJumping) return;
         isJumping = true;
-
-        // 显示加载提示
         enterBtn.style.display = 'none';
         loadingText.style.display = 'block';
 
-        // 🔴 点击时再次确认webapp指令（和关于页隐私链接的触发逻辑一致）
-        try {
-            webapp.关闭跳转打开(false);
-            webapp.设置下拉刷新(false);
-            webapp.清空浏览记录();
-        } catch(e) {}
-
-        // 🔴 300ms延迟跳转（给webapp足够时间隐藏导航栏）
+        // 🔴 点击事件里完全没有webapp指令！只负责跳转！
         setTimeout(() => {
             const v120_url = 'https://raccoon.fit/game/%E3%80%90%E6%B8%B8%E6%88%8F%E9%A1%B9%E7%9B%AE%E3%80%91%E9%BB%84%E5%B0%8F%E4%BB%99%E8%AE%A8%E5%B0%81/%E5%81%A5%E5%BA%B7%E6%B8%B8%E6%88%8F%E5%BF%A0%E5%91%8A/index.html?t=' + Date.now();
             try {
-                if (self !== top) {
-                    top.location.replace(v120_url);
-                } else {
-                    window.location.replace(v120_url);
-                }
+                if (self !== top) { top.location.replace(v120_url); }
+                else { window.location.replace(v120_url); }
             } catch(e) {
-                // 跳转失败显示重试按钮
                 loadingText.style.display = 'none';
                 retryBtn.style.display = 'block';
                 isJumping = false;
             }
         }, 300);
-
-        // 🔴 兜底：3秒没跳走就显示重试按钮，绝不无限加载
-        setTimeout(() => {
-            if (isJumping) {
-                loadingText.style.display = 'none';
-                retryBtn.style.display = 'block';
-                enterBtn.style.display = 'flex';
-                isJumping = false;
-            }
-        }, 3000);
     });
 
-    // 重试按钮逻辑
+    // 兜底重试
     retryBtn.addEventListener('click', function() {
         retryBtn.style.display = 'none';
         enterBtn.style.display = 'flex';

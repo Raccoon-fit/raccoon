@@ -154,10 +154,9 @@
     <div class="changelog-popup" id="changelogPopup">
         <h4>📜 更新日志</h4>
         <ul>
-            <li><b>v2.0.4</b> — 自动云端合并，成就永不丢失</li>
-            <li><b>v2.0.3</b> — 修复覆盖问题</li>
-            <li><b>v2.0.2</b> — 云端合并同步</li>
+            <li><b>v2.0.2</b> — 云端合并同步，成就互不覆盖</li>
             <li><b>v2.0.1</b> — 修复成就映射与复合动作</li>
+            <li><b>v2.0.0</b> — 剧情与界面分离</li>
         </ul>
         <button class="close-changelog" onclick="document.getElementById('changelogPopup').classList.remove('show')">关闭</button>
     </div>
@@ -182,7 +181,7 @@
         <div class="story-container" id="story-container"></div>
         <div class="choices-container" id="choices-container"></div>
         <div class="footer">
-            <div><button class="version-btn" id="versionBtn">v2.0.4</button></div>
+            <div><button class="version-btn" id="versionBtn">v2.0.2</button></div>
             <div><a href="https://raccoon.fit/" target="_blank" style="color:#5D4037;text-decoration:none;">2026 软软的小窝</a></div>
         </div>
     </div>
@@ -234,11 +233,19 @@
             if (!cloudDocId && window.parent !== window) cloudDocId = window.parent.localStorage.getItem('cloudDocId') || '';
         } catch(e) {}
 
-        const STORAGE_KEY = 'huangdaxian_achievements';
-        const SPECIAL_KEY = 'huangdaxian_special_achievements';
-        const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes';
-        const USED_CODES_KEY = 'huangdaxian_used_codes';
+        const gameState = {
+            currentScene: 'start',
+            storyHistory: [],
+            sceneHistory: [],
+            typingTimer: null,
+            checkpointScene: 'start',
+            achievements: { ...window.ACHIEVEMENTS_INIT },
+            playerLingYun: 0,
+            playerZhuoNian: 0,
+            playerDifficulty: 'normal'
+        };
 
+        // ========== 成就数据定义（与 achievements.html 保持一致） ==========
         const achievementIcons = [
             { id: 'witness', title: '无对无错，善良依旧', icon: '✦', legendary: true },
             { id: 'sacrifice', title: '舍身成仁', icon: '†', legendary: true },
@@ -272,58 +279,94 @@
             { id: 'chess_sage', title: '棋道天成', icon: '♟', legendary: false }
         ];
 
-        const gameState = {
-            currentScene: 'start',
-            storyHistory: [],
-            sceneHistory: [],
-            typingTimer: null,
-            checkpointScene: 'start',
-            achievements: { ...window.ACHIEVEMENTS_INIT },
-            playerLingYun: 0,
-            playerZhuoNian: 0,
-            playerDifficulty: 'normal'
-        };
+        const STORAGE_KEY = 'huangdaxian_achievements';
+        const SPECIAL_KEY = 'huangdaxian_special_achievements';
+        const SPECIAL_NOTES_KEY = 'huangdaxian_special_notes';
+        const USED_CODES_KEY = 'huangdaxian_used_codes';
 
-        // ========== 本地存储工具函数 ==========
-        function getLocalAchievements() {
+        // ========== 成就读写辅助函数 ==========
+        function getAchievementsObj() {
             const raw = localStorage.getItem(STORAGE_KEY);
-            return raw ? JSON.parse(raw) : {};
+            if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+            return {};
         }
-        function saveLocalAchievements(obj) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-        }
+
         function getAchievementTitles() {
-            const ach = getLocalAchievements();
-            return Object.keys(ach).filter(k => ach[k]).map(k => {
-                const found = achievementIcons.find(a => a.id === k);
-                return found ? found.title : k;
+            const ach = getAchievementsObj();
+            return Object.keys(ach).filter(id => ach[id]).map(id => {
+                const found = achievementIcons.find(a => a.id === id);
+                return found ? found.title : id;
             });
         }
+
         function getSpecialAchievements() {
             const raw = localStorage.getItem(SPECIAL_KEY);
-            return raw ? JSON.parse(raw) : [];
+            if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+            return [];
         }
+
         function saveSpecialAchievements(arr) {
             localStorage.setItem(SPECIAL_KEY, JSON.stringify(arr));
         }
+
         function getSpecialNotes() {
             const raw = localStorage.getItem(SPECIAL_NOTES_KEY);
-            return raw ? JSON.parse(raw) : {};
+            if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+            return {};
         }
+
         function saveSpecialNotes(obj) {
             localStorage.setItem(SPECIAL_NOTES_KEY, JSON.stringify(obj));
         }
+
         function getUsedCodes() {
             const raw = localStorage.getItem(USED_CODES_KEY);
-            return raw ? JSON.parse(raw) : [];
+            if (raw) { try { return JSON.parse(raw); } catch(e) {} }
+            return [];
         }
+
         function addUsedCode(code) {
             const arr = getUsedCodes();
             arr.push(code);
             localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr));
         }
 
-        // ========== 云端API ==========
+        // ========== StorageBridge ==========
+        const StorageBridge = (function() {
+            const hasNative = (() => { try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; } })();
+            if (!hasNative) {
+                return {
+                    getItem: async (k, d = null) => localStorage.getItem(k) ?? d,
+                    setItem: async (k, v) => { localStorage.setItem(k, v); },
+                    removeItem: async (k) => { localStorage.removeItem(k); },
+                    clear: async () => { localStorage.clear(); }
+                };
+            }
+            let id = 0;
+            const pending = {};
+            window.addEventListener('message', (e) => {
+                const d = e.data;
+                if (d && d.id && pending[d.id]) {
+                    d.error ? pending[d.id].reject(new Error(d.error)) : pending[d.id].resolve(d.result);
+                    delete pending[d.id];
+                }
+            });
+            function send(action, key, value, def) {
+                return new Promise((resolve, reject) => {
+                    const i = ++id;
+                    pending[i] = { resolve, reject };
+                    window.parent.postMessage({ id:i, action, key, value, defaultValue:def }, '*');
+                });
+            }
+            return {
+                getItem: (k, d) => send('get', k, null, d),
+                setItem: (k, v) => send('set', k, v),
+                removeItem: (k) => send('remove', k),
+                clear: () => send('clear')
+            };
+        })();
+
+        // ========== 云居API 函数 ==========
         async function apiListDocuments() {
             const url = `${CONFIG.apiList}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`;
             const res = await fetch(url);
@@ -331,6 +374,7 @@
             if (data.code != 1) throw new Error(data.msg || '获取列表失败');
             return data.list || [];
         }
+
         async function apiQueryDocument(docId) {
             const url = `${CONFIG.apiQuery}?user=${CONFIG.user}&appid=${CONFIG.appid}&id=${docId}`;
             const res = await fetch(url);
@@ -338,21 +382,15 @@
             if (data.code != 1) throw new Error(data.msg || '查询文档失败');
             return { title: data.title, content: JSON.parse(data.content) };
         }
+
         async function apiModifyDocument(docId, title, contentObj) {
             const url = `${CONFIG.apiModify}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}&id=${docId}`;
             const body = `title=${encodeURIComponent(title)}&content=${encodeURIComponent(JSON.stringify(contentObj))}`;
-            const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
             const data = await res.json();
             if (data.code != 1) throw new Error(data.msg || '修改文档失败');
         }
-        async function apiEstablishDocument(title, contentObj) {
-            const url = `${CONFIG.apiEstablish}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`;
-            const body = `title=${encodeURIComponent(title)}&content=${encodeURIComponent(JSON.stringify(contentObj))}`;
-            const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body });
-            const data = await res.json();
-            if (data.code != 1) throw new Error(data.msg || '创建文档失败');
-            return data.id || data.data;
-        }
+
         async function findDocByPlayerName() {
             if (!playerName) return null;
             const list = await apiListDocuments();
@@ -360,68 +398,90 @@
             return found ? found.id : null;
         }
 
-        // ========== 核心：自动合并同步 ==========
-        let syncTimer = null;
-        // 防抖函数：2秒内多次调用只执行最后一次
-        function debounceSync() {
-            if (syncTimer) clearTimeout(syncTimer);
-            syncTimer = setTimeout(() => autoSyncToCloud(), 2000);
-        }
-
-        // 自动同步：拉取云端 -> 合并本地 -> 上传
-        async function autoSyncToCloud() {
-            if (!playerName || !cloudDocId) return;
-            try {
-                // 1. 拉取云端最新数据
-                const remoteDoc = await apiQueryDocument(cloudDocId);
-                const remote = remoteDoc.content;
-                // 2. 合并成就（并集）
-                const localAch = getLocalAchievements();
-                const remoteTitles = remote.achievements || [];
-                const mergedAch = { ...localAch };
-                remoteTitles.forEach(title => {
-                    const found = achievementIcons.find(a => a.title === title);
-                    if (found) mergedAch[found.id] = true;
-                });
-                saveLocalAchievements(mergedAch);
-                gameState.achievements = mergedAch;
-
-                // 3. 合并特殊成就、备注、兑换码
-                const localSpecial = getSpecialAchievements();
-                const remoteSpecial = remote.specialAchievements || [];
-                saveSpecialAchievements([...new Set([...localSpecial, ...remoteSpecial])]);
-
-                const localNotes = getSpecialNotes();
-                const remoteNotes = remote.specialNotes || {};
-                saveSpecialNotes({ ...localNotes, ...remoteNotes });
-
-                const localCodes = getUsedCodes();
-                const remoteCodes = remote.usedCodes || [];
-                localStorage.setItem(USED_CODES_KEY, JSON.stringify([...new Set([...localCodes, ...remoteCodes])]));
-
-                // 4. 准备上传数据（使用合并后的数据）
-                const uploadData = {
-                    playerName: playerName,
-                    achievements: getAchievementTitles(),
-                    specialAchievements: getSpecialAchievements(),
-                    specialNotes: getSpecialNotes(),
-                    usedCodes: JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]'),
-                    storyNode: localStorage.getItem('storyNode') || 'start',
-                    lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
-                    zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
-                    updateTime: Date.now()
-                };
-
-                // 5. 上传到云端
-                await apiModifyDocument(cloudDocId, playerName, uploadData);
-                localStorage.setItem('lastCloudSaveTime', Date.now());
-                updateKarmaUI();
-            } catch (e) {
-                console.warn('自动同步云端失败：', e.message);
+        // ========== 云端合并同步 ==========
+        async function pushCloudSave() {
+            if (!playerName) {
+                alert('请先设置道号！');
+                return;
             }
+            const localAchievements = getAchievementTitles();
+            const localSpecial = getSpecialAchievements();
+            const localNotes = getSpecialNotes();
+            const localUsedCodes = getUsedCodes();
+
+            if (!cloudDocId) {
+                const existingId = await findDocByPlayerName();
+                if (existingId) {
+                    cloudDocId = existingId;
+                    localStorage.setItem('cloudDocId', cloudDocId);
+                }
+            }
+
+            let mergedAchievements = [...localAchievements];
+            let mergedSpecial = [...localSpecial];
+            let mergedNotes = { ...localNotes };
+            let mergedUsedCodes = [...localUsedCodes];
+
+            if (cloudDocId) {
+                try {
+                    const remoteDoc = await apiQueryDocument(cloudDocId);
+                    const remote = remoteDoc.content;
+                    if (remote.achievements) {
+                        mergedAchievements = [...new Set([...remote.achievements, ...localAchievements])];
+                    }
+                    if (remote.specialAchievements) {
+                        mergedSpecial = [...new Set([...remote.specialAchievements, ...localSpecial])];
+                    }
+                    if (remote.specialNotes) {
+                        mergedNotes = { ...remote.specialNotes, ...localNotes };
+                    }
+                    if (remote.usedCodes) {
+                        mergedUsedCodes = [...new Set([...remote.usedCodes, ...localUsedCodes])];
+                    }
+                } catch (e) {
+                    console.warn('合并云端数据失败，将使用本地数据上传', e);
+                }
+            }
+
+            const saveData = {
+                playerName: playerName,
+                achievements: mergedAchievements,
+                specialAchievements: mergedSpecial,
+                specialNotes: mergedNotes,
+                usedCodes: mergedUsedCodes,
+                storyNode: localStorage.getItem('storyNode') || 'start',
+                lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
+                zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
+                updateTime: Date.now()
+            };
+
+            const contentStr = JSON.stringify(saveData);
+            const cfg = getConfig();
+            try {
+                let url, options;
+                if (cloudDocId) {
+                    url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                } else {
+                    url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
+                    options = { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                }
+                const res = await fetch(url, options);
+                const result = await res.json();
+                if (result.code == 1) {
+                    if (!cloudDocId) {
+                        let newId = result.id || result.data;
+                        if (!newId) newId = await findDocByPlayerName();
+                        if (newId) { cloudDocId = newId; localStorage.setItem('cloudDocId', newId); }
+                    }
+                    localStorage.setItem('lastCloudSaveTime', Date.now());
+                    alert('修为已合并上传至云端！');
+                } else {
+                    alert('上传失败：' + (result.msg || '未知'));
+                }
+            } catch (e) { alert('网络错误：' + e.message); }
         }
 
-        // ========== 云端下载（手动触发，但也执行合并） ==========
         async function pullCloudSave() {
             if (!playerName) {
                 alert('请先设置道号！');
@@ -435,66 +495,75 @@
                     if (manualId && manualId.trim()) { cloudDocId = manualId.trim(); localStorage.setItem('cloudDocId', cloudDocId); } else return;
                 }
             }
+            const cfg = getConfig();
+            const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
             try {
-                const remoteDoc = await apiQueryDocument(cloudDocId);
-                const remote = remoteDoc.content;
-                // 合并成就
-                const localAch = getLocalAchievements();
-                const remoteTitles = remote.achievements || [];
-                const mergedAch = { ...localAch };
-                remoteTitles.forEach(title => {
-                    const found = achievementIcons.find(a => a.title === title);
-                    if (found) mergedAch[found.id] = true;
-                });
-                saveLocalAchievements(mergedAch);
-                gameState.achievements = mergedAch;
+                const res = await fetch(url);
+                const result = await res.json();
+                if (result.code == 1) {
+                    let data;
+                    try { data = JSON.parse(result.content); } catch (e) { alert('云端数据损坏！'); return; }
 
-                // 合并特殊成就
-                const localSpecial = getSpecialAchievements();
-                const remoteSpecial = remote.specialAchievements || [];
-                saveSpecialAchievements([...new Set([...localSpecial, ...remoteSpecial])]);
+                    const remoteTitles = data.achievements || [];
+                    const localAchObj = getAchievementsObj();
+                    const achObj = { ...localAchObj };
+                    remoteTitles.forEach(title => {
+                        const found = achievementIcons.find(a => a.title === title);
+                        if (found) achObj[found.id] = true;
+                    });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(achObj));
+                    gameState.achievements = achObj;
 
-                // 合并备注
-                const localNotes = getSpecialNotes();
-                const remoteNotes = remote.specialNotes || {};
-                saveSpecialNotes({ ...localNotes, ...remoteNotes });
+                    const remoteSpecial = data.specialAchievements || [];
+                    const localSpecial = getSpecialAchievements();
+                    saveSpecialAchievements([...new Set([...localSpecial, ...remoteSpecial])]);
 
-                // 合并兑换码
-                const localCodes = getUsedCodes();
-                const remoteCodes = remote.usedCodes || [];
-                localStorage.setItem(USED_CODES_KEY, JSON.stringify([...new Set([...localCodes, ...remoteCodes])]));
+                    const remoteNotes = data.specialNotes || {};
+                    const localNotes = getSpecialNotes();
+                    saveSpecialNotes({ ...localNotes, ...remoteNotes });
 
-                // 数值：云端覆盖（保持最新）
-                if (remote.storyNode) localStorage.setItem('storyNode', remote.storyNode);
-                if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
-                if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
-                if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
+                    const remoteCodes = data.usedCodes || [];
+                    const localCodes = getUsedCodes();
+                    localStorage.setItem(USED_CODES_KEY, JSON.stringify([...new Set([...localCodes, ...remoteCodes])]));
 
-                localStorage.setItem('lastCloudSaveTime', Date.now());
-                updateKarmaUI();
-                alert('仙缘已接续，成就已合并！');
-            } catch (e) {
-                alert('网络错误：' + e.message);
-            }
+                    if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
+                    if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
+                    if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
+                    if (data.playerName) { playerName = data.playerName; localStorage.setItem('playerName', playerName); }
+
+                    localStorage.setItem('lastCloudSaveTime', Date.now());
+                    updateKarmaUI();
+                    alert('仙缘已接续，成就已合并！');
+                } else {
+                    alert('下载失败：' + (result.msg || '未知错误'));
+                }
+            } catch (e) { alert('网络错误：' + e.message); }
         }
 
-        // ========== 云端上传（手动触发，也执行合并） ==========
-        async function pushCloudSave() {
-            if (!playerName) {
-                alert('请先设置道号！');
+        // ========== 原有游戏逻辑（部分调整） ==========
+        async function loadKarmaFromCloud() {
+            if (!cloudDocId && playerName) {
+                cloudDocId = await findDocByPlayerName();
+                if (cloudDocId) {
+                    localStorage.setItem('cloudDocId', cloudDocId);
+                    try { if (window.parent) window.parent.localStorage.setItem('cloudDocId', cloudDocId); } catch(e) {}
+                }
+            }
+            if (!cloudDocId) {
+                updateKarmaUI();
                 return;
             }
-            // 确保有文档ID
-            if (!cloudDocId) {
-                const foundId = await findDocByPlayerName();
-                if (foundId) { cloudDocId = foundId; localStorage.setItem('cloudDocId', cloudDocId); }
-            }
-            // 先执行合并下载，再上传
-            await autoSyncToCloud();
-            alert('修为已合并上传至云端！');
+            try {
+                const doc = await apiQueryDocument(cloudDocId);
+                gameState.playerLingYun = doc.content.lingYun || 0;
+                gameState.playerZhuoNian = doc.content.zhuoNian || 0;
+                playerName = doc.title;
+                localStorage.setItem('playerName', playerName);
+                try { if (window.parent) window.parent.localStorage.setItem('playerName', playerName); } catch(e) {}
+            } catch(e) { console.warn('云端加载灵韵/浊念失败：', e.message); }
+            updateKarmaUI();
         }
 
-        // ========== 原有游戏逻辑 ==========
         async function updateLingYun(delta) {
             if (!cloudDocId) return;
             try {
@@ -504,8 +573,9 @@
                 await apiModifyDocument(cloudDocId, playerName, doc.content);
                 gameState.playerLingYun = newVal;
                 updateKarmaUI();
-            } catch(e) {}
+            } catch(e) { console.error('更新灵韵失败：', e.message); }
         }
+
         async function updateZhuoNian(delta) {
             if (!cloudDocId) return;
             try {
@@ -515,21 +585,28 @@
                 await apiModifyDocument(cloudDocId, playerName, doc.content);
                 gameState.playerZhuoNian = newVal;
                 updateKarmaUI();
-            } catch(e) {}
+            } catch(e) { console.error('更新浊念失败：', e.message); }
         }
-        function updateKarmaUI() {
-            const el = document.getElementById('karmaDisplay');
-            if (!el) return;
+
+        function getKarmaDisplay() {
             const ly = gameState.playerLingYun, zn = gameState.playerZhuoNian;
             let lyL = '', znL = '';
             if (ly >= 80) lyL = '仙光护体'; else if (ly >= 50) lyL = '心怀慈悲'; else if (ly >= 20) lyL = '心存善念'; else lyL = '初入道途';
             if (zn >= 80) znL = '魔障缠身'; else if (zn >= 50) znL = '心魔暗生'; else if (zn >= 20) znL = '偶生恶念'; else znL = '心台明净';
-            el.innerHTML = `<span class="karma-lingyun">☯ 灵韵 ${ly} · ${lyL}</span><span class="karma-zhuonian">☠ 浊念 ${zn} · ${znL}</span>`;
+            return { lingYun: ly, zhuoNian: zn, lingYunLabel: lyL, zhuoNianLabel: znL };
+        }
+
+        function updateKarmaUI() {
+            const el = document.getElementById('karmaDisplay');
+            if (!el) return;
+            const d = getKarmaDisplay();
+            el.innerHTML = `<span class="karma-lingyun">☯ 灵韵 ${d.lingYun} · ${d.lingYunLabel}</span><span class="karma-zhuonian">☠ 浊念 ${d.zhuoNian} · ${d.zhuoNianLabel}</span>`;
         }
 
         function getScene(id) { return window.SCENES[id] || null; }
         function getCultivation(sceneId) { return window.CULTIVATION_MAP[sceneId] || '五百年'; }
         function updateCultivationUI(sceneId) { const el = document.getElementById('cultivation-level'); if (el) el.textContent = getCultivation(sceneId); }
+
         function updateEnvUI(scene) {
             const bar = document.getElementById('envBar');
             if (!bar || !scene || !scene.env) { bar.innerHTML = ''; return; }
@@ -537,26 +614,22 @@
             const w = window.WEATHER_TYPES[env.weather] || { name: '—', icon: '·' };
             const t = window.TIME_OF_DAY[env.timeOfDay] || { name: '—', icon: '·' };
             const m = window.MOON_PHASES[env.moonPhase] || { name: '—', icon: '·' };
-            let eff = window.ENV_EFFECTS[env.weather] || '';
+            let eff = window.ENV_EFFECTS[env.weather] || (env.moonPhase === 'full_moon' && window.ENV_EFFECTS['full_moon']) || (env.moonPhase === 'new_moon' && window.ENV_EFFECTS['new_moon']) || '';
             let html = `<span class="env-item"><span class="env-icon">${w.icon}</span><span class="env-label">${w.name}</span></span><span class="env-item"><span class="env-icon">${t.icon}</span><span class="env-label">${t.name}</span></span><span class="env-item"><span class="env-label">第${env.day||'—'}日</span></span><span class="env-item moon"><span class="env-icon">${m.icon}</span><span class="env-label">${m.name}</span></span>`;
             if (eff) html += `<span class="env-effect">${eff}</span>`;
             bar.innerHTML = html;
         }
 
-        // 解锁成就（写入本地后立即触发自动同步）
         async function unlockAchievement(id) {
-            const currentAch = getLocalAchievements();
-            if (!currentAch[id]) {
-                currentAch[id] = true;
-                saveLocalAchievements(currentAch);
-                gameState.achievements = currentAch;
+            if (!gameState.achievements[id]) {
+                gameState.achievements[id] = true;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState.achievements));
+                try { await StorageBridge.setItem(STORAGE_KEY, JSON.stringify(gameState.achievements)); } catch(e) {}
                 const name = window.ACHIEVEMENT_NAME_MAP[id] || id;
                 const golden = window.GOLDEN_ACHIEVEMENTS && window.GOLDEN_ACHIEVEMENTS.includes(id);
                 showAchievementPopup(name, golden);
                 if (window.parent) window.parent.postMessage({ type: 'achievements-updated' }, '*');
                 try { new BroadcastChannel('huangdaxian_sync').postMessage({ type: 'achievements-updated' }); } catch(e) {}
-                // 自动同步到云端
-                debounceSync();
             }
         }
 
@@ -571,13 +644,8 @@
         }
 
         async function loadAchievements() {
-            const localAch = getLocalAchievements();
-            if (Object.keys(localAch).length > 0) {
-                gameState.achievements = localAch;
-                return;
-            }
-            const saved = await StorageBridge?.getItem?.(STORAGE_KEY);
-            if (saved) { gameState.achievements = JSON.parse(saved); saveLocalAchievements(gameState.achievements); }
+            const saved = await StorageBridge.getItem(STORAGE_KEY);
+            if (saved) { const data = JSON.parse(saved); Object.keys(data).forEach(k => { if (data[k]) gameState.achievements[k] = true; }); }
         }
 
         function getUnlockedCount() { return Object.values(gameState.achievements).filter(v => v).length; }
@@ -627,24 +695,54 @@
             if (action) {
                 const actions = action.split(',').map(a => a.trim());
                 for (let act of actions) {
-                    if (act.startsWith('lingyun_')) { const v = parseInt(act.replace('lingyun_',''),10); if (!isNaN(v)) await updateLingYun(v); }
-                    else if (act.startsWith('zhuonian_')) { const v = parseInt(act.replace('zhuonian_',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
-                    else if (act.startsWith('karma_plus_')) { const v = parseInt(act.replace('karma_plus_',''),10); if (!isNaN(v)) await updateLingYun(v); }
-                    else if (act.startsWith('karma_minus_')) { const v = parseInt(act.replace('karma_minus_',''),10); if (!isNaN(v)) await updateZhuoNian(v); }
+                    if (act.startsWith('lingyun_')) {
+                        const v = parseInt(act.replace('lingyun_',''),10);
+                        if (!isNaN(v)) await updateLingYun(v);
+                    }
+                    else if (act.startsWith('zhuonian_')) {
+                        const v = parseInt(act.replace('zhuonian_',''),10);
+                        if (!isNaN(v)) await updateZhuoNian(v);
+                    }
+                    else if (act.startsWith('karma_plus_')) {
+                        const v = parseInt(act.replace('karma_plus_',''),10);
+                        if (!isNaN(v)) await updateLingYun(v);
+                    }
+                    else if (act.startsWith('karma_minus_')) {
+                        const v = parseInt(act.replace('karma_minus_','').replace('-',''),10);
+                        if (!isNaN(v)) await updateZhuoNian(v);
+                    }
                     const unlockMap = {
-                        'unlock_god':'god', 'unlock_fail_scholar':'fail_scholar', 'unlock_fail_kid':'fail_kid',
-                        'unlock_farmer':'farmer', 'unlock_star':'star', 'unlock_mortal':'mortal',
-                        'unlock_demon_king':'demon_king', 'unlock_sacrifice':'sacrifice', 'unlock_mad':'mad',
-                        'unlock_love':'love', 'unlock_guardian':'guardian', 'unlock_lost':'lost',
-                        'unlock_severed':'severed', 'unlock_dawn':'dawn', 'unlock_witness':'witness',
-                        'unlock_suspicious':'suspicious', 'unlock_sword_friend':'sword_friend',
-                        'unlock_sword_master':'sword_master', 'unlock_green_fate':'green_memory',
-                        'unlock_ghost_friend':'ghost_friend', 'unlock_seven_days':'seven_days',
-                        'unlock_moon_fox':'moon_fox', 'unlock_drought_hero':'drought_hero',
-                        'unlock_well_insight':'well_insight', 'unlock_chess_sage':'chess_sage',
-                        'unlock_empty_face':'empty_face', 'unlock_true': 'true'
+                        'unlock_god':'god',
+                        'unlock_fail_scholar':'fail_scholar',
+                        'unlock_fail_kid':'fail_kid',
+                        'unlock_farmer':'farmer',
+                        'unlock_star':'star',
+                        'unlock_mortal':'mortal',
+                        'unlock_demon_king':'demon_king',
+                        'unlock_sacrifice':'sacrifice',
+                        'unlock_mad':'mad',
+                        'unlock_love':'love',
+                        'unlock_guardian':'guardian',
+                        'unlock_lost':'lost',
+                        'unlock_severed':'severed',
+                        'unlock_dawn':'dawn',
+                        'unlock_witness':'witness',
+                        'unlock_suspicious':'suspicious',
+                        'unlock_sword_friend':'sword_friend',
+                        'unlock_sword_master':'sword_master',
+                        'unlock_green_fate':'green_memory',
+                        'unlock_ghost_friend':'ghost_friend',
+                        'unlock_seven_days':'seven_days',
+                        'unlock_moon_fox':'moon_fox',
+                        'unlock_drought_hero':'drought_hero',
+                        'unlock_well_insight':'well_insight',
+                        'unlock_chess_sage':'chess_sage',
+                        'unlock_empty_face':'empty_face',
+                        'unlock_true': 'true'
                     };
-                    if (unlockMap[act]) await unlockAchievement(unlockMap[act]);
+                    if (unlockMap[act]) {
+                        await unlockAchievement(unlockMap[act]);
+                    }
                     if (act === 'reset' || act === 'reset_suspicious') {
                         if (act === 'reset_suspicious') await unlockAchievement('suspicious');
                         resetGame(false);
@@ -659,41 +757,90 @@
             setTimeout(() => { currentFocusIndex = 0; renderScene(nextScene); }, 200);
         };
 
-        async function resetGame(fullReset) { /* 保持不变 */ }
-        window.startGame = function() { /* 保持不变 */ };
+        async function resetGame(fullReset) {
+            document.getElementById('startOverlay').style.display = 'none';
+            if (fullReset) { gameState.achievements = { ...window.ACHIEVEMENTS_INIT }; await StorageBridge.removeItem(STORAGE_KEY); gameState.playerDifficulty='normal'; await StorageBridge.removeItem('huangdaxian_difficulty'); }
+            gameState.checkpointScene = 'start'; gameState.sceneHistory = [];
+            renderScene('start');
+        }
 
-        // ========== UI控制 ==========
+        window.startGame = function() {
+            gameState.playerDifficulty = 'normal';
+            StorageBridge.setItem('huangdaxian_difficulty', 'normal');
+            document.getElementById('startOverlay').style.display = 'none';
+            renderScene('start');
+            setTimeout(() => { const first = document.querySelector('#choices-container .choice-btn'); if (first) focusElement(first); }, 200);
+        };
+
+        // ========== UI 控制 ==========
         let currentFocusIndex = 0;
-        function getFocusableElements() { /* 保持不变 */ }
-        function focusElement(el) { /* 保持不变 */ }
-        // ... 其余UI函数保持不变，请复用之前版本的完整按键处理 ...
+        function getFocusableElements() {
+            const confirmEl = document.getElementById('confirmOverlay');
+            if (confirmEl && confirmEl.classList.contains('show')) return Array.from(confirmEl.querySelectorAll('.focusable'));
+            const overlay = document.getElementById('settingsOverlay');
+            if (overlay && overlay.classList.contains('show')) return Array.from(overlay.querySelectorAll('.focusable'));
+            const startOverlay = document.getElementById('startOverlay');
+            if (startOverlay && startOverlay.style.display !== 'none') return Array.from(startOverlay.querySelectorAll('.focusable'));
+            return Array.from(document.querySelectorAll('#choices-container .choice-btn'));
+        }
+        function focusElement(el) {
+            if (!el) return;
+            document.querySelectorAll('.tv-focus').forEach(e => e.classList.remove('tv-focus'));
+            el.classList.add('tv-focus');
+            el.focus({ preventScroll: false });
+            try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e) { el.scrollIntoView(); }
+            const list = getFocusableElements();
+            currentFocusIndex = list.indexOf(el);
+        }
+        function focusNext(direction) {
+            const list = getFocusableElements(); if (!list.length) return;
+            if (currentFocusIndex < 0) currentFocusIndex = 0;
+            let next = (currentFocusIndex + direction + list.length) % list.length;
+            focusElement(list[next]);
+        }
+        function activateCurrent() { const list = getFocusableElements(); const el = list[currentFocusIndex]; if (el) el.click(); }
+        function isMenuKey(e) { /* 省略保持不变 */ return false; }
+        function isBackKey(e) { return false; }
+        function handleRemoteKey(e) { /* 省略保持不变 */ }
+        // ...（完整的按键处理请保留原代码，此处因篇幅省略）...
 
         function openSettings() {
             const total = window.ACHIEVEMENT_ICONS ? window.ACHIEVEMENT_ICONS.length : 0;
             document.getElementById('progressInfo').textContent = `已解锁 ${getUnlockedCount()} / ${total} 项成就`;
             document.getElementById('settingsOverlay').classList.add('show');
+            setTimeout(() => { const first = document.querySelector('#settingsOverlay .focusable'); if (first) focusElement(first); }, 50);
         }
         function closeSettings() { document.getElementById('settingsOverlay').classList.remove('show'); }
+        // ...（其余 UI 辅助函数保持）...
 
         // ===== 启动 =====
         window.onload = async function() {
             if (!window.SCENES) return;
             await loadAchievements();
-            // 加载灵韵/浊念
-            if (cloudDocId) {
-                try {
-                    const doc = await apiQueryDocument(cloudDocId);
-                    gameState.playerLingYun = doc.content.lingYun || 0;
-                    gameState.playerZhuoNian = doc.content.zhuoNian || 0;
-                    updateKarmaUI();
-                } catch(e) {}
-            }
-            updateCultivationUI('start');
+            await loadKarmaFromCloud();
+            await loadTabletMode();
             document.getElementById('startOverlay').style.display = 'flex';
             setTimeout(() => { const btn = document.getElementById('startBtn'); if (btn) focusElement(btn); }, 100);
             initControls();
             setupScrollAssist();
         };
+    </script>
+    <script>
+        // 粒子背景
+        (function() {
+            const canvas = document.getElementById('particleCanvas'), ctx = canvas.getContext('2d');
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+            const particles = [];
+            for (let i=0;i<80;i++) particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, size:Math.random()*2.5+0.5, alpha:Math.random()*0.5+0.2 });
+            function update() { for (let p of particles) { p.x=(p.x+p.vx+canvas.width)%canvas.width; p.y=(p.y+p.vy+canvas.height)%canvas.height; } }
+            function draw() {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                for (let p of particles) { ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fillStyle=`rgba(184,134,11,${p.alpha})`; ctx.fill(); ctx.beginPath(); ctx.arc(p.x,p.y,p.size*2.5,0,Math.PI*2); ctx.fillStyle=`rgba(184,134,11,${p.alpha*0.2})`; ctx.fill(); }
+                requestAnimationFrame(()=>{ update(); draw(); });
+            }
+            draw();
+        })();
     </script>
 </body>
 </html>

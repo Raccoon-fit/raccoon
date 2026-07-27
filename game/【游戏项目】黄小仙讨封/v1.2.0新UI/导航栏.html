@@ -455,6 +455,125 @@
             background: #222;
         }
 
+        /* ===== 云控公告 ===== */
+        .announcement-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 10000;
+        }
+        .announcement-overlay.show {
+            display: block;
+        }
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(180deg, #1a1510, #0f0c0a);
+            border: 2px solid var(--gold-dark);
+            border-radius: 10px;
+            width: 88%;
+            max-width: 460px;
+            max-height: 74vh;
+            z-index: 10001;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.18), inset 0 1px 0 rgba(255, 220, 140, 0.08);
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .announcement-modal.show {
+            display: flex;
+        }
+        .announcement-modal.force {
+            border-color: #a03030;
+            box-shadow: 0 0 40px rgba(192, 57, 43, 0.25), inset 0 1px 0 rgba(255, 150, 150, 0.06);
+        }
+        .ann-header {
+            padding: 20px 22px 12px;
+            text-align: center;
+            border-bottom: 1px solid #2a2018;
+            flex-shrink: 0;
+        }
+        .ann-title {
+            color: var(--gold);
+            font-size: 19px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .announcement-modal.force .ann-title {
+            color: #e74c3c;
+        }
+        .ann-datetime {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+        }
+        .ann-body {
+            padding: 18px 22px;
+            color: #d5d0c8;
+            font-size: 14.5px;
+            line-height: 1.85;
+            letter-spacing: 0.6px;
+            overflow-y: auto;
+            flex: 1;
+            white-space: pre-wrap;
+            word-break: break-word;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ann-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .ann-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .ann-body::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 2px;
+        }
+        .ann-footer {
+            padding: 14px 22px 20px;
+            text-align: center;
+            border-top: 1px solid #2a2018;
+            flex-shrink: 0;
+        }
+        .announcement-modal.force .ann-footer {
+            display: none;
+        }
+        .ann-close-btn {
+            padding: 10px 40px;
+            background: transparent;
+            border: 1px solid var(--gold-dark);
+            color: var(--gold);
+            border-radius: 5px;
+            font-family: var(--font-stack);
+            font-size: 14px;
+            letter-spacing: 5px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .ann-close-btn:active {
+            background: rgba(212, 175, 55, 0.15);
+            transform: scale(0.96);
+        }
+        .ann-force-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            background: rgba(192, 57, 43, 0.15);
+            border: 1px solid rgba(192, 57, 43, 0.4);
+            color: #e74c3c;
+            font-size: 12px;
+            letter-spacing: 2px;
+            border-radius: 3px;
+        }
+
         /* ===== 断网模式 ===== */
         .app-container.offline-mode .bottom-nav {
             background: #0a0806;
@@ -508,6 +627,17 @@
                 height: 24px;
                 font-size: 14px;
             }
+            .announcement-modal {
+                width: 92%;
+                max-height: 78vh;
+            }
+            .ann-title {
+                font-size: 17px;
+            }
+            .ann-body {
+                font-size: 13.5px;
+                padding: 14px 18px;
+            }
         }
         @media (min-width: 600px) {
             .nav-btn.scroll-btn {
@@ -528,17 +658,7 @@
             }
         }
 
-        /* 当横幅显示时，给app-container顶部留出空间（避免遮挡内容） */
-        .offline-banner.show~.app-container .iframe-wrapper {
-            /* 不额外留空，横幅覆盖在内容之上，但iframe内容可能被遮挡顶部一小部分 */
-            /* 通过给iframe-wrapper加padding-top来让内容下移 */
-        }
-        /* 更好的方式：在横幅显示时，给iframe-wrapper添加一个顶部内边距 */
-        .offline-banner.show~.app-container .iframe-wrapper {
-            padding-top: 0;
-            /* 默认不加，因为横幅是fixed定位，覆盖在内容之上，不占用文档流空间 */
-        }
-        /* 但如果想要内容不被遮挡，可以取消注释下面的代码 */
+        /* 当横幅显示时，给iframe-wrapper添加一个顶部内边距 */
         /*
         .offline-banner.show ~ .app-container .iframe-wrapper {
             padding-top: 52px;
@@ -547,7 +667,6 @@
             margin-bottom: 0;
         }
         */
-        /* 但是保持原样，横幅覆盖在内容之上，不改变布局 */
     </style>
 </head>
 <body>
@@ -609,6 +728,19 @@
         </div>
     </div>
 
+    <!-- ===== 云控公告遮罩 & 弹窗 ===== -->
+    <div class="announcement-overlay" id="announcementOverlay"></div>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="ann-header">
+            <div class="ann-title" id="annTitle"></div>
+            <div class="ann-datetime" id="annDatetime"></div>
+        </div>
+        <div class="ann-body" id="annBody"></div>
+        <div class="ann-footer" id="annFooter">
+            <button class="ann-close-btn" id="annCloseBtn">知晓</button>
+        </div>
+    </div>
+
     <script>
         (function() {
             'use strict';
@@ -631,6 +763,14 @@
             // ===== 断网横幅 DOM =====
             const offlineBanner = document.getElementById('offlineBanner');
             const bannerCloseBtn = document.getElementById('bannerCloseBtn');
+
+            // ===== 云控公告 DOM =====
+            const announcementOverlay = document.getElementById('announcementOverlay');
+            const announcementModal = document.getElementById('announcementModal');
+            const annTitle = document.getElementById('annTitle');
+            const annDatetime = document.getElementById('annDatetime');
+            const annBody = document.getElementById('annBody');
+            const annCloseBtn = document.getElementById('annCloseBtn');
 
             // ==================== URL 配置 ====================
             const LOCAL_BASE = (function() {
@@ -1061,6 +1201,116 @@
                 return online;
             }
 
+            // ==================== 云控公告 ====================
+            const ANNOUNCEMENT_URL = 'https://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=c5b3054bfaea';
+
+            function parseAnnouncement(text) {
+                const rawLines = text.split('\n');
+                const lines = [];
+                for (let i = 0; i < rawLines.length; i++) {
+                    const trimmed = rawLines[i].trim();
+                    if (trimmed.length > 0) lines.push(trimmed);
+                }
+                if (lines.length < 4) return null;
+
+                // 第1行：去除所有空格和 // 注释
+                let firstLine = lines[0].replace(/\s/g, '').replace(/\/\/.*/g, '');
+                const type = parseInt(firstLine, 10);
+                if (isNaN(type) || type < 0 || type > 2) return null;
+                if (type === 0) return { type: 0 };
+
+                return {
+                    type: type,
+                    title: lines[1] || '',
+                    datetime: lines[2] || '',
+                    content: lines.slice(3).join('\n')
+                };
+            }
+
+            function getAnnouncementId(ann) {
+                try {
+                    const raw = ann.title + '|' + ann.datetime + '|' + ann.content.substring(0, 60);
+                    let hash = 0;
+                    for (let i = 0; i < raw.length; i++) {
+                        const char = raw.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash = hash & hash;
+                    }
+                    return 'ann_read_' + Math.abs(hash).toString(36);
+                } catch (e) {
+                    return 'ann_read_' + Date.now();
+                }
+            }
+
+            function showAnnouncement(ann) {
+                annTitle.textContent = ann.title;
+                annDatetime.textContent = ann.datetime;
+                annBody.textContent = ann.content;
+
+                announcementModal.classList.remove('force');
+
+                if (ann.type === 1) {
+                    // 强制弹窗：无法关闭，遮罩不可点击关闭
+                    announcementModal.classList.add('force');
+                }
+
+                announcementOverlay.classList.add('show');
+                announcementModal.classList.add('show');
+            }
+
+            function hideAnnouncement() {
+                announcementOverlay.classList.remove('show');
+                announcementModal.classList.remove('show');
+            }
+
+            function fetchAnnouncement() {
+                fetch(ANNOUNCEMENT_URL + '&_t=' + Date.now(), {
+                    method: 'GET',
+                    cache: 'no-cache'
+                })
+                .then(function(r) { return r.text(); })
+                .then(function(text) {
+                    const ann = parseAnnouncement(text);
+                    if (!ann) return;
+
+                    if (ann.type === 0) {
+                        // 无公告，若当前有弹窗则隐藏
+                        hideAnnouncement();
+                        return;
+                    }
+
+                    if (ann.type === 1) {
+                        // 强制维护公告：始终显示，无法关闭
+                        showAnnouncement(ann);
+                    } else if (ann.type === 2) {
+                        // 更新公告：仅弹一次（localStorage记录）
+                        const annId = getAnnouncementId(ann);
+                        const hasRead = localStorage.getItem(annId);
+                        if (!hasRead) {
+                            showAnnouncement(ann);
+                            localStorage.setItem(annId, '1');
+                        }
+                    }
+                })
+                .catch(function() {
+                    // 静默失败，不影响游戏运行
+                });
+            }
+
+            // 关闭按钮（仅非强制弹窗可用）
+            annCloseBtn.addEventListener('click', function() {
+                if (!announcementModal.classList.contains('force')) {
+                    hideAnnouncement();
+                }
+            });
+
+            // 遮罩点击关闭（仅非强制弹窗可用；强制弹窗遮罩不可点击关闭）
+            announcementOverlay.addEventListener('click', function(e) {
+                if (e.target === announcementOverlay && !announcementModal.classList.contains('force')) {
+                    hideAnnouncement();
+                }
+            });
+
             // ==================== 事件绑定 ====================
 
             // 讨封iframe加载完成
@@ -1289,6 +1539,11 @@
                         hideOfflineBanner();
                     }
                 }, 600);
+
+                // ===== 云控公告：进入页面立刻检测一次 =====
+                fetchAnnouncement();
+                // 每30秒轮询一次
+                setInterval(fetchAnnouncement, 30000);
             }
 
             init();
@@ -1296,3 +1551,6 @@
     </script>
 </body>
 </html>
+
+
+               

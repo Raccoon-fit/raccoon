@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>道主榜 · 同修仙籍</title>
+    <meta name="theme-color" content="#5D4037">
+    <style>
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+            --card-bg: rgba(255, 248, 220, 0.7);
+            --unlocked-glow: rgba(184, 134, 11, 0.35);
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210, 180, 140, 0.2) 0%, transparent 60%);
+        }
+        .page-container {
+            max-width: 720px;
+            width: 100%;
+            padding: 24px 20px 40px;
+            background: rgba(255, 248, 220, 0.5);
+            border-left: 4px solid var(--scroll-dark);
+            border-right: 4px solid var(--scroll-dark);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+        .header { text-align: center; border-bottom: 2px solid var(--scroll-dark); margin-bottom: 16px; padding-bottom: 10px; }
+        .header h1 { color: var(--scroll-gold); font-size: 32px; letter-spacing: 6px; text-shadow: 2px 2px 0 var(--scroll-dark); }
+        .subtitle { color: #5D4037; font-size: 13px; letter-spacing: 4px; font-style: italic; }
+
+        .stats-row { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .stat-item {
+            background: linear-gradient(180deg, #D2B48C, #A0522D);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-size: 13px;
+            color: var(--scroll-light);
+            letter-spacing: 1px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            margin: 16px 0 4px;
+            border-bottom: 2px solid var(--scroll-dark);
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 4px;
+            color: #8B7355;
+            font-size: 13px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .tab.active { color: var(--scroll-dark); border-bottom-color: var(--scroll-gold); font-weight: bold; background: rgba(184, 134, 11, 0.08); }
+        .tab:active { background: rgba(184, 134, 11, 0.15); }
+
+        .top-podium {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 8px;
+            margin: 16px 0;
+            align-items: end;
+        }
+        .podium-item {
+            text-align: center;
+            background: var(--card-bg);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 8px 8px 0 0;
+            padding: 12px 6px 8px;
+            position: relative;
+        }
+        .podium-item.first { border-color: var(--scroll-gold); box-shadow: 0 0 16px var(--unlocked-glow); }
+        .podium-item .rank-no {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--scroll-dark);
+            color: var(--scroll-light);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .podium-item.first .rank-no { background: #C9A227; }
+        .podium-item .podium-name { font-weight: bold; color: var(--scroll-dark); margin-top: 6px; font-size: 14px; word-break: break-all; }
+        .podium-item .podium-score { color: var(--scroll-gold); font-size: 13px; margin-top: 2px; }
+        .podium-item .podium-meta { color: #8B7355; font-size: 11px; margin-top: 2px; }
+        .podium-item .podium-crown { font-size: 20px; line-height: 1; }
+
+        .section-title {
+            color: var(--scroll-dark);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-align: center;
+            padding: 14px 0 8px;
+            border-top: 2px solid var(--scroll-dark);
+            margin-top: 14px;
+            font-weight: bold;
+        }
+
+        .rank-list { display: flex; flex-direction: column; gap: 0; }
+        .rank-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px dashed var(--scroll-dark);
+            min-height: 56px;
+            gap: 12px;
+            background: var(--card-bg);
+            margin-bottom: 4px;
+            border-radius: 6px;
+        }
+        .rank-row.me { background: linear-gradient(135deg, rgba(184, 134, 11, 0.25), rgba(255, 248, 220, 0.7)); border: 1px solid var(--scroll-gold); }
+        .rank-no-cell {
+            flex-shrink: 0;
+            width: 36px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--scroll-dark);
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+        .rank-row .rank-name {
+            flex: 1;
+            min-width: 0;
+            font-weight: bold;
+            color: var(--scroll-dark);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .rank-row .rank-score {
+            flex-shrink: 0;
+            color: var(--scroll-gold);
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 80px;
+            text-align: right;
+        }
+        .rank-row .rank-meta {
+            flex-shrink: 0;
+            color: #8B7355;
+            font-size: 11px;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--scroll-dark);
+            font-style: italic;
+            background: var(--card-bg);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .footer-hint { text-align: center; color: #8b5a2b; font-size: 12px; margin-top: 20px; font-style: italic; }
+
+        .loading-tip { text-align: center; padding: 20px; color: #8b5a2b; font-size: 14px; }
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #8b5a2b; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .refresh-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px;
+            font-size: 11px;
+            color: #8B7355;
+            letter-spacing: 1px;
+        }
+        .refresh-btn {
+            padding: 4px 14px;
+            background: transparent;
+            border: 1px solid var(--scroll-dark);
+            color: var(--scroll-dark);
+            border-radius: 14px;
+            font-family: var(--font-stack);
+            font-size: 11px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .refresh-btn:active { background: rgba(139, 69, 19, 0.15); }
+        .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+        
+        .hxsf-kill-only { display: none; }
+        html.hxsf-kill .hxsf-kill-only { display: block; }
+        .cloud-disabled-card {
+            max-width: 480px;
+            width: 90%;
+            margin: 20vh auto 0;
+            padding: 40px 30px;
+            background: var(--scroll-light);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--scroll-dark);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .cloud-disabled-card .cd-title { font-size: 20px; letter-spacing: 4px; color: var(--scroll-gold); margin-bottom: 12px; font-weight: bold; }
+        .cloud-disabled-card .cd-hint { font-size: 13px; line-height: 2; color: #8b5a2b; }
+    </style>
+    <script>
+        // localStorage 沙盒兜底：某些嵌入/隐私模式下 localStorage 会抛异常
+        // 用一个内存 Map 兜底，保证代码在任何环境都不崩溃
+        (function () {
+            try {
+                const testKey = '__hxsf_ls_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                const memStore = {};
+                Object.defineProperty(window, 'localStorage', {
+                    value: {
+                        getItem: (k) => Object.prototype.hasOwnProperty.call(memStore, k) ? memStore[k] : null,
+                        setItem: (k, v) => { memStore[k] = String(v); },
+                        removeItem: (k) => { delete memStore[k]; },
+                        clear: () => { for (const k in memStore) delete memStore[k]; },
+                        key: (i) => Object.keys(memStore)[i] || null,
+                        get length() { return Object.keys(memStore).length; }
+                    },
+                    configurable: true
+                });
+            }
+        })();
+    </script>
+    
+    
+    <script>
+        
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <style>
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+    </style>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = {
+                ready: null,
+                done: false,
+                killed: false
+            };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            // 会话内缓存：同一会话不再重复请求；未命中才发起真实请求
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    // 2 秒超时：避免首屏长时间空白
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        // 请求失败 / 超时 → 视为 kill=0（正常）
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    
+</head>
+<body>
+    <div class="cloud-disabled-card hxsf-kill-only">
+        <div class="cd-title">榜单未启</div>
+        <div class="cd-hint">&#x9053;&#x4e3b;&#x699c;&#x4f9d;&#x8d56;&#x4e91;&#x7aef;&#x4ed9;&#x7c4d;&#x4e92;&#x901a;&#xff0c;&#x529f;&#x80fd;&#x6682;&#x672a;&#x5f00;&#x653e;&#x3002;<br>本地修行进度不受影响。</div>
+    </div>
+    <div class="page-container hxsf-cloud-only">
+        <div class="header">
+            <h1>道 主 榜</h1>
+            <div class="subtitle">— 同修共证 · 千秋不朽 —</div>
+            <div class="stats-row">
+                <div class="stat-item">共 <span id="statTotal">0</span> 位道友</div>
+                <div class="stat-item">小仙排名 <span id="statMyRank">—</span></div>
+            </div>
+        </div>
+
+        <div class="tab-bar" id="tabBar">
+            <div class="tab active" data-sort="daoxing">道行榜</div>
+            <div class="tab" data-sort="zhuoniang">灼念榜</div>
+            <div class="tab" data-sort="lingyun">灵运榜</div>
+            <div class="tab" data-sort="achievement">成就榜</div>
+        </div>
+
+        <div id="loadingTip" class="loading-tip">
+            <span class="loading-spinner"></span>正在请仙籍登册...
+        </div>
+
+        <div id="contentArea" style="display:none;">
+            <div class="top-podium" id="topPodium"></div>
+
+            <div class="refresh-bar">
+                <span id="updateTime">—</span>
+                <button class="refresh-btn" id="refreshBtn">刷 新</button>
+            </div>
+
+            <div class="section-title">同 修 录</div>
+            <div class="rank-list" id="rankList"></div>
+
+            <div class="footer-hint">&#x699c;&#x5355;&#x6bcf;&#x65e5;&#x8bf7;&#x4ed9;&#x7c4d;&#x6838;&#x9a8c;,&#x6570;&#x636e;&#x7531;&#x4e91;&#x7aef;&#x4ed9;&#x7c4d;&#x540c;&#x6b65;&#x800c;&#x6765;</div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display:none;">
+            暂无仙籍可查,请稍后再试
+        </div>
+    </div>
+
+    <script>
+        
+        // title = 道号；content 是 JSON，含 achievements/lingYun/zhuoNian 等
+        const CONFIG = (function(){ try { return JSON.parse(atob("eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9")); } catch(e){ return null; } })();
+        const ME_KEY = 'playerName';
+        const CACHE_KEY = 'daozhu_rank_cache_v1'; 
+
+        function getMyName() {
+            try {
+                const p = new URLSearchParams(location.search);
+                const u = p.get('player');
+                if (u) { localStorage.setItem(ME_KEY, u); return u; }
+            } catch (e) {}
+            return localStorage.getItem(ME_KEY) || '';
+        }
+
+        async function apiList() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const r = await window['fet'+'ch'](`${CONFIG.apiList}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`);
+            const d = await r.json();
+            if (String(d.code) !== '1') throw new Error(d.msg || '列表失败');
+            return d.list || [];
+        }
+        async function apiQuery(id) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const r = await window['fet'+'ch'](`${CONFIG.apiQuery}?user=${CONFIG.user}&appid=${CONFIG.appid}&id=${id}`);
+            const d = await r.json();
+            if (String(d.code) !== '1') return null; // 单条失败不阻断整体榜单
+            try { return { title: d.title, content: JSON.parse(d.content) }; }
+            catch(e) { return { title: d.title, content: {} }; }
+        }
+
+        
+        async function batchQuery(ids, concurrency = 6) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const results = new Array(ids.length);
+            let cursor = 0;
+            async function worker() {
+                while (cursor < ids.length) {
+                    const my = cursor++;
+                    try { results[my] = await apiQuery(ids[my]); }
+                    catch (e) { results[my] = null; }
+                }
+            }
+            const workers = [];
+            for (let i = 0; i < Math.min(concurrency, ids.length); i++) workers.push(worker());
+            await Promise.all(workers);
+            return results;
+        }
+
+        
+        // 道行文本 → 排序权重（用于老档兜底与显示时的映射）
+        const CULTIVATION_RANK = { '∞':10000,'千载妖力':1000,'八百年':800,'七百年':700,'六百年':600,'五百二十年':520,'五百年':500,'四百八十年':480,'四百五十年':450,'四百年':400,'三百二十年':320,'三百年':300,'二百六十年':260,'无':0,'归零':0 };
+        const CULTIVATION_BY_SCENE = { start:'五百年', true_encounter_first:'五百年', true_encounter_second:'五百年', true_guidance:'五百年', true_ending:'五百年', farmer_ending:'五百年', ruins_path:'四百八十年', ruins_arrival:'四百八十年', ruins_meeting:'四百八十年', witness_ending:'∞', mountain_guardian_end:'六百年', lost_in_rain:'三百二十年', dawn_return_end:'五百二十年', star_ending:'五百二十年', mortal_love_ending:'五百二十年', severed_ending:'四百年', mortal_ending:'无', god_ending_favor:'八百年', sacrifice_ending:'归零', mad_ending:'千载妖力', obsession_recover_end:'二百六十年', fail_scholar_end:'三百年', fail_kid_end:'四百五十年', demon_king_ending:'七百年', wait_final:'四百五十年' };
+
+        function parsePlayer(listItem, doc) {
+            const title = String((doc && doc.title) || listItem.title || '');
+            const c = (doc && doc.content) || {};
+            const achArr = Array.isArray(c.achievements) ? c.achievements : [];
+            const specialArr = Array.isArray(c.specialAchievements) ? c.specialAchievements : [];
+            const achCount = achArr.length + specialArr.length;
+            const lingyun = Number(c.lingYun) || 0;
+            const zhuoniang = Number(c.zhuoNian) || 0;
+
+            
+            // 老档没有这两个字段时，从 storyNode 反查文本；再没有则退化为 '五百年' + 权重 500
+            var cultText = c.cultivation || CULTIVATION_BY_SCENE[c.storyNode] || '五百年';
+            var cultRank = Number(c.cultivationRank) || CULTIVATION_RANK[cultText] || 500;
+
+            return {
+                id: listItem.id,
+                title: title || String(listItem.title || ''),
+                daoxing: cultRank,          // 排序用权重
+                daoxingText: cultText,      // 显示用文本
+                zhuoniang: zhuoniang,
+                lingyun: lingyun,
+                achievement: achCount,
+                updateTime: Number(c.updateTime) || 0
+            };
+        }
+
+        // ===========================================================
+        //  渲染
+        // ===========================================================
+        const tabBar = document.getElementById('tabBar');
+        const loadingTip = document.getElementById('loadingTip');
+        const contentArea = document.getElementById('contentArea');
+        const emptyState = document.getElementById('emptyState');
+        const topPodium = document.getElementById('topPodium');
+        const rankList = document.getElementById('rankList');
+        const statTotal = document.getElementById('statTotal');
+        const statMyRank = document.getElementById('statMyRank');
+        const updateTime = document.getElementById('updateTime');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        let currentPlayers = [];
+        let currentSort = 'daoxing';
+
+        const SORT_LABELS = {
+            daoxing: '道行',
+            zhuoniang: '灼念',
+            lingyun: '灵运',
+            achievement: '成就'
+        };
+
+        function getSorted(players, sortKey) {
+            return [...players].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+        }
+
+        function fmtNum(n) {
+            if (n === 0) return '0';
+            if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
+            return String(n);
+        }
+
+        function render() {
+            const sorted = getSorted(currentPlayers, currentSort);
+            statTotal.textContent = sorted.length;
+
+            // 找自己
+            const myName = getMyName();
+            let myRank = -1;
+            if (myName) {
+                myRank = sorted.findIndex(p => p.title === myName || p.title.startsWith(myName));
+                if (myRank >= 0) {
+                    statMyRank.textContent = '第 ' + (myRank + 1) + ' 名';
+                } else {
+                    // 登录态降噪：未入榜以弱化样式长期展示（灰色 #999、字号降一级）
+                    statMyRank.innerHTML = '<span style="color:#999;font-size:11px;">榜上无名</span>';
+                }
+            } else {
+                // 登录态降噪：未登录以弱化样式长期展示（灰色 #999、字号降一级）
+                statMyRank.innerHTML = '<span style="color:#999;font-size:11px;">未登录</span>';
+            }
+
+            // 渲染前三
+            const top3 = sorted.slice(0, 3);
+            // 按 2-1-3 排序展示
+            const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+            const podiumRanks = [2, 1, 3];
+            topPodium.innerHTML = podiumOrder.map((p, i) => {
+                const rk = podiumRanks[i];
+                const isFirst = rk === 1;
+                const scoreLabel = SORT_LABELS[currentSort];
+                return `
+                    <div class="podium-item ${isFirst ? 'first' : ''}">
+                        <div class="rank-no">${rk}</div>
+                        <div class="podium-crown">${rk === 1 ? '👑' : (rk === 2 ? '🥈' : '🥉')}</div>
+                        <div class="podium-name">${escapeHtml(p.title)}</div>
+                        <div class="podium-score">${scoreLabel} ${fmtNum(p[currentSort])}</div>
+                        <div class="podium-meta">道行 ${p.daoxingText}</div>
+                    </div>
+                `;
+            }).join('') || '<div class="empty-state" style="grid-column:1/4">暂无数据</div>';
+
+            // 渲染列表(4 名之后)
+            const rest = sorted.slice(3);
+            if (rest.length === 0 && top3.length > 0) {
+                rankList.innerHTML = '<div class="empty-state">同修录仅此 3 位,还需更多道友入册</div>';
+            } else if (sorted.length === 0) {
+                rankList.innerHTML = '<div class="empty-state">仙籍尚空,待道友入册</div>';
+            } else {
+                rankList.innerHTML = rest.map((p, i) => {
+                    const rk = i + 4;
+                    const isMe = p.title === myName;
+                    return `
+                        <div class="rank-row ${isMe ? 'me' : ''}">
+                            <div class="rank-no-cell">${rk}</div>
+                            <div class="rank-name">${escapeHtml(p.title)}${isMe ? ' <span style="color:var(--scroll-gold);font-size:11px;">【我】</span>' : ''}</div>
+                            <div class="rank-score">${SORT_LABELS[currentSort]} ${currentSort === 'daoxing' ? p.daoxingText : fmtNum(p[currentSort])}</div>
+                            <div class="rank-meta">道行 ${p.daoxingText}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        
+        function tryRenderFromCache() {
+            try {
+                const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+                if (c && Array.isArray(c.players) && c.players.length) {
+                    currentPlayers = c.players;
+                    loadingTip.style.display = 'none';
+                    contentArea.style.display = '';
+                    updateTime.textContent = '缓存于 ' + new Date(c.ts || Date.now()).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                    render();
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function load(force) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const hasCache = tryRenderFromCache();
+            if (!hasCache) {
+                loadingTip.style.display = '';
+                contentArea.style.display = 'none';
+                emptyState.style.display = 'none';
+            }
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = hasCache ? '刷新中...' : '请 册 中...';
+
+            if (!CONFIG) {
+                loadingTip.style.display = 'none';
+                if (!hasCache) { emptyState.style.display = ''; emptyState.textContent = '仙籍配置缺失,请稍后再试'; }
+                refreshBtn.disabled = false; refreshBtn.textContent = '刷 新';
+                return;
+            }
+
+            try {
+                const list = await apiList();
+                if (!list.length) {
+                    loadingTip.style.display = 'none';
+                    if (!hasCache) { emptyState.style.display = ''; emptyState.textContent = '仙籍尚空,待道友入册'; }
+                    return;
+                }
+                // 拉每一份 content
+                const docs = await batchQuery(list.map(i => i.id));
+                currentPlayers = list.map((item, i) => parsePlayer(item, docs[i]));
+                // 写本地缓存
+                try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), players: currentPlayers })); } catch (e) {}
+                loadingTip.style.display = 'none';
+                contentArea.style.display = '';
+                updateTime.textContent = '请册于 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                render();
+            } catch (e) {
+                if (!hasCache) {
+                    loadingTip.style.display = 'none';
+                    emptyState.style.display = '';
+                    emptyState.textContent = '请册失败:' + (e.message || '未知原因') + ',请稍后再试';
+                }
+                // 有缓存则静默降级，不打扰用户
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '刷 新';
+            }
+        }
+
+        // tab 切换
+        tabBar.addEventListener('click', (e) => {
+            const t = e.target.closest('.tab');
+            if (!t) return;
+            tabBar.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+            t.classList.add('active');
+            currentSort = t.dataset.sort;
+            render();
+        });
+
+        refreshBtn.addEventListener('click', () => load(true));
+
+        // 启动
+        load();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>黄小仙 · 讨封之卷</title>
+    <style>
+        :root {
+            --nav-height: 52px;
+            --gold: #D4AF37;
+            --gold-dark: #8B7355;
+            --gold-light: #F0D080;
+            --border-subtle: #222;
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            --scroll-bg-start: #5a3e2b;
+            --scroll-bg-end: #d4a457;
+            --scroll-text: #f5e6c8;
+            --scroll-border: #c9a84c;
+            --bg-deep: #0a0806;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-deep);
+            font-family: var(--font-stack);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            position: relative;
+        }
+
+        /* ===== iframe 容器 ===== */
+        .iframe-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg-deep);
+        }
+        .iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            transition: opacity 0.25s ease;
+        }
+        /* 讨封iframe */
+        .iframe-tao {
+            z-index: 1;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .iframe-tao.dimmed {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        /* 其他页面iframe */
+        .iframe-other {
+            z-index: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .iframe-other.active {
+            z-index: 2;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ===== 加载遮罩 ===== */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            font-size: 16px;
+            background: rgba(10, 8, 6, 0.92);
+            z-index: 20;
+            pointer-events: auto;
+            transition: opacity 0.35s;
+        }
+        .loading-overlay.fading-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-overlay.hidden {
+            display: none;
+        }
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        .loading-overlay .status-text {
+            font-size: 15px;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 0 20px;
+            transition: color 0.3s;
+        }
+        .loading-overlay .retry-btn {
+            margin-top: 16px;
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-stack);
+            font-size: 14px;
+            letter-spacing: 2px;
+            pointer-events: auto;
+            display: none;
+            transition: all 0.25s;
+        }
+        .loading-overlay .retry-btn:active {
+            background: rgba(212, 175, 55, 0.15);
+        }
+        .loading-overlay .retry-btn.visible {
+            display: block;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== 底部导航栏 ===== */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #0a0806;
+            border-top: 1px solid var(--border-subtle);
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 1000;
+            min-height: var(--nav-height);
+            transition: all 0.3s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 2px;
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: color 0.28s, background 0.28s, transform 0.2s, box-shadow 0.3s, opacity 0.3s;
+            min-height: 44px;
+            font-family: var(--font-stack);
+            position: relative;
+            border-radius: 0;
+            white-space: nowrap;
+        }
+        .nav-btn {
+            color: #888;
+            font-size: 14px;
+            position: relative;
+        }
+        .nav-btn.active {
+            color: #c9a96e;
+            font-weight: bold;
+        }
+        /* 选中Tab底部2px金色细线 */
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 2px;
+            background: #c9a96e;
+            border-radius: 1px;
+        }
+        .nav-btn.hidden-btn {
+            display: none !important;
+        }
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+        /* 极窄屏合并按钮的☰图标 */
+        .nav-btn .hamburger-ico {
+            display: inline-block;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* ===== 右侧抽屉 ===== */
+        .drawer-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease;
+        }
+        .drawer-mask.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 78vw;
+            max-width: 300px;
+            min-width: 240px;
+            background: linear-gradient(180deg, #1a1510, #0f0c0a);
+            border-left: 1px solid #2a2018;
+            box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 2600;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding-top: env(safe-area-inset-top, 0);
+            will-change: transform;
+        }
+        .side-drawer.show {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 20px 20px 12px;
+            color: #c9a96e;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-align: center;
+            border-bottom: 1px solid #2a2018;
+            font-family: var(--font-stack);
+        }
+        .drawer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: #d5d0c8;
+            font-size: 15px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: var(--font-stack);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .drawer-item:active {
+            background: rgba(201, 169, 110, 0.08);
+        }
+        .drawer-item .drawer-ico {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+            color: #c9a96e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .drawer-item .drawer-ico svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+        }
+        .drawer-item .drawer-text {
+            flex: 1;
+        }
+        .drawer-item .drawer-arrow {
+            color: #666;
+            font-size: 18px;
+            margin-left: 8px;
+        }
+
+        /* ===== 轻提示 toast ===== */
+        .app-toast {
+            position: fixed;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            background: rgba(20, 15, 10, 0.92);
+            color: #f5ecd7;
+            padding: 12px 22px;
+            border-radius: 22px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            z-index: 5000;
+            border: 1px solid #5a3a1a;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.25s;
+            font-family: var(--font-stack);
+            pointer-events: none;
+        }
+        .app-toast.show {
+            opacity: 1;
+        }
+
+        /* 开关置灰 */
+        .toggle-switch.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        
+        .nav-btn.scroll-btn {
+            flex: 0 1 auto;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            margin: 4px 12px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(145deg, var(--scroll-bg-start), var(--scroll-bg-end));
+            color: var(--scroll-text);
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            font-family: var(--font-stack);
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 12px rgba(212, 175, 55, 0.25),
+                inset 0 1px 0 rgba(255, 220, 140, 0.5),
+                inset 0 -2px 0 rgba(60, 40, 20, 0.6);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s, box-shadow 0.3s;
+            z-index: 2;
+        }
+        .nav-btn.scroll-btn::before,
+        .nav-btn.scroll-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 28px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #c9a84c, #8b7355);
+            box-shadow: inset 0 1px 2px rgba(255, 220, 140, 0.3), 0 1px 4px rgba(0, 0, 0, 0.4);
+            border: 1px solid #a08040;
+        }
+        .nav-btn.scroll-btn::before {
+            left: -4px;
+            border-radius: 4px 0 0 4px;
+        }
+        .nav-btn.scroll-btn::after {
+            right: -4px;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-btn.scroll-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 1px 6px rgba(212, 175, 55, 0.15), inset 0 1px 2px rgba(255, 220, 140, 0.3);
+        }
+        .nav-btn.scroll-btn .btn-glow {
+            position: absolute;
+            top: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+            opacity: 0.6;
+            border-radius: 50%;
+            filter: blur(1px);
+        }
+        .nav-btn.scroll-btn .btn-glow-bottom {
+            top: auto;
+            bottom: -1px;
+            opacity: 0.3;
+        }
+        .nav-btn.scroll-btn .btn-text {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .nav-btn.scroll-btn .btn-text::before,
+        .nav-btn.scroll-btn .btn-text::after {
+            content: '◆';
+            font-size: 10px;
+            color: var(--gold-light);
+            opacity: 0.5;
+            letter-spacing: 0;
+        }
+
+        /* ===== 设置面板 ===== */
+        .overlay-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+        }
+        .overlay-bg.show {
+            display: block;
+        }
+        .settings-panel {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+            z-index: 2000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+        }
+        .settings-panel.show {
+            display: block;
+        }
+        .settings-panel h4 {
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 16px;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #0f0f0f;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .setting-label {
+            color: #ccc;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .toggle-switch {
+            width: 48px;
+            height: 28px;
+            background: #333;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        .toggle-switch.on {
+            background: var(--gold-dark);
+        }
+        .toggle-switch.on::after {
+            transform: translateX(20px);
+        }
+        .setting-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid #555;
+            color: #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .setting-btn:active {
+            background: #222;
+        }
+
+        /* ===== 云控公告 ===== */
+        .announcement-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 10000;
+        }
+        .announcement-overlay.show {
+            display: block;
+        }
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(180deg, #1a1510, #0f0c0a);
+            border: 2px solid var(--gold-dark);
+            border-radius: 10px;
+            width: 88%;
+            max-width: 460px;
+            max-height: 74vh;
+            z-index: 10001;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.18), inset 0 1px 0 rgba(255, 220, 140, 0.08);
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .announcement-modal.show {
+            display: flex;
+        }
+        .announcement-modal.force {
+            border-color: #a03030;
+            box-shadow: 0 0 40px rgba(192, 57, 43, 0.25), inset 0 1px 0 rgba(255, 150, 150, 0.06);
+        }
+        .ann-header {
+            padding: 20px 22px 12px;
+            text-align: center;
+            border-bottom: 1px solid #2a2018;
+            flex-shrink: 0;
+        }
+        .ann-title {
+            color: var(--gold);
+            font-size: 19px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .announcement-modal.force .ann-title {
+            color: #e74c3c;
+        }
+        .ann-datetime {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+        }
+        .ann-body {
+            padding: 18px 22px;
+            color: #d5d0c8;
+            font-size: 14.5px;
+            line-height: 1.85;
+            letter-spacing: 0.6px;
+            overflow-y: auto;
+            flex: 1;
+            white-space: pre-wrap;
+            word-break: break-word;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ann-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .ann-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .ann-body::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 2px;
+        }
+        .ann-footer {
+            padding: 14px 22px 20px;
+            text-align: center;
+            border-top: 1px solid #2a2018;
+            flex-shrink: 0;
+        }
+        .announcement-modal.force .ann-footer {
+            display: none;
+        }
+        .ann-close-btn {
+            padding: 10px 40px;
+            background: transparent;
+            border: 1px solid var(--gold-dark);
+            color: var(--gold);
+            border-radius: 5px;
+            font-family: var(--font-stack);
+            font-size: 14px;
+            letter-spacing: 5px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .ann-close-btn:active {
+            background: rgba(212, 175, 55, 0.15);
+            transform: scale(0.96);
+        }
+        .ann-force-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 12px;
+            background: rgba(192, 57, 43, 0.15);
+            border: 1px solid rgba(192, 57, 43, 0.4);
+            color: #e74c3c;
+            font-size: 12px;
+            letter-spacing: 2px;
+            border-radius: 3px;
+        }
+
+        /* ===== 响应式 ===== */
+        /* 默认（竖屏手机） 5 tab 等宽字号 ≥14px —— 已在基础 .nav-btn 中设置 font-size:14px */
+        /* 极窄屏（<320px）：把"仙籍"和"更多"合并为☰ */
+        .nav-btn-merge { display: none; }
+        @media (max-width: 319px) {
+            .nav-btn[data-page="daozhu"],
+            .nav-btn[data-page="more"] {
+                display: none !important;
+            }
+            .nav-btn-merge {
+                display: flex !important;
+            }
+        }
+        /* 横屏平板 & 大屏：字号 ≥16px，均匀分布 */
+        @media (min-width: 600px) {
+            .nav-btn {
+                font-size: 16px;
+                letter-spacing: 1px;
+                min-height: 52px;
+            }
+            .drawer-item {
+                font-size: 16px;
+                padding: 16px 24px;
+            }
+        }
+        @media (max-width: 420px) {
+            .nav-btn {
+                font-size: 14px;
+                letter-spacing: 0;
+                padding: 0 2px;
+            }
+            .nav-btn.scroll-btn {
+                font-size: 16px;
+                letter-spacing: 4px;
+                min-width: 130px;
+                padding: 0 14px;
+            }
+            .nav-btn.scroll-btn::before,
+            .nav-btn.scroll-btn::after {
+                width: 7px;
+                height: 22px;
+            }
+            .nav-btn.scroll-btn .btn-text::before,
+            .nav-btn.scroll-btn .btn-text::after {
+                font-size: 8px;
+            }
+            .settings-panel {
+                width: 260px;
+                padding: 16px;
+                bottom: 70px;
+            }
+            .announcement-modal {
+                width: 92%;
+                max-height: 78vh;
+            }
+            .ann-title {
+                font-size: 17px;
+            }
+            .ann-body {
+                font-size: 13.5px;
+                padding: 14px 18px;
+            }
+        }
+        @media (min-width: 600px) {
+            .nav-btn.scroll-btn {
+                min-width: 200px;
+                font-size: 20px;
+                letter-spacing: 8px;
+                padding: 0 28px;
+                min-height: 54px;
+            }
+            .nav-btn.scroll-btn::before,
+            .nav-btn.scroll-btn::after {
+                width: 13px;
+                height: 34px;
+            }
+        }
+
+        /* 当横幅显示时，给iframe-wrapper添加一个顶部内边距 */
+        /*
+        */
+    </style>
+    
+    
+    <script>
+        
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <style>
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+    </style>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = {
+                ready: null,
+                done: false,
+                killed: false
+            };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            // 会话内缓存：同一会话不再重复请求；未命中才发起真实请求
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    // 2 秒超时：避免首屏长时间空白
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        // 请求失败 / 超时 → 视为 kill=0（正常）
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    
+    <script>
+        // localStorage 沙盒兜底：某些嵌入/隐私模式下 localStorage 会抛异常
+        (function () {
+            try {
+                var testKey = '__hxsf_ls_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                var memStore = {};
+                Object.defineProperty(window, 'localStorage', {
+                    value: {
+                        getItem: function(k){ return Object.prototype.hasOwnProperty.call(memStore,k) ? memStore[k] : null; },
+                        setItem: function(k,v){ memStore[k] = String(v); },
+                        removeItem: function(k){ delete memStore[k]; },
+                        clear: function(){ for (var k in memStore) delete memStore[k]; },
+                        key: function(i){ return Object.keys(memStore)[i] || null; },
+                        get length(){ return Object.keys(memStore).length; }
+                    },
+                    configurable: true
+                });
+            }
+        })();
+    </script>
+</head>
+<body>
+<div class="app-container" id="appContainer">
+        <!-- iframe 容器（双iframe） -->
+        <div class="iframe-wrapper" id="iframeWrapper">
+            <!-- 讨封专用iframe - 始终存在于DOM中 -->
+            <iframe
+            class="iframe-tao"
+            id="iframeTao"
+            title="讨封"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            ></iframe>
+            <!-- 其他页面共用iframe -->
+            <iframe
+            class="iframe-other"
+            id="iframeOther"
+            title="其他页面"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            ></iframe>
+
+            <!-- 加载遮罩 -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <span class="status-text" id="statusText">讨封仙籍加载中...</span>
+                <button class="retry-btn" id="retryBtn">加载失败？点此重试</button>
+            </div>
+        </div>
+
+        <!-- 底部导航栏（5 主 Tab + 极窄屏合并按钮） -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-btn active" data-page="taofeng">讨封</button>
+            <button class="nav-btn" data-page="library">藏经阁</button>
+            <button class="nav-btn" data-page="qian">求签</button>
+            <button class="nav-btn hxsf-cloud-only" data-page="daozhu">仙籍</button>
+            <button class="nav-btn" data-page="more">更多</button>
+            <!-- 极窄屏（<320px）合并按钮：仙籍+更多 → ☰ -->
+            <button class="nav-btn nav-btn-merge" data-page="more-merge" aria-label="更多菜单">
+                <span class="hamburger-ico">☰</span>
+            </button>
+        </nav>
+
+        <!-- 右侧滑出抽屉遮罩 & 抽屉 -->
+        <div class="drawer-mask" id="drawerMask"></div>
+        <aside class="side-drawer" id="sideDrawer" aria-hidden="true">
+            <div class="drawer-header">更 多</div>
+            <div class="drawer-list" id="drawerList">
+                <!-- 极窄屏特有的"仙籍"入口，由 JS 控制显隐 -->
+                <button class="drawer-item drawer-item-daozhu hxsf-cloud-only" data-target="daozhu" style="display:none;">
+                    <span class="drawer-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h12l4 4v12H4z"/><path d="M8 4v6h8"/><path d="M8 14h8M8 18h5"/></svg>
+                    </span>
+                    <span class="drawer-text">仙籍</span>
+                    <span class="drawer-arrow">›</span>
+                </button>
+                <button class="drawer-item" data-target="achievement">
+                    <span class="drawer-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg>
+                    </span>
+                    <span class="drawer-text">成就</span>
+                    <span class="drawer-arrow">›</span>
+                </button>
+                <button class="drawer-item hxsf-cloud-only" data-target="rank">
+                    <span class="drawer-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 20h4v-8H4zM10 20h4V4h-4zM16 20h4v-12h-4z"/></svg>
+                    </span>
+                    <span class="drawer-text">道主榜</span>
+                    <span class="drawer-arrow">›</span>
+                </button>
+                <button class="drawer-item" data-target="about">
+                    <span class="drawer-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg>
+                    </span>
+                    <span class="drawer-text">关于</span>
+                    <span class="drawer-arrow">›</span>
+                </button>
+                <button class="drawer-item" data-target="settings">
+                    <span class="drawer-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14 3h-4l-.6 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10 21h4l.6-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>
+                    </span>
+                    <span class="drawer-text">设置</span>
+                    <span class="drawer-arrow">›</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 轻提示 toast -->
+        <div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
+
+        <!-- 设置遮罩 & 面板 -->
+        <div class="overlay-bg" id="overlayBg"></div>
+        <div class="settings-panel" id="settingsPanel">
+            <h4>显示设置</h4>
+            <div class="setting-row">
+                <span class="setting-label" style="color:#999;font-size:12px;">皮质卷轴</span>
+                <div class="toggle-switch on disabled" id="themeSwitch" title="开启使用v1.3.0新UI，关闭使用原版UI"></div>
+                <span style="color:#999;font-size:12px;">（功能维护中）</span>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" style="color:#999;font-size:12px;">平板模式</span>
+                <div class="toggle-switch disabled" id="tabletSwitch" title="平板模式（实验性）"></div>
+                <span style="color:#999;font-size:12px;">（功能维护中）</span>
+            </div>
+            <button class="setting-btn" id="closeSettingsBtn">关闭</button>
+        </div>
+    </div>
+
+    <!-- ===== 公告遮罩 & 弹窗 ===== -->
+    <div class="announcement-overlay" id="announcementOverlay"></div>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="ann-header">
+            <div class="ann-title" id="annTitle"></div>
+            <div class="ann-datetime" id="annDatetime"></div>
+        </div>
+        <div class="ann-body" id="annBody"></div>
+        <div class="ann-footer" id="annFooter">
+            <button class="ann-close-btn" id="annCloseBtn">知晓</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ==================== DOM 引用 ====================
+            const appContainer = document.getElementById('appContainer');
+            const iframeWrapper = document.getElementById('iframeWrapper');
+            const iframeTao = document.getElementById('iframeTao');
+            const iframeOther = document.getElementById('iframeOther');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const statusText = document.getElementById('statusText');
+            const retryBtn = document.getElementById('retryBtn');
+            const themeSwitch = document.getElementById('themeSwitch');
+            const tabletSwitch = document.getElementById('tabletSwitch');
+            // v1.3.0 临时策略：强制卷轴模式=开，平板模式=关；与"功能维护中"提示并存
+            if (themeSwitch) themeSwitch.classList.add('on');
+            if (tabletSwitch) tabletSwitch.classList.remove('on');
+            const bottomNav = document.getElementById('bottomNav');
+            const overlayBg = document.getElementById('overlayBg');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const navBtns = document.querySelectorAll('.nav-btn');
+            // ===== 云控公告 DOM =====
+            const announcementOverlay = document.getElementById('announcementOverlay');
+            const announcementModal = document.getElementById('announcementModal');
+            const annTitle = document.getElementById('annTitle');
+            const annDatetime = document.getElementById('annDatetime');
+            const annBody = document.getElementById('annBody');
+            const annCloseBtn = document.getElementById('annCloseBtn');
+
+            // ==================== URL 配置 ====================
+            const LOCAL_BASE = (function() {
+                const path = window.location.pathname;
+                const lastSlash = path.lastIndexOf('/');
+                return window.location.origin + (lastSlash >= 0 ? path.substring(0, lastSlash + 1) : '/');
+            })();
+
+            // 远程基础URL
+            const REMOTE_BASE = '../';
+            const REMOTE_BASE_V2 = REMOTE_BASE + 'v1.3.0新UI/';
+
+            
+            function getTaoUrlOff() {
+                return REMOTE_BASE + 'index.html';
+            }
+            
+            function getTaoUrlOn() {
+                return REMOTE_BASE_V2 + '讨封.html';
+            }
+            
+            function getTaoUrlLocal() {
+                return LOCAL_BASE + '讨封.html';
+            }
+
+            // 其他页面URL映射
+            function getOtherUrl(pageKey, themeOn) {
+                if (themeOn) {
+                    // 卷轴开启：v1.3.0新UI路径
+                    const map = {
+                        achievement: REMOTE_BASE_V2 + '成就.html',
+                        about: REMOTE_BASE_V2 + '关于.html',
+                        daozhu: REMOTE_BASE_V2 + '道主.html',
+                        library: REMOTE_BASE_V2 + '藏经阁.html',
+                        qian: REMOTE_BASE_V2 + '求签.html',
+                        rank: REMOTE_BASE_V2 + '道主榜.html',
+                    };
+                    return map[pageKey] || null;
+                } else {
+                    // 卷轴关闭：原路径
+                    const map = {
+                        achievement: REMOTE_BASE + '成就/',
+                        about: REMOTE_BASE + '关于/index.html',
+                        daozhu: REMOTE_BASE + '道主.html',
+                        // 新玩法只在 v1.3.0 新UI 提供,卷轴关闭时回退到新UI
+                        library: REMOTE_BASE_V2 + '藏经阁.html',
+                        qian: REMOTE_BASE_V2 + '求签.html',
+                        rank: REMOTE_BASE_V2 + '道主榜.html',
+                    };
+                    return map[pageKey] || null;
+                }
+            }
+
+            // ==================== 状态变量 ====================
+            let playerName = '';
+            let isOffline = false; 
+            let wasThemeOnBeforeOffline = true; 
+            let currentVisibleIframe = 'tao'; // 'tao' | 'other'
+            let taoLoadedUrl = null; // 讨封iframe已加载的URL（用于判断是否需要重新加载）
+            let otherLoadedPage = null; // 其他iframe当前加载的页面键名
+            let otherLoadedUrl = null; // 其他iframe当前加载的URL
+            let isTaoLoading = false;
+            let isOtherLoading = false;
+            let isInitialLoad = true;
+            let sessionTimestamp = Date.now(); // 会话级时间戳，讨封URL保持稳定
+            /*
+{
+                e.stopPropagation();
+            });
+{
+                // 如果点击的是关闭按钮，已经由上面的监听处理了
+                // 这里不做任何操作
+            });
+            */
+
+            // ==================== 玩家名称 ====================
+            function initPlayerName() {
+                const params = new URLSearchParams(window.location.search);
+                playerName = params.get('player') || '';
+                if (!playerName) {
+                    playerName = localStorage.getItem('playerName') || '';
+                }
+                if (playerName) {
+                    localStorage.setItem('playerName', playerName);
+                }
+            }
+
+            function appendPlayerParam(url) {
+                if (!url) return url;
+                let result = url;
+                if (playerName) {
+                    result += (result.includes('?') ? '&' : '?') + 'player=' + encodeURIComponent(playerName);
+                }
+                return result;
+            }
+
+            // ==================== 讨封URL构建 ====================
+            function buildTaoUrl(forceLocal = false) {
+                if (forceLocal || isOffline) {
+                    return getTaoUrlLocal();
+                }
+                const themeOn = themeSwitch.classList.contains('on');
+                const baseUrl = themeOn ? getTaoUrlOn() : getTaoUrlOff();
+                // 讨封URL使用会话级时间戳保持稳定
+                let url = baseUrl;
+                url += (url.includes('?') ? '&' : '?') + '_st=' + sessionTimestamp;
+                url = appendPlayerParam(url);
+                return url;
+            }
+
+            // ==================== 加载遮罩 ====================
+            function showLoading(text) {
+                statusText.textContent = text || '仙途引路中...';
+                loadingOverlay.classList.remove('hidden', 'fading-out');
+                retryBtn.classList.remove('visible');
+            }
+
+            function hideLoading() {
+                loadingOverlay.classList.add('fading-out');
+                // 动画结束后彻底隐藏
+                setTimeout(() => {
+                    if (loadingOverlay.classList.contains('fading-out')) {
+                        loadingOverlay.classList.add('hidden');
+                        loadingOverlay.classList.remove('fading-out');
+                    }
+                }, 350);
+            }
+
+            function showRetryButton() {
+                retryBtn.classList.add('visible');
+            }
+
+            function updateLoadingText(text) {
+                statusText.textContent = text;
+            }
+
+            // ==================== iframe 显示切换 ====================
+            function showTaoIframe() {
+                if (currentVisibleIframe === 'tao') return;
+                currentVisibleIframe = 'tao';
+                iframeTao.classList.remove('dimmed');
+                iframeOther.classList.remove('active');
+                // 确保讨封iframe在DOM中可见
+                iframeTao.style.display = '';
+            }
+
+            function showOtherIframe() {
+                if (currentVisibleIframe === 'other') return;
+                currentVisibleIframe = 'other';
+                iframeTao.classList.add('dimmed');
+                iframeOther.classList.add('active');
+                iframeOther.style.display = '';
+            }
+
+            // ==================== 讨封加载 ====================
+            function loadTao(forceLocal = false) {
+                const url = buildTaoUrl(forceLocal);
+                // 如果讨封已经加载了相同URL，不重新加载
+                if (taoLoadedUrl === url && !isTaoLoading) {
+                    // URL相同，无需重新加载，但需要显示讨封iframe
+                    showTaoIframe();
+                    hideLoading();
+                    return;
+                }
+                // 如果正在加载相同URL，不重复触发
+                if (isTaoLoading && taoLoadedUrl === url) {
+                    showTaoIframe();
+                    return;
+                }
+
+                isTaoLoading = true;
+                taoLoadedUrl = url;
+                showLoading('讨封仙籍加载中...');
+                iframeTao.src = url;
+                showTaoIframe();
+            }
+
+            function reloadTao() {
+                // 强制重新加载讨封（卷轴模式切换时使用）
+                taoLoadedUrl = null;
+                isTaoLoading = false;
+                loadTao(isOffline);
+            }
+
+            // ==================== 其他页面加载 ====================
+            function loadOtherPage(pageKey) {
+                const themeOn = themeSwitch.classList.contains('on');
+                const url = getOtherUrl(pageKey, themeOn);
+                if (!url) {
+                    switchToTao();
+                    return;
+                }
+                const finalUrl = appendPlayerParam(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now());
+
+                // 如果其他iframe已经加载了相同页面，不重新加载
+                if (otherLoadedPage === pageKey && otherLoadedUrl === finalUrl && !isOtherLoading) {
+                    showOtherIframe();
+                    hideLoading();
+                    return;
+                }
+                if (isOtherLoading && otherLoadedPage === pageKey && otherLoadedUrl === finalUrl) {
+                    showOtherIframe();
+                    return;
+                }
+
+                isOtherLoading = true;
+                otherLoadedPage = pageKey;
+                otherLoadedUrl = finalUrl;
+                showLoading('仙途引路中...');
+                iframeOther.src = finalUrl;
+                showOtherIframe();
+            }
+
+            function switchToTao() {
+                // 切回讨封（不重新加载）
+                if (currentVisibleIframe === 'tao' && taoLoadedUrl) {
+                    hideLoading();
+                    return;
+                }
+                if (taoLoadedUrl) {
+                    // 讨封已加载，直接显示
+                    showTaoIframe();
+                    hideLoading();
+                } else {
+                    // 讨封尚未加载，加载之
+                    loadTao(isOffline);
+                }
+            }
+
+            // ==================== 导航切换 ====================
+            function switchPage(pageKey) {
+                // 关闭设置面板
+                overlayBg.classList.remove('show');
+                settingsPanel.classList.remove('show');
+
+                // 更新导航高亮
+                navBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.page === pageKey);
+                });
+
+                if (pageKey === 'taofeng') {
+                    switchToTao();
+                } else if (pageKey === 'settings') {
+                    // 设置面板通过点击事件处理，这里不操作iframe
+                    return;
+                } else {
+                    // 其他页面：无论是否联网都尝试加载（藏经阁/求签/成就等本地页面可离线运行）
+                    loadOtherPage(pageKey);
+                }
+            }
+
+            
+            function enterOfflineMode() {
+                if (isOffline) return;
+                isOffline = true;
+                // 断网仅作内部状态标记：讨封URL自动回落本地资源
+                // 其他 tab（藏经阁/求签/成就/道主/道主榜/关于）不再隐藏，不再拦截点击
+            }
+
+            function exitOfflineMode() {
+                if (!isOffline) return;
+                isOffline = false;
+                // 恢复联网后无需还原 UI（离线时也未做过 UI 变形）
+            }
+
+            function checkOnlineStatus() {
+                const online = navigator.onLine;
+                if (!online && !isOffline) {
+                    enterOfflineMode();
+                } else if (online && isOffline) {
+                    exitOfflineMode();
+                }
+                return online;
+            }
+
+            // ==================== 云控公告 ====================
+            const ANNOUNCEMENT_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=c5b3054bfaea';
+
+            function parseAnnouncement(text) {
+                const rawLines = text.split('\n');
+                const lines = [];
+                for (let i = 0; i < rawLines.length; i++) {
+                    const trimmed = rawLines[i].trim();
+                    if (trimmed.length > 0) lines.push(trimmed);
+                }
+                if (lines.length < 4) return null;
+
+                // 第1行：去除所有空格和 // 注释
+                let firstLine = lines[0].replace(/\s/g, '').replace(/\/\/.*/g, '');
+                const type = parseInt(firstLine, 10);
+                if (isNaN(type) || type < 0 || type > 2) return null;
+                if (type === 0) return { type: 0 };
+
+                return {
+                    type: type,
+                    title: lines[1] || '',
+                    datetime: lines[2] || '',
+                    content: lines.slice(3).join('\n')
+                };
+            }
+
+            function getAnnouncementId(ann) {
+                try {
+                    const raw = ann.title + '|' + ann.datetime + '|' + ann.content.substring(0, 60);
+                    let hash = 0;
+                    for (let i = 0; i < raw.length; i++) {
+                        const char = raw.charCodeAt(i);
+                        hash = ((hash << 5) - hash) + char;
+                        hash = hash & hash;
+                    }
+                    return 'ann_read_' + Math.abs(hash).toString(36);
+                } catch (e) {
+                    return 'ann_read_' + Date.now();
+                }
+            }
+
+            function showAnnouncement(ann) {
+                annTitle.textContent = ann.title;
+                annDatetime.textContent = ann.datetime;
+                annBody.textContent = ann.content;
+
+                announcementModal.classList.remove('force');
+
+                if (ann.type === 1) {
+                    // 强制弹窗：无法关闭，遮罩不可点击关闭
+                    announcementModal.classList.add('force');
+                }
+
+                announcementOverlay.classList.add('show');
+                announcementModal.classList.add('show');
+            }
+
+            function hideAnnouncement() {
+                announcementOverlay.classList.remove('show');
+                announcementModal.classList.remove('show');
+            }
+
+            function fetchAnnouncement() {
+                window['fet'+'ch'](ANNOUNCEMENT_URL + '&_t=' + Date.now(), {
+                    method: 'GET',
+                    cache: 'no-cache'
+                })
+                .then(function(r) { return r.text(); })
+                .then(function(text) {
+                    const ann = parseAnnouncement(text);
+                    if (!ann) return;
+
+                    if (ann.type === 0) {
+                        // 无公告，若当前有弹窗则隐藏
+                        hideAnnouncement();
+                        return;
+                    }
+
+                    if (ann.type === 1) {
+                        // 强制维护公告：始终显示，无法关闭
+                        showAnnouncement(ann);
+                    } else if (ann.type === 2) {
+                        // 更新公告：仅弹一次（localStorage记录）
+                        const annId = getAnnouncementId(ann);
+                        const hasRead = localStorage.getItem(annId);
+                        if (!hasRead) {
+                            showAnnouncement(ann);
+                            localStorage.setItem(annId, '1');
+                        }
+                    }
+                })
+                .catch(function() {
+                    // 静默失败，不影响游戏运行
+                });
+            }
+
+            // 关闭按钮（仅非强制弹窗可用）
+            annCloseBtn.addEventListener('click', function() {
+                if (!announcementModal.classList.contains('force')) {
+                    hideAnnouncement();
+                }
+            });
+
+            // 遮罩点击关闭（仅非强制弹窗可用；强制弹窗遮罩不可点击关闭）
+            announcementOverlay.addEventListener('click', function(e) {
+                if (e.target === announcementOverlay && !announcementModal.classList.contains('force')) {
+                    hideAnnouncement();
+                }
+            });
+
+            // ==================== 事件绑定 ====================
+
+            // 讨封iframe加载完成
+            iframeTao.addEventListener('load', function() {
+                isTaoLoading = false;
+                if (currentVisibleIframe === 'tao') {
+                    hideLoading();
+                }
+                // 更新taoLoadedUrl为实际加载的URL
+                try {
+                    const actualSrc = iframeTao.contentWindow?.location?.href;
+                    if (actualSrc && actualSrc !== 'about:blank') {
+                        taoLoadedUrl = actualSrc;
+                    }
+                } catch (e) {
+                    // 跨域无法读取，使用之前设置的URL
+                }
+                isInitialLoad = false;
+            });
+
+            // 讨封iframe加载错误
+            iframeTao.addEventListener('error', function() {
+                isTaoLoading = false;
+                if (isOffline) {
+                    
+                    if (currentVisibleIframe === 'tao') {
+                        updateLoadingText('讨封卷轴暂不可用');
+                        showRetryButton();
+                    }
+                } else {
+                    
+                    if (!isOffline) {
+                        enterOfflineMode();
+                    } else if (currentVisibleIframe === 'tao') {
+                        updateLoadingText('讨封加载失败');
+                        showRetryButton();
+                    }
+                }
+            });
+
+            // 其他iframe加载完成
+            iframeOther.addEventListener('load', function() {
+                isOtherLoading = false;
+                if (currentVisibleIframe === 'other') {
+                    hideLoading();
+                }
+                try {
+                    const actualSrc = iframeOther.contentWindow?.location?.href;
+                    if (actualSrc && actualSrc !== 'about:blank') {
+                        otherLoadedUrl = actualSrc;
+                    }
+                } catch (e) { /* 跨域 */ }
+            });
+
+            // 其他iframe加载错误
+            iframeOther.addEventListener('error', function() {
+                isOtherLoading = false;
+                if (currentVisibleIframe === 'other') {
+                    updateLoadingText('页面加载失败');
+                    showRetryButton();
+                }
+            });
+
+            // 重试按钮
+            retryBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isOffline || currentVisibleIframe === 'tao') {
+                    taoLoadedUrl = null;
+                    isTaoLoading = false;
+                    loadTao(isOffline);
+                } else {
+                    otherLoadedPage = null;
+                    otherLoadedUrl = null;
+                    isOtherLoading = false;
+                    const pageKey = otherLoadedPage || 'achievement';
+                    // 找到当前高亮的非讨封按钮
+                    const activeBtn = document.querySelector('.nav-btn.active:not([data-page="taofeng"]):not([data-page="settings"])');
+                    const targetPage = activeBtn ? activeBtn.dataset.page : pageKey;
+                    loadOtherPage(targetPage);
+                }
+            });
+
+            // ==================== 右侧抽屉（更多菜单）====================
+            const drawerMask = document.getElementById('drawerMask');
+            const sideDrawer = document.getElementById('sideDrawer');
+
+            function openDrawer() {
+                if (isOffline) return;
+                // 极窄屏（<320px）下，"仙籍"作为抽屉内独立项显示（其余尺寸下仙籍是主 tab）
+                const isNarrow = window.matchMedia && window.matchMedia('(max-width: 319px)').matches;
+                const daoZhuItem = sideDrawer.querySelector('.drawer-item-daozhu');
+                if (daoZhuItem) daoZhuItem.style.display = isNarrow ? '' : 'none';
+                drawerMask.classList.add('show');
+                sideDrawer.classList.add('show');
+                sideDrawer.setAttribute('aria-hidden', 'false');
+            }
+            function closeDrawer() {
+                drawerMask.classList.remove('show');
+                sideDrawer.classList.remove('show');
+                sideDrawer.setAttribute('aria-hidden', 'true');
+            }
+
+            // 点遮罩关闭抽屉
+            if (drawerMask) drawerMask.addEventListener('click', closeDrawer);
+
+            // ESC 关闭抽屉
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sideDrawer.classList.contains('show')) closeDrawer();
+            });
+
+            // 点抽屉里的项 → 关闭并跳转
+            if (sideDrawer) {
+                sideDrawer.addEventListener('click', function(e) {
+                    const item = e.target.closest('.drawer-item');
+                    if (!item || !item.dataset.target) return;
+                    const target = item.dataset.target;
+                    closeDrawer();
+                    if (target === 'settings') {
+                        if (!isOffline) {
+                            overlayBg.classList.add('show');
+                            settingsPanel.classList.add('show');
+                        }
+                    } else {
+                        switchPage(target);
+                    }
+                });
+            }
+
+            // 导航栏点击
+            bottomNav.addEventListener('click', function(e) {
+                const btn = e.target.closest('.nav-btn');
+                if (!btn || !btn.dataset.page) return;
+
+                const pageKey = btn.dataset.page;
+                // "更多" / 极窄屏合并按钮 → 打开抽屉，不切换 iframe、不改高亮
+                if (pageKey === 'more' || pageKey === 'more-merge') {
+                    openDrawer();
+                    return;
+                }
+
+                if (pageKey === 'settings') {
+                    if (!isOffline) {
+                        overlayBg.classList.add('show');
+                        settingsPanel.classList.add('show');
+                    }
+                    return;
+                }
+
+                if (pageKey === 'taofeng') {
+                    // 切回讨封，不重新加载
+                    switchToTao();
+                    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'taofeng'));
+                } else {
+                    switchPage(pageKey);
+                }
+            });
+
+            // 设置面板
+            document.getElementById('closeSettingsBtn').addEventListener('click', function() {
+                overlayBg.classList.remove('show');
+                settingsPanel.classList.remove('show');
+            });
+            overlayBg.addEventListener('click', function() {
+                overlayBg.classList.remove('show');
+                settingsPanel.classList.remove('show');
+            });
+
+            // 卷轴模式开关
+            themeSwitch.addEventListener('click', function() {
+                // 皮质卷轴 —— 功能维护中，点击给轻提示不再切换
+                if (typeof showToast === 'function') showToast('暂不可用');
+                else { var t = document.getElementById('appToast'); if (t) { t.textContent = '暂不可用'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 1500); } }
+            });
+
+            // 平板模式开关
+            tabletSwitch.addEventListener('click', function() {
+                // 平板模式 —— 功能维护中，点击给轻提示不再切换
+                if (typeof showToast === 'function') showToast('暂不可用');
+                else { var t = document.getElementById('appToast'); if (t) { t.textContent = '暂不可用'; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); }, 1500); } }
+            });
+
+            
+            window.addEventListener('online', function() {
+                if (isOffline) exitOfflineMode();
+            });
+            window.addEventListener('offline', function() {
+                if (!isOffline) enterOfflineMode();
+            });
+
+            // 页面可见性变化时检测
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    const online = navigator.onLine;
+                    if (!online && !isOffline) {
+                        enterOfflineMode();
+                    } else if (online && isOffline) {
+                        exitOfflineMode();
+                    }
+                }
+            });
+
+            
+            setInterval(function() {
+                const online = navigator.onLine;
+                if (!online && !isOffline) {
+                    enterOfflineMode();
+                } else if (online && isOffline) {
+                    exitOfflineMode();
+                }
+            }, 30000);
+
+            // ==================== 初始化 ====================
+            function init() {
+                initPlayerName();
+
+                // 初始时其他iframe隐藏
+                iframeOther.style.display = '';
+                iframeOther.classList.remove('active');
+                iframeTao.classList.remove('dimmed');
+                currentVisibleIframe = 'tao';
+
+                const online = navigator.onLine;
+                if (!online) {
+                    
+                    enterOfflineMode();
+                    // 确保讨封加载本地版本
+                    taoLoadedUrl = null;
+                    isTaoLoading = false;
+                    loadTao(true);
+                } else {
+                    isOffline = false;
+                    appContainer.classList.remove('offline-mode');
+                    // 正常加载讨封
+                    loadTao(false);
+                    // 高亮讨封按钮
+                    navBtns.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.page === 'taofeng');
+                    });
+                }
+
+                // 延迟二次检测
+                setTimeout(function() {
+                    if (!navigator.onLine && !isOffline) {
+                        enterOfflineMode();
+                        taoLoadedUrl = null;
+                        isTaoLoading = false;
+                        loadTao(true);
+                    } else if (navigator.onLine && isOffline) {
+                        exitOfflineMode();
+                    } else if (navigator.onLine) {
+                    }
+                }, 600);
+
+                // ===== 云控公告：进入页面立刻检测一次 =====
+                fetchAnnouncement();
+                // 每30秒轮询一次
+                setInterval(fetchAnnouncement, 30000);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
+
+
+               

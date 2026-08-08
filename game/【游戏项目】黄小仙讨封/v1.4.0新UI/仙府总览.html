@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>仙府总览 · 黄小仙讨封</title>
+    <script>
+        (function () {
+            // 主题系统：妖异风 demonic / 卷轴风 scroll
+            function readTheme() {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                        if (pt === 'scroll' || pt === 'demonic') return pt;
+                    }
+                } catch (e) {}
+                try { var t = localStorage.getItem('hxsf_theme'); return (t === 'scroll' || t === 'demonic') ? t : 'demonic'; }
+                catch (e) { return 'demonic'; }
+            }
+            document.documentElement.setAttribute('data-theme', readTheme());
+        })();
+    </script>
+    <style>
+        :root {
+            --bg-deep: #0d0508;
+            --gold: #E8C56A;
+            --gold-dark: #a8873f;
+            --gold-light: #FFE9A8;
+            --crimson: #8a1f2b;
+            --border-subtle: #2a1214;
+            --text-muted: #9a8370;
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-deep);
+            font-family: var(--font-stack);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        /* 妖异暗红黑底 + 金色云雾 + 星尘 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 20% -5%, rgba(138, 31, 43, 0.32), transparent 55%),
+                radial-gradient(ellipse at 80% 10%, rgba(232, 197, 106, 0.14), transparent 48%),
+                radial-gradient(ellipse at 50% 108%, rgba(90, 13, 20, 0.42), transparent 62%),
+                linear-gradient(180deg, #0d0508 0%, #160a0c 50%, #1c0c0f 100%);
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(1.5px 1.5px at 14% 24%, rgba(255, 233, 168, 0.7), transparent 60%),
+                radial-gradient(1px 1px at 36% 70%, rgba(255, 233, 168, 0.5), transparent 60%),
+                radial-gradient(2px 2px at 60% 30%, rgba(255, 233, 168, 0.6), transparent 60%),
+                radial-gradient(1px 1px at 78% 76%, rgba(255, 233, 168, 0.45), transparent 60%),
+                radial-gradient(1.5px 1.5px at 90% 16%, rgba(255, 233, 168, 0.55), transparent 60%),
+                radial-gradient(1px 1px at 46% 90%, rgba(255, 233, 168, 0.4), transparent 60%);
+            animation: stardrift 14s linear infinite;
+        }
+        @keyframes stardrift {
+            0% { transform: translateY(0); opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-30px); opacity: 0.7; }
+        }
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+
+        .page { height: 100%; display: flex; flex-direction: column; position: relative; z-index: 1; }
+
+        /* ===== 顶部 ===== */
+        .header { padding: 26px 16px 14px; text-align: center; flex-shrink: 0; position: relative; }
+        .header .title { color: var(--gold-light); font-size: 23px; letter-spacing: 10px; font-weight: bold; text-shadow: 0 0 18px rgba(232, 197, 106, 0.7), 0 2px 6px rgba(0, 0, 0, 0.8); }
+        .header .title::before,
+        .header .title::after { content: '◆'; font-size: 11px; color: var(--gold); vertical-align: middle; margin: 0 10px; opacity: 0.7; }
+        .header .subtitle { color: var(--text-muted); font-size: 13px; letter-spacing: 3px; margin-top: 8px; }
+        .header .player-name { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-top: 14px; border-top: 1px solid #3a1620; padding-top: 14px; }
+        .header .player-name .ico { color: var(--gold-dark); margin-right: 8px; }
+
+        /* ===== 分组列表 ===== */
+        .group-list { flex: 1; overflow-y: auto; padding: 4px 14px 24px; }
+        .group-title { color: var(--gold-dark); font-size: 13px; letter-spacing: 4px; margin: 22px 4px 12px; position: relative; }
+        .group-title::after { content: ""; display: block; width: 60%; height: 1px; margin-top: 6px; background: linear-gradient(90deg, rgba(232, 197, 106, 0.45), transparent); }
+        .func-item {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; padding: 16px 18px; margin-bottom: 10px;
+            background: linear-gradient(180deg, rgba(44, 18, 22, 0.9), rgba(22, 10, 12, 0.92));
+            border: 1px solid #3a1620;
+            border-radius: 10px;
+            color: #f0e6d2; font-size: 15px; letter-spacing: 2px;
+            font-family: inherit; cursor: pointer; text-align: left;
+            box-shadow: inset 0 1px 0 rgba(255, 233, 168, 0.06), 0 4px 14px rgba(0, 0, 0, 0.35);
+            transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .func-item::before {
+            content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+            background: linear-gradient(180deg, var(--gold-light), var(--gold-dark));
+            box-shadow: 0 0 10px rgba(232, 197, 106, 0.6);
+            opacity: 0.7;
+        }
+        .func-item:active { background: rgba(232, 197, 106, 0.1); border-color: var(--gold-dark); transform: scale(0.98); box-shadow: 0 0 20px rgba(232, 197, 106, 0.15); }
+        .func-item .name { display: flex; align-items: center; }
+        .func-item .ico { color: var(--gold); margin-right: 12px; font-size: 16px; min-width: 16px; text-align: center; filter: drop-shadow(0 0 6px rgba(232, 197, 106, 0.5)); }
+        .func-item .cloud-tag { color: var(--gold-dark); font-size: 11px; border: 1px solid #5a3a20; border-radius: 3px; padding: 1px 6px; margin-left: 10px; }
+        .func-item .arrow { color: #6d5650; font-size: 18px; }
+
+        /* ===== 内嵌视图 ===== */
+        .embed-view { position: fixed; inset: 0; background: var(--bg-deep); z-index: 100; display: none; flex-direction: column; }
+        .embed-view.show { display: flex; }
+        .embed-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #160a0c; border-bottom: 1px solid var(--border-subtle); flex-shrink: 0; }
+        .embed-back { background: transparent; border: none; color: var(--gold-light); font-size: 15px; font-family: inherit; letter-spacing: 2px; cursor: pointer; padding: 6px 12px; white-space: nowrap; text-shadow: 0 0 10px rgba(232, 197, 106, 0.5); }
+        .embed-back:active { opacity: 0.7; }
+        .embed-title { color: #e6dcc8; font-size: 14px; letter-spacing: 2px; flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .embed-frame { flex: 1; border: none; width: 100%; }
+
+        /* ===== 卷轴风（浅色牛皮纸）主题覆盖 ===== */
+        html[data-theme="scroll"] {
+            --bg-deep: #F5DEB3;
+            --gold: #B8860B;
+            --gold-dark: #8B7355;
+            --gold-light: #3E2723;
+            --crimson: #A0522D;
+            --border-subtle: #C9A84C;
+            --text-muted: #5D4037;
+        }
+        html[data-theme="scroll"] body {
+            background: #F5DEB3;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139,69,19,0.03) 2px, rgba(139,69,19,0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210,180,140,0.15) 0%, transparent 60%);
+        }
+        html[data-theme="scroll"] body::before,
+        html[data-theme="scroll"] body::after { background: none; animation: none; }
+        html[data-theme="scroll"] .header .title {
+            color: var(--gold);
+            text-shadow: 2px 2px 0 var(--crimson);
+        }
+        html[data-theme="scroll"] .header .title::before,
+        html[data-theme="scroll"] .header .title::after { color: var(--gold); }
+        html[data-theme="scroll"] .header .player-name { border-top-color: var(--border-subtle); color: #3E2723; }
+        html[data-theme="scroll"] .header .player-name .ico { color: var(--gold-dark); }
+        html[data-theme="scroll"] .group-title { color: var(--gold-dark); }
+        html[data-theme="scroll"] .group-title::after { background: linear-gradient(90deg, rgba(139,69,19,0.5), transparent); }
+        html[data-theme="scroll"] .func-item {
+            background: rgba(255,248,220,0.75);
+            border-color: var(--border-subtle);
+            color: #3E2723;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 14px rgba(0,0,0,0.12);
+        }
+        html[data-theme="scroll"] .func-item::before { background: linear-gradient(180deg, var(--gold-light), var(--gold-dark)); box-shadow: none; }
+        html[data-theme="scroll"] .func-item:active { background: rgba(184,134,11,0.12); border-color: var(--gold-dark); box-shadow: 0 0 14px rgba(184,134,11,0.2); }
+        html[data-theme="scroll"] .func-item .ico { color: var(--gold-dark); filter: none; }
+        html[data-theme="scroll"] .func-item .cloud-tag { color: var(--gold-dark); border-color: var(--border-subtle); }
+        html[data-theme="scroll"] .func-item .arrow { color: #8B7355; }
+        html[data-theme="scroll"] .embed-view { background: #F5DEB3; }
+        html[data-theme="scroll"] .embed-bar { background: #EED9A8; border-bottom-color: var(--border-subtle); }
+        html[data-theme="scroll"] .embed-back { color: var(--gold-dark); text-shadow: none; }
+        html[data-theme="scroll"] .embed-title { color: #3E2723; }
+    </style>
+</head>
+<body>
+    <script>
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = { ready: null, done: false, killed: false };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    <script>
+        // localStorage 沙盒兜底：某些嵌入/隐私模式下 localStorage 会抛异常
+        (function () {
+            try {
+                var testKey = '__hxsf_ls_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                var store = {};
+                Object.defineProperty(window, 'localStorage', {
+                    configurable: true,
+                    get: function () {
+                        return {
+                            getItem: function (k) { return k in store ? store[k] : null; },
+                            setItem: function (k, v) { store[k] = String(v); },
+                            removeItem: function (k) { delete store[k]; },
+                            clear: function () { store = {}; }
+                        };
+                    }
+                });
+            }
+        })();
+    </script>
+
+    <div class="page">
+        <div class="header">
+            <div class="title">仙 府 总 览</div>
+            <div class="subtitle">— 黄小仙 · 讨封之卷 —</div>
+            <div class="player-name" id="playerName"><span class="ico">道号</span><span id="playerNameText">无名散修</span></div>
+        </div>
+        <div class="group-list" id="groupList">
+            <div class="group-title">✦ 修 炼</div>
+            <button class="func-item" data-url="求签.html" data-name="求签">
+                <span class="name"><span class="ico">签</span>求签</span><span class="arrow">›</span>
+            </button>
+            <button class="func-item" data-url="藏经阁.html" data-name="藏经阁">
+                <span class="name"><span class="ico">典</span>藏经阁</span><span class="arrow">›</span>
+            </button>
+
+            <div class="group-title">✦ 收 集</div>
+            <button class="func-item hxsf-cloud-only" data-url="道主.html" data-name="仙籍">
+                <span class="name"><span class="ico">籍</span>仙籍<span class="cloud-tag">云端</span></span><span class="arrow">›</span>
+            </button>
+            <button class="func-item" data-url="成就.html" data-name="成就">
+                <span class="name"><span class="ico">✦</span>成就</span><span class="arrow">›</span>
+            </button>
+            <button class="func-item hxsf-cloud-only" data-url="道主榜.html" data-name="道主榜">
+                <span class="name"><span class="ico">榜</span>道主榜<span class="cloud-tag">云端</span></span><span class="arrow">›</span>
+            </button>
+
+            <div class="group-title">✦ 辅 助</div>
+            <button class="func-item" data-url="关于.html" data-name="关于">
+                <span class="name"><span class="ico">☯</span>关于</span><span class="arrow">›</span>
+            </button>
+            <button class="func-item" data-special="settings" data-name="设置">
+                <span class="name"><span class="ico">⚙</span>设置</span><span class="arrow">›</span>
+            </button>
+            <button class="func-item" data-external="../健康游戏忠告/index.html" data-name="健康游戏忠告">
+                <span class="name"><span class="ico">戒</span>健康游戏忠告</span><span class="arrow">›</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 内嵌视图 -->
+    <div class="embed-view" id="embedView">
+        <div class="embed-bar">
+            <button class="embed-back" id="embedBack">‹ 返回</button>
+            <span class="embed-title" id="embedTitle"></span>
+        </div>
+        <iframe class="embed-frame" id="embedFrame"></iframe>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ===== 道号显示 =====
+            var playerName = '';
+            try { playerName = localStorage.getItem('playerName') || ''; } catch (e) {}
+            if (!playerName) {
+                try { if (window.parent && window.parent !== window) playerName = window.parent.localStorage.getItem('playerName') || ''; } catch (e) {}
+            }
+            var nameEl = document.getElementById('playerNameText');
+            if (nameEl && playerName) nameEl.textContent = playerName;
+
+            // ===== 内嵌视图 =====
+            var embedView = document.getElementById('embedView');
+            var embedFrame = document.getElementById('embedFrame');
+            var embedTitle = document.getElementById('embedTitle');
+            var embedBack = document.getElementById('embedBack');
+
+            function closeEmbed() {
+                embedView.classList.remove('show');
+                embedFrame.src = 'about:blank';
+            }
+
+            document.querySelectorAll('.func-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    var special = item.dataset.special;
+                    var external = item.dataset.external;
+                    var name = item.dataset.name;
+
+                    // 设置卡片 → 通知父导航栏打开设置面板
+                    if (special === 'settings') {
+                        try {
+                            if (window.parent && window.parent !== window) {
+                                window.parent.postMessage({ type: 'nav', target: 'settings' }, '*');
+                            }
+                        } catch (e) {}
+                        return;
+                    }
+
+                    // 外部页面（健康游戏忠告为启动页，自动跳转，不适合内嵌）→ 新窗口打开
+                    if (external) {
+                        window.open(external, '_blank');
+                        return;
+                    }
+
+                    var url = item.dataset.url;
+                    if (!url) return;
+                    embedTitle.textContent = name || '';
+                    embedFrame.src = url + (url.indexOf('?') !== -1 ? '&' : '?') + 't=' + Date.now();
+                    embedView.classList.add('show');
+                });
+            });
+
+            embedBack.addEventListener('click', closeEmbed);
+
+            // 内嵌子页面（如道主.html 返回按钮）会向本页发送 nav 消息 → 视为返回列表
+            window.addEventListener('message', function (e) {
+                var d = e.data;
+                if (d && d.type === 'nav') closeEmbed();
+                // 主题广播：接收导航栏主题切换
+                if (d && d.type === 'hxsf-theme' && (d.theme === 'scroll' || d.theme === 'demonic')) {
+                    document.documentElement.setAttribute('data-theme', d.theme);
+                    try { localStorage.setItem('hxsf_theme', d.theme); } catch (err) {}
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>藏经阁 · 仙典在册</title>
+    <meta name="theme-color" content="#5D4037">
+    <script>
+        (function () {
+            // 主题系统：妖异风 demonic / 卷轴风 scroll
+            function readTheme() {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                        if (pt === 'scroll' || pt === 'demonic') return pt;
+                    }
+                } catch (e) {}
+                try { var t = localStorage.getItem('hxsf_theme'); return (t === 'scroll' || t === 'demonic') ? t : 'demonic'; }
+                catch (e) { return 'demonic'; }
+            }
+            document.documentElement.setAttribute('data-theme', readTheme());
+        })();
+    </script>
+    <style>
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+            --card-bg: rgba(255, 248, 220, 0.7);
+            --unlocked-glow: rgba(184, 134, 11, 0.35);
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210, 180, 140, 0.2) 0%, transparent 60%);
+        }
+        .page-container {
+            max-width: 720px;
+            width: 100%;
+            padding: 24px 20px 40px;
+            background: rgba(255, 248, 220, 0.5);
+            border-left: 4px solid var(--scroll-dark);
+            border-right: 4px solid var(--scroll-dark);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            flex: 1;
+        }
+        .header { text-align: center; border-bottom: 2px solid var(--scroll-dark); margin-bottom: 16px; padding-bottom: 10px; }
+        .header h1 { color: var(--scroll-gold); font-size: 32px; letter-spacing: 6px; text-shadow: 2px 2px 0 var(--scroll-dark); }
+        .subtitle { color: #5D4037; font-size: 13px; letter-spacing: 4px; font-style: italic; }
+        .stats-row { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .stat-item {
+            background: linear-gradient(180deg, #D2B48C, #A0522D);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-size: 13px;
+            color: var(--scroll-light);
+            letter-spacing: 1px;
+        }
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            margin: 16px 0 4px;
+            border-bottom: 2px solid var(--scroll-dark);
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 6px;
+            color: #8B7355;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .tab.active { color: var(--scroll-dark); border-bottom-color: var(--scroll-gold); font-weight: bold; background: rgba(184, 134, 11, 0.08); }
+        .tab:active { background: rgba(184, 134, 11, 0.15); }
+        .section-title {
+            color: var(--scroll-dark);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-align: center;
+            padding: 14px 0 8px;
+            border-top: 2px solid var(--scroll-dark);
+            margin-top: 14px;
+            font-weight: bold;
+        }
+        .scroll-list { display: flex; flex-direction: column; gap: 0; }
+        .scroll-row {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px 16px;
+            border-bottom: 1px dashed var(--scroll-dark);
+            min-height: 60px;
+            gap: 14px;
+            background: var(--card-bg);
+            margin-bottom: 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .scroll-row:active { transform: scale(0.99); }
+        .scroll-row.unlocked { box-shadow: 0 0 8px var(--unlocked-glow); }
+        .scroll-row.locked { opacity: 0.6; }
+        .scroll-icon {
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: linear-gradient(135deg, #F5DEB3, #DEB887);
+        }
+        .scroll-row.unlocked .scroll-icon { border-color: var(--scroll-gold); }
+        .scroll-row.locked .scroll-icon { filter: grayscale(0.6); }
+        .scroll-main { flex: 1; min-width: 0; }
+        .scroll-title { font-weight: bold; font-size: 15px; color: var(--scroll-dark); margin-bottom: 2px; }
+        .scroll-row.locked .scroll-title { font-style: italic; color: #8B7355; font-weight: normal; }
+        .scroll-meta { font-size: 11px; color: #8B7355; letter-spacing: 1px; }
+        .scroll-row.unlocked .scroll-meta { color: var(--scroll-gold); }
+        .scroll-preview {
+            font-size: 12px;
+            color: #5D4037;
+            margin-top: 4px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .scroll-row.locked .scroll-preview { display: none; }
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--scroll-dark);
+            font-style: italic;
+            background: var(--card-bg);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        /* 详情弹层 */
+        .detail-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .detail-overlay.show { display: flex; animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .detail-modal {
+            max-width: 520px;
+            width: 100%;
+            max-height: 80vh;
+            background: var(--scroll-light);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 10px;
+            padding: 24px 22px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            font-family: var(--font-stack);
+        }
+        .detail-title { color: var(--scroll-gold); font-size: 20px; letter-spacing: 4px; text-align: center; margin-bottom: 8px; text-shadow: 1px 1px 0 var(--scroll-dark); }
+        .detail-sub { color: #5D4037; font-size: 12px; letter-spacing: 2px; text-align: center; font-style: italic; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--scroll-dark); }
+        .detail-body { color: var(--scroll-text); font-size: 14.5px; line-height: 2; white-space: pre-wrap; }
+        .detail-close {
+            display: block;
+            margin: 18px auto 0;
+            padding: 8px 32px;
+            background: #8B4513;
+            color: var(--scroll-light);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font-stack);
+            font-size: 14px;
+            letter-spacing: 4px;
+            box-shadow: 0 3px 0 #5D2906;
+        }
+        .detail-close:active { transform: translateY(2px); box-shadow: 0 1px 0 #5D2906; }
+
+        .footer-hint { text-align: center; color: #8b5a2b; font-size: 12px; margin-top: 24px; font-style: italic; }
+
+        /* ===== 妖异风覆盖 ===== */
+        html[data-theme="demonic"] body {
+            background-color: #0d0508;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(232, 197, 106, 0.03) 2px, rgba(232, 197, 106, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(232, 197, 106, 0.14) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 85%, rgba(138, 31, 43, 0.25) 0%, transparent 65%);
+            color: #e8d8b8;
+        }
+        html[data-theme="demonic"] .page-container {
+            background: rgba(18, 8, 12, 0.72);
+            border-left: 4px solid #2a0f16;
+            border-right: 4px solid #2a0f16;
+            box-shadow: 0 0 40px rgba(138, 31, 43, 0.35);
+        }
+        html[data-theme="demonic"] .header { border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .header h1 { color: #E8C56A; text-shadow: 2px 2px 0 #3a0a10; }
+        html[data-theme="demonic"] .subtitle { color: #c8a878; }
+        html[data-theme="demonic"] .stat-item {
+            background: linear-gradient(180deg, #5a1620, #3a0f16);
+            border-color: #2a0f16;
+            color: #FFE9A8;
+        }
+        html[data-theme="demonic"] .tab-bar { border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .tab { color: #9a8268; }
+        html[data-theme="demonic"] .tab.active { color: #FFE9A8; border-bottom-color: #E8C56A; background: rgba(232, 197, 106, 0.08); }
+        html[data-theme="demonic"] .tab:active { background: rgba(232, 197, 106, 0.12); }
+        html[data-theme="demonic"] .section-title { color: #FFE9A8; border-top-color: #3a131c; }
+        html[data-theme="demonic"] .scroll-row {
+            background: rgba(24, 10, 14, 0.85);
+            border-bottom-color: rgba(138, 31, 43, 0.6);
+        }
+        html[data-theme="demonic"] .scroll-row.unlocked { box-shadow: 0 0 10px rgba(232, 197, 106, 0.3); }
+        html[data-theme="demonic"] .scroll-icon {
+            border-color: #3a131c;
+            background: linear-gradient(135deg, #3a2a0c, #2a1a08);
+        }
+        html[data-theme="demonic"] .scroll-row.unlocked .scroll-icon { border-color: #E8C56A; }
+        html[data-theme="demonic"] .scroll-title { color: #e8d8b8; }
+        html[data-theme="demonic"] .scroll-row.locked .scroll-title { color: #9a8268; }
+        html[data-theme="demonic"] .scroll-meta { color: #9a8268; }
+        html[data-theme="demonic"] .scroll-row.unlocked .scroll-meta { color: #E8C56A; }
+        html[data-theme="demonic"] .scroll-preview { color: #d8c4a0; }
+        html[data-theme="demonic"] .empty-state { color: #e0d0b4; background: rgba(24, 10, 14, 0.85); }
+        html[data-theme="demonic"] .detail-modal {
+            background: #180a0e;
+            border-color: #3a131c;
+            box-shadow: 0 10px 40px rgba(138, 31, 43, 0.4);
+        }
+        html[data-theme="demonic"] .detail-title { color: #FFE9A8; text-shadow: 1px 1px 0 #3a0a10; }
+        html[data-theme="demonic"] .detail-sub { color: #c8a878; border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .detail-body { color: #e0d0b4; }
+        html[data-theme="demonic"] .detail-close {
+            background: linear-gradient(180deg, #8a1f2b, #5a1620);
+            color: #FFE9A8;
+            box-shadow: 0 3px 0 #2a0f16;
+        }
+        html[data-theme="demonic"] .footer-hint { color: #9a8268; }
+    </style>
+    <script>
+        // localStorage 沙盒兜底：某些嵌入/隐私模式下 localStorage 会抛异常
+        // 用一个内存 Map 兜底，保证代码在任何环境都不崩溃
+        (function () {
+            try {
+                const testKey = '__hxsf_ls_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                const memStore = {};
+                Object.defineProperty(window, 'localStorage', {
+                    value: {
+                        getItem: (k) => Object.prototype.hasOwnProperty.call(memStore, k) ? memStore[k] : null,
+                        setItem: (k, v) => { memStore[k] = String(v); },
+                        removeItem: (k) => { delete memStore[k]; },
+                        clear: () => { for (const k in memStore) delete memStore[k]; },
+                        key: (i) => Object.keys(memStore)[i] || null,
+                        get length() { return Object.keys(memStore).length; }
+                    },
+                    configurable: true
+                });
+            }
+        })();
+    </script>
+    
+    
+    <script>
+        
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <style>
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+    </style>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = {
+                ready: null,
+                done: false,
+                killed: false
+            };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            // 会话内缓存：同一会话不再重复请求；未命中才发起真实请求
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    // 2 秒超时：避免首屏长时间空白
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        // 请求失败 / 超时 → 视为 kill=0（正常）
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    
+</head>
+<body>
+    <div class="page-container">
+        <div class="header">
+            <h1>藏 经 阁</h1>
+            <div class="subtitle">— 仙典在册 · 道法长存 —</div>
+            <div class="stats-row">
+                <div class="stat-item">已收录 <span id="statTotal">0</span> 卷</div>
+                <div class="stat-item">已通读 <span id="statRead">0</span> 卷</div>
+            </div>
+        </div>
+
+        <div class="tab-bar" id="tabBar">
+            <div class="tab active" data-cat="all">全 部</div>
+            <div class="tab" data-cat="jing">经 典</div>
+            <div class="tab" data-cat="jian">剑 诀</div>
+            <div class="tab" data-cat="qi">棋 谱</div>
+            <div class="tab" data-cat="lu">山志录</div>
+        </div>
+
+        <div class="section-title" id="sectionTitle">阁中典籍</div>
+        <div class="scroll-list" id="scrollList"></div>
+
+        <div class="footer-hint">典籍会随讨封进程陆续入阁,集齐全套可参悟「藏经阁主」之位</div>
+    </div>
+
+    <!-- 详情弹层 -->
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-modal">
+            <div class="detail-title" id="detailTitle">—</div>
+            <div class="detail-sub" id="detailSub">—</div>
+            <div class="detail-body" id="detailBody">—</div>
+            <button class="detail-close" id="detailClose">收 卷</button>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================================
+        //  藏经阁数据 —— 典籍 = 剧情中出现的可收集文本
+        //  unlocked 判断：读 story.js 里的 ACHIEVEMENT_NAME_MAP / 剧情节点
+        //  为简单起见，用 localStorage flag 标记 + 成就联动
+        // ===========================================================
+
+        // 典籍分类：jing(经典)/ jian(剑诀)/ qi(棋谱)/ lu(山志录)
+        const SCROLLS = [
+            {
+                id: 'lun_yu_yu', cat: 'jing', icon: '📜',
+                title: '雨夜问对',
+                meta: '经典 · 入门',
+                need: ['lost'],
+                preview: '雨声入耳,问对生心。凡言"我像人"者,皆已在人相之中矣。',
+                body: '雨夜问对\n\n——开篇悟道之语。\n\n黄小仙初入山门,与白狐对坐。白狐曰:"我修了三百年,问了三百年「你像我吗」,却从未问过自己「我像什么」。"\n\n此语一出,小仙心中一惊。世人皆向外求一个"像"字,却忘了先问自心。\n\n道在自心,不在他口。\n——节选自《山神语录》第一卷'
+            },
+            {
+                id: 'tian_shan', cat: 'jing', icon: '☯',
+                title: '天山心法残卷',
+                meta: '经典 · 进阶',
+                need: ['well_insight', 'moon_fox'],
+                preview: '天地不仁,以万物为刍狗;圣人不仁,以百姓为刍狗。',
+                body: '天山心法残卷\n\n——得自井底月影,与狐友共参。\n\n"井中月,天上月,皆是月。\n井中影,心头影,皆是影。\n汝今所见,非月非影,乃汝自心。"\n\n小仙读罢,于井边盘膝三日夜,方悟:\n求道不在山高水远,只在当下此心。\n\n——卷尾有山神印,似已历千年。'
+            },
+            {
+                id: 'da_de', cat: 'jing', icon: '☯',
+                title: '道德经·上篇',
+                meta: '经典 · 通读',
+                need: ['great_good'],
+                preview: '上善若水,水善利万物而不争,处众人之所恶,故几于道。',
+                body: '道德经·上篇(节录)\n\n上善若水。水善利万物而不争,处众人之所恶,故几于道。\n\n居善地,心善渊,与善仁,言善信,正善治,事善能,动善时。\n\n夫唯不争,故无尤。\n\n——小仙批注:做妖五百年,方知"不争"二字最难。"求封"本身,便是争。争一个"像"。'
+            },
+            {
+                id: 'qi_jue_xu', cat: 'jian', icon: '⚔',
+                title: '虚无剑诀·起手式',
+                meta: '剑诀 · 入门',
+                need: ['sword_friend'],
+                preview: '剑不在手,剑在意中。意到剑到,无剑无我。',
+                body: '虚无剑诀·起手式\n\n——白狐所传。\n\n"剑起于意,落于空。\n剑发于念,止于无。\n汝执剑时,剑已不在。\n汝忘剑时,剑遍虚空。"\n\n小仙于月下试剑,初时执着剑形,后忘剑在手,方知剑道之真。\n\n此诀共九式,小仙只习得三式,余六式藏于更深之处。'
+            },
+            {
+                id: 'jian_dao_chuan', cat: 'jian', icon: '剑',
+                title: '剑道传承手札',
+                meta: '剑诀 · 圆满',
+                need: ['sword_master'],
+                preview: '剑为道之器,非杀之器。以剑证道,得大自在。',
+                body: '剑道传承手札\n\n——青衣人临别所赠。\n\n"吾平生只一剑,剑名「问心」。\n问心之剑,不斩外物,只斩己念。\n一念贪生,剑斩之;\n一念惧死,剑斩之;\n一念执我,剑亦斩之。\n念尽则剑归,剑归则道成。"\n\n手札末尾,有青衣人题字:"后会有期。"\n\n——小仙读此札时,窗外月色正明。'
+            },
+            {
+                id: 'qi_pu_can', cat: 'qi', icon: '♟',
+                title: '古槐残局',
+                meta: '棋谱 · 残篇',
+                need: ['chess_sage'],
+                preview: '黑子势强,白子势弱,然白子有一条隐而不发的活路。',
+                body: '古槐残局\n\n——山中老人所留。\n\n黑:三三·四四·五五 连杀势\n白:一三·二二·四二 隐伏\n\n白子若于"一二"位点入,则黑子大势崩于一角。\n然落子之人,往往被黑子杀气所慑,不见此活路。\n\n老人评语:"棋如人生,看似死处,恰是生处。"\n\n——小仙批注:与满月试炼所见三重幻境同理。'
+            },
+            {
+                id: 'qi_lu', cat: 'qi', icon: '♟',
+                title: '天元棋理',
+                meta: '棋谱 · 通读',
+                need: ['chess_sage', 'star_seeker'],
+                preview: '天元不动,八方皆动。守中之理,乃棋道之根。',
+                body: '天元棋理\n\n"棋盘三百六十一,天元只一。\n守住天元,便守住全局;\n动天元者,必生枝节。\n然守住非不动,\n乃应万变而心不动。"\n\n——小仙读后感:与"中庸之道"成就暗合。\n棋道即人道,人道即天道。'
+            },
+            {
+                id: 'shan_zhi', cat: 'lu', icon: '⛰',
+                title: '山神山志·卷一',
+                meta: '山志录 · 入门',
+                need: ['guardian'],
+                preview: '山有山神,水有水神。万物有灵,各有其主。',
+                body: '山神山志·卷一\n\n——白狐所遗。\n\n"吾昔为妖,与汝同途。\n后化山神,守此山三百年。\n守山非以力,乃以心。\n山有山心,吾以吾心应之;\n人有人心,吾以吾心化之;\n妖有妖心,吾以吾心渡之。\n山心、吾心、人心、妖心,\n一以贯之,是为「守」。"'
+            },
+            {
+                id: 'qian_cheng', cat: 'lu', icon: '记',
+                title: '前尘往事录',
+                meta: '山志录 · 通读',
+                need: ['green_memory'],
+                preview: '前尘已矣,来者可追。不忆过去,不惧将来。',
+                body: '前尘往事录\n\n——青衣人与白狐之旧事,小仙偶得之。\n\n"我曾是一只青鸟,栖息于天山之巅。\n后化人形,访遍九州。\n识白狐于井边,化剑客于月下。\n皆前世事,今生已忘。\n唯心中一点灵光未灭,是为「我」。"\n\n——小仙读后沉默良久。\n原来每一个「我像什么」的背后,都有一段「我曾是什么」。'
+            },
+            {
+                id: 'ming_yue', cat: 'jing', icon: '☽',
+                title: '满月心印',
+                meta: '经典 · 圆满',
+                need: ['seven_days'],
+                preview: '满月一照,万缘俱寂。此时无声,胜有声。',
+                body: '满月心印\n\n——七日圆满之夜,小仙自观所得。\n\n"七日之前,我问人「我像什么」;\n七日之后,我不再问。\n我即是我,\n像不像人,由他;\n是不是妖,由我。\n此心自在,便是满月。"\n\n——小仙自题于洞府石壁。\n后有访客见之,皆言:此十六字,胜过藏经阁万卷。'
+            },
+        ];
+
+        // ===========================================================
+        
+        //  存档结构：{ achievements:[中文标题], specialAchievements:[], ... }
+        //  参考 v1.3.0新UI/讨封.html 中 apiQueryDocument / autoSyncToCloud
+        // ===========================================================
+        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        const CONFIG = (function(){ try { return JSON.parse(atob(ENCODED_CONFIG)); } catch(e){ return null; } })();
+
+        // 从 URL / localStorage / parent 兜底取身份
+        let playerName = '';
+        let cloudDocId = '';
+        try {
+            const params = new URLSearchParams(location.search);
+            playerName = params.get('player') || localStorage.getItem('playerName') || '';
+            cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
+            if (!playerName && window.parent && window.parent !== window) {
+                playerName = window.parent.localStorage.getItem('playerName') || '';
+                cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || '';
+            }
+            if (playerName) localStorage.setItem('playerName', playerName);
+            if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+        } catch(e) {}
+
+        
+        let cloudAchTitles = null; // null=未拉到 / Set
+
+        async function apiListDocuments() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const url = `${CONFIG.apiList}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`;
+            const res = await window['fet'+'ch'](url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '获取列表失败');
+            return data.list || [];
+        }
+        async function apiQueryDocument(docId) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const url = `${CONFIG.apiQuery}?user=${CONFIG.user}&appid=${CONFIG.appid}&id=${docId}`;
+            const res = await window['fet'+'ch'](url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '查询失败');
+            return { title: data.title, content: JSON.parse(data.content) };
+        }
+        async function findDocIdByName() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            if (!playerName) return null;
+            const list = await apiListDocuments();
+            const found = list.find(i => i.title === playerName);
+            return found ? found.id : null;
+        }
+
+        async function pullCloudAchievements() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            if (!CONFIG || !playerName) return;
+            try {
+                if (!cloudDocId) {
+                    cloudDocId = await findDocIdByName();
+                    if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+                }
+                if (!cloudDocId) return; // 该道号尚未入册
+                const remoteDoc = await apiQueryDocument(cloudDocId);
+                const c = remoteDoc.content || {};
+                const set = new Set();
+                // 兼容三种格式：title 数组 / id 数组 / achievementsRaw 对象
+                (c.achievements || []).forEach(function(v){
+                    if (!v) return;
+                    if (typeof v === 'string' && /^[a-z_]/.test(v)) {
+                        // 是 id：转 title 放进去（isUnlocked 走 title 匹配）
+                        const t = ACH_ID_TO_TITLE[v];
+                        if (t) set.add(t);
+                        set.add(v); // id 也放一份，以防映射缺失
+                    } else {
+                        set.add(v);
+                    }
+                });
+                if (c.achievementsRaw && typeof c.achievementsRaw === 'object') {
+                    Object.keys(c.achievementsRaw).forEach(function(id){
+                        if (c.achievementsRaw[id]) {
+                            const t = ACH_ID_TO_TITLE[id];
+                            if (t) set.add(t);
+                            set.add(id);
+                        }
+                    });
+                }
+                cloudAchTitles = set;
+                render(); // 重绘
+            } catch (e) {
+                
+                // 静默降级，不打扰用户
+            }
+        }
+
+        // 本地成就映射（讨封页/成就页共用的存储键）
+        // huangdaxian_achievements: JSON { id: true }
+        // huangdaxian_special_achievements: [title]
+        function getLocalAchIdSet() {
+            try {
+                const raw = JSON.parse(localStorage.getItem('huangdaxian_achievements') || '{}');
+                const s = new Set();
+                Object.keys(raw).forEach(k => { if (raw[k]) s.add(k); });
+                return s;
+            } catch (e) { return new Set(); }
+        }
+
+        // ===========================================================
+        
+        // ===========================================================
+        // 需要用到成就的 id ↔ 标题 映射（与讨封页 achievementIcons 保持一致的子集，含本页会用到的 need）
+        const ACH_ID_TO_TITLE = {
+            lost: '雨夜迷途',
+            well_insight: '井中悟道',
+            moon_fox: '月下同行',
+            great_good: '大善若水',
+            sword_friend: '剑影知交',
+            sword_master: '剑道传承',
+            chess_sage: '棋道天成',
+            star_seeker: '文曲星耀',
+            guardian: '守山之人',
+            green_memory: '前尘往事',
+            seven_days: '黎明归宿'
+        };
+
+        function isUnlocked(need) {
+            if (!need || need.length === 0) return false;
+
+            
+            if (cloudAchTitles) {
+                for (const id of need) {
+                    const title = ACH_ID_TO_TITLE[id];
+                    if (title && cloudAchTitles.has(title)) return true;
+                    if (cloudAchTitles.has(id)) return true;
+                }
+            }
+
+            // 1) 本地 huangdaxian_achievements JSON（讨封页真实写入的键）
+            const localSet = getLocalAchIdSet();
+            for (const id of need) {
+                if (localSet.has(id)) return true;
+            }
+
+            // 2) 兼容旧标记
+            for (const key of need) {
+                if (localStorage.getItem('ach_' + key) === '1') return true;
+                if (localStorage.getItem('achievement_' + key) === '1') return true;
+            }
+            // 3) 兼容 story.js 的 window.ACHIEVEMENT_NAME_MAP
+            try {
+                if (window.ACHIEVEMENT_NAME_MAP) {
+                    for (const key of need) {
+                        if (window.ACHIEVEMENT_NAME_MAP[key]) return true;
+                    }
+                }
+            } catch (e) {}
+            // 4) 调试用：URL 写 ?unlock=all 可全解锁
+            try {
+                const params = new URLSearchParams(location.search);
+                if (params.get('unlock') === 'all') return true;
+            } catch (e) {}
+            return false;
+        }
+
+        // ===========================================================
+        //  渲染
+        // ===========================================================
+        const tabBar = document.getElementById('tabBar');
+        const sectionTitle = document.getElementById('sectionTitle');
+        const scrollList = document.getElementById('scrollList');
+        const statTotal = document.getElementById('statTotal');
+        const statRead = document.getElementById('statRead');
+
+        let currentCat = 'all';
+
+        function getCategoryName(cat) {
+            return ({ all: '阁中典籍', jing: '经典要义', jian: '剑诀心法', qi: '棋谱残局', lu: '山志杂录' })[cat] || '阁中典籍';
+        }
+
+        function render() {
+            sectionTitle.textContent = getCategoryName(currentCat);
+            const filtered = currentCat === 'all' ? SCROLLS : SCROLLS.filter(s => s.cat === currentCat);
+
+            if (filtered.length === 0) {
+                scrollList.innerHTML = '<div class="empty-state">此分类下暂无典籍,待日后收录</div>';
+            } else {
+                scrollList.innerHTML = filtered.map((s, idx) => {
+                    const unlocked = isUnlocked(s.need);
+                    return `
+                        <div class="scroll-row ${unlocked ? 'unlocked' : 'locked'}" data-idx="${SCROLLS.indexOf(s)}">
+                            <div class="scroll-icon">${s.icon}</div>
+                            <div class="scroll-main">
+                                <div class="scroll-title">${unlocked ? s.title : '???'}</div>
+                                <div class="scroll-meta">${s.meta} · ${unlocked ? '已通读' : '未解锁'}</div>
+                                <div class="scroll-preview">${s.preview}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 统计
+            statTotal.textContent = SCROLLS.length;
+            statRead.textContent = SCROLLS.filter(s => isUnlocked(s.need)).length;
+
+            // 绑定点击
+            scrollList.querySelectorAll('.scroll-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const idx = parseInt(row.dataset.idx, 10);
+                    showDetail(SCROLLS[idx]);
+                });
+            });
+        }
+
+        // 详情弹层
+        const detailOverlay = document.getElementById('detailOverlay');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailSub = document.getElementById('detailSub');
+        const detailBody = document.getElementById('detailBody');
+        const detailClose = document.getElementById('detailClose');
+
+        function showDetail(scroll) {
+            const unlocked = isUnlocked(scroll.need);
+            detailTitle.textContent = unlocked ? scroll.title : '???';
+            detailSub.textContent = unlocked ? scroll.meta : '此卷尚在封存,通读相应剧情后方可阅览';
+            detailBody.textContent = unlocked ? scroll.body : '卷轴紧闭,隐隐透出淡光。\n\n或可于讨封中再遇机缘,届时此卷自开。';
+            detailOverlay.classList.add('show');
+        }
+        detailClose.addEventListener('click', () => detailOverlay.classList.remove('show'));
+        detailOverlay.addEventListener('click', (e) => {
+            if (e.target === detailOverlay) detailOverlay.classList.remove('show');
+        });
+
+        // 切 tab
+        tabBar.addEventListener('click', (e) => {
+            const t = e.target.closest('.tab');
+            if (!t) return;
+            tabBar.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+            t.classList.add('active');
+            currentCat = t.dataset.cat;
+            render();
+        });
+
+        
+        render();
+        pullCloudAchievements();
+
+        // 主题切换同步（父窗广播）
+        window.addEventListener('message', function (e) {
+            if (e.data && e.data.type === 'hxsf-theme' && (e.data.theme === 'scroll' || e.data.theme === 'demonic')) {
+                document.documentElement.setAttribute('data-theme', e.data.theme);
+                try { localStorage.setItem('hxsf_theme', e.data.theme); } catch (err) {}
+            }
+        });
+    </script>
+</body>
+</html>

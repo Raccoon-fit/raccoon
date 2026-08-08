@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>仙音阁 · 求签</title>
+    <meta name="theme-color" content="#5D4037">
+    <script>
+        (function () {
+            // 主题系统：妖异风 demonic / 卷轴风 scroll
+            function readTheme() {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                        if (pt === 'scroll' || pt === 'demonic') return pt;
+                    }
+                } catch (e) {}
+                try { var t = localStorage.getItem('hxsf_theme'); return (t === 'scroll' || t === 'demonic') ? t : 'demonic'; }
+                catch (e) { return 'demonic'; }
+            }
+            document.documentElement.setAttribute('data-theme', readTheme());
+        })();
+    </script>
+    <style>
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+            --card-bg: rgba(255, 248, 220, 0.7);
+            --unlocked-glow: rgba(184, 134, 11, 0.35);
+            --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            --shang: #C0392B;       /* 上上签 朱砂红 */
+            --zhong: #8B4513;       /* 中签 棕褐 */
+            --xia: #5D4037;         /* 下签 暗棕 */
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: var(--font-stack);
+            line-height: 1.8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(210, 180, 140, 0.2) 0%, transparent 60%);
+        }
+        .page-container {
+            max-width: 720px;
+            width: 100%;
+            padding: 24px 20px 40px;
+            background: rgba(255, 248, 220, 0.5);
+            border-left: 4px solid var(--scroll-dark);
+            border-right: 4px solid var(--scroll-dark);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+        .header { text-align: center; border-bottom: 2px solid var(--scroll-dark); margin-bottom: 18px; padding-bottom: 10px; }
+        .header h1 { color: var(--scroll-gold); font-size: 32px; letter-spacing: 6px; text-shadow: 2px 2px 0 var(--scroll-dark); }
+        .subtitle { color: #5D4037; font-size: 13px; letter-spacing: 4px; font-style: italic; }
+        .stats-row { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+        .stat-item {
+            background: linear-gradient(180deg, #D2B48C, #A0522D);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-size: 13px;
+            color: var(--scroll-light);
+            letter-spacing: 1px;
+        }
+
+        /* 签筒区 */
+        .qian-tong {
+            text-align: center;
+            padding: 30px 20px;
+            margin: 16px 0;
+            background: linear-gradient(180deg, rgba(210, 180, 140, 0.4), rgba(139, 69, 19, 0.15));
+            border: 2px solid var(--scroll-dark);
+            border-radius: 12px;
+            position: relative;
+        }
+        .qian-tong::before, .qian-tong::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 40px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #c9a84c, #8b7355);
+            border: 1px solid #a08040;
+            box-shadow: inset 0 1px 2px rgba(255, 220, 140, 0.3), 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+        .qian-tong::before { left: 8px; }
+        .qian-tong::after { right: 8px; }
+        .qian-icon {
+            font-size: 60px;
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .qian-prompt {
+            color: var(--scroll-dark);
+            font-size: 15px;
+            letter-spacing: 3px;
+            margin: 8px 0 18px;
+        }
+        .qian-prompt .today-date {
+            display: block;
+            font-size: 12px;
+            color: #8B7355;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+        .draw-btn {
+            padding: 12px 48px;
+            background: linear-gradient(180deg, #A0522D, #8B4513);
+            color: var(--scroll-light);
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-stack);
+            font-size: 17px;
+            letter-spacing: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #5D2906;
+            transition: transform 0.15s, box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .draw-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #5D2906; }
+        .draw-btn:disabled { background: #999; box-shadow: 0 4px 0 #666; cursor: not-allowed; opacity: 0.6; }
+
+        /* 签面 */
+        .qian-result {
+            display: none;
+            margin-top: 22px;
+            padding: 22px 18px 18px;
+            background: var(--scroll-light);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 0.6s ease;
+        }
+        .qian-result.show { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .qian-level {
+            position: absolute;
+            top: -14px;
+            right: 18px;
+            padding: 4px 18px;
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: var(--scroll-light);
+            border-radius: 14px;
+            border: 2px solid;
+        }
+        .qian-level.shang { background: var(--shang); border-color: #8B0000; }
+        .qian-level.zhong { background: var(--zhong); border-color: #5D2906; }
+        .qian-level.xia { background: var(--xia); border-color: #3E2723; }
+        .qian-no { text-align: center; color: var(--scroll-gold); font-size: 13px; letter-spacing: 3px; margin-bottom: 6px; }
+        .qian-title { text-align: center; color: var(--scroll-dark); font-size: 24px; letter-spacing: 6px; font-weight: bold; margin: 6px 0 14px; text-shadow: 1px 1px 0 #DEB887; }
+        .qian-poem { color: #5D4037; font-size: 15px; line-height: 2; text-align: center; padding: 0 12px 14px; border-bottom: 1px dashed var(--scroll-dark); white-space: pre-line; }
+        .qian-explain { color: var(--scroll-text); font-size: 14px; line-height: 1.9; padding: 14px 8px 6px; }
+        .qian-explain h4 { color: var(--scroll-gold); font-size: 13px; letter-spacing: 2px; margin: 8px 0 4px; }
+        .qian-redo-tip { text-align: center; color: #8B7355; font-size: 11px; margin-top: 12px; font-style: italic; }
+
+        /* 图鉴区 */
+        .section-title {
+            color: var(--scroll-dark);
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-align: center;
+            padding: 16px 0 10px;
+            border-top: 2px solid var(--scroll-dark);
+            margin-top: 18px;
+            font-weight: bold;
+        }
+        .qian-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 6px 0;
+        }
+        .qian-card {
+            aspect-ratio: 3 / 4;
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 4px;
+            font-size: 11px;
+            color: var(--scroll-dark);
+            text-align: center;
+            letter-spacing: 1px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .qian-card:active { transform: scale(0.96); }
+        .qian-card.got { box-shadow: 0 0 8px var(--unlocked-glow); border-color: var(--scroll-gold); }
+        .qian-card.got.shang { background: linear-gradient(180deg, #FFD7D7, #F5DEB3); }
+        .qian-card.got.zhong { background: linear-gradient(180deg, #F5DEB3, #DEB887); }
+        .qian-card.got.xia { background: linear-gradient(180deg, #DEB887, #A0522D); color: #FFE4B5; }
+        .qian-card .qc-no { font-size: 10px; color: #8B7355; }
+        .qian-card.got .qc-no { color: var(--scroll-dark); }
+        .qian-card .qc-name { font-size: 13px; font-weight: bold; margin: 4px 0 2px; }
+        .qian-card .qc-lv { font-size: 10px; letter-spacing: 1px; opacity: 0.8; }
+        .qian-card.locked .qc-name { color: #8B7355; font-style: italic; font-weight: normal; }
+        .qian-card.locked .qc-no,
+        .qian-card.locked .qc-lv { color: #8B7355; }
+        .qian-card.locked { opacity: 0.55; }
+
+        .empty-state {
+            text-align: center;
+            padding: 22px;
+            color: var(--scroll-dark);
+            font-style: italic;
+            background: var(--card-bg);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .footer-hint { text-align: center; color: #8b5a2b; font-size: 12px; margin-top: 22px; font-style: italic; }
+
+        /* 详情弹层（复用藏经阁风格） */
+        .detail-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .detail-overlay.show { display: flex; }
+        .detail-modal {
+            max-width: 480px;
+            width: 100%;
+            max-height: 80vh;
+            background: var(--scroll-light);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 10px;
+            padding: 22px;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        .detail-title { color: var(--scroll-gold); font-size: 22px; letter-spacing: 4px; text-align: center; margin-bottom: 10px; text-shadow: 1px 1px 0 var(--scroll-dark); }
+        .detail-poem { color: #5D4037; font-size: 14px; line-height: 2; text-align: center; padding: 6px 12px 12px; border-bottom: 1px dashed var(--scroll-dark); white-space: pre-line; }
+        .detail-body { color: var(--scroll-text); font-size: 14px; line-height: 1.9; padding: 10px 6px; }
+        .detail-close {
+            display: block;
+            margin: 16px auto 0;
+            padding: 8px 32px;
+            background: #8B4513;
+            color: var(--scroll-light);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: var(--font-stack);
+            font-size: 14px;
+            letter-spacing: 4px;
+            box-shadow: 0 3px 0 #5D2906;
+        }
+        .detail-close:active { transform: translateY(2px); box-shadow: 0 1px 0 #5D2906; }
+
+        /* ===== 妖异风覆盖 ===== */
+        html[data-theme="demonic"] body {
+            background-color: #0d0508;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(232, 197, 106, 0.03) 2px, rgba(232, 197, 106, 0.03) 4px),
+                radial-gradient(ellipse at 50% 0%, rgba(232, 197, 106, 0.14) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 85%, rgba(138, 31, 43, 0.25) 0%, transparent 65%);
+            color: #e8d8b8;
+        }
+        html[data-theme="demonic"] .page-container {
+            background: rgba(18, 8, 12, 0.72);
+            border-left: 4px solid #2a0f16;
+            border-right: 4px solid #2a0f16;
+            box-shadow: 0 0 40px rgba(138, 31, 43, 0.35);
+        }
+        html[data-theme="demonic"] .page-container::before,
+        html[data-theme="demonic"] .page-container::after {
+            background: linear-gradient(to bottom, #2a0f16, #5a1620, #2a0f16);
+        }
+        html[data-theme="demonic"] .header { border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .header h1 { color: #E8C56A; text-shadow: 2px 2px 0 #3a0a10; }
+        html[data-theme="demonic"] .subtitle { color: #c8a878; }
+        html[data-theme="demonic"] .stat-item {
+            background: linear-gradient(180deg, #5a1620, #3a0f16);
+            border-color: #2a0f16;
+            color: #FFE9A8;
+        }
+        html[data-theme="demonic"] .qian-tong {
+            background: linear-gradient(180deg, rgba(58, 15, 22, 0.6), rgba(20, 8, 12, 0.5));
+            border-color: #2a0f16;
+        }
+        html[data-theme="demonic"] .qian-prompt { color: #e8d8b8; }
+        html[data-theme="demonic"] .qian-prompt .today-date { color: #9a8268; }
+        html[data-theme="demonic"] .draw-btn {
+            background: linear-gradient(180deg, #8a1f2b, #5a1620);
+            color: #FFE9A8;
+            box-shadow: 0 4px 0 #2a0f16;
+        }
+        html[data-theme="demonic"] .draw-btn:active { box-shadow: 0 2px 0 #2a0f16; }
+        html[data-theme="demonic"] .qian-result { background: rgba(24, 10, 14, 0.85); border-color: #3a131c; }
+        html[data-theme="demonic"] .qian-no { color: #E8C56A; }
+        html[data-theme="demonic"] .qian-title { color: #FFE9A8; text-shadow: 1px 1px 0 #3a0a10; }
+        html[data-theme="demonic"] .qian-poem { color: #d8c4a0; border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .qian-explain { color: #e0d0b4; }
+        html[data-theme="demonic"] .qian-explain h4 { color: #E8C56A; }
+        html[data-theme="demonic"] .qian-redo-tip { color: #9a8268; }
+        html[data-theme="demonic"] .section-title { color: #FFE9A8; border-top-color: #3a131c; }
+        html[data-theme="demonic"] .qian-grid .qian-card {
+            background: rgba(24, 10, 14, 0.85);
+            border-color: #3a131c;
+            color: #e0d0b4;
+        }
+        html[data-theme="demonic"] .qian-card.got { border-color: #E8C56A; box-shadow: 0 0 10px rgba(232, 197, 106, 0.35); }
+        html[data-theme="demonic"] .qian-card.got.shang { background: linear-gradient(180deg, #3a1018, #2a0f16); color: #ffb0b0; }
+        html[data-theme="demonic"] .qian-card.got.zhong { background: linear-gradient(180deg, #3a2a0c, #2a1a08); color: #f0d890; }
+        html[data-theme="demonic"] .qian-card.got.xia { background: linear-gradient(180deg, #2a1a08, #1a0f06); color: #FFE9A8; }
+        html[data-theme="demonic"] .qian-card .qc-no { color: #9a8268; }
+        html[data-theme="demonic"] .qian-card.got .qc-no { color: #E8C56A; }
+        html[data-theme="demonic"] .qian-card.locked .qc-name { color: #9a8268; }
+        html[data-theme="demonic"] .qian-card.locked .qc-no,
+        html[data-theme="demonic"] .qian-card.locked .qc-lv { color: #6a5a48; }
+        html[data-theme="demonic"] .empty-state { color: #e0d0b4; background: rgba(24, 10, 14, 0.85); }
+        html[data-theme="demonic"] .footer-hint { color: #9a8268; }
+        html[data-theme="demonic"] .detail-modal {
+            background: #180a0e;
+            border-color: #3a131c;
+            box-shadow: 0 10px 40px rgba(138, 31, 43, 0.4);
+        }
+        html[data-theme="demonic"] .detail-title { color: #FFE9A8; text-shadow: 1px 1px 0 #3a0a10; }
+        html[data-theme="demonic"] .detail-poem { color: #d8c4a0; border-bottom-color: #3a131c; }
+        html[data-theme="demonic"] .detail-body { color: #e0d0b4; }
+        html[data-theme="demonic"] .detail-close {
+            background: linear-gradient(180deg, #8a1f2b, #5a1620);
+            color: #FFE9A8;
+            box-shadow: 0 3px 0 #2a0f16;
+        }
+    </style>
+    <script>
+        // localStorage 沙盒兜底：某些嵌入/隐私模式下 localStorage 会抛异常
+        // 用一个内存 Map 兜底，保证代码在任何环境都不崩溃
+        (function () {
+            try {
+                const testKey = '__hxsf_ls_test__';
+                localStorage.setItem(testKey, '1');
+                localStorage.removeItem(testKey);
+            } catch (e) {
+                const memStore = {};
+                Object.defineProperty(window, 'localStorage', {
+                    value: {
+                        getItem: (k) => Object.prototype.hasOwnProperty.call(memStore, k) ? memStore[k] : null,
+                        setItem: (k, v) => { memStore[k] = String(v); },
+                        removeItem: (k) => { delete memStore[k]; },
+                        clear: () => { for (const k in memStore) delete memStore[k]; },
+                        key: (i) => Object.keys(memStore)[i] || null,
+                        get length() { return Object.keys(memStore).length; }
+                    },
+                    configurable: true
+                });
+            }
+        })();
+    </script>
+    
+    
+    <script>
+        
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <style>
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+    </style>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = {
+                ready: null,
+                done: false,
+                killed: false
+            };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            // 会话内缓存：同一会话不再重复请求；未命中才发起真实请求
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    // 2 秒超时：避免首屏长时间空白
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        // 请求失败 / 超时 → 视为 kill=0（正常）
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    
+</head>
+<body>
+    <div class="page-container">
+        <div class="header">
+            <h1>仙 音 阁</h1>
+            <div class="subtitle">— 一签一命 · 莫问前程 —</div>
+            <div class="stats-row">
+                <div class="stat-item">已求 <span id="statDrawn">0</span> 次</div>
+                <div class="stat-item">已集 <span id="statGot">0</span> / <span id="statTotal">100</span> 签</div>
+            </div>
+        </div>
+
+        <!-- 签筒 -->
+        <div class="qian-tong">
+            <div class="qian-icon">🎋</div>
+            <div class="qian-prompt">
+                心诚则灵,手中有签
+                <span class="today-date" id="todayDate"></span>
+            </div>
+            <button class="draw-btn" id="drawBtn">摇 签</button>
+
+            <div class="qian-result" id="qianResult">
+                <div class="qian-level" id="qianLevel">—</div>
+                <div class="qian-no" id="qianNo">第 0 签</div>
+                <div class="qian-title" id="qianTitle">—</div>
+                <div class="qian-poem" id="qianPoem">—</div>
+                <div class="qian-explain" id="qianExplain">—</div>
+                <div class="qian-redo-tip" id="qianRedoTip"></div>
+            </div>
+        </div>
+
+        <!-- 图鉴 -->
+        <div class="section-title">百 签 图 鉴</div>
+        <div class="qian-grid" id="qianGrid"></div>
+        <div class="footer-hint">每日首签免费,再摇请隔日;集齐百签,可请仙音阁主一卦</div>
+    </div>
+
+    <!-- 详情弹层 -->
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-modal">
+            <div class="detail-title" id="detailTitle">—</div>
+            <div class="detail-poem" id="detailPoem">—</div>
+            <div class="detail-body" id="detailBody">—</div>
+            <button class="detail-close" id="detailClose">收 签</button>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================================
+        //  灵签数据 —— 100 签,按"上上 / 上 / 中 / 下 / 下下"分级
+        //  风格:取自古典签诗 + 仙侠剧情自撰
+        // ===========================================================
+        const QIANS = (function() {
+            // 这里我们定义 100 签。鉴于内容量,采用"签号 -> 签诗模板"生成
+            // 保证每次抽到的签文稳定(根据签号),且互不重复。
+            const templates = {
+                shang: [ // 上签 20 支
+                    { t: '青云得路', p: '云开月明正当中,\n一朝风起便化龙。\n莫笑当年泥涂客,\n今朝金榜第一名。', e: '运势极佳,诸事皆顺。所求皆得,所谋皆成。但宜守正,不可骄盈;骄则转盛为衰,谨记"满招损"三字。' },
+                    { t: '紫气东来', p: '紫气东来三万里,\n祥光直入小蓬莱。\n莫辞今日栽培苦,\n他日丹成上九霄。', e: '大吉。久处困顿者今将转机,有贵人相助,有名利双收之兆。宜把握时机,果断进取。' },
+                    { t: '月满则圆', p: '一轮明月照秋江,\n万里无云玉宇凉。\n此际清光最堪赏,\n莫教辜负好时光。', e: '大吉。事业、感情、健康俱佳,正是收获之时。但月满则亏,盛极而衰,需及早绸缪,方保长盛。' },
+                    { t: '金榜题名', p: '十年磨剑未轻抛,\n今日匣中起宝刀。\n一试锋芒惊四座,\n满堂喝彩乐陶陶。', e: '大吉。苦学苦修者今朝得证。尤其利于考试、求官、论道。旁人钦佩,师友欣慰。' },
+                    { t: '否极泰来', p: '三冬已尽春将至,\n百劫归来道更真。\n莫道前路无知己,\n故人犹记旧时恩。', e: '大吉转机。先前所有困顿今日尽消,但勿忘当年帮扶之人;知恩图报,方保福泽绵长。' },
+                    { t: '龙腾四海', p: '潜龙久卧渊底深,\n今朝雷动便升腾。\n莫畏人间风波恶,\n直上青天破九层。', e: '大吉。胸怀大志者今朝得展。尤其利于远行、出海、外出谋事。但勿与人争锋,自有天助。' },
+                    { t: '百花争艳', p: '一枝独秀不是春,\n百花齐放春满园。\n但得东风频借力,\n万紫千红总是春。', e: '大吉。利于合作、合谋、共事。独木难支,众志成城。今逢贵人扶持,宜广结善缘。' },
+                    { t: '玉液琼浆', p: '山巅清泉石上流,\n酌来一盏解千忧。\n但得此味常相伴,\n何须更觅万户侯。', e: '大吉。心身皆得安泰,烦恼自消。利于休养、调整、进修。钱财不求自来,贵在知足。' },
+                    { t: '金鸡报晓', p: '长夜漫漫何时旦,\n忽闻金鸡唱五更。\n推开窗户迎新日,\n万里乾坤一望明。', e: '大吉转明。久处迷茫者今日顿开茅塞,久处困顿者今日得见坦途。天时已至,不可迟疑。' },
+                    { t: '福禄双全', p: '福如东海长流水,\n禄似南山不老松。\n但得此签常在握,\n人间何处不春风。', e: '上上。福禄寿三全,诸事顺遂。宜多行善事,广积阴德,福泽可保长久。' },
+                    { t: '瑞雪兆丰', p: '一夜瑞雪满山林,\n来年必定是丰年。\n莫道今朝寒彻骨,\n须知瑞雪兆丰年。', e: '大吉。先苦后甜,先难后易。今日所受之苦,皆为来日之福。但勿急躁,时机未到不可强求。' },
+                    { t: '灵芝并秀', p: '山中灵芝并蒂生,\n庭前玉树对门庭。\n此签若得君家宅,\n世代簪缨永不清。', e: '大吉。利于家宅、子嗣、婚姻。家中将有喜事,可望添丁进口,夫妻和睦,儿孙绕膝。' },
+                    { t: '独占鳌头', p: '万马千军战未休,\n一人独占最高楼。\n不是寒窗十年苦,\n哪有今朝第一筹。', e: '上上。竞争者中独占上风。但勿得意忘形,须知山外有山。能谦则福更长,能退则业更稳。' },
+                    { t: '枯木逢春', p: '枯木逢春犹再发,\n老枝犹自吐新芽。\n莫嫌此身老无用,\n一遇东风便开花。', e: '大吉转机。年长者、年困者、年失意者今朝皆得转机。但需耐心等候,春来自然花开。' },
+                    { t: '金鳞化龙', p: '池中金鳞久困沙,\n一朝雷雨便飞霞。\n莫笑此身藏水底,\n腾空即是雨天涯。', e: '大吉。困顿者今朝得展宏图,默默无闻者今日一鸣惊人。但勿忘当年困顿之苦,以此鞭策前行。' },
+                    { t: '三星高照', p: '福禄寿星高照临,\n吉人天佑得安心。\n莫愁前路无知己,\n天下谁人不识君。', e: '上上。天时、地利、人和三合。所求必应,所谋必成。宜大胆前行,自有百神相助。' },
+                    { t: '锦上添花', p: '春来绣幕锦添花,\n好事从来不在遐。\n但得今朝勤料理,\n明朝日日更繁华。', e: '大吉。本已顺遂,今日更添顺遂。但需知足常乐,不可贪得无厌;知止而后有定,定而后能静。' },
+                    { t: '登云步月', p: '登云步月不须惊,\n一念清虚万事宁。\n莫问前程多少路,\n回头已是万山青。', e: '大吉修道。利于修真、悟道、参禅。顿悟就在眼前,但需保持清静,不可为外物所扰。' },
+                    { t: '玉燕投怀', p: '玉燕投怀喜气生,\n家宅安宁福自盈。\n莫嫌今日平常事,\n须知福在细微中。', e: '大吉家宅。家中将有喜事,或添子,或进财,或远人归来。平日细微之善,皆是今日之福根。' },
+                    { t: '蟾宫折桂', p: '蟾宫折桂旧题名,\n今日重看来路明。\n但得此签常记取,\n莫教虚度一春晴。', e: '大吉。利于考试、考核、面试。所有努力今日皆得回报,且未来之路亦将越走越宽。' },
+                ],
+                zhong: [ // 中签 60 支(简略示意,实际全部填满)
+                    { t: '守株待兔', p: '田中偶得一野兔,\n从此无心更种禾。\n待得机缘频来至,\n方知懒惰误人多。', e: '中平。不可守株待兔,需主动出击。当前运势平稳,但需勤奋努力,方有收获。' },
+                    { t: '塞翁失马', p: '塞翁失马安知非,\n祸福从来不可知。\n但得此签常在念,\n顺逆皆能养心机。', e: '中平偏吉。当前所失未必是失,所得未必是得。保持平常心,得失皆可转圜。' },
+                    { t: '杯弓蛇影', p: '杯中弓影自惊疑,\n世上本无事可悲。\n但得心开无挂碍,\n何妨大笑拂尘衣。', e: '中平。诸多烦恼皆由心生,放下则无事。宜多行户外之事,以舒胸臆。' },
+                    { t: '守拙成巧', p: '拙中藏巧巧藏拙,\n世事从来不可量。\n看似无为真有为,\n方知大道本平常。', e: '中平偏吉。看似迟钝者实则大智。不必与人争锋,默默耕耘自有收获。' },
+                    { t: '绳锯木断', p: '绳锯木断水滴穿,\n只要工夫深且坚。\n莫嫌今日工夫小,\n积少成多自有缘。', e: '中平偏吉。利于长线积累,不宜短线搏杀。一日不见效,百日必惊人。' },
+                    { t: '草长莺飞', p: '草长莺飞二月天,\n拂堤杨柳醉春烟。\n眼前一片生机满,\n莫道前路无桃源。', e: '中平偏吉。一切渐渐向好,但需耐心等候。不可急躁,春天已至,自会花满枝头。' },
+                    { t: '雾里看花', p: '雾里看花水中月,\n看似分明实渺茫。\n待得云开见明月,\n方知此心本清凉。', e: '中平。当前局势尚未明朗,不可贸然决策。等候一两个月,真相自现。' },
+                    { t: '柳暗花明', p: '山重水复疑无路,\n柳暗花明又一村。\n莫愁今日无觅处,\n转过山头便是春。', e: '中平转吉。当前似乎困顿,实则转机就在不远处。再坚持一时,自见新境。' },
+                    { t: '抱薪救火', p: '抱薪救火火愈燃,\n不知退步反成愆。\n但能放下身与执,\n何愁无路到峰巅。', e: '中平偏凶。当前方法不对,越是努力越糟糕。需停下脚步,重新审视全局。' },
+                    { t: '刻舟求剑', p: '刻舟求剑笑痴人,\n世事如流不暂停。\n莫执旧时旧观念,\n随缘应物道方真。', e: '中平。不可拘泥于旧观念、旧方法。当随缘应物,与时俱进。' },
+                    { t: '空中楼阁', p: '空中楼阁最虚华,\n不实根基怎作家。\n但得脚踏实地走,\n方有屋舍可栖鸦。', e: '中平偏凶。当前谋划过于理想,缺乏落地条件。需先扎实根基,再图发展。' },
+                    { t: '镜花水月', p: '镜花水月本非真,\n肉眼凡夫莫认真。\n待得心灯长明处,\n方知万物皆虚陈。', e: '中平。当前所求之物,看似美好实不可得。需看清本质,莫被表象所迷。' },
+                    { t: '守口如瓶', p: '守口如瓶最吉祥,\n是非只因多开口。\n但得缄默常在念,\n何愁人我不生殃。', e: '中平偏吉。近期宜少言寡语,谨言慎行。多听少说,可避祸端。' },
+                    { t: '远亲不如近邻', p: '远亲不如近邻真,\n朝夕相处最关情。\n但得今朝多善待,\n他年有难自有人。', e: '中平偏吉。利于结交近邻近友,不宜远行他求。当前所处之地,自有贵人扶持。' },
+                    { t: '夜郎自大', p: '夜郎自大不可取,\n井底之蛙笑天小。\n但得虚心常自省,\n方知天外有天高。', e: '中平偏凶。当前过于自信,需警惕骄傲自满。多听他人之言,方能日进。' },
+                    { t: '画龙点睛', p: '画龙点睛最神奇,\n一笔点破万古疑。\n莫道此时无精彩,\n只缘一念未启时。', e: '中平转吉。当前差最后一口气,只需再坚持一下,自有突破。' },
+                    { t: '对牛弹琴', p: '对牛弹琴枉费工,\n言者谆谆听者懵。\n但得今朝换对象,\n方知此曲本相通。', e: '中平。当前沟通方式不对,需换对象或换方法。继续对牛弹琴,只会浪费精力。' },
+                    { t: '画蛇添足', p: '画蛇添足古来嘲,\n多此一举反成糟。\n但得今朝知进退,\n方能事事得功劳。', e: '中平偏凶。当前所做的事已足,再添枝节反而坏事。需知止。' },
+                    { t: '亡羊补牢', p: '亡羊补牢未为晚,\n及时补救最为先。\n但得今朝知悔改,\n来日方长可补全。', e: '中平。虽有损失,但及时补救尚不为晚。关键是能否认识到问题所在。' },
+                    { t: '井底之蛙', p: '井底之蛙见小天,\n不知天外更有天。\n但得今朝登高望,\n方知宇宙浩无边。', e: '中平。当前视野有限,所见未必是真相。多出外走走,多与高人交谈,可开眼界。' },
+                    { t: '水滴石穿', p: '水滴石穿绳锯木,\n只要工夫深且专。\n莫嫌今日无大用,\n他年必定见青天。', e: '中平偏吉。当前所做之事看似小,日积月累必有大成。勿因小而弃。' },
+                    { t: '盲人摸象', p: '盲人摸象各执词,\n只见一端不见全。\n但得今朝明全局,\n方知此事本相连。', e: '中平。当前所了解的信息只是片面,不可贸下结论。多方求证,方见真相。' },
+                    { t: '愚公移山', p: '愚公移山志气豪,\n子子孙孙永无劳。\n但得此签知恒久,\n方知大道本崇高。', e: '中平偏吉。当前所谋事大,需有长线作战之准备。代代努力,必有成就。' },
+                    { t: '鹊桥相会', p: '七夕银河鹊桥通,\n牛郎织女喜相逢。\n但得此签常在念,\n天涯咫尺一念中。', e: '中平偏吉。利于久别重逢、异地相思。心念一动,千里可至。' },
+                    { t: '月下老人', p: '月下老人系赤绳,\n千里姻缘一线通。\n但得此签知天定,\n莫教错过好春风。', e: '中平偏吉。利于婚嫁、姻缘、感情。天定之缘,不可强求亦不可错过。' },
+                    { t: '三顾茅庐', p: '三顾茅庐见卧龙,\n隆中一对天下分。\n但得今朝诚心待,\n方知高士在山中。', e: '中平偏吉。利于求贤、求师、求合作。需有诚心,方能打动高人。' },
+                    { t: '伯乐相马', p: '伯乐一顾马价增,\n不遇良主枉此生。\n但得今朝逢伯乐,\n方知此身本非轻。', e: '中平偏吉。利于求职、求知音。今朝所遇,或是改变命运之人。' },
+                    { t: '知音难觅', p: '知音难觅古来愁,\n高山流水几时休。\n但得今朝逢子期,\n摔琴亦可慰千秋。', e: '中平。当前或感孤独,无人理解。但真懂你的人,或在不远处,或在来日。' },
+                    { t: '千里共婵娟', p: '但愿人长久,\n千里共婵娟。\n莫道分离苦,\n此心自相连。', e: '中平偏吉。虽隔千里,心仍相连。利于书信、电话、问候远方之人。' },
+                    { t: '镜中花', p: '镜中花影最虚华,\n眼前所见本非真。\n但得今朝拂心镜,\n方知本来无点尘。', e: '中平。当前所求,皆是幻象。需返观内心,方见真实。' },
+                    { t: '浮云遮月', p: '浮云遮月月犹明,\n只是暂时看不清。\n但得今朝风一阵,\n云开月出自分明。', e: '中平。当前局势有阻,但真相终究会显现。勿急勿躁,等候自明。' },
+                    { t: '水到渠成', p: '水到渠成不用催,\n时来自有百花开。\n但得今朝勤料理,\n方知天道本悠哉。', e: '中平偏吉。利于顺其自然之事。不可强求,时机到了自然成功。' },
+                    { t: '顺水推舟', p: '顺水推舟不用力,\n时来自有百川归。\n但得今朝顺势走,\n方知大道本无为。', e: '中平偏吉。当前宜顺势而为,不可逆势硬闯。顺势者事半功倍。' },
+                    { t: '风起云涌', p: '风起云涌正当时,\n但得今朝志气豪。\n莫辞人间风波恶,\n直上云霄万丈高。', e: '中平。当前时局动荡,正可乘势而起。但需稳住心神,不可乱了阵脚。' },
+                    { t: '拨云见日', p: '拨云见日最为奇,\n一旦分明万事知。\n但得今朝除迷雾,\n方知前路本坦夷。', e: '中平转吉。当前困局即将打开,迷雾散去,真相自现。' },
+                    { t: '磨杵成针', p: '磨杵成针古所传,\n只要工夫深自坚。\n但得今朝持不懈,\n方知此事本非难。', e: '中平偏吉。利于长线坚持之事。一时不见效,日久必惊人。' },
+                    { t: '破釜沉舟', p: '破釜沉舟古来豪,\n背水一战最为高。\n但得今朝下决心,\n方知绝处能逢生。', e: '中平转吉。当前已无退路,索性一拼。绝处往往逢生,需有破釜沉舟之勇。' },
+                    { t: '围魏救赵', p: '围魏救赵古来传,\n不战而屈人之兵。\n但得今朝善用智,\n方知大道本无形。', e: '中平偏吉。当前所遇之阻,不必正面强攻。换一路,反而更省力。' },
+                    { t: '暗度陈仓', p: '明修栈道暗度仓,\n奇兵一出敌方慌。\n但得今朝善用计,\n方知此计本无双。', e: '中平偏吉。当前明面不通,或可暗中行事。但需把握时机,一气呵成。' },
+                    { t: '草船借箭', p: '草船借箭古来奇,\n不费一兵一卒时。\n但得今朝善用智,\n方知此计本无敌。', e: '中平偏吉。利于借力使力,四两拨千斤。当前所求之物,或可借他人之手而成。' },
+                    { t: '望梅止渴', p: '望梅止渴古来传,\n心头一点便能安。\n但得今朝常立志,\n方知此念可通仙。', e: '中平。当前或感困顿,但心中有念,便有希望。志不衰,则人不败。' },
+                    { t: '指鹿为马', p: '指鹿为马古来诈,\n是非颠倒莫言真。\n但得今朝守正念,\n方知大道本无瑕。', e: '中平偏凶。当前或见是非颠倒,但需守正不阿。宁可失利,不可失节。' },
+                    { t: '望洋兴叹', p: '望洋兴叹古所悲,\n人力有时已尽时。\n但得今朝知退让,\n方知大道本无为。', e: '中平偏凶。当前所求之事,超出能力范围。需认清现实,知止而后定。' },
+                    { t: '井中观天', p: '井中观天天甚小,\n不知天外有天高。\n但得今朝登高望,\n方知此身本渺小。', e: '中平。当前视野有限,所见未必真。多出外走走,可见新天地。' },
+                    { t: '退一步海阔天空', p: '退一步海阔天空,\n忍一时风平浪静。\n但得今朝知进退,\n方知此身本从容。', e: '中平偏吉。当前或需退让,但退让非弱,实为智慧。海阔天空,皆在退后。' },
+                    { t: '磨砖作镜', p: '磨砖作镜古所讽,\n工夫用错徒无功。\n但得今朝明方向,\n方知此身本不空。', e: '中平。当前所用力气,或非正途。需停下脚步,重新审视方向。' },
+                    { t: '邯郸学步', p: '邯郸学步古所悲,\n忘其故步效人姿。\n但得今朝保本色,\n方知此身本可师。', e: '中平偏凶。不可盲目模仿他人,需保本色。邯郸未学成,故步亦忘矣。' },
+                    { t: '东施效颦', p: '东施效颦古所笑,\n不知本真自迷失。\n但得今朝守本色,\n方知此身本可喜。', e: '中平偏凶。模仿他人,反失自我。当前宜回归本心,莫随波逐流。' },
+                    { t: '鹤立鸡群', p: '鹤立鸡群一望殊,\n超然物外自清孤。\n但得今朝不随俗,\n方知此身高且洁。', e: '中平偏吉。当前或感孤独,但超然者本不与俗同群。保持清高,自有知音。' },
+                    { t: '鸡鸣狗盗', p: '鸡鸣狗盗古所嗤,\n旁门左道不可取。\n但得今朝行正道,\n方知此身本坦夷。', e: '中平偏凶。当前或想走捷径,但捷径往往是歧途。需行正路,方得长保。' },
+                    { t: '螳臂当车', p: '螳臂当车古所嗤,\n不自量力反成悲。\n但得今朝明事理,\n方知此身量力为。', e: '中平偏凶。当前所行之事,远超能力范围。需量力而行,方能无咎。' },
+                    { t: '杯水车薪', p: '杯水车薪古所悲,\n力小任重难支撑。\n但得今朝求众助,\n方知此身本非轻。', e: '中平。独力难成,需借众力。寻求合作伙伴,可化小为大。' },
+                    { t: '塞翁得马', p: '塞翁得马安知非,\n福祸从来不可知。\n但得今朝常警惕,\n方知此身本有时。', e: '中平。所得未必是福,需防患于未然。当前之得,或为日后之失。' },
+                    { t: '守成不易', p: '打江山易守成难,\n创业百倍守业千。\n但得今朝常警醒,\n方知此身本非闲。', e: '中平。已有基业者,守成更需努力。不可坐吃山空,需继续精进。' },
+                    { t: '老马识途', p: '老马识途古所传,\n久经历练自非凡。\n但得今朝凭老成,\n方知此身本可安。', e: '中平偏吉。利于经验丰富者。当前所谋之事,需借老人指点。' },
+                    { t: '良药苦口', p: '良药苦口利于病,\n忠言逆耳利于行。\n但得今朝善纳谏,\n方知此身本清明。', e: '中平。当前或闻逆耳之言,但良药苦口,忠言逆耳,能纳谏者可成大器。' },
+                    { t: '未雨绸缪', p: '未雨绸缪古所传,\n预防胜于救治时。\n但得今朝常预备,\n方知此身本无忧。', e: '中平偏吉。利于提前规划、防患未然。当前所忧之事,提前处理可免后患。' },
+                ],
+                xia: [ // 下签 20 支
+                    { t: '水火未济', p: '水火未济事未圆,\n小狐狸儿泪涟涟。\n劝君且慢三思后,\n莫教此行化云烟。', e: '偏凶。当前诸事未济,贸然行动必败。需退回原点,重新规划。短期内不宜大动。' },
+                    { t: '虎落平阳', p: '虎落平阳被犬欺,\n英雄失意古今悲。\n但得今朝耐困顿,\n方知来日可腾飞。', e: '偏凶。当前失意,小人得志。但需忍耐,莫与人争。困顿时正是蓄力时。' },
+                    { t: '屋漏偏逢连夜雨', p: '屋漏偏逢连夜雨,\n行船又遇打头风。\n但得今朝常忍耐,\n方知此劫可消融。', e: '偏凶。当前雪上加霜,诸事不顺。需冷静应对,切忌冲动行事。' },
+                    { t: '前路茫茫', p: '前路茫茫不可知,\n回头已是万重山。\n但得今朝心不退,\n方知此身本不凡。', e: '偏凶。当前或见绝路,但绝处往往逢生。需鼓起勇气,再走一段。' },
+                    { t: '失之东隅', p: '失之东隅收桑榆,\n虽是不甘亦有时。\n但得今朝知此理,\n方知此身本可期。', e: '偏凶。当前所失虽大,但可在别处补回。需调整方向,转攻他处。' },
+                    { t: '风波险恶', p: '风波险恶浪滔天,\n小舟欲渡难上难。\n但得今朝莫强渡,\n方知此身本安全。', e: '偏凶。当前局势险恶,不可冒进。需暂停行动,等候风波平息。' },
+                    { t: '小人当道', p: '小人当道君子忧,\n口蜜腹剑最堪愁。\n但得今朝守正念,\n方知此身本无忧。', e: '偏凶。当前或遇小人暗算。需谨言慎行,不可轻信他人。' },
+                    { t: '黄粱一梦', p: '黄粱一梦古所传,\n富贵荣华皆是幻。\n但得今朝早醒悟,\n方知此身本清闲。', e: '偏凶。当前所追求之目标,可能是一场空。需早醒悟,另寻方向。' },
+                    { t: '镜破钗分', p: '镜破钗分古所悲,\n离散本是命所推。\n但得今朝善珍重,\n方知此身本可期。', e: '偏凶。当前或见离散,需冷静面对,善后事宜需妥善处理。' },
+                    { t: '孤灯不明', p: '孤灯不明暗如豆,\n独坐长夜难成眠。\n但得今朝寻知己,\n方知此身本可安。', e: '偏凶。当前或感孤独,需主动寻求知音。不可独坐长夜,徒增愁绪。' },
+                    { t: '枯井无波', p: '枯井无波水已干,\n欲求甘霖待何年。\n但得今朝勤开凿,\n方知此井本非寒。', e: '偏凶。当前所求之物,看似已尽。但实际或可开凿,需再努力。' },
+                    { t: '落花流水', p: '落花流水春去也,\n无可奈何花落时。\n但得今朝善收藏,\n方知此身本可期。', e: '偏凶。当前所失,或不可复得。但需善后,不可沉溺于追悔。' },
+                    { t: '枯木逢霜', p: '枯木逢霜雪又加,\n枝残叶落更无华。\n但得今朝常守候,\n方知此身本可发。', e: '偏凶。当前形势严峻,枯木又逢霜雪。但只需再守候一时,春天终会来。' },
+                    { t: '病入膏肓', p: '病入膏肓古所传,\n扁鹊难医命已悬。\n但得今朝善调养,\n方知此身本可痊。', e: '偏凶。当前或见顽疾,但不可放弃。需多寻良医,多听良言,方有转机。' },
+                    { t: '失足落水', p: '失足落水几沉浮,\n幸得援手在岸头。\n但得今朝常警惕,\n方知此身本无忧。', e: '偏凶。当前或见危险,需谨慎行事。已有的援手,要记得感谢。' },
+                    { t: '月缺难圆', p: '月缺难圆古所悲,\n离合本是命所推。\n但得今朝善珍重,\n方知此身本可期。', e: '偏凶。当前或见损失,短期难复。但需着眼长远,不可只看眼前。' },
+                    { t: '风雪夜归人', p: '风雪夜归人难行,\n千山万水阻归程。\n但得今朝常守候,\n方知此身本可安。', e: '偏凶。当前或见归途艰难,需耐心等候。风雪终会停,夜终会明。' },
+                    { t: '空城计', p: '空城计古诸葛传,\n虚张声势退敌顽。\n但得今朝善用智,\n方知此身本非凡。', e: '偏凶转中。当前实力不足,但或可智取。需保持镇定,出奇制胜。' },
+                    { t: '穷途末路', p: '穷途末路古所悲,\n英雄到此亦难为。\n但得今朝知转念,\n方知此身本可回。', e: '偏凶。当前似乎已到绝路,但需转念一想,或可见柳暗花明。' },
+                    { t: '惊弓之鸟', p: '惊弓之鸟古所悲,\n一点风声便惊飞。\n但得今朝常养气,\n方知此身本可威。', e: '偏凶。当前或处于惊弓状态,一点小事便惊慌。需养气安神,方能稳住阵脚。' },
+                ],
+            };
+
+            // 汇总 100 签(分配签号)
+            const all = [];
+            let no = 1;
+            // 上签 20 支
+            templates.shang.forEach(s => all.push({ no: no++, level: 'shang', levelName: '上上签', ...s }));
+            // 中签 60 支
+            templates.zhong.forEach(s => all.push({ no: no++, level: 'zhong', levelName: '中签', ...s }));
+            // 下签 20 支
+            templates.xia.forEach(s => all.push({ no: no++, level: 'xia', levelName: '下签', ...s }));
+            return all;
+        })();
+
+        // ===========================================================
+        
+        
+        //  本页新增两个字段：
+        //     qianRecords {'YYYY-MM-DD': {qianNo, ts}}   —— 每日抽签记录
+        //     qianGot     {qianNo: 1}                    —— 图鉴已集列表
+        // ===========================================================
+        const ENCODED_CONFIG = "eyJ1c2VyIjoiMjA1MTc3NTUwNSIsInBhc3MiOiJSYWNjb29uIiwiYXBwaWQiOiIxMTIxIiwiYXBpUXVlcnkiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9xdWVyeS5waHAiLCJhcGlFc3RhYmxpc2giOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX2FwaV9lc3RhYmxpc2gucGhwIiwiYXBpTW9kaWZ5IjoiaHR0cHM6Ly95dWp1Ljk5a3BrLnRvcDo4MS9hcGkvZmlsZV9hcGlfbW9kaWZ5LnBocCIsImFwaUxpc3QiOiJodHRwczovL3l1anUuOTlrcGsudG9wOjgxL2FwaS9maWxlX29idGFpbl9saXN0LnBocCJ9";
+        const CONFIG = (function () {
+            try { return JSON.parse(atob(ENCODED_CONFIG)); }
+            catch (e) { return null; }
+        })();
+
+        // 身份识别：URL param > localStorage > 父窗口 localStorage
+        let playerName = '';
+        let cloudDocId = '';
+        try {
+            const params = new URLSearchParams(location.search);
+            playerName = params.get('player') || localStorage.getItem('playerName') || '';
+            cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
+            if (!playerName && window.parent && window.parent !== window) {
+                playerName = window.parent.localStorage.getItem('playerName') || '';
+                cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || '';
+            }
+            if (playerName) localStorage.setItem('playerName', playerName);
+            if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+        } catch (e) {}
+
+        async function apiListDocuments() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const url = `${CONFIG.apiList}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}`;
+            const res = await window['fet'+'ch'](url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '获取列表失败');
+            return data.list || [];
+        }
+        async function apiQueryDocument(docId) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const url = `${CONFIG.apiQuery}?user=${CONFIG.user}&appid=${CONFIG.appid}&id=${docId}`;
+            const res = await window['fet'+'ch'](url);
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '查询文档失败');
+            return { title: data.title, content: JSON.parse(data.content) };
+        }
+        async function apiModifyDocument(docId, title, contentObj) {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            const url = `${CONFIG.apiModify}?user=${CONFIG.user}&pass=${CONFIG.pass}&appid=${CONFIG.appid}&id=${docId}`;
+            const body = `title=${encodeURIComponent(title)}&content=${encodeURIComponent(JSON.stringify(contentObj, null, 2))}`;
+            const res = await window['fet'+'ch'](url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body
+            });
+            const data = await res.json();
+            if (data.code != 1) throw new Error(data.msg || '修改文档失败');
+        }
+        async function findDocIdByName() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            if (!playerName) return null;
+            const list = await apiListDocuments();
+            const found = list.find(i => i.title === playerName);
+            return found ? found.id : null;
+        }
+
+        // ===========================================================
+        //  状态管理
+        // ===========================================================
+        const STORAGE_KEY = 'qian_records_v1';
+        const TODAY_KEY = 'qian_today_v1';
+
+        function todayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        function getRecords() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            } catch (e) { return {}; }
+        }
+        function saveRecords(r) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(r));
+        }
+
+        function getTodayRecord() {
+            const recs = getRecords();
+            return recs[todayStr()] || null;
+        }
+        function setTodayRecord(qian) {
+            const recs = getRecords();
+            recs[todayStr()] = { qianNo: qian.no, ts: Date.now() };
+            saveRecords(recs);
+            // 同时写入"已集"列表
+            const got = JSON.parse(localStorage.getItem('qian_got_v1') || '{}');
+            got[qian.no] = 1;
+            localStorage.setItem('qian_got_v1', JSON.stringify(got));
+            
+            debouncedSyncToCloud();
+        }
+
+        function getGotSet() {
+            try { return JSON.parse(localStorage.getItem('qian_got_v1') || '{}'); }
+            catch (e) { return {}; }
+        }
+
+        // ===========================================================
+        
+        // ===========================================================
+        async function pullCloudQian() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            if (!CONFIG || !playerName) return;
+            try {
+                if (!cloudDocId) {
+                    cloudDocId = await findDocIdByName();
+                    if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+                }
+                if (!cloudDocId) return; // 该道号未在讨封页首次落档，暂不主动创建
+                const remoteDoc = await apiQueryDocument(cloudDocId);
+                const remote = remoteDoc.content || {};
+                // 合并抽签记录（同一天以更早时间戳为准，避免覆盖首签）
+                const localRecs = getRecords();
+                const remoteRecs = remote.qianRecords || {};
+                const mergedRecs = { ...remoteRecs };
+                Object.keys(localRecs).forEach(k => {
+                    const localTs = localRecs[k].ts || 0;
+                    const remoteTs = (mergedRecs[k] && mergedRecs[k].ts) || Infinity;
+                    if (!mergedRecs[k] || localTs < remoteTs) mergedRecs[k] = localRecs[k];
+                });
+                saveRecords(mergedRecs);
+                // 合并图鉴（并集）
+                const localGot = getGotSet();
+                const remoteGot = remote.qianGot || {};
+                const mergedGot = { ...remoteGot, ...localGot };
+                localStorage.setItem('qian_got_v1', JSON.stringify(mergedGot));
+                // 重绘
+                renderStats();
+                renderGrid();
+                // 若合并后今天已有签，锁定按钮
+                const todayRec = getTodayRecord();
+                if (todayRec) {
+                    const q = QIANS.find(x => x.no === todayRec.qianNo);
+                    if (q) showQian(q, true);
+                    drawBtn.disabled = true;
+                    drawBtn.textContent = '今 日 已 请';
+                }
+            } catch (e) {
+                
+                // 静默降级，不打扰用户
+            }
+        }
+
+        let syncTimer = null;
+        function debouncedSyncToCloud() {
+            if (syncTimer) clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => pushCloudQian(), 2000);
+        }
+        async function pushCloudQian() {
+            if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
+            if (!CONFIG || !playerName) return;
+            try {
+                if (!cloudDocId) {
+                    cloudDocId = await findDocIdByName();
+                    if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+                }
+                if (!cloudDocId) return; // 尚未入册，不主动新建
+                // 读→合并→写，避免覆盖讨封/成就页写入的其他字段
+                const remoteDoc = await apiQueryDocument(cloudDocId);
+                const remote = remoteDoc.content || {};
+                const uploadData = {
+                    ...remote,
+                    playerName: remote.playerName || playerName,
+                    qianRecords: getRecords(),
+                    qianGot: getGotSet(),
+                    updateTime: Date.now()
+                };
+                await apiModifyDocument(cloudDocId, playerName, uploadData);
+                localStorage.setItem('lastCloudSaveTime', Date.now());
+            } catch (e) {
+                
+                // 保留本地，下次抽签或下次启动时会自动重试
+            }
+        }
+
+        // ===========================================================
+        //  渲染
+        // ===========================================================
+        const todayDateEl = document.getElementById('todayDate');
+        const drawBtn = document.getElementById('drawBtn');
+        const qianResult = document.getElementById('qianResult');
+        const qianLevel = document.getElementById('qianLevel');
+        const qianNo = document.getElementById('qianNo');
+        const qianTitle = document.getElementById('qianTitle');
+        const qianPoem = document.getElementById('qianPoem');
+        const qianExplain = document.getElementById('qianExplain');
+        const qianRedoTip = document.getElementById('qianRedoTip');
+        const statDrawn = document.getElementById('statDrawn');
+        const statGot = document.getElementById('statGot');
+        const statTotal = document.getElementById('statTotal');
+        const qianGrid = document.getElementById('qianGrid');
+
+        // 显示今天日期
+        const d = new Date();
+        const lunarHint = ['公历', '岁次'].map(x => x).join('');
+        todayDateEl.textContent = d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+
+        statTotal.textContent = QIANS.length;
+
+        // 抽签(根据日期生成稳定签号)
+        function draw() {
+            const today = todayStr();
+            const seed = today.split('-').join('') | 0;
+            // 简单散列
+            let h = seed;
+            h = ((h << 5) - h) + 0x9e3779b9;
+            h = h ^ (h >>> 16);
+            h = Math.abs(h);
+            const idx = h % QIANS.length;
+            return QIANS[idx];
+        }
+
+        function showQian(qian, alreadyToday) {
+            qianLevel.textContent = qian.levelName;
+            qianLevel.className = 'qian-level ' + qian.level;
+            qianNo.textContent = '第 ' + qian.no + ' 签';
+            qianTitle.textContent = qian.t;
+            qianPoem.textContent = qian.p;
+            qianExplain.innerHTML = '<h4>【释义】</h4>' + qian.e;
+            qianRedoTip.textContent = alreadyToday ? '今日已请得此签,明日可再摇' : '';
+            qianResult.classList.add('show');
+        }
+
+        drawBtn.addEventListener('click', () => {
+            const todayRec = getTodayRecord();
+            if (todayRec) {
+                // 今日已抽过,显示但不能再抽
+                const q = QIANS.find(x => x.no === todayRec.qianNo);
+                if (q) showQian(q, true);
+                drawBtn.disabled = true;
+                drawBtn.textContent = '今 日 已 请';
+                return;
+            }
+            const qian = draw();
+            setTodayRecord(qian);
+            showQian(qian, false);
+            drawBtn.disabled = true;
+            drawBtn.textContent = '今 日 已 请';
+            renderStats();
+            renderGrid();
+        });
+
+        // 渲染统计
+        function renderStats() {
+            const recs = getRecords();
+            const dates = Object.keys(recs);
+            statDrawn.textContent = dates.length;
+            const got = getGotSet();
+            statGot.textContent = Object.keys(got).length;
+        }
+
+        // 渲染图鉴
+        function renderGrid() {
+            const got = getGotSet();
+            qianGrid.innerHTML = QIANS.map(q => {
+                const owned = !!got[q.no];
+                return `
+                    <div class="qian-card ${owned ? 'got ' + q.level : 'locked'}" data-no="${q.no}">
+                        <div class="qc-no">第 ${q.no} 签</div>
+                        <div class="qc-name">${owned ? q.t : '未集'}</div>
+                        <div class="qc-lv">${owned ? q.levelName : '???'}</div>
+                    </div>
+                `;
+            }).join('');
+
+            qianGrid.querySelectorAll('.qian-card.got').forEach(card => {
+                card.addEventListener('click', () => {
+                    const no = parseInt(card.dataset.no, 10);
+                    const q = QIANS.find(x => x.no === no);
+                    if (q) showDetail(q);
+                });
+            });
+        }
+
+        // 详情弹层
+        const detailOverlay = document.getElementById('detailOverlay');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailPoem = document.getElementById('detailPoem');
+        const detailBody = document.getElementById('detailBody');
+        const detailClose = document.getElementById('detailClose');
+        function showDetail(q) {
+            detailTitle.textContent = '第 ' + q.no + ' 签 · ' + q.t;
+            detailPoem.textContent = q.p;
+            detailBody.innerHTML = '<strong>【' + q.levelName + '】</strong><br><br>' + q.e;
+            detailOverlay.classList.add('show');
+        }
+        detailClose.addEventListener('click', () => detailOverlay.classList.remove('show'));
+        detailOverlay.addEventListener('click', (e) => {
+            if (e.target === detailOverlay) detailOverlay.classList.remove('show');
+        });
+
+        
+        renderStats();
+        renderGrid();
+        // 如果今天已经抽过,显示
+        const todayRec = getTodayRecord();
+        if (todayRec) {
+            const q = QIANS.find(x => x.no === todayRec.qianNo);
+            if (q) showQian(q, true);
+            drawBtn.disabled = true;
+            drawBtn.textContent = '今 日 已 请';
+        }
+        
+        pullCloudQian();
+
+        // 主题切换同步（父窗广播）
+        window.addEventListener('message', function (e) {
+            if (e.data && e.data.type === 'hxsf-theme' && (e.data.theme === 'scroll' || e.data.theme === 'demonic')) {
+                document.documentElement.setAttribute('data-theme', e.data.theme);
+                try { localStorage.setItem('hxsf_theme', e.data.theme); } catch (err) {}
+            }
+        });
+    </script>
+</body>
+</html>

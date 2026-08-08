@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>关于 · 黄小仙讨封（卷轴）</title>
+    <meta name="theme-color" content="#5D4037">
+    <script>
+        (function () {
+            // 主题系统：妖异风 demonic / 卷轴风 scroll
+            function readTheme() {
+                try {
+                    if (window.parent && window.parent !== window) {
+                        var pt = window.parent.document.documentElement.getAttribute('data-theme');
+                        if (pt === 'scroll' || pt === 'demonic') return pt;
+                    }
+                } catch (e) {}
+                try { var t = localStorage.getItem('hxsf_theme'); return (t === 'scroll' || t === 'demonic') ? t : 'demonic'; }
+                catch (e) { return 'demonic'; }
+            }
+            document.documentElement.setAttribute('data-theme', readTheme());
+        })();
+    </script>
+    <style>
+        :root {
+            --scroll-bg: #F5DEB3;
+            --scroll-dark: #8B4513;
+            --scroll-gold: #B8860B;
+            --scroll-text: #3E2723;
+            --scroll-light: #FFF8DC;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--scroll-bg);
+            color: var(--scroll-text);
+            font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+            line-height: 1.8;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(139,69,19,0.03) 2px,
+                    rgba(139,69,19,0.03) 4px
+                ),
+                radial-gradient(ellipse at 50% 30%, rgba(210,180,140,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(210,180,140,0.1) 0%, transparent 60%);
+        }
+
+        /* 卷轴主容器 */
+        .page-container {
+            max-width: 520px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            animation: fadeIn 0.8s ease forwards;
+            border-left: 6px solid var(--scroll-dark);
+            border-right: 6px solid var(--scroll-dark);
+            background: rgba(255, 248, 220, 0.6);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+        }
+
+        /* 卷轴左右卷曲厚度 */
+        .page-container::before,
+        .page-container::after {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 12px;
+            background: linear-gradient(to bottom, var(--scroll-dark), #A0522D, var(--scroll-dark));
+            box-shadow: inset 2px 0 5px rgba(0,0,0,0.3), inset -2px 0 5px rgba(0,0,0,0.2);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .page-container::before {
+            left: -6px;
+            border-radius: 4px 0 0 4px;
+        }
+        .page-container::after {
+            right: -6px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部标题区 */
+        .about-header {
+            margin-bottom: 40px;
+        }
+        .about-header .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            color: var(--scroll-gold);
+            animation: goldenPulse 3s ease-in-out infinite;
+            text-shadow: 0 0 8px rgba(184, 134, 11, 0.4);
+        }
+        @keyframes goldenPulse {
+            0%, 100% { opacity: 0.65; }
+            50% { opacity: 1; }
+        }
+        .about-header h1 {
+            font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+            color: var(--scroll-gold);
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 var(--scroll-dark);
+            margin-bottom: 10px;
+        }
+        .about-header .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--scroll-gold), transparent);
+            margin: 0 auto;
+        }
+
+        /* 版本号区域 */
+        .version-block {
+            margin-bottom: 50px;
+            padding: 20px 0;
+        }
+        .version-label {
+            font-size: 14px;
+            color: #5D4037;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            font-family: 'KaiTi', serif;
+        }
+        .version-number {
+            font-size: 52px;
+            font-weight: bold;
+            color: var(--scroll-gold);
+            letter-spacing: 6px;
+            text-shadow: 2px 2px 0 var(--scroll-dark), 0 0 15px rgba(184, 134, 11, 0.3);
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
+        }
+        .version-number::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--scroll-dark);
+        }
+        .version-tag {
+            font-size: 13px;
+            color: #5D4037;
+            letter-spacing: 2px;
+            margin-top: 18px;
+            font-style: italic;
+            font-family: 'KaiTi', serif;
+        }
+
+        /* 隐私政策链接 */
+        .privacy-section {
+            margin-top: auto;
+            padding-top: 30px;
+            border-top: 2px dashed var(--scroll-dark);
+            width: 100%;
+        }
+        .privacy-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--scroll-light);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            padding: 10px 22px;
+            background: linear-gradient(180deg, #D2B48C 0%, #A0522D 100%);
+            border: 2px solid var(--scroll-dark);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Ma Shan Zheng', 'KaiTi', serif;
+            font-weight: bold;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+        }
+        .privacy-link .link-icon {
+            font-size: 16px;
+            color: #FFE4B5;
+        }
+        .privacy-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.4);
+        }
+        .privacy-link:active {
+            transform: translateY(1px);
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+        }
+        .privacy-hint {
+            font-size: 11px;
+            color: #5D4037;
+            margin-top: 12px;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* 页脚 */
+        .footer-note {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #5D4037;
+            letter-spacing: 1px;
+            font-family: 'KaiTi', serif;
+        }
+        .footer-note a {
+            color: var(--scroll-dark);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: bold;
+        }
+        .footer-note a:hover {
+            color: var(--scroll-gold);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .about-header h1 { font-size: 24px; letter-spacing: 3px; }
+            .version-number { font-size: 40px; letter-spacing: 3px; }
+            .version-label { font-size: 12px; }
+            .privacy-link { font-size: 13px; padding: 8px 16px; }
+            .page-container { padding: 24px 12px; }
+        }
+
+        /* ===== 妖异风覆盖 ===== */
+        html[data-theme="demonic"] body {
+            background-color: #0d0508;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(232, 197, 106, 0.03) 2px, rgba(232, 197, 106, 0.03) 4px),
+                radial-gradient(ellipse at 50% 30%, rgba(232, 197, 106, 0.13) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 85%, rgba(138, 31, 43, 0.25) 0%, transparent 65%);
+            color: #e8d8b8;
+        }
+        html[data-theme="demonic"] .page-container {
+            background: rgba(18, 8, 12, 0.72);
+            border-left: 6px solid #2a0f16;
+            border-right: 6px solid #2a0f16;
+            box-shadow: 0 0 40px rgba(138, 31, 43, 0.35);
+        }
+        html[data-theme="demonic"] .page-container::before,
+        html[data-theme="demonic"] .page-container::after {
+            background: linear-gradient(to bottom, #2a0f16, #5a1620, #2a0f16);
+        }
+        html[data-theme="demonic"] .about-header .icon { color: #E8C56A; text-shadow: 0 0 12px rgba(232, 197, 106, 0.5); }
+        html[data-theme="demonic"] .about-header h1 { color: #E8C56A; text-shadow: 2px 2px 0 #3a0a10; }
+        html[data-theme="demonic"] .about-header .divider { background: linear-gradient(to right, transparent, #E8C56A, transparent); }
+        html[data-theme="demonic"] .version-label { color: #c8a878; }
+        html[data-theme="demonic"] .version-number { color: #E8C56A; text-shadow: 2px 2px 0 #3a0a10, 0 0 20px rgba(232, 197, 106, 0.3); }
+        html[data-theme="demonic"] .version-number::after { background: #3a131c; }
+        html[data-theme="demonic"] .version-tag { color: #c8a878; }
+        html[data-theme="demonic"] .privacy-section { border-top-color: #3a131c; }
+        html[data-theme="demonic"] .privacy-link {
+            background: linear-gradient(180deg, #8a1f2b, #5a1620);
+            border-color: #2a0f16;
+            color: #FFE9A8;
+        }
+        html[data-theme="demonic"] .privacy-link .link-icon { color: #E8C56A; }
+        html[data-theme="demonic"] .privacy-hint { color: #c8a878; }
+        html[data-theme="demonic"] .footer-note { color: #c8a878; }
+        html[data-theme="demonic"] .footer-note a { color: #E8C56A; }
+        html[data-theme="demonic"] .footer-note a:hover { color: #FFE9A8; }
+    </style>
+    
+    
+    <script>
+        
+        // 等 kill switch 探测完成后按结果放开或隐藏。避免"先亮再消失"的闪烁。
+        document.documentElement.classList.add('hxsf-cloud-loading');
+    </script>
+    <style>
+        /* kill=1 或探测未完成时，隐藏所有 hxsf-cloud-only 元素 */
+        html.hxsf-kill .hxsf-cloud-only,
+        html.hxsf-cloud-loading .hxsf-cloud-only { display: none !important; }
+    </style>
+    <script>
+        (function () {
+            var KILL_URL = 'ht'+'tps://yuju.99kpk.top:81/doc/visit.php?appid=1121&id=9890dfd37f58';
+            var CLOUD_HOST = 'yuju.99kpk.top';
+            var SESSION_KEY = 'hxsf_cloud_kill_v1';
+
+            var state = {
+                ready: null,
+                done: false,
+                killed: false
+            };
+            window.HXSF_CLOUD = state;
+
+            function applyKill(k) {
+                state.killed = !!k;
+                state.done = true;
+                try {
+                    var root = document.documentElement;
+                    root.classList.remove('hxsf-cloud-loading');
+                    if (k) root.classList.add('hxsf-kill');
+                    else root.classList.remove('hxsf-kill');
+                } catch (e) {}
+            }
+
+            var _origFetch = window.fetch ? window.fetch.bind(window) : null;
+            if (_origFetch) {
+                window.fetch = function (input, init) {
+                    try {
+                        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+                        if (state.killed && url.indexOf(CLOUD_HOST) !== -1 && url !== KILL_URL) {
+                            return Promise.reject(new Error('cloud disabled'));
+                        }
+                    } catch (e) {}
+                    return _origFetch(input, init);
+                };
+            }
+
+            // 会话内缓存：同一会话不再重复请求；未命中才发起真实请求
+            try {
+                var cached = sessionStorage.getItem(SESSION_KEY);
+                if (cached === '1' || cached === '0') {
+                    applyKill(cached === '1');
+                    state.ready = Promise.resolve(state.killed);
+                    return;
+                }
+            } catch (e) {}
+
+            state.ready = new Promise(function (resolve) {
+                if (!_origFetch) { applyKill(false); resolve(false); return; }
+                
+                try { if (navigator && navigator.onLine === false) { applyKill(false); resolve(false); return; } } catch (e) {}
+                var ctrl = null, timer = null;
+                try {
+                    ctrl = new AbortController();
+                    // 2 秒超时：避免首屏长时间空白
+                    timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 2000);
+                } catch (e) {}
+                _origFetch(KILL_URL, ctrl ? { signal: ctrl.signal } : {})
+                    .then(function (r) { return r.text(); })
+                    .then(function (t) {
+                        if (timer) clearTimeout(timer);
+                        var v = (t || '').trim();
+                        var k = (v === '1');
+                        try { sessionStorage.setItem(SESSION_KEY, k ? '1' : '0'); } catch (e) {}
+                        applyKill(k);
+                        resolve(k);
+                    })
+                    .catch(function () {
+                        if (timer) clearTimeout(timer);
+                        // 请求失败 / 超时 → 视为 kill=0（正常）
+                        try { sessionStorage.setItem(SESSION_KEY, '0'); } catch (e) {}
+                        applyKill(false);
+                        resolve(false);
+                    });
+            });
+        })();
+    </script>
+    
+</head>
+<body>
+    <!-- WebIDE 环境脚本（真实运行环境保留原有功能；其它环境静默降级） -->
+    <script>
+        try {
+            if (typeof webapp !== 'undefined') {
+                webapp.关闭跳转打开(false);
+                webapp.设置下拉刷新(false);
+                webapp.清空浏览记录();
+            }
+        } catch (e) { /* 非 WebIDE 环境静默 */ }
+    </script>
+
+    <div class="page-container">
+        <!-- 关于标题 -->
+        <div class="about-header">
+            <span class="icon">✦</span>
+            <h1>关于黄小仙讨封</h1>
+            <div class="divider"></div>
+        </div>
+
+        <!-- 版本号 -->
+        <div class="version-block">
+            <p class="version-label">当前版本</p>
+            <p class="version-number">V1.3.0</p>
+            <p class="version-tag">五百年修为一念之间</p>
+        </div>
+
+        <!-- 隐私政策
+        <div class="privacy-section">
+            <span>
+                <span class="link-icon">📜</span>
+                <span>隐私政策</span>
+            </span>
+            <p class="privacy-hint">点击查看完整隐私政策</p>
+        </div>
+        -->
+
+        <!-- 页脚 -->
+        <div class="footer-note">
+            <span>© 2026 软软的小窝</span>
+        </div>
+    </div>
+
+    <!-- 主题切换同步（父窗广播） -->
+    <script>
+        window.addEventListener('message', function (e) {
+            if (e.data && e.data.type === 'hxsf-theme' && (e.data.theme === 'scroll' || e.data.theme === 'demonic')) {
+                document.documentElement.setAttribute('data-theme', e.data.theme);
+                try { localStorage.setItem('hxsf_theme', e.data.theme); } catch (err) {}
+            }
+        });
+    </script>
+</body>
+</html>

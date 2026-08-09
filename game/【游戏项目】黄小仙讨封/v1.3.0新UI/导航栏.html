@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -56,7 +57,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            transition: opacity 0.25s ease;
+            transition: opacity 0.3s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), filter 0.38s ease;
         }
         /* 讨封iframe */
         .iframe-tao {
@@ -68,17 +69,30 @@
             opacity: 0;
             pointer-events: none;
             z-index: 0;
+            transform: translateY(8px) scale(0.995);
+            filter: blur(1px);
         }
         /* 其他页面iframe */
         .iframe-other {
             z-index: 0;
             opacity: 0;
             pointer-events: none;
+            transform: translateY(8px) scale(0.995);
+            filter: blur(1px);
         }
         .iframe-other.active {
             z-index: 2;
             opacity: 1;
             pointer-events: auto;
+            transform: translateY(0) scale(1);
+            filter: none;
+        }
+        .iframe-wrapper iframe.page-enter {
+            animation: page-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes page-enter {
+            from { opacity: 0; transform: translateY(10px) scale(0.995); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* ===== 加载遮罩 ===== */
@@ -112,8 +126,9 @@
             border: 3px solid #333;
             border-top: 3px solid var(--gold);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 1.1s cubic-bezier(0.55, 0.1, 0.45, 0.9) infinite;
             margin-bottom: 15px;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
         }
         .loading-overlay .status-text {
             font-size: 15px;
@@ -166,33 +181,92 @@
             position: relative;
             flex-shrink: 0;
         }
+        .bottom-nav::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 8%;
+            right: 8%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+        }
+        .nav-indicator {
+            position: absolute;
+            top: 4px;
+            left: 0;
+            height: calc(100% - 8px - env(safe-area-inset-bottom, 0px));
+            border: 1px solid rgba(212, 175, 55, 0.28);
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.12), rgba(139, 115, 85, 0.14));
+            box-shadow: inset 0 1px 0 rgba(240, 208, 128, 0.1), 0 4px 18px rgba(0, 0, 0, 0.22);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(0);
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s ease, opacity 0.2s ease;
+            will-change: transform, width;
+        }
+        .nav-indicator.ready { opacity: 1; }
         .nav-btn {
             flex: 1;
+            min-width: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0 2px;
+            gap: 3px;
+            padding: 2px 2px;
             background: transparent;
             border: none;
-            color: #777;
-            font-size: 12px;
+            color: #888;
+            font-size: 14px;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: color 0.28s, background 0.28s, transform 0.2s, box-shadow 0.3s, opacity 0.3s;
+            transition: color 0.24s ease, transform 0.24s ease, opacity 0.3s ease, text-shadow 0.3s ease;
             min-height: 44px;
             font-family: var(--font-stack);
             position: relative;
             border-radius: 0;
             white-space: nowrap;
+            z-index: 1;
+            isolation: isolate;
         }
         .nav-btn {
             color: #888;
             font-size: 14px;
             position: relative;
         }
+        .nav-btn .nav-ico {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            color: #9a8a66;
+            transition: color 0.24s ease, filter 0.24s ease, transform 0.24s ease;
+        }
+        .nav-btn .nav-ico svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .nav-btn .nav-txt {
+            font-size: 11px;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
         .nav-btn.active {
             color: #c9a96e;
             font-weight: bold;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.55), 0 0 24px rgba(212, 175, 55, 0.25);
+            transform: translateY(-1px);
+        }
+        .nav-btn.active .nav-ico {
+            color: #f0d080;
+            filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.65));
+            transform: translateY(-1px);
         }
         /* 选中Tab底部2px金色细线 */
         .nav-btn.active::after {
@@ -203,154 +277,37 @@
             transform: translateX(-50%);
             width: 40%;
             height: 2px;
-            background: #c9a96e;
+            background: linear-gradient(90deg, transparent, #c9a96e, transparent);
             border-radius: 1px;
+            box-shadow: 0 0 8px rgba(201, 169, 110, 0.7);
+            animation: nav-line-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes nav-line-in {
+            from { opacity: 0; transform: translateX(-50%) scaleX(0.2); }
+            to { opacity: 1; transform: translateX(-50%) scaleX(1); }
         }
         .nav-btn.hidden-btn {
             display: none !important;
         }
         .nav-btn:active {
-            transform: scale(0.95);
+            transform: translateY(1px) scale(0.96);
         }
-        /* 极窄屏合并按钮的☰图标 */
-        .nav-btn .hamburger-ico {
-            display: inline-block;
-            font-size: 20px;
-            line-height: 1;
-        }
-
-        /* ===== 右侧抽屉 ===== */
-        .drawer-mask {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 2500;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.28s ease;
-        }
-        .drawer-mask.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .side-drawer {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100%;
-            width: 78vw;
-            max-width: 300px;
-            min-width: 240px;
-            background: linear-gradient(180deg, #1a1510, #0f0c0a);
-            border-left: 1px solid #2a2018;
-            box-shadow: -6px 0 20px rgba(0, 0, 0, 0.5);
-            z-index: 2600;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            padding-top: env(safe-area-inset-top, 0);
-            will-change: transform;
-        }
-        .side-drawer.show {
-            transform: translateX(0);
-        }
-        .drawer-header {
-            padding: 20px 20px 12px;
-            color: #c9a96e;
-            font-size: 16px;
-            letter-spacing: 3px;
-            text-align: center;
-            border-bottom: 1px solid #2a2018;
-            font-family: var(--font-stack);
-        }
-        .drawer-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 0;
-        }
-        .drawer-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            color: #d5d0c8;
-            font-size: 15px;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: var(--font-stack);
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-        }
-        .drawer-item:active {
-            background: rgba(201, 169, 110, 0.08);
-        }
-        .drawer-item .drawer-ico {
-            width: 22px;
-            height: 22px;
-            margin-right: 14px;
-            flex-shrink: 0;
-            color: #c9a96e;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .drawer-item .drawer-ico svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-        }
-        .drawer-item .drawer-text {
-            flex: 1;
-        }
-        .drawer-item .drawer-arrow {
-            color: #666;
-            font-size: 18px;
-            margin-left: 8px;
-        }
-
-        /* ===== 轻提示 toast ===== */
-        .app-toast {
-            position: fixed;
-            left: 50%;
-            top: 40%;
-            transform: translate(-50%, -50%);
-            background: rgba(20, 15, 10, 0.92);
-            color: #f5ecd7;
-            padding: 12px 22px;
-            border-radius: 22px;
-            font-size: 14px;
-            letter-spacing: 2px;
-            z-index: 5000;
-            border: 1px solid #5a3a1a;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-            opacity: 0;
-            transition: opacity 0.25s;
-            font-family: var(--font-stack);
-            pointer-events: none;
-        }
-        .app-toast.show {
-            opacity: 1;
-        }
-
-        /* 开关置灰 */
-        .toggle-switch.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        
+        /* 讨封卷轴主按钮常驻（视觉居中） */
+        .bottom-nav .nav-btn[data-page="taofeng"] { order: 3; }
+        .bottom-nav .nav-btn[data-page="library"] { order: 1; }
+        .bottom-nav .nav-btn[data-page="qian"] { order: 2; }
+        .bottom-nav .nav-btn[data-page="daozhu"] { order: 4; }
+        .bottom-nav .nav-btn[data-page="more"] { order: 5; }
+        .bottom-nav .nav-btn[data-page="more-merge"] { order: 6; }
         .nav-btn.scroll-btn {
             flex: 0 1 auto;
+            flex-direction: row;
             display: flex !important;
             align-items: center;
             justify-content: center;
+            gap: 0;
             min-height: 48px;
-            margin: 4px 12px;
+            margin: 2px 12px;
             padding: 0 18px;
             border: none;
             border-radius: 6px;
@@ -366,7 +323,7 @@
                 inset 0 1px 0 rgba(255, 220, 140, 0.5),
                 inset 0 -2px 0 rgba(60, 40, 20, 0.6);
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-            transition: transform 0.25s, box-shadow 0.3s;
+            transition: transform 0.25s, box-shadow 0.3s, filter 0.3s;
             z-index: 2;
         }
         .nav-btn.scroll-btn::before,
@@ -426,10 +383,184 @@
             opacity: 0.5;
             letter-spacing: 0;
         }
+        .nav-btn.scroll-btn.active {
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.55));
+            transform: translateY(-1px);
+        }
+        .nav-btn.scroll-btn.active::after { display: none; }
+        /* 极窄屏合并按钮的☰图标 */
+        .nav-btn .hamburger-ico {
+            display: inline-block;
+            font-size: 20px;
+            line-height: 1;
+        }
 
+        /* ===== 右侧抽屉 ===== */
+        .drawer-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.42);
+            backdrop-filter: blur(2px);
+            z-index: 2500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+        }
+        .drawer-mask.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 78vw;
+            max-width: 300px;
+            min-width: 240px;
+            background: linear-gradient(180deg, #1a1510, #0f0c0a);
+            border-left: 1px solid #2a2018;
+            box-shadow: -6px 0 24px rgba(0, 0, 0, 0.55), inset -1px 0 0 rgba(212, 175, 55, 0.07);
+            z-index: 2600;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            padding-top: env(safe-area-inset-top, 0);
+            will-change: transform;
+        }
+        .side-drawer.show {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            min-height: 62px;
+            padding: 16px 16px 12px 20px;
+            color: #c9a96e;
+            font-size: 16px;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #2a2018;
+            font-family: var(--font-stack);
+            text-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .drawer-title { flex: 1; text-align: left; }
+        .drawer-close {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            background: transparent;
+            color: #c9a96e;
+            font: 24px/1 var(--font-stack);
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+        .drawer-close:active {
+            transform: scale(0.9) rotate(8deg);
+            background: rgba(212, 175, 55, 0.08);
+        }
+        .drawer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: #d5d0c8;
+            font-size: 15px;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateX(18px);
+            transition: background 0.2s ease, color 0.2s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+            font-family: var(--font-stack);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+        .drawer-item:active {
+            background: rgba(201, 169, 110, 0.08);
+            transform: translateX(3px);
+        }
+        .side-drawer.show .drawer-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .side-drawer.show .drawer-item:nth-child(1) { transition-delay: 0.08s; }
+        .side-drawer.show .drawer-item:nth-child(2) { transition-delay: 0.13s; }
+        .side-drawer.show .drawer-item:nth-child(3) { transition-delay: 0.18s; }
+        .side-drawer.show .drawer-item:nth-child(4) { transition-delay: 0.23s; }
+        .side-drawer.show .drawer-item:nth-child(5) { transition-delay: 0.28s; }
+        @media (hover: hover) {
+            .nav-btn:hover { color: #b9a77e; }
+            .nav-btn.active:hover { color: #c9a96e; }
+            .drawer-item:hover { background: rgba(201, 169, 110, 0.06); color: #e6dcc8; }
+            .drawer-close:hover { color: #e6dcc8; background: rgba(201, 169, 110, 0.06); }
+        }
+        .drawer-item .drawer-ico {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            flex-shrink: 0;
+            color: #c9a96e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .drawer-item .drawer-ico svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+        }
+        .drawer-item .drawer-text {
+            flex: 1;
+        }
+        .drawer-item .drawer-arrow {
+            color: #666;
+            font-size: 18px;
+            margin-left: 8px;
+        }
+
+        /* ===== 轻提示 toast ===== */
+        .app-toast {
+            position: fixed;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, calc(-50% + 8px)) scale(0.98);
+            background: rgba(20, 15, 10, 0.92);
+            color: #f5ecd7;
+            padding: 12px 22px;
+            border-radius: 22px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            z-index: 5000;
+            border: 1px solid #5a3a1a;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.22s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            font-family: var(--font-stack);
+            pointer-events: none;
+        }
+        .app-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 开关置灰 */
+        .toggle-switch.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        
         /* ===== 设置面板 ===== */
         .overlay-bg {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -437,16 +568,21 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.28s ease, visibility 0s linear 0.28s;
         }
         .overlay-bg.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0s;
         }
         .settings-panel {
-            display: none;
             position: fixed;
             bottom: 80px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, 16px) scale(0.97);
             background: #1a1a1a;
             border: 1px solid #444;
             border-radius: 12px;
@@ -454,9 +590,15 @@
             width: 300px;
             z-index: 2000;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.24s ease, transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.36s;
         }
         .settings-panel.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0) scale(1);
+            transition-delay: 0s;
         }
         .settings-panel h4 {
             color: var(--gold);
@@ -658,6 +800,13 @@
             .nav-btn-merge {
                 display: flex !important;
             }
+            .nav-btn.scroll-btn {
+                margin: 2px 6px;
+                min-width: 100px;
+                padding: 0 8px;
+                font-size: 15px;
+                letter-spacing: 3px;
+            }
         }
         /* 横屏平板 & 大屏：字号 ≥16px，均匀分布 */
         @media (min-width: 600px) {
@@ -665,6 +814,17 @@
                 font-size: 16px;
                 letter-spacing: 1px;
                 min-height: 52px;
+            }
+            .nav-btn .nav-ico {
+                width: 24px;
+                height: 24px;
+            }
+            .nav-btn .nav-ico svg {
+                width: 22px;
+                height: 22px;
+            }
+            .nav-btn .nav-txt {
+                font-size: 13px;
             }
             .drawer-item {
                 font-size: 16px;
@@ -677,10 +837,22 @@
                 letter-spacing: 0;
                 padding: 0 2px;
             }
+            .nav-btn .nav-ico {
+                width: 20px;
+                height: 20px;
+            }
+            .nav-btn .nav-ico svg {
+                width: 18px;
+                height: 18px;
+            }
+            .nav-btn .nav-txt {
+                font-size: 10px;
+                letter-spacing: 0.5px;
+            }
             .nav-btn.scroll-btn {
                 font-size: 16px;
                 letter-spacing: 4px;
-                min-width: 130px;
+                min-width: 124px;
                 padding: 0 14px;
             }
             .nav-btn.scroll-btn::before,
@@ -721,6 +893,15 @@
             .nav-btn.scroll-btn::after {
                 width: 13px;
                 height: 34px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
 
@@ -871,21 +1052,49 @@
 
         <!-- 底部导航栏（5 主 Tab + 极窄屏合并按钮） -->
         <nav class="bottom-nav" id="bottomNav">
-            <button class="nav-btn active" data-page="taofeng">讨封</button>
-            <button class="nav-btn" data-page="library">藏经阁</button>
-            <button class="nav-btn" data-page="qian">求签</button>
-            <button class="nav-btn hxsf-cloud-only" data-page="daozhu">仙籍</button>
-            <button class="nav-btn" data-page="more">更多</button>
+            <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
+            <button class="nav-btn scroll-btn active" data-page="taofeng" aria-current="page">
+                <span class="btn-glow" aria-hidden="true"></span>
+                <span class="btn-glow btn-glow-bottom" aria-hidden="true"></span>
+                <span class="btn-text">讨封</span>
+            </button>
+            <button class="nav-btn" data-page="library">
+                <span class="nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 5h5a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H4z"/><path d="M20 5h-5a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h6z"/></svg>
+                </span>
+                <span class="nav-txt">藏经阁</span>
+            </button>
+            <button class="nav-btn" data-page="qian">
+                <span class="nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M6 8h12l-1.2 12H7.2z"/><path d="M10 2h4v6h-4z"/></svg>
+                </span>
+                <span class="nav-txt">求签</span>
+            </button>
+            <button class="nav-btn hxsf-cloud-only" data-page="daozhu">
+                <span class="nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+                </span>
+                <span class="nav-txt">仙籍</span>
+            </button>
+            <button class="nav-btn" data-page="more" aria-controls="sideDrawer" aria-expanded="false">
+                <span class="nav-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+                </span>
+                <span class="nav-txt">更多</span>
+            </button>
             <!-- 极窄屏（<320px）合并按钮：仙籍+更多 → ☰ -->
-            <button class="nav-btn nav-btn-merge" data-page="more-merge" aria-label="更多菜单">
+            <button class="nav-btn nav-btn-merge" data-page="more-merge" aria-label="更多菜单" aria-controls="sideDrawer" aria-expanded="false">
                 <span class="hamburger-ico">☰</span>
             </button>
         </nav>
 
         <!-- 右侧滑出抽屉遮罩 & 抽屉 -->
-        <div class="drawer-mask" id="drawerMask"></div>
+        <div class="drawer-mask" id="drawerMask" aria-hidden="true"></div>
         <aside class="side-drawer" id="sideDrawer" aria-hidden="true">
-            <div class="drawer-header">更 多</div>
+            <div class="drawer-header">
+                <span class="drawer-title">更 多</span>
+                <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭更多菜单">×</button>
+            </div>
             <div class="drawer-list" id="drawerList">
                 <!-- 极窄屏特有的"仙籍"入口，由 JS 控制显隐 -->
                 <button class="drawer-item drawer-item-daozhu hxsf-cloud-only" data-target="daozhu" style="display:none;">
@@ -930,9 +1139,9 @@
         <div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
 
         <!-- 设置遮罩 & 面板 -->
-        <div class="overlay-bg" id="overlayBg"></div>
-        <div class="settings-panel" id="settingsPanel">
-            <h4>显示设置</h4>
+        <div class="overlay-bg" id="overlayBg" aria-hidden="true"></div>
+        <div class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+            <h4 id="settingsTitle">显示设置</h4>
             <div class="setting-row">
                 <span class="setting-label" style="color:#999;font-size:12px;">皮质卷轴</span>
                 <div class="toggle-switch on disabled" id="themeSwitch" title="开启使用v1.3.0新UI，关闭使用原版UI"></div>
@@ -978,9 +1187,11 @@
             if (themeSwitch) themeSwitch.classList.add('on');
             if (tabletSwitch) tabletSwitch.classList.remove('on');
             const bottomNav = document.getElementById('bottomNav');
+            const navIndicator = document.getElementById('navIndicator');
             const overlayBg = document.getElementById('overlayBg');
             const settingsPanel = document.getElementById('settingsPanel');
             const navBtns = document.querySelectorAll('.nav-btn');
+            let lastSettingsTrigger = null;
             // ===== 云控公告 DOM =====
             const announcementOverlay = document.getElementById('announcementOverlay');
             const announcementModal = document.getElementById('announcementModal');
@@ -1124,6 +1335,52 @@
                 statusText.textContent = text;
             }
 
+            // ==================== 动效与导航高亮 ====================
+            function animatePage(iframe) {
+                if (!iframe || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                iframe.classList.remove('page-enter');
+                void iframe.offsetWidth;
+                iframe.classList.add('page-enter');
+            }
+
+            function updateNavIndicator() {
+                const activeBtn = bottomNav.querySelector('.nav-btn.active:not(.hidden-btn)');
+                if (!navIndicator || !activeBtn || activeBtn.offsetParent === null) return;
+                navIndicator.style.width = activeBtn.offsetWidth + 'px';
+                navIndicator.style.transform = 'translateX(' + activeBtn.offsetLeft + 'px)';
+                navIndicator.classList.add('ready');
+            }
+
+            function setActiveNav(pageKey) {
+                // 抽屉项（成就/道主榜/关于）归属"更多"tab；仙籍是独立主tab
+                const fallbackPages = ['achievement', 'rank', 'about'];
+                const activePage = fallbackPages.includes(pageKey) ? 'more' : pageKey;
+                navBtns.forEach(btn => {
+                    const isActive = btn.dataset.page === activePage;
+                    btn.classList.toggle('active', isActive);
+                    if (isActive) btn.setAttribute('aria-current', 'page');
+                    else btn.removeAttribute('aria-current');
+                });
+                requestAnimationFrame(updateNavIndicator);
+            }
+
+            function openSettings() {
+                if (isOffline) return;
+                lastSettingsTrigger = document.activeElement;
+                overlayBg.classList.add('show');
+                overlayBg.setAttribute('aria-hidden', 'false');
+                settingsPanel.classList.add('show');
+                settingsPanel.setAttribute('aria-hidden', 'false');
+            }
+
+            function closeSettings() {
+                overlayBg.classList.remove('show');
+                overlayBg.setAttribute('aria-hidden', 'true');
+                settingsPanel.classList.remove('show');
+                settingsPanel.setAttribute('aria-hidden', 'true');
+                if (lastSettingsTrigger && typeof lastSettingsTrigger.focus === 'function') lastSettingsTrigger.focus();
+            }
+
             // ==================== iframe 显示切换 ====================
             function showTaoIframe() {
                 if (currentVisibleIframe === 'tao') return;
@@ -1132,6 +1389,7 @@
                 iframeOther.classList.remove('active');
                 // 确保讨封iframe在DOM中可见
                 iframeTao.style.display = '';
+                animatePage(iframeTao);
             }
 
             function showOtherIframe() {
@@ -1140,6 +1398,7 @@
                 iframeTao.classList.add('dimmed');
                 iframeOther.classList.add('active');
                 iframeOther.style.display = '';
+                animatePage(iframeOther);
             }
 
             // ==================== 讨封加载 ====================
@@ -1220,13 +1479,10 @@
             // ==================== 导航切换 ====================
             function switchPage(pageKey) {
                 // 关闭设置面板
-                overlayBg.classList.remove('show');
-                settingsPanel.classList.remove('show');
+                if (settingsPanel.classList.contains('show')) closeSettings();
 
                 // 更新导航高亮
-                navBtns.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.page === pageKey);
-                });
+                setActiveNav(pageKey);
 
                 if (pageKey === 'taofeng') {
                     switchToTao();
@@ -1458,29 +1714,41 @@
             // ==================== 右侧抽屉（更多菜单）====================
             const drawerMask = document.getElementById('drawerMask');
             const sideDrawer = document.getElementById('sideDrawer');
+            const drawerClose = document.getElementById('drawerClose');
+            const drawerTriggers = bottomNav.querySelectorAll('[aria-controls="sideDrawer"]');
+            let lastDrawerTrigger = null;
 
-            function openDrawer() {
+            function openDrawer(trigger) {
                 if (isOffline) return;
+                lastDrawerTrigger = trigger || document.activeElement;
                 // 极窄屏（<320px）下，"仙籍"作为抽屉内独立项显示（其余尺寸下仙籍是主 tab）
                 const isNarrow = window.matchMedia && window.matchMedia('(max-width: 319px)').matches;
                 const daoZhuItem = sideDrawer.querySelector('.drawer-item-daozhu');
                 if (daoZhuItem) daoZhuItem.style.display = isNarrow ? '' : 'none';
                 drawerMask.classList.add('show');
+                drawerMask.setAttribute('aria-hidden', 'false');
                 sideDrawer.classList.add('show');
                 sideDrawer.setAttribute('aria-hidden', 'false');
+                drawerTriggers.forEach(btn => btn.setAttribute('aria-expanded', 'true'));
+                setTimeout(function() { if (drawerClose) drawerClose.focus(); }, 120);
             }
             function closeDrawer() {
                 drawerMask.classList.remove('show');
+                drawerMask.setAttribute('aria-hidden', 'true');
                 sideDrawer.classList.remove('show');
                 sideDrawer.setAttribute('aria-hidden', 'true');
+                drawerTriggers.forEach(btn => btn.setAttribute('aria-expanded', 'false'));
+                if (lastDrawerTrigger && typeof lastDrawerTrigger.focus === 'function') lastDrawerTrigger.focus();
             }
 
             // 点遮罩关闭抽屉
             if (drawerMask) drawerMask.addEventListener('click', closeDrawer);
+            if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
 
-            // ESC 关闭抽屉
+            // ESC 关闭抽屉 / 设置面板
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && sideDrawer.classList.contains('show')) closeDrawer();
+                else if (e.key === 'Escape' && settingsPanel.classList.contains('show')) closeSettings();
             });
 
             // 点抽屉里的项 → 关闭并跳转
@@ -1491,10 +1759,7 @@
                     const target = item.dataset.target;
                     closeDrawer();
                     if (target === 'settings') {
-                        if (!isOffline) {
-                            overlayBg.classList.add('show');
-                            settingsPanel.classList.add('show');
-                        }
+                        openSettings();
                     } else {
                         switchPage(target);
                     }
@@ -1509,22 +1774,19 @@
                 const pageKey = btn.dataset.page;
                 // "更多" / 极窄屏合并按钮 → 打开抽屉，不切换 iframe、不改高亮
                 if (pageKey === 'more' || pageKey === 'more-merge') {
-                    openDrawer();
+                    openDrawer(btn);
                     return;
                 }
 
                 if (pageKey === 'settings') {
-                    if (!isOffline) {
-                        overlayBg.classList.add('show');
-                        settingsPanel.classList.add('show');
-                    }
+                    openSettings();
                     return;
                 }
 
                 if (pageKey === 'taofeng') {
                     // 切回讨封，不重新加载
                     switchToTao();
-                    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'taofeng'));
+                    setActiveNav('taofeng');
                 } else {
                     switchPage(pageKey);
                 }
@@ -1532,13 +1794,23 @@
 
             // 设置面板
             document.getElementById('closeSettingsBtn').addEventListener('click', function() {
-                overlayBg.classList.remove('show');
-                settingsPanel.classList.remove('show');
+                closeSettings();
             });
             overlayBg.addEventListener('click', function() {
-                overlayBg.classList.remove('show');
-                settingsPanel.classList.remove('show');
+                closeSettings();
             });
+
+            // 导航指示器随布局变化重算
+            window.addEventListener('resize', updateNavIndicator, { passive: true });
+            if ('ResizeObserver' in window) {
+                new ResizeObserver(updateNavIndicator).observe(bottomNav);
+            }
+            if ('MutationObserver' in window) {
+                new MutationObserver(updateNavIndicator).observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            }
 
             // 卷轴模式开关
             themeSwitch.addEventListener('click', function() {
@@ -1608,9 +1880,7 @@
                     // 正常加载讨封
                     loadTao(false);
                     // 高亮讨封按钮
-                    navBtns.forEach(btn => {
-                        btn.classList.toggle('active', btn.dataset.page === 'taofeng');
-                    });
+                    setActiveNav('taofeng');
                 }
 
                 // 延迟二次检测
@@ -1630,6 +1900,9 @@
                 fetchAnnouncement();
                 // 每30秒轮询一次
                 setInterval(fetchAnnouncement, 30000);
+
+                // 首帧后校准导航指示器位置
+                requestAnimationFrame(updateNavIndicator);
             }
 
             init();

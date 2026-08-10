@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -7,17 +6,29 @@
     <title>黄小仙 · 讨封之卷</title>
     <style>
         :root {
-            --nav-height: 52px;
-            --gold: #D4AF37;
-            --gold-dark: #8B7355;
-            --gold-light: #F0D080;
-            --border-subtle: #222;
+            --nav-height: 56px;
+            --gold: #c7a64a;
+            --gold-light: #e8cc80;
+            --gold-glow: #fff0c8;
+            --gold-ghost: #6e5d3a;
+            --jade: #5a8a78;
+            --jade-light: #8ab8a6;
+            --jade-deep: #2a4a3e;
+            --bronze: #7a5230;
+            --bronze-light: #c89860;
+            --bronze-deep: #3a1a10;
+            --plaque-bg: #2c1410;
+            --plaque-border: #c7a64a;
+            --plaque-inner: #a07830;
+            --zitan: #3a1810;
+            --zitan-light: #5a2818;
+            --zitan-deep: #1a0808;
+            --ink: #d4cec0;
+            --ink-dim: #7a7568;
+            --ink-deep: #4a4540;
+            --border-subtle: #1a2a22;
             --font-stack: "SimSun", "Songti SC", "Noto Serif SC", serif;
-            --scroll-bg-start: #5a3e2b;
-            --scroll-bg-end: #d4a457;
-            --scroll-text: #f5e6c8;
-            --scroll-border: #c9a84c;
-            --bg-deep: #0a0806;
+            --bg-deep: #061210;
         }
         * {
             margin: 0;
@@ -49,6 +60,47 @@
             overflow: hidden;
             position: relative;
             background: var(--bg-deep);
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        /* 顶部装饰金光（呼应底栏） */
+        .iframe-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 4%;
+            right: 4%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(199, 166, 74, 0.4) 20%,
+                rgba(232, 204, 128, 0.55) 50%,
+                rgba(199, 166, 74, 0.4) 80%,
+                transparent 100%);
+            box-shadow: 0 0 4px rgba(199, 166, 74, 0.25);
+            z-index: 10;
+            pointer-events: none;
+        }
+        /* 顶部流光扫过 */
+        .iframe-wrapper::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 30%;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 240, 200, 0.8),
+                transparent);
+            z-index: 11;
+            pointer-events: none;
+            animation: top-sweep 5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+        @keyframes top-sweep {
+            0% { transform: translateX(-30%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(400%); opacity: 0; }
         }
         .iframe-wrapper iframe {
             position: absolute;
@@ -167,42 +219,296 @@
             }
         }
 
-        /* ===== 底部导航栏 ===== */
+        /* ===== 底部导航栏 · 紫檀木面板 ===== */
         .bottom-nav {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            background: #0a0806;
-            border-top: 1px solid var(--border-subtle);
+            background:
+                radial-gradient(1.2px 1.2px at 12% 30%, rgba(232, 204, 128, 0.55), transparent),
+                radial-gradient(1px 1px at 28% 70%, rgba(199, 166, 74, 0.4), transparent),
+                radial-gradient(1.5px 1.5px at 45% 45%, rgba(232, 204, 128, 0.5), transparent),
+                radial-gradient(1px 1px at 62% 25%, rgba(199, 166, 74, 0.35), transparent),
+                radial-gradient(1.2px 1.2px at 78% 65%, rgba(232, 204, 128, 0.5), transparent),
+                radial-gradient(1px 1px at 92% 40%, rgba(199, 166, 74, 0.4), transparent),
+                url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><path d='M0 20 Q10 14 20 20 T40 20' fill='none' stroke='rgba(199,166,74,0.05)' stroke-width='1'/><path d='M0 30 Q10 24 20 30 T40 30' fill='none' stroke='rgba(138,184,166,0.04)' stroke-width='1'/></svg>"),
+                linear-gradient(180deg,
+                    var(--zitan-light) 0%,
+                    var(--zitan) 18%,
+                    #2a1208 65%,
+                    var(--zitan-deep) 100%);
+            background-size:
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                40px 40px,
+                100% 100%;
+            background-repeat:
+                no-repeat,
+                no-repeat,
+                no-repeat,
+                no-repeat,
+                no-repeat,
+                no-repeat,
+                repeat,
+                no-repeat;
+            border-top: 1px solid rgba(199, 166, 74, 0.18);
+            border-bottom: 1px solid rgba(199, 166, 74, 0.1);
             padding-bottom: env(safe-area-inset-bottom, 0);
+            padding-top: 2px;
             z-index: 1000;
             min-height: var(--nav-height);
             transition: all 0.3s ease;
             position: relative;
             flex-shrink: 0;
+            box-shadow:
+                0 -6px 28px rgba(0, 0, 0, 0.65),
+                0 -1px 0 rgba(232, 204, 128, 0.08),
+                inset 0 2px 0 rgba(199, 166, 74, 0.06),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4);
         }
+        /* 顶部金线：贯穿高光 */
         .bottom-nav::before {
             content: "";
             position: absolute;
             top: 0;
-            left: 8%;
-            right: 8%;
+            left: 4%;
+            right: 4%;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(199, 166, 74, 0.55) 20%,
+                rgba(255, 240, 200, 0.85) 50%,
+                rgba(199, 166, 74, 0.55) 80%,
+                transparent 100%);
+            box-shadow: 0 0 6px rgba(199, 166, 74, 0.4);
+            overflow: hidden;
+        }
+        /* 顶部副高光：内层极细 */
+        .bottom-nav::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 18%;
+            right: 18%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(232, 204, 128, 0.14), transparent);
+            pointer-events: none;
+        }
+        /* ===== 氛围层：仙台悬浮夜色 =====
+           向上溢出的远山 + 灵光 + 仙雾 + 星尘，衔接游戏画面底部 */
+        .nav-ambient {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 100%;
+            height: 120px;
+            pointer-events: none;
+            z-index: 990;
+            overflow: hidden;
+        }
+        /* 远山剪影（双层，极暗） */
+        .nav-ambient .atm-peaks {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            background-repeat: repeat-x;
+            background-position: bottom center;
+            background-size: 220px 100%;
+        }
+        .nav-ambient .atm-peaks-a {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 80' preserveAspectRatio='none'><path d='M0 80 L0 52 Q30 34 60 44 T120 38 T180 46 T220 40 L220 80 Z' fill='rgba(2,8,10,0.5)'/></svg>");
+            opacity: 0.9;
+        }
+        .nav-ambient .atm-peaks-b {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 80' preserveAspectRatio='none'><path d='M0 80 L0 60 Q35 48 70 56 T140 50 T200 58 T220 52 L220 80 Z' fill='rgba(4,12,14,0.65)'/></svg>");
+            background-size: 300px 70%;
+            opacity: 0.85;
+        }
+        /* 青玉灵光：黄仙月华 */
+        .nav-ambient .atm-glow {
+            position: absolute;
+            left: 50%;
+            bottom: -16px;
+            width: 200px;
+            height: 100px;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse at center bottom,
+                rgba(138, 184, 166, 0.32) 0%,
+                rgba(199, 166, 74, 0.12) 45%,
+                transparent 68%);
+            filter: blur(7px);
+            animation: atm-glow-breathe 4.5s ease-in-out infinite;
+        }
+        @keyframes atm-glow-breathe {
+            0%, 100% { opacity: 0.65; transform: translateX(-50%) scaleY(1); }
+            50% { opacity: 1; transform: translateX(-50%) scaleY(1.12); }
+        }
+        /* 仙雾：双层错位漂移 */
+        .nav-ambient .atm-mist {
+            position: absolute;
+            left: -10%;
+            right: -10%;
+            bottom: -4px;
+            height: 72px;
+            filter: blur(10px);
+            background:
+                radial-gradient(ellipse 42% 60% at 18% 100%, rgba(216, 226, 208, 0.14), transparent 70%),
+                radial-gradient(ellipse 38% 55% at 46% 100%, rgba(216, 226, 208, 0.12), transparent 70%),
+                radial-gradient(ellipse 40% 58% at 78% 100%, rgba(216, 226, 208, 0.14), transparent 70%);
+        }
+        .nav-ambient .atm-mist-a {
+            animation: mist-drift-a 16s ease-in-out infinite alternate;
+        }
+        .nav-ambient .atm-mist-b {
+            height: 58px;
+            opacity: 0.7;
+            background:
+                radial-gradient(ellipse 46% 60% at 32% 100%, rgba(216, 226, 208, 0.1), transparent 70%),
+                radial-gradient(ellipse 40% 55% at 66% 100%, rgba(216, 226, 208, 0.12), transparent 70%);
+            animation: mist-drift-b 20s ease-in-out infinite alternate;
+        }
+        @keyframes mist-drift-a {
+            0% { transform: translateX(-2.5%); }
+            100% { transform: translateX(2.5%); }
+        }
+        @keyframes mist-drift-b {
+            0% { transform: translateX(3%); }
+            100% { transform: translateX(-3%); }
+        }
+        /* 星尘：稀疏闪烁 */
+        .nav-ambient .atm-stars {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 8% 20%, rgba(232, 204, 128, 0.6), transparent),
+                radial-gradient(1.5px 1.5px at 23% 55%, rgba(216, 226, 208, 0.5), transparent),
+                radial-gradient(1px 1px at 37% 25%, rgba(232, 204, 128, 0.45), transparent),
+                radial-gradient(1px 1px at 54% 15%, rgba(216, 226, 208, 0.55), transparent),
+                radial-gradient(1.5px 1.5px at 68% 40%, rgba(232, 204, 128, 0.5), transparent),
+                radial-gradient(1px 1px at 84% 20%, rgba(216, 226, 208, 0.5), transparent),
+                radial-gradient(1px 1px at 93% 50%, rgba(232, 204, 128, 0.4), transparent);
+            animation: atm-star-twinkle 5s ease-in-out infinite alternate;
+        }
+        @keyframes atm-star-twinkle {
+            0% { opacity: 0.4; }
+            100% { opacity: 0.9; }
+        }
+        /* 金粉微粒升华 */
+        .nav-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .nav-particles .dust {
+            position: absolute;
+            bottom: 4px;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 240, 200, 0.95), rgba(199, 166, 74, 0.4) 60%, transparent);
+            box-shadow: 0 0 4px rgba(232, 204, 128, 0.7);
+            opacity: 0;
+            animation: dust-rise 6s ease-in-out infinite;
+        }
+        .nav-particles .d1 { left:  6%; animation-delay: 0s;   animation-duration: 5.5s; }
+        .nav-particles .d2 { left: 16%; animation-delay: 1.2s; animation-duration: 7s;   width: 1.5px; height: 1.5px; }
+        .nav-particles .d3 { left: 26%; animation-delay: 2.4s; animation-duration: 6s;   }
+        .nav-particles .d4 { left: 38%; animation-delay: 0.8s; animation-duration: 8s;   width: 1px; height: 1px; }
+        .nav-particles .d5 { left: 50%; animation-delay: 3.2s; animation-duration: 6.5s; }
+        .nav-particles .d6 { left: 62%; animation-delay: 1.6s; animation-duration: 7.5s; width: 1.5px; height: 1.5px; }
+        .nav-particles .d7 { left: 74%; animation-delay: 2.8s; animation-duration: 5.8s; }
+        .nav-particles .d8 { left: 88%; animation-delay: 0.4s; animation-duration: 7.2s; width: 1px; height: 1px; }
+        @keyframes dust-rise {
+            0% {
+                transform: translate(0, 0) scale(0.4);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.9;
+            }
+            50% {
+                transform: translate(6px, -22px) scale(1);
+                opacity: 0.7;
+            }
+            85% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(-4px, -54px) scale(0.6);
+                opacity: 0;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .nav-particles .dust { animation: none; }
+            .nav-ambient .atm-mist,
+            .nav-ambient .atm-glow,
+            .nav-ambient .atm-stars { animation: none; }
+            .nav-indicator::after { animation: none; }
         }
         .nav-indicator {
             position: absolute;
-            top: 4px;
+            top: 5px;
             left: 0;
-            height: calc(100% - 8px - env(safe-area-inset-bottom, 0px));
-            border: 1px solid rgba(212, 175, 55, 0.28);
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.12), rgba(139, 115, 85, 0.14));
-            box-shadow: inset 0 1px 0 rgba(240, 208, 128, 0.1), 0 4px 18px rgba(0, 0, 0, 0.22);
+            height: calc(100% - 10px - env(safe-area-inset-bottom, 0px));
+            border: 1px solid rgba(199, 166, 74, 0.45);
+            border-radius: 5px;
+            background:
+                radial-gradient(60% 40% at 50% 30%, rgba(255, 220, 140, 0.1), transparent 70%),
+                linear-gradient(180deg,
+                    rgba(138, 184, 166, 0.12) 0%,
+                    rgba(90, 138, 120, 0.08) 50%,
+                    rgba(42, 74, 62, 0.14) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(232, 204, 128, 0.18),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+                inset 0 0 0 1px rgba(160, 120, 48, 0.2),
+                0 0 12px rgba(199, 166, 74, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.3);
             opacity: 0;
             pointer-events: none;
             transform: translateX(0);
             transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s ease, opacity 0.2s ease;
             will-change: transform, width;
+        }
+        .nav-indicator::before {
+            content: "";
+            position: absolute;
+            top: 1px;
+            left: 6%;
+            right: 6%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 240, 200, 0.5), transparent);
+            opacity: 0.6;
+        }
+        /* 金光扫过：循环流光 */
+        .nav-indicator::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 240, 200, 0.0) 20%,
+                rgba(255, 240, 200, 0.25) 50%,
+                rgba(232, 204, 128, 0.0) 80%,
+                transparent);
+            animation: indicator-sweep 2.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+        @keyframes indicator-sweep {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(300%); }
         }
         .nav-indicator.ready { opacity: 1; }
         .nav-btn {
@@ -212,36 +518,49 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
-            padding: 2px 2px;
+            gap: 2px;
+            padding: 4px 2px;
             background: transparent;
             border: none;
-            color: #888;
+            color: var(--ink-dim);
             font-size: 14px;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: color 0.24s ease, transform 0.24s ease, opacity 0.3s ease, text-shadow 0.3s ease;
+            transition: color 0.24s ease, transform 0.24s ease, filter 0.28s ease;
             min-height: 44px;
             font-family: var(--font-stack);
             position: relative;
-            border-radius: 0;
+            border-radius: 6px;
             white-space: nowrap;
             z-index: 1;
             isolation: isolate;
-        }
-        .nav-btn {
-            color: #888;
-            font-size: 14px;
-            position: relative;
         }
         .nav-btn .nav-ico {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 22px;
-            height: 22px;
-            color: #9a8a66;
-            transition: color 0.24s ease, filter 0.24s ease, transform 0.24s ease;
+            width: 30px;
+            height: 30px;
+            color: var(--ink-deep);
+            position: relative;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 35% 30%, rgba(232, 204, 128, 0.06), transparent 60%),
+                linear-gradient(180deg, rgba(60, 30, 18, 0.55), rgba(20, 10, 6, 0.7));
+            box-shadow:
+                inset 0 1px 0 rgba(232, 204, 128, 0.08),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+            transition: color 0.24s ease, filter 0.24s ease, transform 0.24s ease, background 0.24s ease, box-shadow 0.3s ease;
+        }
+        .nav-btn .nav-ico::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            border: 1px solid rgba(199, 166, 74, 0);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            pointer-events: none;
         }
         .nav-btn .nav-ico svg {
             width: 20px;
@@ -251,35 +570,68 @@
             stroke-width: 1.8;
             stroke-linecap: round;
             stroke-linejoin: round;
+            position: relative;
+            z-index: 1;
         }
         .nav-btn .nav-txt {
             font-size: 11px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             line-height: 1;
+            transition: text-shadow 0.3s ease, letter-spacing 0.3s ease;
+        }
+        .nav-btn.active .nav-txt {
+            text-shadow:
+                0 0 6px rgba(232, 204, 128, 0.5),
+                0 0 12px rgba(199, 166, 74, 0.3);
+            letter-spacing: 2px;
+            font-weight: 600;
         }
         .nav-btn.active {
-            color: #c9a96e;
+            color: var(--gold);
             font-weight: bold;
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.55), 0 0 24px rgba(212, 175, 55, 0.25);
+            text-shadow: 0 0 10px rgba(199, 166, 74, 0.45);
             transform: translateY(-1px);
+        }
+        /* 非卷轴 tab 选中：翠玉衬底 + 金描边 */
+        .nav-btn.active:not(.scroll-btn) {
+            background:
+                linear-gradient(180deg, rgba(90, 138, 120, 0.16), rgba(42, 74, 62, 0.22));
+            box-shadow:
+                inset 0 1px 0 rgba(232, 204, 128, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(199, 166, 74, 0.32),
+                0 1px 8px rgba(0, 0, 0, 0.25),
+                0 0 10px rgba(199, 166, 74, 0.08);
         }
         .nav-btn.active .nav-ico {
-            color: #f0d080;
-            filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.65));
+            color: var(--gold-light);
+            filter: drop-shadow(0 0 5px rgba(199, 166, 74, 0.55));
             transform: translateY(-1px);
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255, 220, 140, 0.18), transparent 65%),
+                linear-gradient(180deg, rgba(199, 166, 74, 0.1), rgba(90, 60, 20, 0.25));
+            box-shadow:
+                inset 0 1px 0 rgba(255, 240, 200, 0.25),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+                0 0 8px rgba(199, 166, 74, 0.25),
+                0 1px 2px rgba(0, 0, 0, 0.4);
         }
-        /* 选中Tab底部2px金色细线 */
-        .nav-btn.active::after {
+        .nav-btn.active .nav-ico::before {
+            border-color: rgba(199, 166, 74, 0.5);
+            box-shadow: 0 0 6px rgba(199, 166, 74, 0.4);
+        }
+        /* 选中Tab底部2px金色细线（卷轴主按钮除外） */
+        .nav-btn.active:not(.scroll-btn)::after {
             content: '';
             position: absolute;
             left: 50%;
             bottom: 0;
             transform: translateX(-50%);
-            width: 40%;
+            width: 36%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, #c9a96e, transparent);
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
             border-radius: 1px;
-            box-shadow: 0 0 8px rgba(201, 169, 110, 0.7);
+            box-shadow: 0 0 6px rgba(199, 166, 74, 0.6);
             animation: nav-line-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
         @keyframes nav-line-in {
@@ -292,102 +644,177 @@
         .nav-btn:active {
             transform: translateY(1px) scale(0.96);
         }
-        /* 讨封卷轴主按钮常驻（视觉居中） */
+        /* 布局排序：讨封居中 */
         .bottom-nav .nav-btn[data-page="taofeng"] { order: 3; }
         .bottom-nav .nav-btn[data-page="library"] { order: 1; }
         .bottom-nav .nav-btn[data-page="qian"] { order: 2; }
         .bottom-nav .nav-btn[data-page="daozhu"] { order: 4; }
         .bottom-nav .nav-btn[data-page="more"] { order: 5; }
         .bottom-nav .nav-btn[data-page="more-merge"] { order: 6; }
+
+        /* ── 讨封 古铜烫金匾额 ── */
         .nav-btn.scroll-btn {
             flex: 0 1 auto;
-            flex-direction: row;
+            flex-direction: column;
             display: flex !important;
             align-items: center;
             justify-content: center;
-            gap: 0;
-            min-height: 48px;
-            margin: 2px 12px;
-            padding: 0 18px;
-            border: none;
-            border-radius: 6px;
-            background: linear-gradient(145deg, var(--scroll-bg-start), var(--scroll-bg-end));
-            color: var(--scroll-text);
-            font-size: 18px;
+            gap: 1px;
+            min-height: 58px;
+            margin: 0 14px;
+            padding: 5px 24px 7px;
+            border: 2px solid var(--plaque-border);
+            outline: 1px solid rgba(160, 120, 48, 0.55);
+            outline-offset: -4px;
+            border-radius: 3px;
+            background:
+                radial-gradient(50% 50% at 50% 45%, rgba(199, 166, 74, 0.15), transparent 70%),
+                linear-gradient(180deg, #4a1c12 0%, var(--plaque-bg) 45%, #1a0a08 100%);
+            color: var(--gold-light);
+            font-size: 17px;
             font-weight: bold;
-            letter-spacing: 6px;
+            letter-spacing: 8px;
             font-family: var(--font-stack);
             cursor: pointer;
             position: relative;
-            box-shadow: 0 2px 12px rgba(212, 175, 55, 0.25),
-                inset 0 1px 0 rgba(255, 220, 140, 0.5),
-                inset 0 -2px 0 rgba(60, 40, 20, 0.6);
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-            transition: transform 0.25s, box-shadow 0.3s, filter 0.3s;
+            box-shadow:
+                0 2px 16px rgba(0, 0, 0, 0.5),
+                0 0 0 1px var(--plaque-inner),
+                0 0 14px rgba(199, 166, 74, 0.15),
+                inset 0 1px 0 rgba(199, 166, 74, 0.35),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+            text-shadow: 0 0 8px rgba(232, 204, 128, 0.5);
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, filter 0.3s ease;
             z-index: 2;
         }
+        /* 匾额四角铆钉 */
         .nav-btn.scroll-btn::before,
         .nav-btn.scroll-btn::after {
             content: '';
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 10px;
-            height: 28px;
-            border-radius: 4px;
-            background: linear-gradient(180deg, #c9a84c, #8b7355);
-            box-shadow: inset 0 1px 2px rgba(255, 220, 140, 0.3), 0 1px 4px rgba(0, 0, 0, 0.4);
-            border: 1px solid #a08040;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, var(--gold-light), var(--bronze) 50%, var(--bronze-deep));
+            box-shadow:
+                inset 0 1px 1px rgba(255, 240, 200, 0.5),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.5),
+                0 0 3px rgba(199, 166, 74, 0.3);
+            border: 1px solid rgba(160, 120, 48, 0.7);
+            z-index: 4;
         }
         .nav-btn.scroll-btn::before {
-            left: -4px;
-            border-radius: 4px 0 0 4px;
+            bottom: 4px;
+            left: 4px;
         }
         .nav-btn.scroll-btn::after {
-            right: -4px;
-            border-radius: 0 4px 4px 0;
+            top: 4px;
+            right: 4px;
         }
         .nav-btn.scroll-btn:active {
             transform: scale(0.96);
-            box-shadow: 0 1px 6px rgba(212, 175, 55, 0.15), inset 0 1px 2px rgba(255, 220, 140, 0.3);
+            box-shadow:
+                0 1px 4px rgba(0, 0, 0, 0.4),
+                0 0 0 1px var(--plaque-inner),
+                inset 0 1px 0 rgba(199, 166, 74, 0.2);
         }
+        /* 顶部贯穿金箔条 */
         .nav-btn.scroll-btn .btn-glow {
             position: absolute;
-            top: -1px;
-            left: 10%;
-            right: 10%;
+            top: -2px;
+            left: 12%;
+            right: 12%;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-            opacity: 0.6;
+            background: linear-gradient(90deg, transparent, var(--gold-light) 20%, #fff8dc 50%, var(--gold-light) 80%, transparent);
+            opacity: 0.85;
             border-radius: 50%;
             filter: blur(1px);
+            box-shadow: 0 0 6px rgba(232, 204, 128, 0.65), 0 0 12px rgba(199, 166, 74, 0.3);
         }
         .nav-btn.scroll-btn .btn-glow-bottom {
             top: auto;
-            bottom: -1px;
-            opacity: 0.3;
+            bottom: -2px;
+            opacity: 0.4;
+            filter: blur(1.5px);
         }
+        /* 匾额题字 "讨封" */
         .nav-btn.scroll-btn .btn-text {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
             pointer-events: none;
+            text-shadow:
+                0 0 5px rgba(232, 204, 128, 0.85),
+                0 0 12px rgba(199, 166, 74, 0.55),
+                0 1px 2px rgba(0, 0, 0, 0.85),
+                0 -1px 0 rgba(255, 220, 140, 0.15);
+            font-feature-settings: "palt";
         }
+        /* 铆钉装饰：两侧小铆钉（第二对） */
         .nav-btn.scroll-btn .btn-text::before,
         .nav-btn.scroll-btn .btn-text::after {
-            content: '◆';
-            font-size: 10px;
-            color: var(--gold-light);
-            opacity: 0.5;
+            content: '';
+            display: block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, rgba(232, 204, 128, 0.85), rgba(200, 152, 96, 0.5) 50%, rgba(100, 50, 20, 0.85));
+            box-shadow:
+                inset 0 1px 0 rgba(255, 240, 200, 0.55),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(160, 120, 48, 0.5);
             letter-spacing: 0;
         }
+        /* 匾额激活：金辉呼吸 */
         .nav-btn.scroll-btn.active {
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.55));
             transform: translateY(-1px);
+            animation: plaque-breathe 3s ease-in-out infinite;
+            box-shadow:
+                0 3px 20px rgba(0, 0, 0, 0.55),
+                0 0 0 2px rgba(199, 166, 74, 0.45),
+                0 0 0 1px var(--plaque-inner),
+                0 0 22px rgba(199, 166, 74, 0.3),
+                inset 0 1px 0 rgba(232, 204, 128, 0.45),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4);
         }
-        .nav-btn.scroll-btn.active::after { display: none; }
+        @keyframes plaque-breathe {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.12) drop-shadow(0 0 10px rgba(199, 166, 74, 0.5)); }
+        }
+        /* 匾额左右云雷纹装饰 */
+        .nav-btn.scroll-btn .btn-edge-left,
+        .nav-btn.scroll-btn .btn-edge-right {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 22px;
+            pointer-events: none;
+            z-index: 2;
+            background:
+                linear-gradient(180deg,
+                    transparent 0%,
+                    rgba(199, 166, 74, 0.5) 20%,
+                    rgba(255, 240, 200, 0.7) 50%,
+                    rgba(199, 166, 74, 0.5) 80%,
+                    transparent 100%);
+            box-shadow:
+                0 0 4px rgba(232, 204, 128, 0.4),
+                inset 0 0 2px rgba(0, 0, 0, 0.5);
+            border-radius: 1px;
+        }
+        .nav-btn.scroll-btn .btn-edge-left {
+            left: 14px;
+            transform: translateY(-50%) scaleX(0.6);
+        }
+        .nav-btn.scroll-btn .btn-edge-right {
+            right: 14px;
+            transform: translateY(-50%) scaleX(0.6);
+        }
         /* 极窄屏合并按钮的☰图标 */
         .nav-btn .hamburger-ico {
             display: inline-block;
@@ -418,9 +845,9 @@
             width: 78vw;
             max-width: 300px;
             min-width: 240px;
-            background: linear-gradient(180deg, #1a1510, #0f0c0a);
-            border-left: 1px solid #2a2018;
-            box-shadow: -6px 0 24px rgba(0, 0, 0, 0.55), inset -1px 0 0 rgba(212, 175, 55, 0.07);
+            background: linear-gradient(180deg, #0e1a16, #07100e);
+            border-left: 1px solid #1a2a22;
+            box-shadow: -6px 0 24px rgba(0, 0, 0, 0.6), inset -1px 0 0 rgba(90, 138, 120, 0.06);
             z-index: 2600;
             transform: translateX(100%);
             transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
@@ -435,12 +862,12 @@
         .drawer-header {
             min-height: 62px;
             padding: 16px 16px 12px 20px;
-            color: #c9a96e;
+            color: var(--gold);
             font-size: 16px;
             letter-spacing: 3px;
-            border-bottom: 1px solid #2a2018;
+            border-bottom: 1px solid #1a2a22;
             font-family: var(--font-stack);
-            text-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+            text-shadow: 0 0 10px rgba(199, 166, 74, 0.3);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -451,14 +878,14 @@
             height: 36px;
             border: 0;
             background: transparent;
-            color: #c9a96e;
+            color: var(--gold);
             font: 24px/1 var(--font-stack);
             cursor: pointer;
             transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
         }
         .drawer-close:active {
             transform: scale(0.9) rotate(8deg);
-            background: rgba(212, 175, 55, 0.08);
+            background: rgba(90, 138, 120, 0.1);
         }
         .drawer-list {
             flex: 1;
@@ -469,7 +896,7 @@
             display: flex;
             align-items: center;
             padding: 14px 20px;
-            color: #d5d0c8;
+            color: var(--ink);
             font-size: 15px;
             letter-spacing: 1.5px;
             cursor: pointer;
@@ -483,7 +910,7 @@
             text-align: left;
         }
         .drawer-item:active {
-            background: rgba(201, 169, 110, 0.08);
+            background: rgba(90, 138, 120, 0.1);
             transform: translateX(3px);
         }
         .side-drawer.show .drawer-item {
@@ -496,17 +923,17 @@
         .side-drawer.show .drawer-item:nth-child(4) { transition-delay: 0.23s; }
         .side-drawer.show .drawer-item:nth-child(5) { transition-delay: 0.28s; }
         @media (hover: hover) {
-            .nav-btn:hover { color: #b9a77e; }
-            .nav-btn.active:hover { color: #c9a96e; }
-            .drawer-item:hover { background: rgba(201, 169, 110, 0.06); color: #e6dcc8; }
-            .drawer-close:hover { color: #e6dcc8; background: rgba(201, 169, 110, 0.06); }
+            .nav-btn:hover { color: var(--ink); }
+            .nav-btn.active:hover { color: var(--gold); }
+            .drawer-item:hover { background: rgba(90, 138, 120, 0.06); color: #c8d8d2; }
+            .drawer-close:hover { color: var(--gold-light); background: rgba(90, 138, 120, 0.06); }
         }
         .drawer-item .drawer-ico {
             width: 22px;
             height: 22px;
             margin-right: 14px;
             flex-shrink: 0;
-            color: #c9a96e;
+            color: var(--gold);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -788,9 +1215,7 @@
             border-radius: 3px;
         }
 
-        /* ===== 响应式 ===== */
-        /* 默认（竖屏手机） 5 tab 等宽字号 ≥14px —— 已在基础 .nav-btn 中设置 font-size:14px */
-        /* 极窄屏（<320px）：把"仙籍"和"更多"合并为☰ */
+        /* 极窄屏（<320px）：隐藏仙籍/更多，显示合并☰ */
         .nav-btn-merge { display: none; }
         @media (max-width: 319px) {
             .nav-btn[data-page="daozhu"],
@@ -801,14 +1226,15 @@
                 display: flex !important;
             }
             .nav-btn.scroll-btn {
-                margin: 2px 6px;
+                margin: 0 4px;
                 min-width: 100px;
-                padding: 0 8px;
-                font-size: 15px;
-                letter-spacing: 3px;
+                padding: 4px 10px 6px;
+                font-size: 14px;
+                letter-spacing: 5px;
+                min-height: 50px;
             }
         }
-        /* 横屏平板 & 大屏：字号 ≥16px，均匀分布 */
+        /* 横屏平板 & 大屏 */
         @media (min-width: 600px) {
             .nav-btn {
                 font-size: 16px;
@@ -816,12 +1242,12 @@
                 min-height: 52px;
             }
             .nav-btn .nav-ico {
-                width: 24px;
-                height: 24px;
+                width: 30px;
+                height: 30px;
             }
             .nav-btn .nav-ico svg {
-                width: 22px;
-                height: 22px;
+                width: 24px;
+                height: 24px;
             }
             .nav-btn .nav-txt {
                 font-size: 13px;
@@ -833,13 +1259,12 @@
         }
         @media (max-width: 420px) {
             .nav-btn {
-                font-size: 14px;
+                font-size: 13px;
                 letter-spacing: 0;
-                padding: 0 2px;
             }
             .nav-btn .nav-ico {
-                width: 20px;
-                height: 20px;
+                width: 24px;
+                height: 24px;
             }
             .nav-btn .nav-ico svg {
                 width: 18px;
@@ -847,22 +1272,15 @@
             }
             .nav-btn .nav-txt {
                 font-size: 10px;
-                letter-spacing: 0.5px;
+                letter-spacing: 1px;
             }
             .nav-btn.scroll-btn {
-                font-size: 16px;
-                letter-spacing: 4px;
-                min-width: 124px;
-                padding: 0 14px;
-            }
-            .nav-btn.scroll-btn::before,
-            .nav-btn.scroll-btn::after {
-                width: 7px;
-                height: 22px;
-            }
-            .nav-btn.scroll-btn .btn-text::before,
-            .nav-btn.scroll-btn .btn-text::after {
-                font-size: 8px;
+                font-size: 15px;
+                letter-spacing: 5px;
+                min-width: 110px;
+                padding: 4px 14px 6px;
+                min-height: 50px;
+                margin: 0 10px;
             }
             .settings-panel {
                 width: 260px;
@@ -883,16 +1301,22 @@
         }
         @media (min-width: 600px) {
             .nav-btn.scroll-btn {
-                min-width: 200px;
+                min-width: 180px;
                 font-size: 20px;
-                letter-spacing: 8px;
-                padding: 0 28px;
-                min-height: 54px;
+                letter-spacing: 12px;
+                padding: 6px 32px 8px;
+                min-height: 60px;
+                margin: 0 24px;
             }
             .nav-btn.scroll-btn::before,
             .nav-btn.scroll-btn::after {
-                width: 13px;
-                height: 34px;
+                width: 9px;
+                height: 9px;
+            }
+            .nav-btn.scroll-btn .btn-text::before,
+            .nav-btn.scroll-btn .btn-text::after {
+                width: 7px;
+                height: 7px;
             }
         }
 
@@ -1052,10 +1476,30 @@
 
         <!-- 底部导航栏（5 主 Tab + 极窄屏合并按钮） -->
         <nav class="bottom-nav" id="bottomNav">
+            <span class="nav-ambient" aria-hidden="true">
+                <span class="atm-peaks atm-peaks-a"></span>
+                <span class="atm-peaks atm-peaks-b"></span>
+                <span class="atm-glow"></span>
+                <span class="atm-mist atm-mist-a"></span>
+                <span class="atm-mist atm-mist-b"></span>
+                <span class="atm-stars"></span>
+            </span>
+            <span class="nav-particles" aria-hidden="true">
+                <span class="dust d1"></span>
+                <span class="dust d2"></span>
+                <span class="dust d3"></span>
+                <span class="dust d4"></span>
+                <span class="dust d5"></span>
+                <span class="dust d6"></span>
+                <span class="dust d7"></span>
+                <span class="dust d8"></span>
+            </span>
             <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
             <button class="nav-btn scroll-btn active" data-page="taofeng" aria-current="page">
                 <span class="btn-glow" aria-hidden="true"></span>
                 <span class="btn-glow btn-glow-bottom" aria-hidden="true"></span>
+                <span class="btn-edge-left" aria-hidden="true"></span>
+                <span class="btn-edge-right" aria-hidden="true"></span>
                 <span class="btn-text">讨封</span>
             </button>
             <button class="nav-btn" data-page="library">

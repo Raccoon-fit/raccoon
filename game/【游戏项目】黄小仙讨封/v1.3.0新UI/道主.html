@@ -573,14 +573,33 @@
             // ==================== UID 辅助 ====================
             // 存档标题格式：道号;UID（英文分号）。UID 在首次建档时生成，之后永久绑定该道号存档。
             function generateUid() {
-                return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+                return String(Date.now() % 100000000);
             }
-            function ensureUid() {
-                if (!uid) { uid = generateUid(); localStorage.setItem(KEY_UID, uid); }
+            async function ensureUid() {
+                if (uid) return uid;
+                if (!(window.HXSF_CLOUD && window.HXSF_CLOUD.killed)) {
+                    try {
+                        // 递增编号：读取云端所有档的 title;uid，取最大 uid + 1
+                        const list = await apiListDocuments();
+                        let max = 0;
+                        (list || []).forEach(item => {
+                            if (typeof item.title !== 'string') return;
+                            const idx = item.title.indexOf(';');
+                            if (idx < 0) return;
+                            const n = parseInt(item.title.slice(idx + 1), 10);
+                            if (!isNaN(n) && n > max) max = n;
+                        });
+                        uid = String(max + 1);
+                        localStorage.setItem(KEY_UID, uid);
+                        return uid;
+                    } catch (e) {}
+                }
+                uid = generateUid();
+                localStorage.setItem(KEY_UID, uid);
                 return uid;
             }
             function docTitleOf(name) {
-                return String(name || playerName) + ';' + ensureUid();
+                return String(name || playerName) + ';' + uid;
             }
 
             // ==================== DOM 引用 ====================
@@ -790,13 +809,15 @@
                 }
                 if (!cloudDocId) {
                     
-                    const newId = await apiEstablishDocument(playerName + ';' + ensureUid(), buildLocalSnapshot());
+                    await ensureUid();
+                    const newId = await apiEstablishDocument(playerName + ';' + uid, buildLocalSnapshot());
                     cloudDocId = newId;
                     localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                     localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
                     return;
                 }
-                await apiModifyDocument(cloudDocId, playerName + ';' + ensureUid(), buildLocalSnapshot());
+                await ensureUid();
+                await apiModifyDocument(cloudDocId, playerName + ';' + uid, buildLocalSnapshot());
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -1009,7 +1030,8 @@
                         if (localStorage.getItem(KEY_LING_YUN) === null)  localStorage.setItem(KEY_LING_YUN, '100');
                         if (localStorage.getItem(KEY_ZHUO_NIAN) === null) localStorage.setItem(KEY_ZHUO_NIAN, '0');
                         if (localStorage.getItem(KEY_STORY_NODE) === null) localStorage.setItem(KEY_STORY_NODE, 'start');
-                        const newId = await apiEstablishDocument(name + ';' + ensureUid(), buildLocalSnapshot());
+                        await ensureUid();
+                        const newId = await apiEstablishDocument(name + ';' + uid, buildLocalSnapshot());
                         cloudDocId = newId;
                         localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                         localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());

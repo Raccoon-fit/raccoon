@@ -444,6 +444,12 @@
         const CULTIVATION_RANK = { '∞':10000,'千载妖力':1000,'八百年':800,'七百年':700,'六百年':600,'五百二十年':520,'五百年':500,'四百八十年':480,'四百五十年':450,'四百年':400,'三百二十年':320,'三百年':300,'二百六十年':260,'无':0,'归零':0 };
         const CULTIVATION_BY_SCENE = { start:'五百年', true_encounter_first:'五百年', true_encounter_second:'五百年', true_guidance:'五百年', true_ending:'五百年', farmer_ending:'五百年', ruins_path:'四百八十年', ruins_arrival:'四百八十年', ruins_meeting:'四百八十年', witness_ending:'∞', mountain_guardian_end:'六百年', lost_in_rain:'三百二十年', dawn_return_end:'五百二十年', star_ending:'五百二十年', mortal_love_ending:'五百二十年', severed_ending:'四百年', mortal_ending:'无', god_ending_favor:'八百年', sacrifice_ending:'归零', mad_ending:'千载妖力', obsession_recover_end:'二百六十年', fail_scholar_end:'三百年', fail_kid_end:'四百五十年', demon_king_ending:'七百年', wait_final:'四百五十年' };
 
+        function banReasonOf(c) {
+            const v = c && c.banReason;
+            if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+            return String(v);
+        }
+
         function parsePlayer(listItem, doc) {
             const title = String((doc && doc.title) || listItem.title || '');
             const c = (doc && doc.content) || {};
@@ -458,6 +464,8 @@
             var cultText = c.cultivation || CULTIVATION_BY_SCENE[c.storyNode] || '五百年';
             var cultRank = Number(c.cultivationRank) || CULTIVATION_RANK[cultText] || 500;
 
+            const banReason = banReasonOf(c);
+
             return {
                 id: listItem.id,
                 title: title || String(listItem.title || ''),
@@ -466,7 +474,9 @@
                 zhuoniang: zhuoniang,
                 lingyun: lingyun,
                 achievement: achCount,
-                updateTime: Number(c.updateTime) || 0
+                updateTime: Number(c.updateTime) || 0,
+                banned: !!banReason,
+                banReason: banReason
             };
         }
 
@@ -495,13 +505,26 @@
         };
 
         function getSorted(players, sortKey) {
-            return [...players].sort((a, b) => (b[sortKey] || 0) - (a[sortKey] || 0));
+            return [...players].sort((a, b) => {
+                if (a.banned && !b.banned) return 1;
+                if (!a.banned && b.banned) return -1;
+                if (a.banned && b.banned) return 0;
+                return (b[sortKey] || 0) - (a[sortKey] || 0);
+            });
         }
 
         function fmtNum(n) {
             if (n === 0) return '0';
             if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
             return String(n);
+        }
+
+        function displayName(t) {
+            const s = String(t);
+            return s.includes(';') ? s.split(';')[0] : s;
+        }
+        function isMeTitle(t, myName) {
+            return String(t).split(';')[0] === myName;
         }
 
         function render() {
@@ -512,7 +535,7 @@
             const myName = getMyName();
             let myRank = -1;
             if (myName) {
-                myRank = sorted.findIndex(p => p.title === myName || p.title.startsWith(myName));
+                myRank = sorted.findIndex(p => isMeTitle(p.title, myName));
                 if (myRank >= 0) {
                     statMyRank.textContent = '第 ' + (myRank + 1) + ' 名';
                 } else {
@@ -537,8 +560,8 @@
                     <div class="podium-item ${isFirst ? 'first' : ''}">
                         <div class="rank-no">${rk}</div>
                         <div class="podium-crown">${rk === 1 ? '👑' : (rk === 2 ? '🥈' : '🥉')}</div>
-                        <div class="podium-name">${escapeHtml(p.title)}</div>
-                        <div class="podium-score">${scoreLabel} ${fmtNum(p[currentSort])}</div>
+                        <div class="podium-name">${escapeHtml(displayName(p.title))}${p.banned ? ' <span style="color:#c0392b">封禁</span>' : ''}</div>
+                        <div class="podium-score">${p.banned ? `<span style="color:#c0392b">${escapeHtml(p.banReason)}</span>` : `${scoreLabel} ${fmtNum(p[currentSort])}`}</div>
                         <div class="podium-meta">道行 ${p.daoxingText}</div>
                     </div>
                 `;
@@ -553,12 +576,12 @@
             } else {
                 rankList.innerHTML = rest.map((p, i) => {
                     const rk = i + 4;
-                    const isMe = p.title === myName;
+                    const isMe = isMeTitle(p.title, myName);
                     return `
                         <div class="rank-row ${isMe ? 'me' : ''}">
                             <div class="rank-no-cell">${rk}</div>
-                            <div class="rank-name">${escapeHtml(p.title)}${isMe ? ' <span style="color:var(--scroll-gold);font-size:11px;">【我】</span>' : ''}</div>
-                            <div class="rank-score">${SORT_LABELS[currentSort]} ${currentSort === 'daoxing' ? p.daoxingText : fmtNum(p[currentSort])}</div>
+                            <div class="rank-name">${escapeHtml(displayName(p.title))}${isMe ? ' <span style="color:var(--scroll-gold);font-size:11px;">【我】</span>' : ''}${p.banned ? ' <span style="color:#c0392b">封禁</span>' : ''}</div>
+                            <div class="rank-score">${p.banned ? `<span style="color:#c0392b">${escapeHtml(p.banReason)}</span>` : `${SORT_LABELS[currentSort]} ${currentSort === 'daoxing' ? p.daoxingText : fmtNum(p[currentSort])}`}</div>
                             <div class="rank-meta">道行 ${p.daoxingText}</div>
                         </div>
                     `;

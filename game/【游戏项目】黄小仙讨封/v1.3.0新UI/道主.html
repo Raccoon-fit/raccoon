@@ -544,6 +544,7 @@
             const KEY_LING_YUN          = 'lingYun';
             const KEY_ZHUO_NIAN         = 'zhuoNian';
             const KEY_UID               = 'playerUid';
+            const KEY_BAN               = 'banReason';
             // 道行映射：scene → 文本 / 文本 → 排序权重
             const CULTIVATION_MAP_LOCAL = {
                 start:'五百年', true_encounter_first:'五百年', true_encounter_second:'五百年',
@@ -572,6 +573,16 @@
 
             // ==================== UID 辅助 ====================
             // 存档标题格式：道号;UID（英文分号）。UID 在首次建档时生成，之后永久绑定该道号存档。
+            // 封号检测：存档 content 中 banReason 为空 / 缺失 / '0' 视为正常，否则其值为封号理由。
+            function banReasonOf(c) {
+                const v = c && c.banReason;
+                if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+                return String(v);
+            }
+            function loginAlertMsg(msg) {
+                const ban = localStorage.getItem(KEY_BAN) || '';
+                return ban ? ('黄小仙：此仙籍已被封禁 — ' + ban) : msg;
+            }
             function generateUid() {
                 return String(Date.now() % 100000000);
             }
@@ -792,10 +803,11 @@
                     
                     ...(localStorage.getItem('savedPasswordHash') ? { passwordHash: localStorage.getItem('savedPasswordHash') } : {}),
                     updateTime: Date.now()
-                }, _cloudKilled ? { uid: uid } : {
+                }, _cloudKilled ? { uid: uid, banReason: readLocal(KEY_BAN, '') } : {
                     
                     usedCodes: readLocalJSON(KEY_USED_CODES, []),
-                    uid: uid
+                    uid: uid,
+                    banReason: readLocal(KEY_BAN, '')
                 });
             }
 
@@ -877,6 +889,7 @@
                     localStorage.setItem(KEY_PLAYER_NAME, playerName);
                 }
                 if (remote.uid) { uid = remote.uid; localStorage.setItem(KEY_UID, uid); }
+                localStorage.setItem(KEY_BAN, banReasonOf(remote));
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -894,7 +907,14 @@
                 userInfoPanel.style.display = 'block';
                 displayDaoHao.textContent = playerName || '—';
                 displaySyncTime.textContent = formatTime(localStorage.getItem(KEY_LAST_CLOUD_TIME));
-                docIdLine.textContent = uid ? `仙籍编号：${uid}` : '';
+                const ban = localStorage.getItem(KEY_BAN) || '';
+                if (ban) {
+                    docIdLine.textContent = '封禁：' + ban;
+                    docIdLine.style.color = '#c0392b';
+                } else {
+                    docIdLine.textContent = uid ? `仙籍编号：${uid}` : '';
+                    docIdLine.style.color = '';
+                }
             }
             function renderLogin() {
                 userInfoPanel.style.display = 'none';
@@ -998,7 +1018,7 @@
                             setLoading(false);
                             resetLoginForm();
                             renderPanel();
-                            customAlert('黄小仙：旧档接续成功。此档原未设密令，已为你设为本次输入之令，请牢记。');
+                            customAlert(loginAlertMsg('黄小仙：旧档接续成功。此档原未设密令，已为你设为本次输入之令，请牢记。'));
                             return;
                         }
                         // 正常校验
@@ -1020,12 +1040,13 @@
                         setLoading(false);
                         resetLoginForm();
                         renderPanel();
-                        customAlert('黄小仙：仙籍接续成功，欢迎归来，' + playerName + '。');
+                        customAlert(loginAlertMsg('黄小仙：仙籍接续成功，欢迎归来，' + playerName + '。'));
                     } else {
                         // === 无档 → 新开 ===
                         playerName = name;
                         localStorage.setItem(KEY_PLAYER_NAME, playerName);
                         localStorage.setItem('savedPasswordHash', inputHash);
+                        localStorage.removeItem(KEY_BAN);
                         // 本地缺省
                         if (localStorage.getItem(KEY_LING_YUN) === null)  localStorage.setItem(KEY_LING_YUN, '100');
                         if (localStorage.getItem(KEY_ZHUO_NIAN) === null) localStorage.setItem(KEY_ZHUO_NIAN, '0');
@@ -1081,6 +1102,7 @@
                     localStorage.removeItem(KEY_PLAYER_NAME);
                     localStorage.removeItem(KEY_CLOUD_DOC_ID);
                     localStorage.removeItem(KEY_LAST_CLOUD_TIME);
+                    localStorage.removeItem(KEY_BAN);
                     // 兼容旧版遗留键
                     localStorage.removeItem('savedDaoHao');
                     localStorage.removeItem('savedPasswordHash');

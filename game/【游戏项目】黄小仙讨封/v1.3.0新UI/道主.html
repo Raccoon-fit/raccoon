@@ -543,6 +543,7 @@
             const KEY_STORY_NODE        = 'storyNode';
             const KEY_LING_YUN          = 'lingYun';
             const KEY_ZHUO_NIAN         = 'zhuoNian';
+            const KEY_UID               = 'playerUid';
             // 道行映射：scene → 文本 / 文本 → 排序权重
             const CULTIVATION_MAP_LOCAL = {
                 start:'五百年', true_encounter_first:'五百年', true_encounter_second:'五百年',
@@ -567,6 +568,20 @@
 
             let playerName = localStorage.getItem(KEY_PLAYER_NAME) || '';
             let cloudDocId = localStorage.getItem(KEY_CLOUD_DOC_ID) || '';
+            let uid = localStorage.getItem(KEY_UID) || '';
+
+            // ==================== UID 辅助 ====================
+            // 存档标题格式：道号;UID（英文分号）。UID 在首次建档时生成，之后永久绑定该道号存档。
+            function generateUid() {
+                return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+            }
+            function ensureUid() {
+                if (!uid) { uid = generateUid(); localStorage.setItem(KEY_UID, uid); }
+                return uid;
+            }
+            function docTitleOf(name) {
+                return String(name || playerName) + ';' + ensureUid();
+            }
 
             // ==================== DOM 引用 ====================
             const loginSection    = document.getElementById('loginSection');
@@ -695,8 +710,22 @@
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
                 if (!title) return null;
                 const list = await apiListDocuments();
-                const found = list.find(item => item.title === title);
-                return found ? found.id : null;
+                // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+                if (uid) {
+                    const exact = list.find(item => item.title === title + ';' + uid);
+                    return exact ? exact.id : null;
+                }
+                // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+                const pref = title + ';';
+                const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
+                if (hit) {
+                    const extracted = hit.title.slice(pref.length);
+                    if (extracted) { uid = extracted; localStorage.setItem(KEY_UID, extracted); }
+                    return hit.id;
+                }
+                // ③ 兜底：纯道号匹配（老档尚未改名时）
+                const old = list.find(item => item.title === title);
+                return old ? old.id : null;
             }
 
             // ==================== 本地存档快照 ====================
@@ -744,9 +773,10 @@
                     
                     ...(localStorage.getItem('savedPasswordHash') ? { passwordHash: localStorage.getItem('savedPasswordHash') } : {}),
                     updateTime: Date.now()
-                }, _cloudKilled ? {} : {
+                }, _cloudKilled ? { uid: uid } : {
                     
-                    usedCodes: readLocalJSON(KEY_USED_CODES, [])
+                    usedCodes: readLocalJSON(KEY_USED_CODES, []),
+                    uid: uid
                 });
             }
 
@@ -760,13 +790,13 @@
                 }
                 if (!cloudDocId) {
                     
-                    const newId = await apiEstablishDocument(playerName, buildLocalSnapshot());
+                    const newId = await apiEstablishDocument(playerName + ';' + ensureUid(), buildLocalSnapshot());
                     cloudDocId = newId;
                     localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                     localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
                     return;
                 }
-                await apiModifyDocument(cloudDocId, playerName, buildLocalSnapshot());
+                await apiModifyDocument(cloudDocId, playerName + ';' + ensureUid(), buildLocalSnapshot());
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -825,6 +855,7 @@
                     playerName = remote.playerName;
                     localStorage.setItem(KEY_PLAYER_NAME, playerName);
                 }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem(KEY_UID, uid); }
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -842,7 +873,7 @@
                 userInfoPanel.style.display = 'block';
                 displayDaoHao.textContent = playerName || '—';
                 displaySyncTime.textContent = formatTime(localStorage.getItem(KEY_LAST_CLOUD_TIME));
-                docIdLine.textContent = cloudDocId ? `仙籍编号：${cloudDocId}` : '';
+                docIdLine.textContent = uid ? `仙籍编号：${uid}` : '';
             }
             function renderLogin() {
                 userInfoPanel.style.display = 'none';
@@ -978,7 +1009,7 @@
                         if (localStorage.getItem(KEY_LING_YUN) === null)  localStorage.setItem(KEY_LING_YUN, '100');
                         if (localStorage.getItem(KEY_ZHUO_NIAN) === null) localStorage.setItem(KEY_ZHUO_NIAN, '0');
                         if (localStorage.getItem(KEY_STORY_NODE) === null) localStorage.setItem(KEY_STORY_NODE, 'start');
-                        const newId = await apiEstablishDocument(name, buildLocalSnapshot());
+                        const newId = await apiEstablishDocument(name + ';' + ensureUid(), buildLocalSnapshot());
                         cloudDocId = newId;
                         localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                         localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
@@ -1049,6 +1080,7 @@
                         __exportTime: new Date().toISOString(),
                         playerName: playerName,
                         cloudDocId: cloudDocId,
+                        uid: uid,
                         lastCloudSaveTime: localStorage.getItem(KEY_LAST_CLOUD_TIME) || '',
                         storyNode: readLocal(KEY_STORY_NODE, 'start'),
                         lingYun: readLocal(KEY_LING_YUN, '100'),
@@ -1083,6 +1115,7 @@
                             if (!ok) { importFile.value = ''; return; }
                             if (data.playerName) localStorage.setItem(KEY_PLAYER_NAME, data.playerName);
                             if (data.cloudDocId) localStorage.setItem(KEY_CLOUD_DOC_ID, data.cloudDocId);
+                            if (data.uid) { uid = data.uid; localStorage.setItem(KEY_UID, data.uid); }
                             if (data.storyNode)  localStorage.setItem(KEY_STORY_NODE, data.storyNode);
                             if (data.lingYun !== undefined)  localStorage.setItem(KEY_LING_YUN, String(data.lingYun));
                             if (data.zhuoNian !== undefined) localStorage.setItem(KEY_ZHUO_NIAN, String(data.zhuoNian));

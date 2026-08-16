@@ -695,6 +695,10 @@
             function docTitleOf(name) {
                 return String(name || playerName) + ';' + uid;
             }
+            function extractUidFromTitle(t) {
+                if (typeof t !== 'string' || !t.includes(';')) return '';
+                return t.slice(t.indexOf(';') + 1) || '';
+            }
 
             // ==================== DOM 引用 ====================
             const loginSection    = document.getElementById('loginSection');
@@ -1025,7 +1029,13 @@
                     playerName = remote.playerName;
                     localStorage.setItem(KEY_PLAYER_NAME, playerName);
                 }
-                if (remote.uid) { uid = remote.uid; localStorage.setItem(KEY_UID, uid); }
+                // 编号以标题为准（权威来源），content.uid 仅作兜底，避免老档 content.uid 与标题编号不一致时被覆盖重新编号
+                const titleUid = extractUidFromTitle(doc.title);
+                if (titleUid) {
+                    uid = titleUid; localStorage.setItem(KEY_UID, uid);
+                } else if (remote.uid) {
+                    uid = remote.uid; localStorage.setItem(KEY_UID, uid);
+                }
                 if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
                 localStorage.setItem(KEY_BAN, banReasonOf(remote));
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());

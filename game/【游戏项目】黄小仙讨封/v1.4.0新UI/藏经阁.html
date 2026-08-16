@@ -514,17 +514,26 @@
         // 从 URL / localStorage / parent 兜底取身份
         let playerName = '';
         let cloudDocId = '';
+        let uid = '';
         try {
             const params = new URLSearchParams(location.search);
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
+            uid = localStorage.getItem('playerUid') || '';
             if (!playerName && window.parent && window.parent !== window) {
                 playerName = window.parent.localStorage.getItem('playerName') || '';
                 cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || '';
+                uid = uid || window.parent.localStorage.getItem('playerUid') || '';
             }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+            if (uid) localStorage.setItem('playerUid', uid);
         } catch(e) {}
+
+        function extractUidFromTitle(t) {
+            if (typeof t !== 'string' || !t.includes(';')) return '';
+            return t.slice(t.indexOf(';') + 1) || '';
+        }
 
         
         let cloudAchTitles = null; // null=未拉到 / Set
@@ -549,8 +558,22 @@
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
             if (!playerName) return null;
             const list = await apiListDocuments();
-            const found = list.find(i => i.title === playerName);
-            return found ? found.id : null;
+            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+            if (uid) {
+                const exact = list.find(i => i.title === playerName + ';' + uid);
+                return exact ? exact.id : null;
+            }
+            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            const pref = playerName + ';';
+            const hit = list.find(i => typeof i.title === 'string' && i.title.startsWith(pref));
+            if (hit) {
+                const extracted = extractUidFromTitle(hit.title);
+                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                return hit.id;
+            }
+            // ③ 兜底：纯道号匹配（老档尚未改名时）
+            const old = list.find(i => i.title === playerName);
+            return old ? old.id : null;
         }
 
         async function pullCloudAchievements() {

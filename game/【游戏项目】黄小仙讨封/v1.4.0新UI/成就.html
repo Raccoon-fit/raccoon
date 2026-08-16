@@ -729,6 +729,7 @@
             <div class="profile-row"><span>灵韵：</span><strong id="display-lingYun">-</strong></div>
             <div class="profile-row"><span>浊念：</span><strong id="display-zhuoNian">-</strong></div>
             <div class="profile-row"><span>当前节点：</span><strong id="display-storyNode">-</strong></div>
+            <div class="profile-row"><span>游玩时间：</span><strong id="display-playTime">-</strong></div>
             <div class="save-time" id="lastSaveTime">&#x4e0a;&#x6b21;&#x4e91;&#x7aef;&#x540c;&#x6b65;&#xff1a;<strong>从未同步</strong></div>
         </div>
 
@@ -1109,9 +1110,109 @@
             updateUserInfo();
         }
 
+        // ==================== 游玩时间（本地累积 + 云端合并，只增不减） ====================
+        const PT_KEY = 'playTime';
+        const PT_LAST = 'playTimeLastSeen';
+        const PT_MERGED = 'playTimeCloudMerged';
+        function ptNow() { return Math.floor(Date.now() / 1000); }
+        function ptTick() {
+            try {
+                let last = parseInt(localStorage.getItem(PT_LAST) || '0', 10) || 0;
+                let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                if (last > 0) {
+                    const gap = ptNow() - last;
+                    if (gap > 0 && gap < 7 * 86400) acc += gap;
+                }
+                localStorage.setItem(PT_KEY, String(acc));
+                localStorage.setItem(PT_LAST, String(ptNow()));
+                return acc;
+            } catch (e) { return 0; }
+        }
+        function ptGet() { return ptTick(); }
+        function ptMergeCloud(cloudSeconds) {
+            if (!cloudSeconds || cloudSeconds <= 0) return;
+            try {
+                let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                let merged = parseInt(localStorage.getItem(PT_MERGED) || '0', 10) || 0;
+                const add = cloudSeconds - merged;
+                if (add > 0) acc += add;
+                localStorage.setItem(PT_KEY, String(acc));
+                localStorage.setItem(PT_MERGED, String(cloudSeconds));
+            } catch (e) {}
+        }
+        function ptUploadValue() {
+            const v = ptGet();
+            try { localStorage.setItem(PT_MERGED, String(v)); } catch (e) {}
+            return v;
+        }
+        function ptFormat(seconds) {
+            seconds = Math.max(0, Math.floor(seconds || 0));
+            const d = Math.floor(seconds / 86400);
+            const h = Math.floor((seconds % 86400) / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            if (d > 0) return d + '天' + h + '小时' + m + '分';
+            if (h > 0) return h + '小时' + m + '分';
+            return m + '分';
+        }
+        function ptBindLifecycle() {
+            const flush = function() { ptTick(); };
+            window.addEventListener('beforeunload', flush);
+            document.addEventListener('visibilitychange', function() { if (document.hidden) flush(); });
+        }
+        function goDaozhuLogin() {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'nav', target: 'daozhu' }, '*');
+                    return;
+                }
+            } catch (e) {}
+            window.location.href = './道主.html';
+        }
+
         // ==================== 道号管理 ====================
         let playerName = '';
         let cloudDocId = '';
+        let uid = '';
+
+        // ============ UID 辅助 ============
+        // 存档标题格式：道号;UID（英文分号）。UID 在道主页首次建档时生成，此后本页仅读取与回填。
+        async function ensureUid() {
+            if (uid) return uid;
+            try {
+                // 递增编号：读取云端所有档的 title;uid，取最大 uid + 1
+                const cfg = getConfig();
+                const res = await window['fet'+'ch'](`${cfg.apiList}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`);
+                const result = await res.json();
+                let max = 0;
+                (result.list || []).forEach(item => {
+                    if (typeof item.title !== 'string') return;
+                    const idx = item.title.indexOf(';');
+                    if (idx < 0) return;
+                    const n = parseInt(item.title.slice(idx + 1), 10);
+                    if (!isNaN(n) && n > max) max = n;
+                });
+                uid = String(max + 1);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            } catch (e) {
+                uid = String(Date.now() % 100000000);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            }
+        }
+        async function docTitleOf(name) {
+            return String(name || playerName) + ';' + await ensureUid();
+        }
+        function extractUidFromTitle(t) {
+            if (typeof t !== 'string' || !t.includes(';')) return '';
+            return t.slice(t.indexOf(';') + 1) || '';
+        }
+        // 封号检测：存档 content 中 banReason 为空 / 缺失 / '0' 视为正常，否则其值为封号理由。
+        function banReasonOf(c) {
+            const v = c && c.banReason;
+            if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+            return String(v);
+        }
 
         function setPlayerName(name) {
             if (!name || !name.trim()) return;
@@ -1119,11 +1220,6 @@
             localStorage.setItem('playerName', playerName);
             try { if (window.parent && window.parent !== window) window.parent.localStorage.setItem('playerName', playerName); } catch (e) {}
             updateUserInfo();
-        }
-
-        async function promptSetPlayerName() {
-            const name = await modalPrompt('请输入您的道号（仙家名号）：', { defaultValue: playerName || '', placeholder: '道号', icon: '📛' });
-            if (name && name.trim()) setPlayerName(name);
         }
 
         function updateUserInfo() {
@@ -1138,6 +1234,8 @@
             document.getElementById('display-storyNode').textContent = localStorage.getItem('storyNode') || 'start';
             const last = localStorage.getItem('lastCloudSaveTime');
             document.getElementById('lastSaveTime').innerHTML = last ? `\u4e0a\u6b21\u4e91\u7aef\u540c\u6b65\uff1a<strong>${new Date(parseInt(last)).toLocaleString('zh-CN')}</strong>` : '\u4e0a\u6b21\u4e91\u7aef\u540c\u6b65\uff1a<strong>\u4ece\u672a\u540c\u6b65</strong>';
+            const ptEl = document.getElementById('display-playTime');
+            if (ptEl) ptEl.textContent = ptFormat(ptGet());
         }
 
         // ==================== 兑换码逻辑 ====================
@@ -1195,7 +1293,23 @@
             const url = `${cfg.apiList}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
             const res = await window['fet'+'ch'](url);
             const result = await res.json();
-            return (result.code == 1 && result.list) ? result.list.find(i => i.title === playerName)?.id : null;
+            if (result.code != 1 || !result.list) return null;
+            const list = result.list;
+            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+            if (uid) {
+                const exact = list.find(i => i.title === playerName + ';' + uid);
+                return exact ? exact.id : null;
+            }
+            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            const pref = playerName + ';';
+            const hit = list.find(i => typeof i.title === 'string' && i.title.startsWith(pref));
+            if (hit) {
+                const extracted = extractUidFromTitle(hit.title);
+                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                return hit.id;
+            }
+            // ③ 兜底：纯道号匹配（老档尚未改名时）
+            return list.find(i => i.title === playerName)?.id || null;
         }
 
         async function getRemoteAchievementCount() {
@@ -1218,7 +1332,7 @@
 
         async function pushCloudSave() {
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) { modalAlert && modalAlert("\u4e91\u7aef\u4ed9\u7c4d\u529f\u80fd\u6682\u672a\u5f00\u653e", "☁"); return; }
-            if (!playerName) { await modalAlert('请先设置道号！', '📛'); await promptSetPlayerName(); if (!playerName) return; }
+            if (!playerName) { await modalAlert('请先到仙府入册登录！', '📛'); goDaozhuLogin(); return; }
             const achievements = getAchievementTitles();
             const special = getSpecialAchievements();
             const notes = getSpecialNotes();
@@ -1246,18 +1360,19 @@
                 lingYun: parseInt(localStorage.getItem('lingYun') || '100'),
                 zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
                 cultivation: _cultText, cultivationRank: _cultRank[_cultText] || 500,
+                playTime: ptUploadValue(),
                 updateTime: Date.now()
-            }, _cloudKilled ? {} : { usedCodes });
+            }, _cloudKilled ? { uid, banReason: localStorage.getItem('banReason') || '' } : { usedCodes, uid, banReason: localStorage.getItem('banReason') || '' });
             const contentStr = JSON.stringify(saveData, null, 2);
             const cfg = getConfig();
             try {
                 let url, options;
                 if (cloudDocId) {
                     url = `${cfg.apiModify}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
-                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(await docTitleOf())}&content=${encodeURIComponent(contentStr)}` };
                 } else {
                     url = `${cfg.apiEstablish}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}`;
-                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(playerName)}&content=${encodeURIComponent(contentStr)}` };
+                    options = { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `title=${encodeURIComponent(await docTitleOf())}&content=${encodeURIComponent(contentStr)}` };
                 }
                 const res = await window['fet'+'ch'](url, options);
                 const result = await res.json();
@@ -1272,7 +1387,7 @@
 
         async function pullCloudSave() {
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) { modalAlert && modalAlert("\u4e91\u7aef\u4ed9\u7c4d\u529f\u80fd\u6682\u672a\u5f00\u653e", "☁"); return; }
-            if (!playerName) { await modalAlert('道号为空，请先设置道号！', '📛'); await promptSetPlayerName(); if (!playerName) return; }
+            if (!playerName) { await modalAlert('道号为空，请先到仙府入册登录！', '📛'); goDaozhuLogin(); return; }
             if (!cloudDocId) {
                 const foundId = await findDocByTitle();
                 if (foundId) { cloudDocId = foundId; localStorage.setItem('cloudDocId', cloudDocId); } else {
@@ -1311,6 +1426,13 @@
                     if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
                     if (data.playerName) setPlayerName(data.playerName);
+                    if (data.uid) { uid = data.uid; localStorage.setItem('playerUid', uid); }
+                    localStorage.setItem('banReason', banReasonOf(data));
+                    if (!uid) {
+                        const ex = extractUidFromTitle(result.title);
+                        if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                    }
+                    if (data.playTime !== undefined) ptMergeCloud(Number(data.playTime) || 0);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     clearAchievementCache();
                     renderAchievements();
@@ -1322,7 +1444,7 @@
         }
 
         async function exportAllData() {
-            const payload = { version: 2, exportTime: new Date().toISOString(), achievements: getAchievements(), order: getOrder(), specialAchievements: getSpecialAchievements(), specialNotes: getSpecialNotes(), usedCodes: getUsedCodes(), playerName, storyNode: localStorage.getItem('storyNode'), lingYun: localStorage.getItem('lingYun'), zhuoNian: localStorage.getItem('zhuoNian') };
+            const payload = { version: 2, exportTime: new Date().toISOString(), achievements: getAchievements(), order: getOrder(), specialAchievements: getSpecialAchievements(), specialNotes: getSpecialNotes(), usedCodes: getUsedCodes(), playerName, storyNode: localStorage.getItem('storyNode'), lingYun: localStorage.getItem('lingYun'), zhuoNian: localStorage.getItem('zhuoNian'), uid };
             const str = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
             try { await navigator.clipboard.writeText(str); await modalAlert('仙籍已复制到剪贴板！', '📋'); } catch (e) { await modalPrompt('请手动复制仙籍：', { defaultValue: str, textarea: true, rows: 5, icon: '📋' }); }
         }
@@ -1342,6 +1464,7 @@
                 if (data.storyNode) localStorage.setItem('storyNode', data.storyNode);
                 if (data.lingYun) localStorage.setItem('lingYun', data.lingYun);
                 if (data.zhuoNian) localStorage.setItem('zhuoNian', data.zhuoNian);
+                if (data.uid) { uid = data.uid; localStorage.setItem('playerUid', data.uid); }
                 clearAchievementCache();
                 renderAchievements();
                 updateUserInfo();
@@ -1351,7 +1474,14 @@
 
         async function logout() {
             const confirmed = await modalConfirm('确定重入轮回？此操作将清除所有本地数据！', { confirmText: '确 定', cancelText: '取 消', icon: '🔥', dangerConfirm: true });
-            if (confirmed) { localStorage.clear(); location.reload(); }
+            if (confirmed) {
+                // 游玩时间属设备累计数据，重入轮回后继续累积，不清除
+                const keep = {};
+                [PT_KEY, PT_LAST, PT_MERGED].forEach(k => { const v = localStorage.getItem(k); if (v !== null) keep[k] = v; });
+                localStorage.clear();
+                Object.keys(keep).forEach(k => localStorage.setItem(k, keep[k]));
+                location.reload();
+            }
         }
 
         // ==================== 实时同步监听 ====================
@@ -1409,10 +1539,14 @@
             const params = new URLSearchParams(location.search);
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
-            if (!playerName) { try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; } } catch (e) {} }
+            uid = localStorage.getItem('playerUid') || '';
+            if (!playerName) { try { if (window.parent && window.parent !== window) { playerName = window.parent.localStorage.getItem('playerName') || ''; cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || ''; uid = uid || window.parent.localStorage.getItem('playerUid') || ''; } } catch (e) {} }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+            if (uid) localStorage.setItem('playerUid', uid);
 
+            ptTick();
+            ptBindLifecycle();
             updateUserInfo();
             renderAchievements();
             setupRealtimeSync();
@@ -1423,11 +1557,24 @@
                 updateUserInfo();
             }, 600);
 
-            if (!playerName) setTimeout(() => { if (!playerName) promptSetPlayerName(); }, 800);
-
-            const editBtn = document.getElementById('editPlayerName');
-            if (editBtn) {
-                editBtn.addEventListener('click', promptSetPlayerName);
+            // 已登录时静默拉取云端游玩时间并入本地（不弹窗、不打扰）
+            if (playerName && cloudDocId) {
+                (async () => {
+                    try {
+                        const cfg = getConfig();
+                        const url = `${cfg.apiQuery}?user=${cfg.user}&pass=${cfg.pass}&appid=${cfg.appid}&id=${cloudDocId}`;
+                        const res = await window['fet'+'ch'](url);
+                        const result = await res.json();
+                        if (result.code == 1) {
+                            let data;
+                            try { data = JSON.parse(result.content); } catch (e) { return; }
+                            if (data && data.playTime !== undefined) {
+                                ptMergeCloud(Number(data.playTime) || 0);
+                                updateUserInfo();
+                            }
+                        }
+                    } catch (e) {}
+                })();
             }
         });
 

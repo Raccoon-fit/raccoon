@@ -577,6 +577,7 @@
             <div class="welcome-line">✦ 仙籍在册，道友安好 ✦</div>
             <div class="dao-hao-display" id="displayDaoHao">—</div>
             <div class="sync-time-line">上次同步：<span id="displaySyncTime">尚未同步</span></div>
+            <div class="sync-time-line">游玩时间：<span id="displayPlayTime">尚未记录</span></div>
 
             <div class="info-divider"></div>
 
@@ -625,6 +626,8 @@
             const KEY_STORY_NODE        = 'storyNode';
             const KEY_LING_YUN          = 'lingYun';
             const KEY_ZHUO_NIAN         = 'zhuoNian';
+            const KEY_UID               = 'playerUid';
+            const KEY_BAN               = 'banReason';
             // 道行映射：scene → 文本 / 文本 → 排序权重
             const CULTIVATION_MAP_LOCAL = {
                 start:'五百年', true_encounter_first:'五百年', true_encounter_second:'五百年',
@@ -649,6 +652,49 @@
 
             let playerName = localStorage.getItem(KEY_PLAYER_NAME) || '';
             let cloudDocId = localStorage.getItem(KEY_CLOUD_DOC_ID) || '';
+            let uid = localStorage.getItem(KEY_UID) || '';
+
+            // ==================== UID 辅助 ====================
+            // 存档标题格式：道号;UID（英文分号）。UID 在首次建档时生成，之后永久绑定该道号存档。
+            // 封号检测：存档 content 中 banReason 为空 / 缺失 / '0' 视为正常，否则其值为封号理由。
+            function banReasonOf(c) {
+                const v = c && c.banReason;
+                if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+                return String(v);
+            }
+            function loginAlertMsg(msg) {
+                const ban = localStorage.getItem(KEY_BAN) || '';
+                return ban ? ('黄小仙：此仙籍已被封禁 — ' + ban) : msg;
+            }
+            function generateUid() {
+                return String(Date.now() % 100000000);
+            }
+            async function ensureUid() {
+                if (uid) return uid;
+                if (!(window.HXSF_CLOUD && window.HXSF_CLOUD.killed)) {
+                    try {
+                        // 递增编号：读取云端所有档的 title;uid，取最大 uid + 1
+                        const list = await apiListDocuments();
+                        let max = 0;
+                        (list || []).forEach(item => {
+                            if (typeof item.title !== 'string') return;
+                            const idx = item.title.indexOf(';');
+                            if (idx < 0) return;
+                            const n = parseInt(item.title.slice(idx + 1), 10);
+                            if (!isNaN(n) && n > max) max = n;
+                        });
+                        uid = String(max + 1);
+                        localStorage.setItem(KEY_UID, uid);
+                        return uid;
+                    } catch (e) {}
+                }
+                uid = generateUid();
+                localStorage.setItem(KEY_UID, uid);
+                return uid;
+            }
+            function docTitleOf(name) {
+                return String(name || playerName) + ';' + uid;
+            }
 
             // ==================== DOM 引用 ====================
             const loginSection    = document.getElementById('loginSection');
@@ -777,8 +823,22 @@
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
                 if (!title) return null;
                 const list = await apiListDocuments();
-                const found = list.find(item => item.title === title);
-                return found ? found.id : null;
+                // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+                if (uid) {
+                    const exact = list.find(item => item.title === title + ';' + uid);
+                    return exact ? exact.id : null;
+                }
+                // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+                const pref = title + ';';
+                const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
+                if (hit) {
+                    const extracted = hit.title.slice(pref.length);
+                    if (extracted) { uid = extracted; localStorage.setItem(KEY_UID, extracted); }
+                    return hit.id;
+                }
+                // ③ 兜底：纯道号匹配（老档尚未改名时）
+                const old = list.find(item => item.title === title);
+                return old ? old.id : null;
             }
 
             // ==================== 本地存档快照 ====================
@@ -790,6 +850,59 @@
                 const v = localStorage.getItem(k);
                 if (v === null) return def;
                 try { return JSON.parse(v); } catch(e) { return def; }
+            }
+            // ==================== 游玩时间（本地累积 + 云端合并，只增不减） ====================
+            const PT_KEY = 'playTime';
+            const PT_LAST = 'playTimeLastSeen';
+            const PT_MERGED = 'playTimeCloudMerged';
+            function ptNow() { return Math.floor(Date.now() / 1000); }
+            function ptTick() {
+                try {
+                    let last = parseInt(localStorage.getItem(PT_LAST) || '0', 10) || 0;
+                    let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                    if (last > 0) {
+                        const gap = ptNow() - last;
+                        if (gap > 0 && gap < 7 * 86400) acc += gap;
+                    }
+                    localStorage.setItem(PT_KEY, String(acc));
+                    localStorage.setItem(PT_LAST, String(ptNow()));
+                    return acc;
+                } catch (e) { return 0; }
+            }
+            function ptGet() { return ptTick(); }
+            function ptMergeCloud(cloudSeconds) {
+                if (!cloudSeconds || cloudSeconds <= 0) return;
+                try {
+                    let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                    let merged = parseInt(localStorage.getItem(PT_MERGED) || '0', 10) || 0;
+                    const add = cloudSeconds - merged;
+                    if (add > 0) acc += add;
+                    localStorage.setItem(PT_KEY, String(acc));
+                    localStorage.setItem(PT_MERGED, String(cloudSeconds));
+                } catch (e) {}
+            }
+            function ptUploadValue() {
+                const v = ptGet();
+                try { localStorage.setItem(PT_MERGED, String(v)); } catch (e) {}
+                return v;
+            }
+            function ptFormat(seconds) {
+                seconds = Math.max(0, Math.floor(seconds || 0));
+                const d = Math.floor(seconds / 86400);
+                const h = Math.floor((seconds % 86400) / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                if (d > 0) return d + '天' + h + '小时' + m + '分';
+                if (h > 0) return h + '小时' + m + '分';
+                return m + '分';
+            }
+            function ptBindLifecycle() {
+                const flush = function() { ptTick(); };
+                window.addEventListener('beforeunload', flush);
+                document.addEventListener('visibilitychange', function() { if (document.hidden) flush(); });
+            }
+            function ptRefreshDisplay() {
+                const el = document.getElementById('displayPlayTime');
+                if (el) el.textContent = ptFormat(ptGet());
             }
             // id ↔ 中文标题 映射表（与讨封页 achievementIcons 保持一致）
             const ACH_ID_TITLE_MAP = {
@@ -825,10 +938,13 @@
                     // 密码散列（从本地 savedPasswordHash 读；用于验证仙籍归属）
                     
                     ...(localStorage.getItem('savedPasswordHash') ? { passwordHash: localStorage.getItem('savedPasswordHash') } : {}),
+                    playTime: ptUploadValue(),
                     updateTime: Date.now()
-                }, _cloudKilled ? {} : {
+                }, _cloudKilled ? { uid: uid, banReason: readLocal(KEY_BAN, '') } : {
                     
-                    usedCodes: readLocalJSON(KEY_USED_CODES, [])
+                    usedCodes: readLocalJSON(KEY_USED_CODES, []),
+                    uid: uid,
+                    banReason: readLocal(KEY_BAN, '')
                 });
             }
 
@@ -842,13 +958,15 @@
                 }
                 if (!cloudDocId) {
                     
-                    const newId = await apiEstablishDocument(playerName, buildLocalSnapshot());
+                    await ensureUid();
+                    const newId = await apiEstablishDocument(playerName + ';' + uid, buildLocalSnapshot());
                     cloudDocId = newId;
                     localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                     localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
                     return;
                 }
-                await apiModifyDocument(cloudDocId, playerName, buildLocalSnapshot());
+                await ensureUid();
+                await apiModifyDocument(cloudDocId, playerName + ';' + uid, buildLocalSnapshot());
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -907,6 +1025,9 @@
                     playerName = remote.playerName;
                     localStorage.setItem(KEY_PLAYER_NAME, playerName);
                 }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem(KEY_UID, uid); }
+                if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
+                localStorage.setItem(KEY_BAN, banReasonOf(remote));
                 localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
             }
 
@@ -924,7 +1045,15 @@
                 userInfoPanel.style.display = 'block';
                 displayDaoHao.textContent = playerName || '—';
                 displaySyncTime.textContent = formatTime(localStorage.getItem(KEY_LAST_CLOUD_TIME));
-                docIdLine.textContent = cloudDocId ? `仙籍编号：${cloudDocId}` : '';
+                const ban = localStorage.getItem(KEY_BAN) || '';
+                if (ban) {
+                    docIdLine.textContent = '封禁：' + ban;
+                    docIdLine.style.color = '#c0392b';
+                } else {
+                    docIdLine.textContent = uid ? `仙籍编号：${uid}` : '';
+                    docIdLine.style.color = '';
+                }
+                ptRefreshDisplay();
             }
             function renderLogin() {
                 userInfoPanel.style.display = 'none';
@@ -1028,7 +1157,7 @@
                             setLoading(false);
                             resetLoginForm();
                             renderPanel();
-                            customAlert('黄小仙：旧档接续成功。此档原未设密令，已为你设为本次输入之令，请牢记。');
+                            customAlert(loginAlertMsg('黄小仙：旧档接续成功。此档原未设密令，已为你设为本次输入之令，请牢记。'));
                             return;
                         }
                         // 正常校验
@@ -1050,17 +1179,19 @@
                         setLoading(false);
                         resetLoginForm();
                         renderPanel();
-                        customAlert('黄小仙：仙籍接续成功，欢迎归来，' + playerName + '。');
+                        customAlert(loginAlertMsg('黄小仙：仙籍接续成功，欢迎归来，' + playerName + '。'));
                     } else {
                         // === 无档 → 新开 ===
                         playerName = name;
                         localStorage.setItem(KEY_PLAYER_NAME, playerName);
                         localStorage.setItem('savedPasswordHash', inputHash);
+                        localStorage.removeItem(KEY_BAN);
                         // 本地缺省
                         if (localStorage.getItem(KEY_LING_YUN) === null)  localStorage.setItem(KEY_LING_YUN, '100');
                         if (localStorage.getItem(KEY_ZHUO_NIAN) === null) localStorage.setItem(KEY_ZHUO_NIAN, '0');
                         if (localStorage.getItem(KEY_STORY_NODE) === null) localStorage.setItem(KEY_STORY_NODE, 'start');
-                        const newId = await apiEstablishDocument(name, buildLocalSnapshot());
+                        await ensureUid();
+                        const newId = await apiEstablishDocument(name + ';' + uid, buildLocalSnapshot());
                         cloudDocId = newId;
                         localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                         localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
@@ -1110,6 +1241,7 @@
                     localStorage.removeItem(KEY_PLAYER_NAME);
                     localStorage.removeItem(KEY_CLOUD_DOC_ID);
                     localStorage.removeItem(KEY_LAST_CLOUD_TIME);
+                    localStorage.removeItem(KEY_BAN);
                     // 兼容旧版遗留键
                     localStorage.removeItem('savedDaoHao');
                     localStorage.removeItem('savedPasswordHash');
@@ -1131,6 +1263,7 @@
                         __exportTime: new Date().toISOString(),
                         playerName: playerName,
                         cloudDocId: cloudDocId,
+                        uid: uid,
                         lastCloudSaveTime: localStorage.getItem(KEY_LAST_CLOUD_TIME) || '',
                         storyNode: readLocal(KEY_STORY_NODE, 'start'),
                         lingYun: readLocal(KEY_LING_YUN, '100'),
@@ -1165,6 +1298,7 @@
                             if (!ok) { importFile.value = ''; return; }
                             if (data.playerName) localStorage.setItem(KEY_PLAYER_NAME, data.playerName);
                             if (data.cloudDocId) localStorage.setItem(KEY_CLOUD_DOC_ID, data.cloudDocId);
+                            if (data.uid) { uid = data.uid; localStorage.setItem(KEY_UID, data.uid); }
                             if (data.storyNode)  localStorage.setItem(KEY_STORY_NODE, data.storyNode);
                             if (data.lingYun !== undefined)  localStorage.setItem(KEY_LING_YUN, String(data.lingYun));
                             if (data.zhuoNian !== undefined) localStorage.setItem(KEY_ZHUO_NIAN, String(data.zhuoNian));
@@ -1211,6 +1345,8 @@
 
             // ==================== 启动 ====================
             function init() {
+                ptTick();
+                ptBindLifecycle();
                 if (playerName) {
                     renderPanel();
                 } else {

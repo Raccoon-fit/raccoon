@@ -653,17 +653,26 @@
         // 身份识别：URL param > localStorage > 父窗口 localStorage
         let playerName = '';
         let cloudDocId = '';
+        let uid = '';
         try {
             const params = new URLSearchParams(location.search);
             playerName = params.get('player') || localStorage.getItem('playerName') || '';
             cloudDocId = params.get('docId') || localStorage.getItem('cloudDocId') || '';
+            uid = localStorage.getItem('playerUid') || '';
             if (!playerName && window.parent && window.parent !== window) {
                 playerName = window.parent.localStorage.getItem('playerName') || '';
                 cloudDocId = cloudDocId || window.parent.localStorage.getItem('cloudDocId') || '';
+                uid = uid || window.parent.localStorage.getItem('playerUid') || '';
             }
             if (playerName) localStorage.setItem('playerName', playerName);
             if (cloudDocId) localStorage.setItem('cloudDocId', cloudDocId);
+            if (uid) localStorage.setItem('playerUid', uid);
         } catch (e) {}
+
+        function extractUidFromTitle(t) {
+            if (typeof t !== 'string' || !t.includes(';')) return '';
+            return t.slice(t.indexOf(';') + 1) || '';
+        }
 
         async function apiListDocuments() {
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
@@ -697,8 +706,22 @@
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
             if (!playerName) return null;
             const list = await apiListDocuments();
-            const found = list.find(i => i.title === playerName);
-            return found ? found.id : null;
+            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+            if (uid) {
+                const exact = list.find(i => i.title === playerName + ';' + uid);
+                return exact ? exact.id : null;
+            }
+            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            const pref = playerName + ';';
+            const hit = list.find(i => typeof i.title === 'string' && i.title.startsWith(pref));
+            if (hit) {
+                const extracted = extractUidFromTitle(hit.title);
+                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                return hit.id;
+            }
+            // ③ 兜底：纯道号匹配（老档尚未改名时）
+            const old = list.find(i => i.title === playerName);
+            return old ? old.id : null;
         }
 
         // ===========================================================
@@ -805,14 +828,19 @@
                 // 读→合并→写，避免覆盖讨封/成就页写入的其他字段
                 const remoteDoc = await apiQueryDocument(cloudDocId);
                 const remote = remoteDoc.content || {};
+                // 回填 uid：标题优先（权威来源），content.uid 兜底
+                const titleUid = extractUidFromTitle(remoteDoc.title);
+                if (titleUid) { uid = titleUid; localStorage.setItem('playerUid', uid); }
+                else if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
                 const uploadData = {
                     ...remote,
                     playerName: remote.playerName || playerName,
                     qianRecords: getRecords(),
                     qianGot: getGotSet(),
+                    uid: uid || remote.uid || '',
                     updateTime: Date.now()
                 };
-                await apiModifyDocument(cloudDocId, playerName, uploadData);
+                await apiModifyDocument(cloudDocId, uid ? (playerName + ';' + uid) : playerName, uploadData);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
             } catch (e) {
                 

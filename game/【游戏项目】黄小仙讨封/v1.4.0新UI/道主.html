@@ -827,22 +827,23 @@
             if (window.HXSF_CLOUD && window.HXSF_CLOUD.killed) return;
                 if (!title) return null;
                 const list = await apiListDocuments();
-                // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
-                if (uid) {
-                    const exact = list.find(item => item.title === title + ';' + uid);
-                    return exact ? exact.id : null;
-                }
-                // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+                // 以「道号 + 云端 uid」为准，本地 uid 仅在多档歧义时作消解
                 const pref = title + ';';
-                const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
-                if (hit) {
-                    const extracted = hit.title.slice(pref.length);
-                    if (extracted) { uid = extracted; localStorage.setItem(KEY_UID, extracted); }
-                    return hit.id;
+                const numbered = list.filter(item => typeof item.title === 'string' && item.title.startsWith(pref));
+                const plain = list.find(item => item.title === title);
+                if (numbered.length > 0) {
+                    let target;
+                    if (numbered.length === 1) target = numbered[0];
+                    else if (uid) target = numbered.find(item => item.title === title + ';' + uid) || null;
+                    else target = null;
+                    if (target) {
+                        const extracted = extractUidFromTitle(target.title);
+                        if (extracted) { uid = extracted; localStorage.setItem(KEY_UID, extracted); }
+                        return target.id;
+                    }
+                    return null;
                 }
-                // ③ 兜底：纯道号匹配（老档尚未改名时）
-                const old = list.find(item => item.title === title);
-                return old ? old.id : null;
+                return plain ? plain.id : null;
             }
 
             // ==================== 本地存档快照 ====================
@@ -968,6 +969,15 @@
                     localStorage.setItem(KEY_CLOUD_DOC_ID, cloudDocId);
                     localStorage.setItem(KEY_LAST_CLOUD_TIME, Date.now().toString());
                     return;
+                }
+                // 已有档但本地 uid 缺失：先以云端标题回填，避免 ensureUid 重新编号覆盖原标题
+                if (!uid) {
+                    try {
+                        const _doc = await apiQueryDocument(cloudDocId);
+                        const _tu = extractUidFromTitle(_doc.title);
+                        if (_tu) { uid = _tu; localStorage.setItem(KEY_UID, _tu); }
+                        else if (_doc.content && _doc.content.uid) { uid = String(_doc.content.uid); localStorage.setItem(KEY_UID, uid); }
+                    } catch (e) {}
                 }
                 await ensureUid();
                 await apiModifyDocument(cloudDocId, playerName + ';' + uid, buildLocalSnapshot());
@@ -1252,6 +1262,7 @@
                     localStorage.removeItem(KEY_CLOUD_DOC_ID);
                     localStorage.removeItem(KEY_LAST_CLOUD_TIME);
                     localStorage.removeItem(KEY_BAN);
+                    localStorage.removeItem(KEY_UID);
                     // 兼容旧版遗留键
                     localStorage.removeItem('savedDaoHao');
                     localStorage.removeItem('savedPasswordHash');
@@ -1259,6 +1270,7 @@
                     localStorage.removeItem('stayLoggedIn');
                     playerName = '';
                     cloudDocId = '';
+                    uid = '';
                     // 刷新视图（不刷新页面亦可，此处主动刷新以复原）
                     setTimeout(() => { location.reload(); }, 200);
                 });

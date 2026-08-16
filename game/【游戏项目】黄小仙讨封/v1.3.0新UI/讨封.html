@@ -99,6 +99,8 @@
         .start-content h1 { font-family: 'Ma Shan Zheng', 'KaiTi', serif; color: var(--scroll-gold); font-size: 56px; margin-bottom: 16px; text-shadow: 2px 2px 0 var(--scroll-dark); letter-spacing: 8px; }
         .start-subtitle { font-size: 18px; margin-bottom: 48px; color: #5D4037; font-style: italic; letter-spacing: 2px; }
         .top-right-bar { position: fixed; top: 12px; right: 12px; z-index: 1500; display: flex; align-items: center; gap: 8px; }
+        .feedback-group-btn { position: fixed; top: 12px; right: 12px; z-index: 2200; background: rgba(20, 7, 10, 0.85); border: 1px solid var(--scroll-gold); color: #E8C56A; font-family: inherit; font-size: 12px; padding: 5px 12px; border-radius: 5px; cursor: pointer; letter-spacing: 1px; line-height: 1.5; }
+        .feedback-group-btn:hover { background: rgba(138, 31, 43, 0.9); color: #FFE4B5; }
         .xianfu-btn { background: transparent; border: none; padding: 4px 8px; font-family: inherit; font-size: 12px; color: #888; cursor: pointer; letter-spacing: 1px; outline: none; transition: color 0.2s; line-height: 1.4; }
         .xianfu-btn.logged { color: #c9a96e; }
         .xianfu-btn:hover { text-decoration: underline; }
@@ -324,6 +326,8 @@
     </div>
     -->
 
+    <button class="feedback-group-btn" id="feedbackGroupBtn" title="点击复制群号">官方反馈群 808417324</button>
+
     <div class="settings-overlay" id="settingsOverlay">
         <div class="settings-modal">
             <h3>设置</h3>
@@ -364,10 +368,50 @@
 
         let playerName = localStorage.getItem('playerName') || '';
         let cloudDocId = localStorage.getItem('cloudDocId') || '';
+        let uid = localStorage.getItem('playerUid') || '';
         try {
             if (!playerName && window.parent !== window) playerName = window.parent.localStorage.getItem('playerName') || '';
             if (!cloudDocId && window.parent !== window) cloudDocId = window.parent.localStorage.getItem('cloudDocId') || '';
+            if (!uid && window.parent !== window) uid = window.parent.localStorage.getItem('playerUid') || '';
         } catch(e) {}
+
+        // ============ UID 辅助 ============
+        // 存档标题格式：道号;UID（英文分号）。UID 在道主页首次建档时生成，此后本页仅读取与回填。
+        async function ensureUid() {
+            if (uid) return uid;
+            try {
+                // 递增编号：读取云端所有档的 title;uid，取最大 uid + 1
+                const list = await apiListDocuments();
+                let max = 0;
+                (list || []).forEach(item => {
+                    if (typeof item.title !== 'string') return;
+                    const idx = item.title.indexOf(';');
+                    if (idx < 0) return;
+                    const n = parseInt(item.title.slice(idx + 1), 10);
+                    if (!isNaN(n) && n > max) max = n;
+                });
+                uid = String(max + 1);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            } catch (e) {
+                uid = String(Date.now() % 100000000);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            }
+        }
+        async function docTitleOf(name) {
+            return String(name || playerName) + ';' + await ensureUid();
+        }
+        function extractUidFromTitle(t) {
+            if (typeof t !== 'string' || !t.includes(';')) return '';
+            return t.slice(t.indexOf(';') + 1) || '';
+        }
+        // 封号检测：存档 content 中 banReason 为空 / 缺失 / '0' 视为正常，否则其值为封号理由。
+        function banReasonOf(c) {
+            const v = c && c.banReason;
+            if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+            return String(v);
+        }
 
         const STORAGE_KEY = 'huangdaxian_achievements';
         const SPECIAL_KEY = 'huangdaxian_special_achievements';
@@ -542,8 +586,22 @@
         async function findDocByPlayerName() {
             if (!playerName) return null;
             const list = await apiListDocuments();
-            const found = list.find(item => item.title === playerName);
-            return found ? found.id : null;
+            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+            if (uid) {
+                const exact = list.find(item => item.title === playerName + ';' + uid);
+                return exact ? exact.id : null;
+            }
+            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            const pref = playerName + ';';
+            const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
+            if (hit) {
+                const extracted = extractUidFromTitle(hit.title);
+                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                return hit.id;
+            }
+            // ③ 兜底：纯道号匹配（老档尚未改名时）
+            const old = list.find(item => item.title === playerName);
+            return old ? old.id : null;
         }
 
         // ========== 自动合并同步 ==========
@@ -603,6 +661,8 @@
                 }
 
                 // 4. 准备上传数据（使用合并后的数据）
+                // 同步封号标记：以云端为准缓存，上传时回写保留，避免覆盖管理员设置的封号
+                localStorage.setItem('banReason', banReasonOf(remote));
                 const cultivationText = getCultivationText();
                 const _cloudKilled = !!(window.HXSF_CLOUD && window.HXSF_CLOUD.killed);
                 const uploadData = Object.assign({
@@ -616,13 +676,19 @@
                     cultivation: cultivationText,               // 道行文本（如"五百年"、"∞"）
                     cultivationRank: getCultivationRank(cultivationText),  // 道行权重（用于排行榜排序）
                     updateTime: Date.now()
-                }, _cloudKilled ? {} : {
+                }, _cloudKilled ? { uid: uid, banReason: localStorage.getItem('banReason') || '' } : {
                     
-                    usedCodes: JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]')
+                    usedCodes: JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]'),
+                    uid: uid,
+                    banReason: localStorage.getItem('banReason') || ''
                 });
 
                 
-                await apiModifyDocument(cloudDocId, playerName, uploadData);
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
+                await apiModifyDocument(cloudDocId, await docTitleOf(), uploadData);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
                 updateKarmaUI();
             } catch (e) {
@@ -697,6 +763,12 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
+                localStorage.setItem('banReason', banReasonOf(remote));
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
 
                 localStorage.setItem('lastCloudSaveTime', Date.now());
                 updateKarmaUI();
@@ -725,9 +797,13 @@
             if (!cloudDocId) return;
             try {
                 const doc = await apiQueryDocument(cloudDocId);
+                if (!uid) {
+                    const ex = extractUidFromTitle(doc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
                 const newVal = Math.max(0, Math.min(100, (doc.content.lingYun || 0) + delta));
                 doc.content.lingYun = newVal;
-                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                await apiModifyDocument(cloudDocId, await docTitleOf(), doc.content);
                 gameState.playerLingYun = newVal;
                 updateKarmaUI();
             } catch(e) {}
@@ -737,9 +813,13 @@
             if (!cloudDocId) return;
             try {
                 const doc = await apiQueryDocument(cloudDocId);
+                if (!uid) {
+                    const ex = extractUidFromTitle(doc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
                 const newVal = Math.max(0, Math.min(100, (doc.content.zhuoNian || 0) + delta));
                 doc.content.zhuoNian = newVal;
-                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                await apiModifyDocument(cloudDocId, await docTitleOf(), doc.content);
                 gameState.playerZhuoNian = newVal;
                 updateKarmaUI();
             } catch(e) {}
@@ -1031,6 +1111,18 @@
             _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
         }
 
+        function copyFeedbackGroup() {
+            const qq = '808417324';
+            const done = () => showToast('官方反馈群号已复制：' + qq);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(qq).then(done, () => showToast('官方反馈群：' + qq));
+            } else {
+                showToast('官方反馈群：' + qq);
+            }
+        }
+        const feedbackGroupBtn = document.getElementById('feedbackGroupBtn');
+        if (feedbackGroupBtn) feedbackGroupBtn.addEventListener('click', copyFeedbackGroup);
+
         function toggleTabletMode() {
             document.body.classList.toggle('tablet-mode');
             const enabled = document.body.classList.contains('tablet-mode');
@@ -1154,6 +1246,12 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
+                localStorage.setItem('banReason', banReasonOf(remote));
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
                 localStorage.setItem('lastCloudSaveTime', Date.now());
             } catch(e) {
                 

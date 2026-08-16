@@ -1964,6 +1964,33 @@
             function init() {
                 initPlayerName();
 
+                // 游玩时间累积（本地；与各子页面共享 localStorage，只增不减）
+                (function() {
+                    const now = Math.floor(Date.now() / 1000);
+                    const last = parseInt(localStorage.getItem('playTimeLastSeen') || '0', 10) || 0;
+                    let acc = parseInt(localStorage.getItem('playTime') || '0', 10) || 0;
+                    if (last > 0) {
+                        const gap = now - last;
+                        if (gap > 0 && gap < 7 * 86400) acc += gap;
+                    }
+                    localStorage.setItem('playTime', String(acc));
+                    localStorage.setItem('playTimeLastSeen', String(now));
+                    const flushPT = function() {
+                        const n2 = Math.floor(Date.now() / 1000);
+                        const l2 = parseInt(localStorage.getItem('playTimeLastSeen') || '0', 10) || 0;
+                        if (l2 > 0) {
+                            const gap2 = n2 - l2;
+                            if (gap2 > 0 && gap2 < 7 * 86400) {
+                                const acc2 = parseInt(localStorage.getItem('playTime') || '0', 10) || 0;
+                                localStorage.setItem('playTime', String(acc2 + gap2));
+                            }
+                        }
+                        localStorage.setItem('playTimeLastSeen', String(n2));
+                    };
+                    window.addEventListener('beforeunload', flushPT);
+                    document.addEventListener('visibilitychange', function() { if (document.hidden) flushPT(); });
+                })();
+
                 // 应用已保存的主题（持久化、广播延迟到 iframe 加载后）
                 applyTheme(getCurrentTheme(), { persist: false, broadcast: false });
 

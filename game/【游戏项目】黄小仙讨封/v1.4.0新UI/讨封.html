@@ -148,6 +148,8 @@
         .start-content h1 { font-family: 'Ma Shan Zheng', 'KaiTi', serif; color: var(--scroll-gold); font-size: 56px; margin-bottom: 16px; text-shadow: 0 0 30px rgba(232, 197, 106, 0.55), 2px 2px 0 var(--scroll-dark); letter-spacing: 8px; }
         .start-subtitle { font-size: 18px; margin-bottom: 48px; color: #c9a480; font-style: italic; letter-spacing: 2px; }
         .top-right-bar { position: fixed; top: 12px; right: 12px; z-index: 1500; display: flex; align-items: center; gap: 8px; }
+        .feedback-group-btn { position: fixed; top: 12px; right: 12px; z-index: 2200; background: rgba(20, 7, 10, 0.85); border: 1px solid var(--scroll-gold); color: #E8C56A; font-family: inherit; font-size: 12px; padding: 5px 12px; border-radius: 5px; cursor: pointer; letter-spacing: 1px; line-height: 1.5; }
+        .feedback-group-btn:hover { background: rgba(138, 31, 43, 0.9); color: #FFE4B5; }
         .xianfu-btn { background: transparent; border: none; padding: 4px 8px; font-family: inherit; font-size: 12px; color: #9a8370; cursor: pointer; letter-spacing: 1px; outline: none; transition: color 0.2s; line-height: 1.4; }
         .xianfu-btn.logged { color: #E8C56A; }
         .xianfu-btn:hover { text-decoration: underline; }
@@ -458,6 +460,8 @@
         <button class="settings-btn" id="settingsBtn" title="设置">⚙</button>
     </div>
     -->
+
+    <button class="feedback-group-btn" id="feedbackGroupBtn" title="点击复制群号">官方反馈群 808417324</button>
 
     <div class="settings-overlay" id="settingsOverlay">
         <div class="settings-modal">
@@ -851,6 +855,10 @@
                 // 4. 准备上传数据（使用合并后的数据）
                 // 同步封号标记：以云端为准缓存，上传时回写保留，避免覆盖管理员设置的封号
                 localStorage.setItem('banReason', banReasonOf(remote));
+                // 回填 uid：标题优先（权威来源），content.uid 兜底，确保 uploadData 携带正确编号
+                const titleUid = extractUidFromTitle(remoteDoc.title);
+                if (titleUid) { uid = titleUid; localStorage.setItem('playerUid', uid); }
+                else if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
                 const cultivationText = getCultivationText();
                 const _cloudKilled = !!(window.HXSF_CLOUD && window.HXSF_CLOUD.killed);
                 const uploadData = Object.assign({
@@ -872,11 +880,6 @@
                     uid: uid,
                     banReason: localStorage.getItem('banReason') || ''
                 });
-
-                if (!uid) {
-                    const ex = extractUidFromTitle(remoteDoc.title);
-                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
-                }
 
                 
                 await apiModifyDocument(cloudDocId, await docTitleOf(), uploadData);
@@ -954,12 +957,14 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
-                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
-                localStorage.setItem('banReason', banReasonOf(remote));
-                if (!uid) {
-                    const ex = extractUidFromTitle(remoteDoc.title);
-                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                // 编号以标题为准（权威来源），content.uid 仅作兜底，避免老档 content.uid 与标题编号不一致时被覆盖重新编号
+                const titleUid = extractUidFromTitle(remoteDoc.title);
+                if (titleUid) {
+                    uid = titleUid; localStorage.setItem('playerUid', uid);
+                } else if (remote.uid) {
+                    uid = remote.uid; localStorage.setItem('playerUid', uid);
                 }
+                localStorage.setItem('banReason', banReasonOf(remote));
                 if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
                 // 云端恢复主题
                 if (remote.theme === 'scroll' || remote.theme === 'demonic') {
@@ -1326,6 +1331,18 @@
             _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
         }
 
+        function copyFeedbackGroup() {
+            const qq = '808417324';
+            const done = () => showToast('官方反馈群号已复制：' + qq);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(qq).then(done, () => showToast('官方反馈群：' + qq));
+            } else {
+                showToast('官方反馈群：' + qq);
+            }
+        }
+        const feedbackGroupBtn = document.getElementById('feedbackGroupBtn');
+        if (feedbackGroupBtn) feedbackGroupBtn.addEventListener('click', copyFeedbackGroup);
+
         function toggleTabletMode() {
             document.body.classList.toggle('tablet-mode');
             const enabled = document.body.classList.contains('tablet-mode');
@@ -1449,12 +1466,14 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
-                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
-                localStorage.setItem('banReason', banReasonOf(remote));
-                if (!uid) {
-                    const ex = extractUidFromTitle(remoteDoc.title);
-                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                // 编号以标题为准（权威来源），content.uid 仅作兜底，避免老档 content.uid 与标题编号不一致时被覆盖重新编号
+                const titleUid = extractUidFromTitle(remoteDoc.title);
+                if (titleUid) {
+                    uid = titleUid; localStorage.setItem('playerUid', uid);
+                } else if (remote.uid) {
+                    uid = remote.uid; localStorage.setItem('playerUid', uid);
                 }
+                localStorage.setItem('banReason', banReasonOf(remote));
                 if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
             } catch(e) {

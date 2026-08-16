@@ -1339,7 +1339,7 @@
             const usedCodes = getUsedCodes();
             const totalLocal = achievements.length + special.length;
 
-            if (!cloudDocId) { const existing = await findDocByTitle(); if (existing) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); } }
+            if (!cloudDocId || !uid) { const existing = await findDocByTitle(); if (existing && !cloudDocId) { cloudDocId = existing; localStorage.setItem('cloudDocId', existing); } }
 
             if (cloudDocId) {
                 const remoteCount = await getRemoteAchievementCount();
@@ -1426,12 +1426,14 @@
                     if (data.lingYun !== undefined) localStorage.setItem('lingYun', data.lingYun);
                     if (data.zhuoNian !== undefined) localStorage.setItem('zhuoNian', data.zhuoNian);
                     if (data.playerName) setPlayerName(data.playerName);
-                    if (data.uid) { uid = data.uid; localStorage.setItem('playerUid', uid); }
-                    localStorage.setItem('banReason', banReasonOf(data));
-                    if (!uid) {
-                        const ex = extractUidFromTitle(result.title);
-                        if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                    // 编号以标题为准（权威来源），content.uid 仅作兜底，避免老档 content.uid 与标题编号不一致时被覆盖重新编号
+                    const titleUid = extractUidFromTitle(result.title);
+                    if (titleUid) {
+                        uid = titleUid; localStorage.setItem('playerUid', uid);
+                    } else if (data.uid) {
+                        uid = data.uid; localStorage.setItem('playerUid', uid);
                     }
+                    localStorage.setItem('banReason', banReasonOf(data));
                     if (data.playTime !== undefined) ptMergeCloud(Number(data.playTime) || 0);
                     localStorage.setItem('lastCloudSaveTime', Date.now());
                     clearAchievementCache();

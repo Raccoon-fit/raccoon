@@ -86,6 +86,8 @@
         }
         .cultivation { font-size: 14px; color: #d9c6a8; }
         .cultivation span { color: var(--scroll-gold); font-weight: bold; text-shadow: 0 0 10px rgba(232, 197, 106, 0.5); }
+        .playtime-display { font-size: 12px; color: #d9c6a8; margin-left: 14px; }
+        .playtime-display span { color: var(--scroll-gold); font-weight: bold; }
         .karma-display { display: flex; gap: 12px; font-size: 12px; }
         .karma-lingyun { color: #66BB6A; }
         .karma-zhuonian { color: #EF5350; }
@@ -435,6 +437,7 @@
     <div class="game-container">
         <div class="status-bar">
             <div class="cultivation">道行：<span id="cultivation-level">五百年</span></div>
+            <div class="playtime-display">游玩时间：<span id="playtime-display">—</span></div>
             <div class="karma-display" id="karmaDisplay"></div>
             <div class="env-bar" id="envBar"></div>
         </div>
@@ -496,10 +499,50 @@
 
         let playerName = localStorage.getItem('playerName') || '';
         let cloudDocId = localStorage.getItem('cloudDocId') || '';
+        let uid = localStorage.getItem('playerUid') || '';
         try {
             if (!playerName && window.parent !== window) playerName = window.parent.localStorage.getItem('playerName') || '';
             if (!cloudDocId && window.parent !== window) cloudDocId = window.parent.localStorage.getItem('cloudDocId') || '';
+            if (!uid && window.parent !== window) uid = window.parent.localStorage.getItem('playerUid') || '';
         } catch(e) {}
+
+        // ============ UID 辅助 ============
+        // 存档标题格式：道号;UID（英文分号）。UID 在道主页首次建档时生成，此后本页仅读取与回填。
+        async function ensureUid() {
+            if (uid) return uid;
+            try {
+                // 递增编号：读取云端所有档的 title;uid，取最大 uid + 1
+                const list = await apiListDocuments();
+                let max = 0;
+                (list || []).forEach(item => {
+                    if (typeof item.title !== 'string') return;
+                    const idx = item.title.indexOf(';');
+                    if (idx < 0) return;
+                    const n = parseInt(item.title.slice(idx + 1), 10);
+                    if (!isNaN(n) && n > max) max = n;
+                });
+                uid = String(max + 1);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            } catch (e) {
+                uid = String(Date.now() % 100000000);
+                localStorage.setItem('playerUid', uid);
+                return uid;
+            }
+        }
+        async function docTitleOf(name) {
+            return String(name || playerName) + ';' + await ensureUid();
+        }
+        function extractUidFromTitle(t) {
+            if (typeof t !== 'string' || !t.includes(';')) return '';
+            return t.slice(t.indexOf(';') + 1) || '';
+        }
+        // 封号检测：存档 content 中 banReason 为空 / 缺失 / '0' 视为正常，否则其值为封号理由。
+        function banReasonOf(c) {
+            const v = c && c.banReason;
+            if (v === undefined || v === null || v === '' || String(v) === '0') return '';
+            return String(v);
+        }
 
         const STORAGE_KEY = 'huangdaxian_achievements';
         const SPECIAL_KEY = 'huangdaxian_special_achievements';
@@ -606,6 +649,63 @@
             localStorage.setItem(USED_CODES_KEY, JSON.stringify(arr));
         }
 
+        // ========== 游玩时间（本地累积 + 云端合并，只增不减） ==========
+        const PT_KEY = 'playTime';
+        const PT_LAST = 'playTimeLastSeen';
+        const PT_MERGED = 'playTimeCloudMerged';
+        function ptNow() { return Math.floor(Date.now() / 1000); }
+        // 结算离线时段并把心跳推到当前时刻
+        function ptTick() {
+            try {
+                let last = parseInt(localStorage.getItem(PT_LAST) || '0', 10) || 0;
+                let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                if (last > 0) {
+                    const gap = ptNow() - last;
+                    if (gap > 0 && gap < 7 * 86400) acc += gap;   // 单次离线超过 7 天视为异常，不累加
+                }
+                localStorage.setItem(PT_KEY, String(acc));
+                localStorage.setItem(PT_LAST, String(ptNow()));
+                return acc;
+            } catch (e) { return 0; }
+        }
+        function ptGet() { return ptTick(); }
+        // 云端时间并入本地：只并入"尚未并入"的增量
+        function ptMergeCloud(cloudSeconds) {
+            if (!cloudSeconds || cloudSeconds <= 0) return;
+            try {
+                let acc = parseInt(localStorage.getItem(PT_KEY) || '0', 10) || 0;
+                let merged = parseInt(localStorage.getItem(PT_MERGED) || '0', 10) || 0;
+                const add = cloudSeconds - merged;
+                if (add > 0) acc += add;
+                localStorage.setItem(PT_KEY, String(acc));
+                localStorage.setItem(PT_MERGED, String(cloudSeconds));
+            } catch (e) {}
+        }
+        // 取上传值：结算本地后返回，并同步"已并入云端"标记，避免下次重复相加
+        function ptUploadValue() {
+            const v = ptGet();
+            try { localStorage.setItem(PT_MERGED, String(v)); } catch (e) {}
+            return v;
+        }
+        function ptFormat(seconds) {
+            seconds = Math.max(0, Math.floor(seconds || 0));
+            const d = Math.floor(seconds / 86400);
+            const h = Math.floor((seconds % 86400) / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            if (d > 0) return d + '天' + h + '小时' + m + '分';
+            if (h > 0) return h + '小时' + m + '分';
+            return m + '分';
+        }
+        function ptBindLifecycle() {
+            const flush = function() { ptTick(); };
+            window.addEventListener('beforeunload', flush);
+            document.addEventListener('visibilitychange', function() { if (document.hidden) flush(); });
+        }
+        function ptRefreshDisplay() {
+            const el = document.getElementById('playtime-display');
+            if (el) el.textContent = ptFormat(ptGet());
+        }
+
         // ========== StorageBridge ==========
         const StorageBridge = (function() {
             const hasNative = (() => { try { return window.parent && window.parent !== window && window.parent.webapp; } catch(e) { return false; } })();
@@ -674,8 +774,22 @@
         async function findDocByPlayerName() {
             if (!playerName) return null;
             const list = await apiListDocuments();
-            const found = list.find(item => item.title === playerName);
-            return found ? found.id : null;
+            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
+            if (uid) {
+                const exact = list.find(item => item.title === playerName + ';' + uid);
+                return exact ? exact.id : null;
+            }
+            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            const pref = playerName + ';';
+            const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
+            if (hit) {
+                const extracted = extractUidFromTitle(hit.title);
+                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                return hit.id;
+            }
+            // ③ 兜底：纯道号匹配（老档尚未改名时）
+            const old = list.find(item => item.title === playerName);
+            return old ? old.id : null;
         }
 
         // ========== 自动合并同步 ==========
@@ -735,6 +849,8 @@
                 }
 
                 // 4. 准备上传数据（使用合并后的数据）
+                // 同步封号标记：以云端为准缓存，上传时回写保留，避免覆盖管理员设置的封号
+                localStorage.setItem('banReason', banReasonOf(remote));
                 const cultivationText = getCultivationText();
                 const _cloudKilled = !!(window.HXSF_CLOUD && window.HXSF_CLOUD.killed);
                 const uploadData = Object.assign({
@@ -747,15 +863,23 @@
                     zhuoNian: parseInt(localStorage.getItem('zhuoNian') || '0'),
                     cultivation: cultivationText,               // 道行文本（如"五百年"、"∞"）
                     cultivationRank: getCultivationRank(cultivationText),  // 道行权重（用于排行榜排序）
+                    playTime: ptUploadValue(),                  // 游玩时间（秒，本地+云端合并，只增不减）
                     theme: (document.documentElement.getAttribute('data-theme') === 'scroll' ? 'scroll' : 'demonic'),
                     updateTime: Date.now()
-                }, _cloudKilled ? {} : {
+                }, _cloudKilled ? { uid: uid, banReason: localStorage.getItem('banReason') || '' } : {
                     
-                    usedCodes: JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]')
+                    usedCodes: JSON.parse(localStorage.getItem(USED_CODES_KEY) || '[]'),
+                    uid: uid,
+                    banReason: localStorage.getItem('banReason') || ''
                 });
 
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
+
                 
-                await apiModifyDocument(cloudDocId, playerName, uploadData);
+                await apiModifyDocument(cloudDocId, await docTitleOf(), uploadData);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
                 updateKarmaUI();
             } catch (e) {
@@ -830,6 +954,13 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
+                localStorage.setItem('banReason', banReasonOf(remote));
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
+                if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
                 // 云端恢复主题
                 if (remote.theme === 'scroll' || remote.theme === 'demonic') {
                     localStorage.setItem('hxsf_theme', remote.theme);
@@ -868,9 +999,13 @@
             if (!cloudDocId) return;
             try {
                 const doc = await apiQueryDocument(cloudDocId);
+                if (!uid) {
+                    const ex = extractUidFromTitle(doc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
                 const newVal = Math.max(0, Math.min(100, (doc.content.lingYun || 0) + delta));
                 doc.content.lingYun = newVal;
-                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                await apiModifyDocument(cloudDocId, await docTitleOf(), doc.content);
                 gameState.playerLingYun = newVal;
                 updateKarmaUI();
             } catch(e) {}
@@ -880,9 +1015,13 @@
             if (!cloudDocId) return;
             try {
                 const doc = await apiQueryDocument(cloudDocId);
+                if (!uid) {
+                    const ex = extractUidFromTitle(doc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
                 const newVal = Math.max(0, Math.min(100, (doc.content.zhuoNian || 0) + delta));
                 doc.content.zhuoNian = newVal;
-                await apiModifyDocument(cloudDocId, playerName, doc.content);
+                await apiModifyDocument(cloudDocId, await docTitleOf(), doc.content);
                 gameState.playerZhuoNian = newVal;
                 updateKarmaUI();
             } catch(e) {}
@@ -1034,6 +1173,19 @@
         }
 
         window.startGame = function() {
+            if (!localStorage.getItem('playerName') && !playerName) {
+                showToast('请先到仙府入册登录，再开始讨封');
+                setTimeout(function() {
+                    try {
+                        if (window.parent && window.parent !== window) {
+                            window.parent.postMessage({ type: 'nav', target: 'daozhu' }, '*');
+                            return;
+                        }
+                    } catch (e) {}
+                    window.location.href = './道主.html';
+                }, 900);
+                return;
+            }
             gameState.playerDifficulty = 'normal';
             StorageBridge.setItem('huangdaxian_difficulty', 'normal');
             document.getElementById('startOverlay').style.display = 'none';
@@ -1297,6 +1449,13 @@
                 if (remote.lingYun !== undefined) localStorage.setItem('lingYun', remote.lingYun);
                 if (remote.zhuoNian !== undefined) localStorage.setItem('zhuoNian', remote.zhuoNian);
                 if (remote.playerName) { playerName = remote.playerName; localStorage.setItem('playerName', playerName); }
+                if (remote.uid) { uid = remote.uid; localStorage.setItem('playerUid', uid); }
+                localStorage.setItem('banReason', banReasonOf(remote));
+                if (!uid) {
+                    const ex = extractUidFromTitle(remoteDoc.title);
+                    if (ex) { uid = ex; localStorage.setItem('playerUid', uid); }
+                }
+                if (remote.playTime !== undefined) ptMergeCloud(Number(remote.playTime) || 0);
                 localStorage.setItem('lastCloudSaveTime', Date.now());
             } catch(e) {
                 
@@ -1308,6 +1467,9 @@
         // ===== 启动 =====
         window.onload = async function() {
             if (!window.SCENES) return;
+            ptTick();
+            ptBindLifecycle();
+            ptRefreshDisplay();
             await loadAchievements();
             
             if (localStorage.getItem('playerName') && localStorage.getItem('cloudDocId')) {
@@ -1324,6 +1486,7 @@
             updateCultivationUI('start');
             await loadTabletMode();
             updateXianfuBtn();
+            ptRefreshDisplay();
             document.getElementById('startOverlay').style.display = 'flex';
             setTimeout(() => { const btn = document.getElementById('startBtn'); if (btn) focusElement(btn); }, 100);
             initControls();

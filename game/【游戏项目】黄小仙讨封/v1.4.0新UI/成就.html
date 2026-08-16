@@ -1295,21 +1295,23 @@
             const result = await res.json();
             if (result.code != 1 || !result.list) return null;
             const list = result.list;
-            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
-            if (uid) {
-                const exact = list.find(i => i.title === playerName + ';' + uid);
-                return exact ? exact.id : null;
-            }
-            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            // 以「道号 + 云端 uid」为准，本地 uid 仅在多档歧义时作消解
             const pref = playerName + ';';
-            const hit = list.find(i => typeof i.title === 'string' && i.title.startsWith(pref));
-            if (hit) {
-                const extracted = extractUidFromTitle(hit.title);
-                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
-                return hit.id;
+            const numbered = list.filter(i => typeof i.title === 'string' && i.title.startsWith(pref));
+            const plain = list.find(i => i.title === playerName);
+            if (numbered.length > 0) {
+                let target;
+                if (numbered.length === 1) target = numbered[0];
+                else if (uid) target = numbered.find(i => i.title === playerName + ';' + uid) || null;
+                else target = null;
+                if (target) {
+                    const extracted = extractUidFromTitle(target.title);
+                    if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                    return target.id;
+                }
+                return null;
             }
-            // ③ 兜底：纯道号匹配（老档尚未改名时）
-            return list.find(i => i.title === playerName)?.id || null;
+            return plain ? plain.id : null;
         }
 
         async function getRemoteAchievementCount() {

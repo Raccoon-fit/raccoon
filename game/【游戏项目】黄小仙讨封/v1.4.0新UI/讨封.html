@@ -778,22 +778,23 @@
         async function findDocByPlayerName() {
             if (!playerName) return null;
             const list = await apiListDocuments();
-            // ① 本地已有 uid：只精确匹配 道号;uid，避免同名其他 uid 的档被误接管
-            if (uid) {
-                const exact = list.find(item => item.title === playerName + ';' + uid);
-                return exact ? exact.id : null;
-            }
-            // ② 无本地 uid：按 道号; 前缀匹配找回老档并回填 uid
+            // 以「道号 + 云端 uid」为准，本地 uid 仅在多档歧义时作消解
             const pref = playerName + ';';
-            const hit = list.find(item => typeof item.title === 'string' && item.title.startsWith(pref));
-            if (hit) {
-                const extracted = extractUidFromTitle(hit.title);
-                if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
-                return hit.id;
+            const numbered = list.filter(item => typeof item.title === 'string' && item.title.startsWith(pref));
+            const plain = list.find(item => item.title === playerName);
+            if (numbered.length > 0) {
+                let target;
+                if (numbered.length === 1) target = numbered[0];
+                else if (uid) target = numbered.find(item => item.title === playerName + ';' + uid) || null;
+                else target = null;
+                if (target) {
+                    const extracted = extractUidFromTitle(target.title);
+                    if (extracted) { uid = extracted; localStorage.setItem('playerUid', uid); }
+                    return target.id;
+                }
+                return null;
             }
-            // ③ 兜底：纯道号匹配（老档尚未改名时）
-            const old = list.find(item => item.title === playerName);
-            return old ? old.id : null;
+            return plain ? plain.id : null;
         }
 
         // ========== 自动合并同步 ==========

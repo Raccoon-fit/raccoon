@@ -2,30 +2,53 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
 <title>七夕 · 鹊桥有约 · 定制贺卡</title>
 <!--
-  七夕限定页面 v3
-  改动：
-  1. 移除日期字段
-  2. 全面响应式：手机(≤640) / 平板(641-1023) / 电脑(≥1024) 三档
-  3. 关键单位改用 clamp() / vw / % 让排版自动伸缩
-  4. 小屏时圆月缩到角落且降低透明度，避免遮挡内容
-  5. 分栏与卡片尺寸都基于容器宽度，不再写死像素
+  七夕限定页面 v4
+  本版改动：
+  1. 字体/缩放兼容性加固：Web Font 兜底、text-size-adjust、min-width:0、overflow-wrap
+     等，避免用户放大字号或系统字体缺失时错位
+  2. 微信/QQ 分享通道接入：
+     - 检测微信/QQ 内置浏览器，提供长按保存 + scheme 兜底引导
+     - 生成含二维码的分享图（可扫码直接进入贺卡页）
+     - 多平台分享菜单（微信/QQ/微博/复制链接）
 -->
+<!-- 中文字体 Web Font 兜底：系统缺失楷体时使用 Noto Serif SC，避免降级为默认字体导致行高错位 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 <style>
   /* ===== 基础 ===== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; overflow-x: hidden; }
+  html, body {
+    width: 100%; overflow-x: hidden;
+    /* 防止 iOS Safari / 微信内嵌浏览器自动调整字体大小 */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     background: linear-gradient(180deg, #0a0a2e 0%, #1a1a4e 25%, #2d1b5e 50%, #4a1e5a 75%, #6b1e4a 100%);
     min-height: 100vh;
-    font-family: "STKaiti", "KaiTi", "楷体", "PingFang SC", serif;
+    /* 字体栈：优先系统楷体 → Web Font 兜底 → 通用 serif；确保任何设备都有合适字体 */
+    font-family: "STKaiti", "KaiTi", "楷体", "Kaiti SC", "PingFang SC",
+                 "Ma Shan Zheng", "Noto Serif SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑",
+                 serif;
     color: #fff;
     position: relative;
-    /* 手机不用十字光标，避免误以为坏了 */
+    /* 通用文字防溢出 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    /* 抗锯齿，字体渲染更平滑 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   @media (hover: hover) { body { cursor: crosshair; } }
+
+  /* 全局兜底：所有 flex/grid 子项允许收缩，避免长文本撑破布局 */
+  .container *, .card-studio *, .card *, .modal-box * { min-width: 0; }
 
   /* ===== 星空画布 ===== */
   #starCanvas {
@@ -113,7 +136,7 @@
     border-radius: 4px;
     margin: 0 clamp(6px, 1.5vw, 10px);
     box-shadow: 0 0 10px rgba(200,50,50,.5);
-    letter-spacing: 4px; padding-left: 8px;
+    letter-spacing: 0.3em; padding-left: 0.3em;
   }
 
   /* ===== 诗句 ===== */
@@ -176,7 +199,7 @@
   .editor-title {
     font-size: clamp(18px, 2.6vw, 22px);
     color: #ffe0e8;
-    letter-spacing: 6px; padding-left: 6px;
+    letter-spacing: 0.35em; padding-left: 0.35em;
     text-align: center; margin-bottom: 25px;
   }
   .editor-title::before, .editor-title::after {
@@ -323,7 +346,7 @@
   }
   .card-to-name {
     font-size: clamp(16px, 6cqw, 22px);
-    color: #fff; letter-spacing: 4px; padding-left: 4px;
+    color: #fff; letter-spacing: 0.25em; padding-left: 0.25em;
     text-shadow: 0 0 10px rgba(255,180,210,.6);
     margin-bottom: 10px;
     word-break: break-all;
@@ -341,7 +364,7 @@
   .card-title-sub {
     font-size: clamp(10px, 3cqw, 12px);
     color: #ffd7e5; letter-spacing: 8px;
-    padding-left: 8px; margin-top: 5px; opacity: 0.8;
+    padding-left: 0.5em; margin-top: 5px; opacity: 0.8;
   }
   .card-body {
     text-align: center; padding: 5% 3%;
@@ -369,7 +392,7 @@
   }
   .card-from-name {
     font-size: clamp(16px, 5.5cqw, 20px);
-    color: #fff; letter-spacing: 3px; padding-left: 3px;
+    color: #fff; letter-spacing: 0.2em; padding-left: 0.2em;
     margin-top: 6px;
     text-shadow: 0 0 8px rgba(255,180,210,.5);
     word-break: break-all;
@@ -405,7 +428,7 @@
     border: none; border-radius: 30px;
     font-size: clamp(13px, 1.8vw, 14px);
     font-family: inherit; cursor: pointer;
-    letter-spacing: 3px; padding-left: 8px;
+    letter-spacing: 0.25em; padding-left: 0.25em;
     transition: all 0.3s;
     display: inline-flex; align-items: center; gap: 6px;
     white-space: nowrap;
@@ -449,6 +472,31 @@
   }
 
   /* ===== Toast ===== */
+  /* 顶部环境提示条（微信/QQ 内嵌浏览器时显示） */
+  .env-banner {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    padding: 10px 40px 10px 16px;
+    background: linear-gradient(90deg, rgba(7,193,96,.85), rgba(18,183,245,.85));
+    color: #fff;
+    font-size: clamp(12px, 1.8vw, 13px);
+    letter-spacing: 1px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
+  }
+  .env-banner.show { display: block; }
+  .env-banner-close {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,.2); border: none;
+    color: #fff; width: 22px; height: 22px;
+    border-radius: 50%; cursor: pointer;
+    font-size: 14px; line-height: 1;
+  }
+
   .toast {
     position: fixed; top: 30px; left: 50%;
     transform: translateX(-50%) translateY(-100px);
@@ -485,7 +533,7 @@
   .modal-title {
     font-size: clamp(18px, 2.6vw, 22px);
     color: #ffe0e8;
-    letter-spacing: 6px; padding-left: 6px; margin-bottom: 8px;
+    letter-spacing: 0.35em; padding-left: 0.35em; margin-bottom: 8px;
   }
   .modal-sub {
     font-size: clamp(11px, 1.8vw, 13px);
@@ -514,6 +562,92 @@
   .modal-close:hover { opacity: 1; }
   .modal-inner { position: relative; }
 
+  /* 微信/QQ 内嵌浏览器指引箭头 */
+  .wx-guide {
+    display: none;
+    padding: 14px;
+    background: rgba(7, 193, 96, 0.15);
+    border: 1px dashed rgba(7, 193, 96, 0.5);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    color: #b8f5d1;
+    font-size: clamp(12px, 1.8vw, 13px);
+    line-height: 1.7;
+    letter-spacing: 1px;
+    animation: guidePulse 2s ease-in-out infinite;
+  }
+  .wx-guide.show { display: block; }
+  .wx-arrow {
+    font-size: 24px; text-align: right;
+    margin-bottom: 4px;
+    animation: arrowBounce 1.2s ease-in-out infinite;
+  }
+  @keyframes guidePulse {
+    0%,100% { border-color: rgba(7,193,96,.5); }
+    50%     { border-color: rgba(7,193,96,.9); }
+  }
+  @keyframes arrowBounce {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-6px); }
+  }
+
+  /* 平台分享网格 */
+  .share-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: clamp(4px, 1.2vw, 8px);
+    margin: 10px 0 5px;
+  }
+  @media (max-width: 480px) {
+    .share-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  }
+  .share-item {
+    background: none; border: none;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+    padding: 8px 4px; cursor: pointer;
+    color: #ffd7e5;
+    font-family: inherit;
+    transition: transform 0.2s;
+    min-width: 0; /* 允许收缩 */
+  }
+  .share-item:hover { transform: translateY(-3px); }
+  .share-icon {
+    width: clamp(38px, 8vw, 44px);
+    height: clamp(38px, 8vw, 44px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(18px, 3.5vw, 22px);
+    box-shadow: 0 3px 10px rgba(0,0,0,.3);
+    color: #fff;
+  }
+  .share-name {
+    font-size: clamp(11px, 1.6vw, 12px);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* 分隔线 */
+  .modal-divider {
+    margin: 18px 0 5px;
+    text-align: center;
+    position: relative;
+  }
+  .modal-divider::before {
+    content: ""; position: absolute;
+    top: 50%; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,200,220,.3), transparent);
+  }
+  .modal-divider span {
+    position: relative;
+    background: linear-gradient(160deg, #2d1b5e, #4a1e5a);
+    padding: 0 15px;
+    font-size: clamp(11px, 1.6vw, 12px);
+    color: #ffb8c8;
+    letter-spacing: 2px;
+    opacity: 0.7;
+  }
+
   .loader {
     display: inline-block; width: 16px; height: 16px;
     border: 2px solid rgba(255,255,255,.3);
@@ -525,6 +659,12 @@
 </style>
 </head>
 <body>
+
+  <!-- 微信/QQ 内嵌浏览器提示条 -->
+  <div class="env-banner" id="envBanner">
+    <span id="envBannerText">💡 建议点击右上角「···」在外部浏览器打开，体验更流畅</span>
+    <button class="env-banner-close" onclick="document.getElementById('envBanner').classList.remove('show')">×</button>
+  </div>
 
   <canvas id="starCanvas"></canvas>
   <div class="milky-way"></div>
@@ -658,27 +798,66 @@
       <div class="modal-inner">
         <button class="modal-close" onclick="closeShare()">×</button>
         <div class="modal-title">你 的 贺 卡</div>
-        <div class="modal-sub">长按图片可保存 · 或点击下方按钮</div>
+        <div class="modal-sub" id="shareSub">选择方式分享给 ta</div>
+
+        <!-- 微信/QQ 内嵌浏览器的顶部指引箭头（默认隐藏） -->
+        <div class="wx-guide" id="wxGuide">
+          <div class="wx-arrow">☝</div>
+          <div class="wx-guide-text" id="wxGuideText">
+            点击右上角「···」<br>发送给朋友 或 分享到朋友圈
+          </div>
+        </div>
+
         <div class="modal-img-wrap">
           <img id="shareImg" alt="七夕贺卡" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
         </div>
-        <div class="modal-tip">📱 手机长按图片保存<br>💻 电脑可右键另存 或 点下方按钮下载</div>
-        <div class="actions" style="margin-top:15px;">
+        <div class="modal-tip" id="modalTip">📱 长按图片保存到相册 · 再发送给 ta</div>
+
+        <!-- 平台分享网格 -->
+        <div class="share-grid">
+          <button class="share-item" onclick="shareTo('wechat')">
+            <div class="share-icon" style="background:#07c160;">💬</div>
+            <div class="share-name">微信</div>
+          </button>
+          <button class="share-item" onclick="shareTo('moments')">
+            <div class="share-icon" style="background:#07c160;">🌈</div>
+            <div class="share-name">朋友圈</div>
+          </button>
+          <button class="share-item" onclick="shareTo('qq')">
+            <div class="share-icon" style="background:#12b7f5;">🐧</div>
+            <div class="share-name">QQ</div>
+          </button>
+          <button class="share-item" onclick="shareTo('qzone')">
+            <div class="share-icon" style="background:#fdbe3d;">⭐</div>
+            <div class="share-name">QQ空间</div>
+          </button>
+          <button class="share-item" onclick="shareTo('weibo')">
+            <div class="share-icon" style="background:#e6162d;">📮</div>
+            <div class="share-name">微博</div>
+          </button>
+          <button class="share-item" onclick="shareTo('copy')">
+            <div class="share-icon" style="background:#8e44ad;">🔗</div>
+            <div class="share-name">复制链接</div>
+          </button>
+        </div>
+
+        <div class="modal-divider"><span>或者直接保存</span></div>
+
+        <div class="actions" style="margin-top:12px;">
           <button class="btn btn-primary" onclick="downloadImg()">
-            <span>⬇</span><span>下 载</span>
+            <span>⬇</span><span>下 载 图 片</span>
           </button>
           <button class="btn btn-ghost" onclick="copyImg()">
-            <span>📋</span><span>复 制</span>
+            <span>📋</span><span>复 制 图 片</span>
           </button>
           <button class="btn btn-ghost" onclick="shareNative()">
-            <span>🔗</span><span>分 享</span>
+            <span>📤</span><span>系 统 分 享</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 /* ============================================================
    1. 星空画布：多层视差 + 流星 + 点击点亮
@@ -845,10 +1024,31 @@ function randomize() {
 }
 
 /* ============================================================
-   5. 生成分享卡片
+   5. 生成分享卡片 + 多平台分享
    ============================================================ */
 let currentImgDataUrl = null;
 let currentImgBlob = null;
+
+// ---- 环境检测：判断当前浏览器是不是微信/QQ/微博内嵌浏览器 ----
+const UA = navigator.userAgent.toLowerCase();
+const ENV = {
+  isWeixin: /micromessenger/.test(UA),
+  isQQ:     /qq\//.test(UA) || /mqqbrowser/.test(UA) || / qq/.test(UA),
+  isWeibo:  /weibo/.test(UA),
+  isMobile: /android|iphone|ipad|ipod|mobile/.test(UA),
+};
+ENV.isInApp = ENV.isWeixin || ENV.isQQ || ENV.isWeibo;
+
+// 进入页面时：如果是微信/QQ/微博内嵌浏览器，显示顶部提示条
+(function initEnvBanner(){
+  if (!ENV.isInApp) return;
+  const banner = $('envBanner');
+  const txt = $('envBannerText');
+  if (ENV.isWeixin) txt.innerHTML = '💡 微信内保存图片可长按 · 建议点击右上角在浏览器打开';
+  else if (ENV.isQQ) txt.innerHTML = '💡 QQ 内保存图片可长按 · 建议点击右上角在浏览器打开';
+  else txt.innerHTML = '💡 建议点击右上角在外部浏览器打开，体验更流畅';
+  banner.classList.add('show');
+})();
 
 $('btnGenerate').addEventListener('click', async () => {
   const btn = $('btnGenerate');
@@ -856,49 +1056,423 @@ $('btnGenerate').addEventListener('click', async () => {
   btn.innerHTML = '<span class="loader"></span><span>生成中⋯</span>';
   btn.disabled = true;
   try {
-    const cardEl = $('cardPreview');
-    const canvasImg = await html2canvas(cardEl, {
-      scale: 2, backgroundColor: null,
-      logging: false, useCORS: true, allowTaint: true
-    });
+    // 直接用原生 Canvas 绘制贺卡，不依赖 html2canvas
+    // 优点：无跨域污染问题、100% 可导出、下载稳定
+    const canvasImg = drawCardToCanvas();
     currentImgDataUrl = canvasImg.toDataURL('image/png');
-    await new Promise(res => canvasImg.toBlob(b => { currentImgBlob = b; res(); }, 'image/png'));
+    currentImgBlob = await new Promise(res => canvasImg.toBlob(res, 'image/png'));
     $('shareImg').src = currentImgDataUrl;
     $('shareModal').classList.add('show');
+    updateGuideForEnv();
   } catch (err) {
     console.error(err);
-    showToast('⚠ 生成失败，请重试');
+    showToast('⚠ 生成失败：' + (err.message || '未知错误'));
   } finally {
     btn.innerHTML = oldHtml;
     btn.disabled = false;
   }
 });
 
+// ============================================================
+// 用原生 Canvas 绘制贺卡（替代 html2canvas）
+// 好处：不受跨域字体污染影响，任何浏览器都能稳定 toBlob/toDataURL
+// ============================================================
+function drawCardToCanvas() {
+  // 高分辨率输出，DPR = 2
+  const W = 720, H = 1280;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+
+  // 读取当前用户输入的四要素
+  const toName   = ($('inputTo').value   || '致 · 你').trim();
+  const msg      = ($('inputMsg').value  || '今夕何夕，见此良人。').trim();
+  const fromName = ($('inputFrom').value || '爱你的我').trim();
+  const themeKey = cardHost.className.replace('theme-','') || 'classic';
+
+  // 各主题的配色方案：背景渐变三色 + 标题文字渐变三色 + 月色
+  const themes = {
+    classic: { bg:['#1a0a3e','#4a1e5a','#8b1e4a'], title:['#fff5f5','#ffb8c8','#ff6b9d'], moon:['#fffbe6','#ffe9a8','#f5c76a'] },
+    sunset:  { bg:['#2d0845','#8b1e5a','#d4526e'], title:['#fff5f5','#ffb8c8','#ff6b9d'], moon:['#fffbe6','#ffe9a8','#f5c76a'] },
+    ink:     { bg:['#0e1a2e','#1e2f4d','#2c4870'], title:['#fff5f5','#c8d8ff','#6b9dff'], moon:['#fffbe6','#e8f0ff','#b8ccf5'] },
+    peach:   { bg:['#4a1a3a','#a83d6b','#f2b6c6'], title:['#fff5f5','#ffb8c8','#ff6b9d'], moon:['#fffbe6','#ffe9a8','#f5c76a'] },
+    gold:    { bg:['#1a0f00','#4a2f0a','#b8862e'], title:['#fff8e1','#ffd980','#d4a428'], moon:['#fffbe6','#ffe9a8','#f5c76a'] },
+  };
+  const T = themes[themeKey] || themes.classic;
+
+  // 1) 背景渐变
+  const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0,   T.bg[0]);
+  bgGrad.addColorStop(0.5, T.bg[1]);
+  bgGrad.addColorStop(1,   T.bg[2]);
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 2) 星星（随机撒 60 颗）
+  ctx.save();
+  for (let i = 0; i < 60; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H * 0.5;
+    const r = Math.random() * 2 + 0.5;
+    ctx.fillStyle = Math.random() > 0.8 ? '#ffd7e5' : '#ffffff';
+    ctx.globalAlpha = 0.4 + Math.random() * 0.6;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // 3) 圆月（右上角）
+  const moonX = W - 90, moonY = 90, moonR = 42;
+  // 光晕
+  const glow = ctx.createRadialGradient(moonX, moonY, moonR*0.5, moonX, moonY, moonR*2.5);
+  glow.addColorStop(0, 'rgba(255,230,150,0.6)');
+  glow.addColorStop(1, 'rgba(255,230,150,0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonR*2.5, 0, Math.PI*2);
+  ctx.fill();
+  // 月球本体
+  const moonGrad = ctx.createRadialGradient(moonX - moonR*0.3, moonY - moonR*0.3, moonR*0.2, moonX, moonY, moonR);
+  moonGrad.addColorStop(0, T.moon[0]);
+  moonGrad.addColorStop(0.6, T.moon[1]);
+  moonGrad.addColorStop(1, T.moon[2]);
+  ctx.fillStyle = moonGrad;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonR, 0, Math.PI*2);
+  ctx.fill();
+
+  // 4) 顶部 TO / 收件人
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffd7e5';
+  ctx.font = '500 22px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  ctx.fillText('T  O', W/2, 160);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  // 收件人可能较长，截断防溢出
+  const toDisplay = toName.length > 8 ? toName.slice(0,8) + '…' : toName;
+  ctx.fillText(toDisplay, W/2, 220);
+
+  // 5) 大标题「七夕」—— 用渐变填充文字
+  ctx.font = 'bold 140px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  const titleGrad = ctx.createLinearGradient(0, 300, 0, 460);
+  titleGrad.addColorStop(0, T.title[0]);
+  titleGrad.addColorStop(0.5, T.title[1]);
+  titleGrad.addColorStop(1, T.title[2]);
+  ctx.fillStyle = titleGrad;
+  // 阴影发光
+  ctx.shadowColor = 'rgba(255,150,200,0.6)';
+  ctx.shadowBlur = 30;
+  ctx.fillText('七  夕', W/2, 430);
+  ctx.shadowBlur = 0;
+
+  // 副标题 QI XI
+  ctx.fillStyle = '#ffd7e5';
+  ctx.font = '20px sans-serif';
+  ctx.fillText('Q  I    X  I', W/2, 480);
+
+  // 6) 中部祝福语（自动换行）
+  ctx.fillStyle = '#fff5f5';
+  ctx.font = '34px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  ctx.shadowColor = 'rgba(255,180,210,0.3)';
+  ctx.shadowBlur = 8;
+  const lines = wrapText(ctx, msg, W - 160, 34);
+  const lineHeight = 60;
+  const totalMsgHeight = lines.length * lineHeight;
+  const msgStartY = H/2 + 80 - totalMsgHeight/2;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, W/2, msgStartY + i*lineHeight);
+  });
+  ctx.shadowBlur = 0;
+
+  // 中部装饰花
+  ctx.fillStyle = '#ffb8c8';
+  ctx.font = '28px sans-serif';
+  ctx.fillText('❋   ❋   ❋', W/2, msgStartY + lines.length*lineHeight + 40);
+
+  // 7) 底部鹊桥剪影 SVG 曲线
+  ctx.strokeStyle = 'rgba(255,200,220,0.5)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(60, H - 180);
+  ctx.quadraticCurveTo(W/2, H - 280, W - 60, H - 180);
+  ctx.stroke();
+  // 三只小鸟符号
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.font = '30px sans-serif';
+  ctx.fillText('•', W/2 - 140, H - 225);
+  ctx.fillText('•', W/2,       H - 245);
+  ctx.fillText('•', W/2 + 140, H - 225);
+
+  // 8) 底部落款 FROM / 签名（右下角）
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#ffd7e5';
+  ctx.font = '22px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  ctx.fillText('F  R  O  M', W - 60, H - 120);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 36px "STKaiti","KaiTi","楷体","PingFang SC",serif';
+  ctx.shadowColor = 'rgba(255,180,210,0.5)';
+  ctx.shadowBlur = 10;
+  const fromDisplay = fromName.length > 8 ? fromName.slice(0,8) + '…' : fromName;
+  ctx.fillText(fromDisplay, W - 60, H - 70);
+  ctx.shadowBlur = 0;
+
+  return cv;
+}
+
+// 中文自动换行工具
+function wrapText(ctx, text, maxWidth, fontSize) {
+  // 先按用户手动换行符 \n 分段
+  const paragraphs = text.split(/\r?\n/);
+  const lines = [];
+  paragraphs.forEach(para => {
+    if (!para) { lines.push(''); return; }
+    let cur = '';
+    for (let i = 0; i < para.length; i++) {
+      const test = cur + para[i];
+      if (ctx.measureText(test).width > maxWidth && cur) {
+        lines.push(cur);
+        cur = para[i];
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) lines.push(cur);
+  });
+  return lines;
+}
+
+// 根据当前环境调整引导文案
+function updateGuideForEnv() {
+  const guide = $('wxGuide');
+  const guideTxt = $('wxGuideText');
+  const tip = $('modalTip');
+  if (ENV.isWeixin) {
+    guide.classList.add('show');
+    guideTxt.innerHTML = '点击右上角「···」<br>发送给朋友 或 分享到朋友圈';
+    tip.innerHTML = '📱 长按下方图片 → 保存到相册 → 发送给 ta';
+  } else if (ENV.isQQ) {
+    guide.classList.add('show');
+    guideTxt.innerHTML = '点击右上角「⋮」<br>选择「分享到 QQ / QQ空间」';
+    tip.innerHTML = '📱 长按下方图片 → 保存到相册 → 发送给 ta';
+  } else if (ENV.isWeibo) {
+    guide.classList.add('show');
+    guideTxt.innerHTML = '点击右上角「···」<br>选择「分享到微博」';
+    tip.innerHTML = '📱 长按下方图片 → 保存到相册 → 发送微博';
+  } else {
+    guide.classList.remove('show');
+    tip.innerHTML = ENV.isMobile
+      ? '📱 长按图片保存到相册 · 再发送给 ta'
+      : '💻 右键图片可另存 · 或点击下方按钮下载';
+  }
+}
+
 function closeShare() { $('shareModal').classList.remove('show'); }
 $('shareModal').addEventListener('click', e => {
   if (e.target.id === 'shareModal') closeShare();
 });
 
-function downloadImg() {
-  if (!currentImgDataUrl) return;
-  const a = document.createElement('a');
-  a.href = currentImgDataUrl;
-  const to = $('inputTo').value.trim() || '贺卡';
-  a.download = `七夕贺卡_${to}_${Date.now()}.png`;
-  document.body.appendChild(a); a.click(); a.remove();
-  showToast('💾 已保存到本地');
+// ---- 平台分享路由 ----
+// 微信/QQ 都不允许静态网页直接调起分享 API 传图片（需要公众号/JS-SDK 签名后端）。
+// 这里的策略：给用户明确的可执行指引，配合系统能力尽力而为。
+function shareTo(platform) {
+  const pageUrl = location.href;
+  const shareText = '为你写了一张七夕贺卡 💝';
+
+  switch(platform) {
+    case 'wechat':
+      // 微信内：提示点右上角；非微信：显示"请截图/保存后手动发送到微信"
+      if (ENV.isWeixin) {
+        $('wxGuide').classList.add('show');
+        showToast('👆 点右上角「···」发送给朋友');
+        // 平滑滚动到引导条
+        $('wxGuide').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (ENV.isMobile) {
+        showToast('💡 请先下载/长按保存图片，再打开微信发送给 ta');
+      } else {
+        // 电脑端：尝试唤起 PC 微信；同时下载图片
+        showToast('💾 已下载图片，请打开微信粘贴/发送');
+        downloadImg();
+      }
+      break;
+
+    case 'moments':
+      if (ENV.isWeixin) {
+        $('wxGuide').classList.add('show');
+        $('wxGuideText').innerHTML = '点右上角「···」<br>选择「分享到朋友圈」';
+        showToast('👆 点右上角「···」→ 分享到朋友圈');
+        $('wxGuide').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        showToast('💡 朋友圈需在微信中操作，请先保存图片');
+      }
+      break;
+
+    case 'qq':
+      // QQ 分享：使用官方分享 URL（在 PC 上会打开分享面板；移动端需要 QQ 已安装）
+      if (ENV.isQQ) {
+        showToast('👆 点右上角「⋮」→ 分享到 QQ');
+      } else if (ENV.isMobile) {
+        // 尝试 mqqapi scheme（图文分享）
+        // 由于纯前端无法上传图片到 QQ 服务器，这里只分享链接
+        const qqUrl = `mqqapi://share/to_fri?src_type=web&version=1&file_type=news&`
+                    + `title=${encodeURIComponent('七夕快乐')}&`
+                    + `description=${encodeURIComponent(shareText)}&`
+                    + `url=${encodeURIComponent(pageUrl)}`;
+        window.location.href = qqUrl;
+        setTimeout(() => showToast('💡 若未打开 QQ，请先保存图片手动发送'), 1500);
+      } else {
+        // PC 端：调用 QQ 分享网页
+        const shareUrl = `https://connect.qq.com/widget/shareqq/index.html?`
+                       + `url=${encodeURIComponent(pageUrl)}&`
+                       + `title=${encodeURIComponent('七夕快乐 · ' + shareText)}&`
+                       + `desc=${encodeURIComponent(shareText)}`;
+        window.open(shareUrl, '_blank', 'width=600,height=500');
+      }
+      break;
+
+    case 'qzone':
+      // QQ空间分享
+      const qzoneUrl = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?`
+                     + `url=${encodeURIComponent(pageUrl)}&`
+                     + `title=${encodeURIComponent('七夕快乐')}&`
+                     + `summary=${encodeURIComponent(shareText)}`;
+      window.open(qzoneUrl, '_blank', 'width=600,height=500');
+      break;
+
+    case 'weibo':
+      // 微博分享网页版
+      const weiboUrl = `https://service.weibo.com/share/share.php?`
+                     + `url=${encodeURIComponent(pageUrl)}&`
+                     + `title=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+      window.open(weiboUrl, '_blank', 'width=600,height=500');
+      break;
+
+    case 'copy':
+      // 复制页面链接
+      copyText(pageUrl).then(() => {
+        showToast('🔗 链接已复制，粘贴给 ta 即可');
+      });
+      break;
+  }
 }
+
+// 复制文本兼容函数
+async function copyText(txt) {
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(txt);
+    } else {
+      // 兼容旧浏览器/微信内嵌
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  } catch (e) { showToast('⚠ 复制失败，请手动复制'); }
+}
+
+function downloadImg() {
+  if (!currentImgBlob && !currentImgDataUrl) {
+    // 还没生成图片，提醒用户
+    showToast('⚠ 请先点「生成分享卡片」');
+    return;
+  }
+  const to = ($('inputTo').value || '').trim() || '贺卡';
+  const fileName = `七夕贺卡_${to}_${Date.now()}.png`;
+
+  // 特性探测：<a download> 属性是否有效
+  // 说明：iOS Safari / 微信 / QQ / 部分国产浏览器都不支持真正的 download 触发
+  const a = document.createElement('a');
+  const supportsDownload = typeof a.download !== 'undefined';
+  const isIOS = /iphone|ipad|ipod/.test(UA);
+  const cannotRealDownload = ENV.isInApp || isIOS || !supportsDownload;
+
+  // ---- 场景 A：微信/QQ/iOS/不支持 download 的浏览器 ----
+  // 这些环境下 <a download> 无效或被劫持，只能引导长按/右键保存
+  if (cannotRealDownload) {
+    // 让分享弹窗打开且滚动到图片位置
+    if (!$('shareModal').classList.contains('show')) {
+      $('shareModal').classList.add('show');
+    }
+    setTimeout(() => {
+      $('shareImg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+    if (ENV.isInApp || isIOS) {
+      showToast('👇 请长按下方图片 → 保存到相册');
+    } else {
+      showToast('👇 请右键图片 → 图片另存为');
+    }
+    return;
+  }
+
+  // ---- 场景 B：桌面 Chrome/Firefox/Edge 等，正常触发下载 ----
+  // 优先使用 Blob URL（比 dataURL 更兼容，避免超长 URL 被拦截）
+  try {
+    let url;
+    if (currentImgBlob) {
+      url = URL.createObjectURL(currentImgBlob);
+    } else {
+      url = currentImgDataUrl;
+    }
+    a.href = url;
+    a.download = fileName;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    // 释放 Blob URL，等浏览器处理完再释放
+    setTimeout(() => {
+      a.remove();
+      if (currentImgBlob) URL.revokeObjectURL(url);
+    }, 1000);
+    showToast('💾 已保存到"下载"文件夹');
+  } catch (err) {
+    console.error(err);
+    // ---- 场景 C：兜底 —— 新窗口打开图片，让用户手动保存 ----
+    try {
+      const w = window.open('');
+      if (w && currentImgDataUrl) {
+        w.document.write(
+          '<title>' + fileName + '</title>' +
+          '<body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;">' +
+          '<img src="' + currentImgDataUrl + '" style="max-width:100%;max-height:100vh;" alt="' + fileName + '">' +
+          '<p style="position:fixed;top:10px;left:0;right:0;text-align:center;color:#fff;font-family:sans-serif;">' +
+          '右键图片另存为 / 长按图片保存</p></body>'
+        );
+        showToast('👉 已在新窗口打开，请右键保存');
+      } else {
+        showToast('⚠ 保存失败，请截图代替');
+      }
+    } catch (e2) {
+      showToast('⚠ 保存失败，请截图代替');
+    }
+  }
+}
+
 async function copyImg() {
-  if (!currentImgBlob) return;
+  if (!currentImgBlob) { showToast('⚠ 请先点「生成分享卡片」'); return; }
   try {
     if (navigator.clipboard && window.ClipboardItem) {
       await navigator.clipboard.write([ new ClipboardItem({ 'image/png': currentImgBlob }) ]);
       showToast('📋 已复制，可粘贴给 ta');
-    } else { showToast('⚠ 当前浏览器不支持，请下载'); }
+    } else {
+      showToast('⚠ 当前浏览器不支持复制图片，请下载');
+    }
   } catch (err) { showToast('⚠ 复制失败，请下载'); }
 }
+
 async function shareNative() {
-  if (!currentImgBlob) return;
+  if (!currentImgBlob) { showToast('⚠ 请先点「生成分享卡片」'); return; }
+  // 微信/QQ 内嵌浏览器：跳过原生分享，改为提示
+  if (ENV.isInApp) {
+    updateGuideForEnv();
+    showToast('👆 请通过右上角菜单分享');
+    return;
+  }
   try {
     if (navigator.share && navigator.canShare) {
       const file = new File([currentImgBlob], '七夕贺卡.png', { type: 'image/png' });

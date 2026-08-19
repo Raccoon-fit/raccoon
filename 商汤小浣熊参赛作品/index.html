@@ -5,26 +5,55 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>商汤小浣熊参赛作品 · 软软的小窝</title>
 <style>
-:root{--bg:#0b0b14;--ink:#e8e6f0;--muted:#9b97b0;--card:#14131f;--line:#262438;--acc:#b9a6ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-header{padding:34px 22px 10px;max-width:920px;margin:auto}.brand{color:var(--muted);font-size:13px;letter-spacing:.05em}
-h1{font-size:24px;margin:6px 0 4px;font-weight:800}.sub{color:var(--muted);font-size:13px}
-main{max-width:920px;margin:auto;padding:18px 22px 60px;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px;transition:.2s;border-top:3px solid transparent}
-.card:hover{border-top-color:var(--acc);transform:translateY(-2px);box-shadow:0 8px 24px #00000033}
-.name{font-weight:700;word-break:break-all}.meta{color:var(--muted);font-size:12px}
-a.open{flex:0 0 auto;align-self:flex-start;margin-top:auto;color:var(--acc);text-decoration:none;font-size:13px;font-weight:700;border:1px solid #3a335c;border-radius:999px;padding:5px 12px}
-a.open:hover{background:#1c1a2c}#status{text-align:center;color:var(--muted);padding:40px 20px;grid-column:1/-1}
+:root{--bg:#0b0b14;--ink:#ecedf5;--muted:#9b97b0;--card:#15141fcc;--line:#2a2840;--acc:#b9a6ff;--acc2:#7fd6ff}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:radial-gradient(1200px 700px at 80% -10%,#2a1f4a22,transparent),radial-gradient(900px 600px at -10% 110%,#16384a22,transparent),var(--bg);color:var(--ink);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+header{padding:44px 24px 14px;max-width:980px;margin:auto}
+.brand{color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+h1{font-size:28px;margin:8px 0 6px;font-weight:900;letter-spacing:.01em;background:linear-gradient(90deg,var(--ink),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:13px;max-width:640px}
+main{max-width:980px;margin:auto;padding:20px 24px 80px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{position:relative;background:var(--card);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;transition:.25s cubic-bezier(.2,.8,.2,1);border-top:3px solid transparent;cursor:pointer}
+.card:hover{border-top-color:var(--acc);transform:translateY(-4px);box-shadow:0 14px 30px #00000040;border-color:#342f52}
+.ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:linear-gradient(135deg,#2a2447,#1a1830);border:1px solid var(--line);color:var(--acc)}
+.name{font-weight:800;word-break:break-all;font-size:15px;line-height:1.35}
+.meta{color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
+.row{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.btn{flex:0 0 auto;color:var(--acc);text-decoration:none;font-size:12.5px;font-weight:700;border:1px solid #3a335c;border-radius:999px;padding:6px 12px;cursor:pointer;background:transparent;font-family:inherit;transition:.2s}
+.btn:hover{background:#1c1a2c;color:var(--acc2);border-color:#3d4a5c}
+#status{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 20px}
+.skel{height:96px;border-radius:18px;background:linear-gradient(90deg,#15141f,#1c1a2c,#15141f);background-size:200% 100%;animation:sh 1.4s infinite}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.empty{background:#15141f;border:1px dashed var(--line);border-radius:18px;padding:38px 22px;color:var(--muted);grid-column:1/-1}
+.empty b{color:var(--ink)}
+footer{max-width:980px;margin:auto;padding:0 24px 40px;color:#5e5a72;font-size:12px;text-align:center}
 </style></head>
 <body>
 <header><div class="brand">Raccoon.Fit · 软软的小窝</div><h1>商汤小浣熊参赛作品</h1><div class="sub">在梦境中保持清醒 · 在现实中保持想象 — 新增作品推送后自动出现在列表</div></header>
 <main id="app"><div id="status">正在加载作品列表…</div></main>
+<footer>© 2025-2026 软软 · 超现实设计哲学 · DREAM AWAKE · CREATE BEYOND</footer>
 <script>
-const API="https://api.github.com/repos/RaccoonFit/raccoon.fit/contents/%E5%95%86%E6%B1%A4%E5%B0%8F%E6%B5%A3%E7%86%8A%E5%8F%82%E8%B5%9B%E4%BD%9C%E5%93%81";const SITE="https://raccoon.fit";const DIR="商汤小浣熊参赛作品";
+const OWNER="Raccoon-fit",REPO="raccoon",DIR="商汤小浣熊参赛作品",SITE="https://raccoon.fit",BRANCH="main";
+const DIR_ENC=DIR.split("/").map(encodeURIComponent).join("/");
+const API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+DIR_ENC;
 const app=document.getElementById("app"),status=document.getElementById("status");
-function escape(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
-function fmt(n){if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";return(n/1048576).toFixed(2)+" MB"}
-function link(name){return SITE+"/"+DIR.split("/").map(encodeURIComponent).join("/")+"/"+encodeURIComponent(name)}
-async function load(){try{const r=await fetch(API,{headers:{"Accept":"application/vnd.github+json"}});if(!r.ok)throw new Error("HTTP "+r.status);let items=await r.json();if(!Array.isArray(items))throw new Error("非目录");items=items.filter(i=>i.type==="file"&&i.name.endsWith(".html")&&i.name!=="index.html").sort((a,b)=>a.name.localeCompare(b.name,"zh"));if(!items.length){status.textContent="暂无 HTML 作品（index.html 自身已隐藏）";return}status.remove();for(const it of items){const card=document.createElement("a");card.className="card";card.href=link(it.name);card.target="_blank";card.rel="noopener";card.innerHTML='<div class="name">'+escape(it.name)+'</div><div class="meta">'+(it.size?fmt(it.size):"")+'</div><span class="open">打开作品 →</span>';app.appendChild(card)}}catch(e){status.textContent="加载失败："+e.message+"（请确认仓库为公开，且 OWNER/REPO 已正确配置）";console.error(e)}}
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function fmt(n){if(!n&&n!==0)return"";if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";return(n/1048576).toFixed(2)+" MB"}
+function siteLink(name){return SITE+"/"+DIR.split("/").map(encodeURIComponent).join("/")+"/"+encodeURIComponent(name)}
+async function load(){try{
+  status.innerHTML='<div class="skel" style="max-width:520px;margin:auto"></div><div style="margin-top:14px;font-size:13px">正在拉取作品列表…</div>';
+  const r=await fetch(API,{headers:{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});
+  if(!r.ok)throw new Error("HTTP "+r.status);let items=await r.json();
+  if(!Array.isArray(items))throw new Error("非目录");
+  items=items.filter(i=>i.type==="file"&&i.name.toLowerCase().endsWith(".html")&&i.name!=="index.html").sort((a,b)=>a.name.localeCompare(b.name,"zh"));
+  if(!items.length){status.outerHTML='<div class="empty"><b>目录中暂无其他 HTML 作品</b><br><span style="font-size:12.5px">把作品 HTML 与 index.html 放在同一目录（'+esc(DIR)+'），推送后刷新即可自动出现。</span></div>';return}
+  status.remove();
+  for(const it of items){const name=it.name.replace(/\.html$/i,"");const card=document.createElement("div");card.className="card";
+    card.innerHTML='<div class="ico">✦</div><div class="name">'+esc(name)+'</div><div class="meta">'+(it.size?fmt(it.size):"")+' · HTML 作品</div><div class="row"><button class="btn" data-act="site">打开作品 →</button></div>';
+    card.addEventListener("click",()=>window.open(siteLink(it.name),"_blank","noopener"));
+    app.appendChild(card);
+  }
+}catch(e){status.innerHTML='加载失败：'+esc(e.message)+'<br><span style="font-size:12px">请确认仓库为公开，且 OWNER/REPO 已正确配置。</span>';console.error(e)}}
 load();
 </script></body></html>

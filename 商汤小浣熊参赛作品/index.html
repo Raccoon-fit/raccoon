@@ -1,99 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>作品索引</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>商汤小浣熊参赛作品 · 软软的小窝</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --border:#262b35; --text:#e6e8eb;
-    --muted:#9aa4b2; --accent:#7aa2ff; --shadow:0 6px 24px rgba(0,0,0,.35);
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    background:var(--bg);color:var(--text);min-height:100vh;padding:32px 20px;
-  }
-  .wrap{max-width:880px;margin:0 auto;}
-  header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
-  h1{font-size:1.6rem;font-weight:700;letter-spacing:.5px;}
-  #meta{color:var(--muted);font-size:.9rem;}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
-  .card{
-    background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:16px;display:flex;flex-direction:column;gap:8px;transition:.2s;
-    text-decoration:none;color:inherit;box-shadow:var(--shadow);
-  }
-  .card:hover{border-color:var(--accent);transform:translateY(-2px);}
-  .name{font-weight:600;font-size:1rem;word-break:break-all;color:var(--accent);}
-  .info{color:var(--muted);font-size:.82rem;display:flex;gap:12px;flex-wrap:wrap;}
-  .empty,.err{color:var(--muted);text-align:center;padding:40px 0;}
-  .err{color:#ff8a8a;}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;}
-  footer{margin-top:32px;text-align:center;color:#5b6472;font-size:.8rem;}
-</style>
-</head>
+:root{--bg:#0b0b14;--ink:#e8e6f0;--muted:#9b97b0;--card:#14131f;--line:#262438;--acc:#b9a6ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+header{padding:34px 22px 10px;max-width:920px;margin:auto}.brand{color:var(--muted);font-size:13px;letter-spacing:.05em}
+h1{font-size:24px;margin:6px 0 4px;font-weight:800}.sub{color:var(--muted);font-size:13px}
+main{max-width:920px;margin:auto;padding:18px 22px 60px;display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px;transition:.2s;border-top:3px solid transparent}
+.card:hover{border-top-color:var(--acc);transform:translateY(-2px);box-shadow:0 8px 24px #00000033}
+.name{font-weight:700;word-break:break-all}.meta{color:var(--muted);font-size:12px}
+a.open{flex:0 0 auto;align-self:flex-start;margin-top:auto;color:var(--acc);text-decoration:none;font-size:13px;font-weight:700;border:1px solid #3a335c;border-radius:999px;padding:5px 12px}
+a.open:hover{background:#1c1a2c}#status{text-align:center;color:var(--muted);padding:40px 20px;grid-column:1/-1}
+</style></head>
 <body>
-<div class="wrap">
-  <header>
-    <h1><span class="dot"></span>作品索引</h1>
-    <div id="meta">加载中…</div>
-  </header>
-  <div id="list" class="grid"></div>
-  <footer>由 GitHub Contents API 自动列出当前目录的 HTML 文件</footer>
-</div>
-
+<header><div class="brand">Raccoon.Fit · 软软的小窝</div><h1>商汤小浣熊参赛作品</h1><div class="sub">在梦境中保持清醒 · 在现实中保持想象 — 新增作品推送后自动出现在列表</div></header>
+<main id="app"><div id="status">正在加载作品列表…</div></main>
 <script>
-/* ===== 只需修改这三项 ===== */
-const OWNER = "raccoon-fit";      // 例: octocat
-const REPO  = "raccoon";            // 例: my-site
-const PATH  = "商汤小浣熊参赛作品";                      // 目录路径，根目录留空；子目录如 "works"
-const BRANCH = "";                     // 留空用默认分支；也可填 "main" / "master"
-/* ========================== */
-
-const list = document.getElementById("list");
-const meta = document.getElementById("meta");
-
-function fmtSize(n){
-  if(n<1024) return n+" B";
-  if(n<1024*1024) return (n/1024).toFixed(1)+" KB";
-  return (n/1024/1024).toFixed(2)+" MB";
-}
-function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-
-async function load(){
-  const ref = BRANCH ? `?ref=${encodeURIComponent(BRANCH)}` : "";
-  const p = PATH ? PATH.replace(/^\/+|\/+$/g,"") + "/" : "";
-  const url = `https://api.github.com/repos/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/contents/${p}${ref}`;
-  let res, data;
-  try{
-    res = await fetch(url, { headers:{ "Accept":"application/vnd.github+json" } });
-  }catch(e){
-    list.innerHTML = `<div class="err">网络请求失败：${esc(e.message)}</div>`; meta.textContent=""; return;
-  }
-  if(!res.ok){ list.innerHTML = `<div class="err">API 错误 ${res.status}：${esc(res.statusText)}<br>请检查 OWNER / REPO / PATH 是否填写正确，且仓库为公开。</div>`; meta.textContent=""; return; }
-  data = await res.json();
-  if(!Array.isArray(data)){ list.innerHTML = `<div class="err">返回数据格式异常</div>`; meta.textContent=""; return; }
-
-  // 仅保留当前目录下的 .html 文件（不含 index.html 自身）
-  const here = PATH.replace(/^\/+|\/+$/g,"");
-  const files = data
-    .filter(it => it.type==="file" && /\.html?$/i.test(it.name) && it.name!=="index.html")
-    .filter(it => here ? it.path === `${here}/${it.name}` : it.path===it.name)
-    .sort((a,b)=> (b.name.localeCompare(a.name)));
-
-  meta.textContent = `共 ${files.length} 个 HTML 文件`;
-  if(files.length===0){ list.innerHTML = `<div class="empty">当前目录暂无 HTML 文件</div>`; return; }
-
-  list.innerHTML = files.map(f=>{
-    const dl = f.download_url || f.html_url;
-    return `<a class="card" href="${esc(dl)}" target="_blank" rel="noopener">
-      <div class="name">${esc(f.name)}</div>
-      <div class="info"><span>${fmtSize(f.size)}</span></div>
-    </a>`;
-  }).join("");
-}
+const API="https://api.github.com/repos/RaccoonFit/raccoon.fit/contents/%E5%95%86%E6%B1%A4%E5%B0%8F%E6%B5%A3%E7%86%8A%E5%8F%82%E8%B5%9B%E4%BD%9C%E5%93%81";const SITE="https://raccoon.fit";const DIR="商汤小浣熊参赛作品";
+const app=document.getElementById("app"),status=document.getElementById("status");
+function escape(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function fmt(n){if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";return(n/1048576).toFixed(2)+" MB"}
+function link(name){return SITE+"/"+DIR.split("/").map(encodeURIComponent).join("/")+"/"+encodeURIComponent(name)}
+async function load(){try{const r=await fetch(API,{headers:{"Accept":"application/vnd.github+json"}});if(!r.ok)throw new Error("HTTP "+r.status);let items=await r.json();if(!Array.isArray(items))throw new Error("非目录");items=items.filter(i=>i.type==="file"&&i.name.endsWith(".html")&&i.name!=="index.html").sort((a,b)=>a.name.localeCompare(b.name,"zh"));if(!items.length){status.textContent="暂无 HTML 作品（index.html 自身已隐藏）";return}status.remove();for(const it of items){const card=document.createElement("a");card.className="card";card.href=link(it.name);card.target="_blank";card.rel="noopener";card.innerHTML='<div class="name">'+escape(it.name)+'</div><div class="meta">'+(it.size?fmt(it.size):"")+'</div><span class="open">打开作品 →</span>';app.appendChild(card)}}catch(e){status.textContent="加载失败："+e.message+"（请确认仓库为公开，且 OWNER/REPO 已正确配置）";console.error(e)}}
 load();
-</script>
-</body>
-</html>
+</script></body></html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作品索引</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --border:#262b35; --text:#e6e8eb;
+    --muted:#9aa4b2; --accent:#7aa2ff; --shadow:0 6px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);min-height:100vh;padding:32px 20px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+  header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  h1{font-size:1.6rem;font-weight:700;letter-spacing:.5px;}
+  #meta{color:var(--muted);font-size:.9rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:16px;display:flex;flex-direction:column;gap:8px;transition:.2s;
+    text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  }
+  .card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .name{font-weight:600;font-size:1rem;word-break:break-all;color:var(--accent);}
+  .info{color:var(--muted);font-size:.82rem;display:flex;gap:12px;flex-wrap:wrap;}
+  .empty,.err{color:var(--muted);text-align:center;padding:40px 0;}
+  .err{color:#ff8a8a;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;}
+  footer{margin-top:32px;text-align:center;color:#5b6472;font-size:.8rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="dot"></span>作品索引</h1>
+    <div id="meta">加载中…</div>
+  </header>
+  <div id="list" class="grid"></div>
+  <footer>由 GitHub Contents API 自动列出当前目录的 HTML 文件</footer>
+</div>
+
+<script>
+/* ===== 只需修改这三项 ===== */
+const OWNER = "raccoon-fit";      // 例: octocat
+const REPO  = "raccoon";            // 例: my-site
+const PATH  = "商汤小浣熊参赛作品";                      // 目录路径，根目录留空；子目录如 "works"
+const BRANCH = "";                     // 留空用默认分支；也可填 "main" / "master"
+/* ========================== */
+
+const list = document.getElementById("list");
+const meta = document.getElementById("meta");
+
+function fmtSize(n){
+  if(n<1024) return n+" B";
+  if(n<1024*1024) return (n/1024).toFixed(1)+" KB";
+  return (n/1024/1024).toFixed(2)+" MB";
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+
+async function load(){
+  const ref = BRANCH ? `?ref=${encodeURIComponent(BRANCH)}` : "";
+  const p = PATH ? PATH.replace(/^\/+|\/+$/g,"") + "/" : "";
+  const url = `https://api.github.com/repos/${encodeURIComponent(OWNER)}/${encodeURIComponent(REPO)}/contents/${p}${ref}`;
+  let res, data;
+  try{
+    res = await fetch(url, { headers:{ "Accept":"application/vnd.github+json" } });
+  }catch(e){
+    list.innerHTML = `<div class="err">网络请求失败：${esc(e.message)}</div>`; meta.textContent=""; return;
+  }
+  if(!res.ok){ list.innerHTML = `<div class="err">API 错误 ${res.status}：${esc(res.statusText)}<br>请检查 OWNER / REPO / PATH 是否填写正确，且仓库为公开。</div>`; meta.textContent=""; return; }
+  data = await res.json();
+  if(!Array.isArray(data)){ list.innerHTML = `<div class="err">返回数据格式异常</div>`; meta.textContent=""; return; }
+
+  // 仅保留当前目录下的 .html 文件（不含 index.html 自身）
+  const here = PATH.replace(/^\/+|\/+$/g,"");
+  const files = data
+    .filter(it => it.type==="file" && /\.html?$/i.test(it.name) && it.name!=="index.html")
+    .filter(it => here ? it.path === `${here}/${it.name}` : it.path===it.name)
+    .sort((a,b)=> (b.name.localeCompare(a.name)));
+
+  meta.textContent = `共 ${files.length} 个 HTML 文件`;
+  if(files.length===0){ list.innerHTML = `<div class="empty">当前目录暂无 HTML 文件</div>`; return; }
+
+  list.innerHTML = files.map(f=>{
+    const dl = f.download_url || f.html_url;
+    return `<a class="card" href="${esc(dl)}" target="_blank" rel="noopener">
+      <div class="name">${esc(f.name)}</div>
+      <div class="info"><span>${fmtSize(f.size)}</span></div>
+    </a>`;
+  }).join("");
+}
+load();
+</script>
+</body>
+</html>

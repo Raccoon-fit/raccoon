@@ -3,39 +3,37 @@
   if (window.__RACCOON_FIT_ISLAND__) return;
   window.__RACCOON_FIT_ISLAND__ = true;
 
-  // ---------- 工具：以视口短边为基准，统一跨浏览器比例 ----------
-  // 设计稿参考短边 800px：胶囊高 44px / 字 15px / 半径 22px
-  function vmin() { return Math.min(window.innerWidth, window.innerHeight) || 800; }
-  function dim(ratio) { return Math.round(vmin() * ratio); }
-
   var ID = 'rf-island-root';
   var STYLE_ID = 'rf-island-style';
 
-  // ---------- 动态样式（尺寸全部由 JS 按 vmin 注入，覆盖默认值） ----------
+  // ---------- 动态样式（简洁 clamp/rem 方案，字号更大、胶囊比例更像灵动岛） ----------
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var s = document.createElement('style');
     s.id = STYLE_ID;
-    // 基础字号/尺寸用 CSS 变量占位，由 updateSizes() 实时刷新
     s.textContent = [
-      '#' + ID + '{position:fixed;top:14px;left:50%;transform:translateX(-50%);',
+      '#' + ID + '{position:fixed;top:16px;left:50%;transform:translateX(-50%);',
       'z-index:2147483600;display:flex;justify-content:center;align-items:flex-start;',
       'pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",',
       '"PingFang SC","Microsoft YaHei",sans-serif;}',
-      '#' + ID + ' .rf-dot{width:34px;height:34px;border-radius:50%;',
+      // 小球：适中 32px，渐变温暖
+      '#' + ID + ' .rf-dot{width:32px;height:32px;border-radius:50%;',
       'background:radial-gradient(circle at 30% 28%,#ffd9a0,#ff8a3d 55%,#e85d2f);',
       'box-shadow:0 6px 18px rgba(232,93,47,.35),0 0 0 2px rgba(255,255,255,.25) inset,',
       '0 0 12px rgba(255,160,90,.6);transition:width .55s cubic-bezier(.5,-0.2,.35,1.2),',
       'height .55s cubic-bezier(.5,-0.2,.35,1.2),border-radius .55s cubic-bezier(.5,-0.2,.35,1.2),',
       'opacity .45s ease;opacity:0;transform:translateY(-30px);}',
       '#' + ID + ' .rf-dot.rf-in{opacity:1;transform:translateY(0);}',
+      // 展开：胶囊扁长，像真灵动岛；字号 clamp 自然缩放，字更大
       '#' + ID + ' .rf-dot.rf-expand{display:flex;align-items:center;justify-content:center;',
-      'gap:8px;padding:0 16px;width:var(--rf-w);height:var(--rf-h);border-radius:calc(var(--rf-h)/2);}',
-      '#' + ID + ' .rf-dot.rf-shrink{width:34px;height:34px;border-radius:50%;padding:0;',
+      'gap:9px;padding:0 20px;width:var(--rf-w);height:var(--rf-h);',
+      'border-radius:calc(var(--rf-h)/2);}',
+      '#' + ID + ' .rf-dot.rf-shrink{width:32px;height:32px;border-radius:50%;padding:0;',
       'opacity:0;transform:translateY(-14px);}',
       '#' + ID + ' .rf-text{display:flex;flex-direction:column;align-items:flex-start;',
-      'justify-content:center;line-height:1.15;white-space:nowrap;opacity:0;transition:opacity .35s ease .15s;}',
+      'justify-content:center;line-height:1.18;white-space:nowrap;opacity:0;transition:opacity .35s ease .15s;}',
       '#' + ID + ' .rf-dot.rf-expand .rf-text{opacity:1;}',
+      // 字号 clamp：下限够大保证可读，上限受控；比例自然
       '#' + ID + ' .rf-title{color:#fff;font-weight:700;font-size:var(--rf-fs);letter-spacing:.3px;',
       'text-shadow:0 1px 2px rgba(0,0,0,.25);}',
       '#' + ID + ' .rf-author{color:rgba(255,255,255,.82);font-weight:500;font-size:var(--rf-fs-sm);}',
@@ -45,20 +43,22 @@
     document.head.appendChild(s);
   }
 
-  // ---------- 按当前视口刷新尺寸变量 ----------
+  // ---------- 尺寸：简洁自然，clamp 由 CSS 变量承载，JS 只算宽度 ----------
   function updateSizes() {
     var root = document.getElementById(ID);
     if (!root) return;
-    var h = Math.max(40, Math.min(dim(0.052), 60));  // 胶囊高 ~ 40~60px
-    var fs = Math.max(13, Math.min(dim(0.0185), 18));   // 标题字号 13~18px（封顶防大屏过大）
-    var fsSm = Math.round(fs * 0.78);       // 作者字号
-    // 先按内容估算宽度：用测量 span 取文字实际宽度
+    // 胶囊高：36~52px，随视口自然放大，灵动岛扁长感
+    var h = Math.round(Math.max(36, Math.min(window.innerWidth * 0.034, 52)));
+    // 标题字号：15~19px，比之前更大更醒目
+    var fs = Math.round(Math.max(15, Math.min(window.innerWidth * 0.0135, 19)));
+    var fsSm = Math.round(fs * 0.78);
     var dot = root.querySelector('.rf-dot');
     var titleEl = root.querySelector('.rf-title');
     var authorEl = root.querySelector('.rf-author');
     var title = '商汤小浣熊参赛作品', author = '作者 · 软软的小窝';
     if (titleEl) titleEl.textContent = title;
     if (authorEl) authorEl.textContent = author;
+    // 测量文字实际宽度，胶囊随内容自适应
     var measure = document.getElementById(ID + '-measure');
     if (!measure) {
       measure = document.createElement('div');
@@ -72,10 +72,10 @@
       measure.querySelector('.m-t').textContent = title;
     }
     var txtW = measure.querySelector('.m-t').getBoundingClientRect().width || 0;
-    var pad = 32, gap = 8, authorW = Math.ceil(txtW * 0.82);
+    var pad = 40, authorW = Math.ceil(txtW * 0.82);
     var contentW = Math.max(txtW, authorW) + pad;
-    var maxW = Math.min(window.innerWidth * 0.9, dim(0.46)); // 大屏也不超短边46%
-    var w = Math.max(180, Math.min(Math.round(contentW), Math.max(180, Math.round(maxW))));
+    var maxW = Math.min(window.innerWidth * 0.88, 340); // 大屏封顶 340，保持灵动岛比例
+    var w = Math.max(170, Math.min(Math.round(contentW), Math.max(170, Math.round(maxW))));
     root.style.setProperty('--rf-w', w + 'px');
     root.style.setProperty('--rf-h', h + 'px');
     root.style.setProperty('--rf-fs', fs + 'px');
@@ -92,14 +92,10 @@
     document.body.appendChild(root);
     updateSizes();
     var dot = root.querySelector('.rf-dot');
-    // 掉落入场
     requestAnimationFrame(function () {
       dot.classList.add('rf-in');
-      // 展开为灵动岛
       setTimeout(function () { dot.classList.add('rf-expand'); }, 520);
-      // 5 秒后缩小消失
       setTimeout(function () { dot.classList.remove('rf-expand'); dot.classList.add('rf-shrink'); }, 5520);
-      // 动画结束清理
       setTimeout(function () {
         try {
           root.parentNode && root.parentNode.removeChild(root);

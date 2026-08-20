@@ -20,6 +20,9 @@
             height: 100%;
             overflow: hidden;
         }
+        html {
+            background: #0a0a0a;
+        }
         body {
             background: #0a0a0a;
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2537,6 +2540,7 @@
             }
 
             applySettings() {
+                document.documentElement.style.backgroundColor = this.settings.theme;
                 document.body.style.backgroundColor = this.settings.theme;
                 const volume = this.settings.volume;
                 document.getElementById('volume-slider').value = volume;
@@ -3041,6 +3045,7 @@ case 'textviewer':
                         el.addEventListener('click', () => {
                             const color = el.dataset.wall;
                             this.settings.theme = color;
+                            document.documentElement.style.backgroundColor = color;
                             document.body.style.backgroundColor = color;
                             this.saveSettings();
                         });
@@ -5903,6 +5908,7 @@ createSettingsWindow(id) {
                                 const wasDark = el.classList.contains('active');
                                 el.classList.toggle('active');
                                 this.settings.theme = wasDark ? '#0a0a0a' : '#1a1a2e';
+                                document.documentElement.style.backgroundColor = this.settings.theme;
                                 document.body.style.backgroundColor = this.settings.theme;
                                 this.saveSettings();
                                 this.showToast(wasDark ? '已关闭夜间模式' : '已开启夜间模式', 'dark_mode');

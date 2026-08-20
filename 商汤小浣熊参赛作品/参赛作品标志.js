@@ -17,10 +17,10 @@
     var css = `
 /* ===== 参赛作品标志 - 灵动岛 样式（自定义CSS，无外部依赖） ===== */
 @keyframes rfDropIn {
-    0%   { transform: translate(-50%, -120px) scale(0.6); opacity: 0; }
-    60%  { transform: translate(-50%, 22px) scale(1.15); opacity: 1; }
-    80%  { transform: translate(-50%, 12px) scale(0.95); }
-    100% { transform: translate(-50%, 18px) scale(1); opacity: 1; }
+    0%   { transform: translateY(-120px) scale(0.6); opacity: 0; }
+    60%  { transform: translateY(22px) scale(1.15); opacity: 1; }
+    80%  { transform: translateY(12px) scale(0.95); }
+    100% { transform: translateY(18px) scale(1); opacity: 1; }
 }
 @keyframes rfExpand {
     0%   { width: 34px; height: 34px; border-radius: 50%; }
@@ -29,7 +29,7 @@
 }
 @keyframes rfShrink {
     0%   { width: 300px; height: 60px; border-radius: 30px; opacity: 1; }
-    100% { width: 0; height: 0; border-radius: 50%; opacity: 0; transform: translate(-50%, 18px) scale(0); }
+    100% { width: 0; height: 0; border-radius: 50%; opacity: 0; transform: translateY(18px) scale(0); }
 }
 @keyframes rfContentFadeIn {
     0%   { opacity: 0; transform: translateY(6px); }
@@ -43,9 +43,10 @@
 .rf-island-wrap {
     position: fixed;
     top: 0; left: 50%;
-    transform: translate(-50%, 18px);
+    transform: translateX(-50%);
     z-index: 2147483640;
     pointer-events: none;
+    display: flex; justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
                  "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }

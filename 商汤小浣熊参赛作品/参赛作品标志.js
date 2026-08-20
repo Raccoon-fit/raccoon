@@ -31,13 +31,14 @@
     80%  { transform: translateY(1.4vh) scale(0.95); }
     100% { transform: translateY(2vh) scale(1); opacity: 1; }
 }
+/* 胶囊尺寸(宽/高/圆角)全部改用 vw，与字号同步随屏幕宽度缩放，UI 同比变大 */
 @keyframes rfExpand {
-    0%   { width: 34px; height: 34px; border-radius: 50%; }
-    60%  { width: 92vw; max-width: 340px; height: 68px; border-radius: 34px; }
-    100% { width: 92vw; max-width: 320px; height: 60px; border-radius: 30px; }
+    0%   { width: 5vw; height: 5vw; min-width: 34px; min-height: 34px; border-radius: 50%; }
+    60%  { width: 92vw; max-width: 46vw; height: 11vw; max-height: 68px; border-radius: 34px; }
+    100% { width: 92vw; max-width: 44vw; height: 9.5vw; max-height: 60px; border-radius: 30px; }
 }
 @keyframes rfShrink {
-    0%   { width: 92vw; max-width: 320px; height: 60px; border-radius: 30px; opacity: 1; }
+    0%   { width: 92vw; max-width: 44vw; height: 9.5vw; max-height: 60px; border-radius: 30px; opacity: 1; }
     100% { width: 0; height: 0; border-radius: 50%; opacity: 0; transform: translateY(2vh) scale(0); }
 }
 @keyframes rfContentFadeIn {
@@ -64,7 +65,8 @@
 }
 .rf-island {
     position: relative;
-    width: 34px; height: 34px;
+    /* 初始小球：尺寸用 vw，与字号同步随屏幕宽度缩放 */
+    width: 5vw; height: 5vw; min-width: 34px; min-height: 34px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ff5c85 0%, #ff8a5c 55%, #ffd25c 100%);
     box-shadow: 0 6px 20px rgba(0,0,0,0.25);
@@ -108,13 +110,14 @@
 }
 .rf-island.rf-expand .rf-island-dot { display: none; }
 
-/* ===== 适配：小屏 / 字体极大 / 大屏 ===== */
+/* ===== 适配：小屏 / 大屏 ===== */
 @media (max-width: 380px) {
-    .rf-island.rf-expand { width: 90vw !important; max-width: 280px !important; }
+    .rf-island.rf-expand { width: 90vw !important; max-width: 70vw !important; }
     .rf-island-title { font-size: clamp(3.2vw, 1vw + 7px, 4vw); }
 }
+/* 大屏：胶囊/字号上限放开，UI 随宽度同比放大（不再被固定 px 卡住） */
 @media (min-width: 1600px) {
-    .rf-island.rf-expand { max-width: 360px; }
+    .rf-island.rf-expand { max-width: 44vw; }
 }
 `;
 
@@ -145,13 +148,14 @@
     document.body.appendChild(wrap);
 
     // ==================== 3. 自适应宽度精修 ====================
-    // 边框往里收：两侧留白由 24px 减至 16px，胶囊整体更紧凑
+    // 胶囊宽度上限改为 vw（44vw），与字号/UI 同比例随屏幕宽度放大；下限略收
     function fitToContent() {
         try {
             var pad = parseFloat(getComputedStyle(content).paddingLeft) +
                       parseFloat(getComputedStyle(content).paddingRight);
             var needed = content.scrollWidth + pad + 16; // 两侧留白收紧
-            var max = Math.min(window.innerWidth * 0.92, 360);
+            // 上限随屏幕宽度同比放大（44vw），大屏不再被 360px 死死卡住
+            var max = Math.min(window.innerWidth * 0.92, window.innerWidth * 0.44);
             var w = Math.max(160, Math.min(Math.ceil(needed), max)); // 最小宽度同步略收
             island.style.width = w + 'px';
         } catch (e) { /* 非关键，静默 */ }

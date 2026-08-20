@@ -6,7 +6,7 @@
   var ID = 'rf-island-root';
   var STYLE_ID = 'rf-island-style';
 
-  // ---------- 动态样式（简洁 clamp/rem 方案，字号更大、胶囊比例更像灵动岛） ----------
+  // ---------- 动态样式（恢复首次交付的完整背景：暖色渐变+光晕+柔和阴影；字号更大、胶囊比例像灵动岛） ----------
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var s = document.createElement('style');
@@ -16,24 +16,24 @@
       'z-index:2147483600;display:flex;justify-content:center;align-items:flex-start;',
       'pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",',
       '"PingFang SC","Microsoft YaHei",sans-serif;}',
-      // 小球：适中 32px，渐变温暖
+      // 小球：恢复首次交付的完整暖色渐变背景 + 脉冲光晕 + 柔和阴影
       '#' + ID + ' .rf-dot{width:32px;height:32px;border-radius:50%;',
-      'background:radial-gradient(circle at 30% 28%,#ffd9a0,#ff8a3d 55%,#e85d2f);',
-      'box-shadow:0 6px 18px rgba(232,93,47,.35),0 0 0 2px rgba(255,255,255,.25) inset,',
-      '0 0 12px rgba(255,160,90,.6);transition:width .55s cubic-bezier(.5,-0.2,.35,1.2),',
+      'background:radial-gradient(circle at 32% 28%,#ffe7c2 0%,#ffb872 45%,#ff8a3d 70%,#e85d2f 100%);',
+      'box-shadow:0 8px 22px rgba(232,93,47,.38),0 0 0 2px rgba(255,255,255,.28) inset,',
+      '0 0 16px rgba(255,170,95,.7);transition:width .55s cubic-bezier(.5,-0.2,.35,1.2),',
       'height .55s cubic-bezier(.5,-0.2,.35,1.2),border-radius .55s cubic-bezier(.5,-0.2,.35,1.2),',
       'opacity .45s ease;opacity:0;transform:translateY(-30px);}',
       '#' + ID + ' .rf-dot.rf-in{opacity:1;transform:translateY(0);}',
-      // 展开：胶囊扁长，像真灵动岛；字号 clamp 自然缩放，字更大
+      // 展开：胶囊扁长，像真灵动岛；padding 左右 22px（原20+2），字体距边缘更宽松不挤
       '#' + ID + ' .rf-dot.rf-expand{display:flex;align-items:center;justify-content:center;',
-      'gap:9px;padding:0 20px;width:var(--rf-w);height:var(--rf-h);',
+      'gap:9px;padding:0 22px;width:var(--rf-w);height:var(--rf-h);',
       'border-radius:calc(var(--rf-h)/2);}',
       '#' + ID + ' .rf-dot.rf-shrink{width:32px;height:32px;border-radius:50%;padding:0;',
       'opacity:0;transform:translateY(-14px);}',
       '#' + ID + ' .rf-text{display:flex;flex-direction:column;align-items:flex-start;',
-      'justify-content:center;line-height:1.18;white-space:nowrap;opacity:0;transition:opacity .35s ease .15s;}',
+      'justify-content:center;line-height:1.2;white-space:nowrap;opacity:0;transition:opacity .35s ease .15s;}',
       '#' + ID + ' .rf-dot.rf-expand .rf-text{opacity:1;}',
-      // 字号 clamp：下限够大保证可读，上限受控；比例自然
+      // 字号：下限够大保证可读，上限受控；比例自然
       '#' + ID + ' .rf-title{color:#fff;font-weight:700;font-size:var(--rf-fs);letter-spacing:.3px;',
       'text-shadow:0 1px 2px rgba(0,0,0,.25);}',
       '#' + ID + ' .rf-author{color:rgba(255,255,255,.82);font-weight:500;font-size:var(--rf-fs-sm);}',
@@ -72,7 +72,7 @@
       measure.querySelector('.m-t').textContent = title;
     }
     var txtW = measure.querySelector('.m-t').getBoundingClientRect().width || 0;
-    var pad = 40, authorW = Math.ceil(txtW * 0.82);
+    var pad = 44, authorW = Math.ceil(txtW * 0.82); // pad 44 对应胶囊左右padding各22，字体距边缘+2px不挤
     var contentW = Math.max(txtW, authorW) + pad;
     var maxW = Math.min(window.innerWidth * 0.88, 340); // 大屏封顶 340，保持灵动岛比例
     var w = Math.max(170, Math.min(Math.round(contentW), Math.max(170, Math.round(maxW))));
@@ -92,18 +92,23 @@
     document.body.appendChild(root);
     updateSizes();
     var dot = root.querySelector('.rf-dot');
-    requestAnimationFrame(function () {
-      dot.classList.add('rf-in');
-      setTimeout(function () { dot.classList.add('rf-expand'); }, 520);
-      setTimeout(function () { dot.classList.remove('rf-expand'); dot.classList.add('rf-shrink'); }, 5520);
-      setTimeout(function () {
-        try {
-          root.parentNode && root.parentNode.removeChild(root);
-          var m = document.getElementById(ID + '-measure'); m && m.parentNode.removeChild(m);
-          var st = document.getElementById(STYLE_ID); st && st.parentNode.removeChild(st);
-        } catch (e) {}
-      }, 6200);
-    });
+    // 页面加载完成后再等 500ms 开始下落动画
+    var startAnim = function () { setTimeout(function () {
+      requestAnimationFrame(function () {
+        dot.classList.add('rf-in');
+        setTimeout(function () { dot.classList.add('rf-expand'); }, 520);
+        setTimeout(function () { dot.classList.remove('rf-expand'); dot.classList.add('rf-shrink'); }, 5520);
+        setTimeout(function () {
+          try {
+            root.parentNode && root.parentNode.removeChild(root);
+            var m = document.getElementById(ID + '-measure'); m && m.parentNode.removeChild(m);
+            var st = document.getElementById(STYLE_ID); st && st.parentNode.removeChild(st);
+          } catch (e) {}
+        }, 6200);
+      });
+    }, 500); };
+    if (document.readyState === 'complete') startAnim();
+    else window.addEventListener('load', startAnim, { once: true });
   }
 
   function init() {

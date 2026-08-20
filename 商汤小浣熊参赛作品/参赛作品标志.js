@@ -5,10 +5,6 @@
  * 样式：完全使用自定义CSS（通过JS动态注入），不依赖任何外部CSS文件
  * 适配：字体缩放 / 大屏(4K·超宽) / 页面缩放(zoom·dpr) 三场景均自适应
  * 作者：软软的小窝
- *
- * 说明：本文件以"第一版"为基础（暖色渐变背景 + 脉冲光晕），并在此之上叠加：
- *   - 字体距边缘 +2px（内容左右 padding 加大，胶囊两侧留白同步增加）
- *   - 下落动画保留；整体动画在"页面加载完成(window.load)后再延迟 500ms"才开始
  */
 
 (function () {
@@ -71,8 +67,8 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
-    /* 动画默认不运行；由 JS 在"页面加载完成 + 500ms"后添加 .rf-started 触发 */
-    opacity: 0;
+    animation: rfDropIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+               rfOrbPulse 2.4s ease-in-out 0.9s infinite;
     pointer-events: auto;
     /* 避免缩放导致模糊 */
     -webkit-font-smoothing: antialiased;
@@ -90,8 +86,7 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     white-space: nowrap; opacity: 0;
     color: #fff; text-align: center; line-height: 1.25;
-    /* 字体距边缘 +2px：左右 padding 由 clamp(12px,2vw,20px) 加大为 clamp(14px,2vw,22px) */
-    padding: 0 clamp(14px, 2vw, 22px);
+    padding: 0 clamp(12px, 2vw, 20px);
 }
 .rf-island-content.rf-show { animation: rfContentFadeIn 0.5s ease 0.25s forwards; }
 .rf-island-title {
@@ -108,13 +103,6 @@
     box-shadow: 0 0 6px rgba(255,255,255,0.7);
 }
 .rf-island.rf-expand .rf-island-dot { display: none; }
-
-/* 启动态：页面加载完成 + 500ms 后由 JS 添加，触发下落与脉冲动画 */
-.rf-island.rf-started {
-    opacity: 1;
-    animation: rfDropIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-               rfOrbPulse 2.4s ease-in-out 0.9s infinite;
-}
 
 /* ===== 适配：小屏 / 字体极大 / 大屏 ===== */
 @media (max-width: 380px) {
@@ -155,12 +143,12 @@
 
     // ==================== 3. 自适应宽度精修 ====================
     // 展开后根据内容实际宽度微调胶囊，避免大字体下文字被截断或胶囊过宽
-    // 留白 28（由原 24 +2px*2 而来），与内容左右 padding 加大保持一致
     function fitToContent() {
         try {
+            // 测量内容所需宽度（含 padding）
             var pad = parseFloat(getComputedStyle(content).paddingLeft) +
                       parseFloat(getComputedStyle(content).paddingRight);
-            var needed = content.scrollWidth + pad + 28; // 两侧留白（较原版 +4 总宽）
+            var needed = content.scrollWidth + pad + 24; // 两侧留白
             var max = Math.min(window.innerWidth * 0.92, 360);
             var w = Math.max(180, Math.min(Math.ceil(needed), max));
             island.style.width = w + 'px';
@@ -168,12 +156,12 @@
     }
 
     // ==================== 4. 动画流程控制 ====================
-    var DISPLAY_MS = 5000;      // 灵动岛展开后显示5秒
-    var START_DELAY_MS = 500;   // 页面加载完成后再延迟 500ms 开始下落动画
+    var DISPLAY_MS = 5000; // 灵动岛展开后显示5秒
 
     function expand() {
         island.classList.add('rf-expand');
         content.classList.add('rf-show');
+        // 等待展开动画一帧后，按内容宽度自适应
         requestAnimationFrame(function () { setTimeout(fitToContent, 60); });
     }
 
@@ -206,13 +194,5 @@
         });
     });
     observer.observe(island, { attributes: true });
-
-    // ==================== 5. 启动：等页面加载完成后再延迟 START_DELAY_MS 开始下落动画 ====================
-    function startAfterLoad() {
-        var begin = function () { setTimeout(function () { island.classList.add('rf-started'); }, START_DELAY_MS); };
-        if (document.readyState === 'complete') { begin(); }
-        else { window.addEventListener('load', begin, { once: true }); }
-    }
-    startAfterLoad();
 
 })();

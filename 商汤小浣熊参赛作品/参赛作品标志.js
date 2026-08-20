@@ -1,119 +1,218 @@
+/*
+ * 参赛作品标志.js
+ * 功能：在页面上以"灵动岛"设计风格提示这是商汤小浣熊参赛作品，作者是软软的小窝
+ * 效果：进入页面 -> 屏幕上方掉落一个小球 -> 放大成灵动岛(胶囊) -> 显示信息5秒 -> 缩小消失
+ * 样式：完全使用自定义CSS（通过JS动态注入），不依赖任何外部CSS文件
+ * 适配：字体缩放 / 大屏(4K·超宽) / 页面缩放(zoom·dpr) 三场景均自适应
+ * 作者：软软的小窝
+ *
+ * 说明：本文件以"第一版"为基础（暖色渐变背景 + 脉冲光晕），并在此之上叠加：
+ *   - 字体距边缘 +2px（内容左右 padding 加大，胶囊两侧留白同步增加）
+ *   - 下落动画保留；整体动画在"页面加载完成(window.load)后再延迟 500ms"才开始
+ */
+
 (function () {
-  'use strict';
-  if (window.__RACCOON_FIT_ISLAND__) return;
-  window.__RACCOON_FIT_ISLAND__ = true;
+    'use strict';
 
-  var ID = 'rf-island-root';
-  var STYLE_ID = 'rf-island-style';
+    // 防止重复注入
+    if (window.__raccoonFitIslandInjected) return;
+    window.__raccoonFitIslandInjected = true;
 
-  // ---------- 动态样式（恢复首次交付的完整背景：暖色渐变+光晕+柔和阴影；字号更大、胶囊比例像灵动岛） ----------
-  function injectStyle() {
-    if (document.getElementById(STYLE_ID)) return;
-    var s = document.createElement('style');
-    s.id = STYLE_ID;
-    s.textContent = [
-      '#' + ID + '{position:fixed;top:16px;left:50%;transform:translateX(-50%);',
-      'z-index:2147483600;display:flex;justify-content:center;align-items:flex-start;',
-      'pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",',
-      '"PingFang SC","Microsoft YaHei",sans-serif;}',
-      // 小球：恢复首次交付的完整暖色渐变背景 + 脉冲光晕 + 柔和阴影
-      '#' + ID + ' .rf-dot{width:32px;height:32px;border-radius:50%;',
-      'background:radial-gradient(circle at 32% 28%,#ffe7c2 0%,#ffb872 45%,#ff8a3d 70%,#e85d2f 100%);',
-      'box-shadow:0 8px 22px rgba(232,93,47,.38),0 0 0 2px rgba(255,255,255,.28) inset,',
-      '0 0 16px rgba(255,170,95,.7);transition:width .55s cubic-bezier(.5,-0.2,.35,1.2),',
-      'height .55s cubic-bezier(.5,-0.2,.35,1.2),border-radius .55s cubic-bezier(.5,-0.2,.35,1.2),',
-      'opacity .45s ease;opacity:0;transform:translateY(-30px);}',
-      '#' + ID + ' .rf-dot.rf-in{opacity:1;transform:translateY(0);}',
-      // 展开：胶囊扁长，像真灵动岛；padding 左右 22px（原20+2），字体距边缘更宽松不挤
-      '#' + ID + ' .rf-dot.rf-expand{display:flex;align-items:center;justify-content:center;',
-      'gap:9px;padding:0 22px;width:var(--rf-w);height:var(--rf-h);',
-      'border-radius:calc(var(--rf-h)/2);}',
-      '#' + ID + ' .rf-dot.rf-shrink{width:32px;height:32px;border-radius:50%;padding:0;',
-      'opacity:0;transform:translateY(-14px);}',
-      '#' + ID + ' .rf-text{display:flex;flex-direction:column;align-items:flex-start;',
-      'justify-content:center;line-height:1.2;white-space:nowrap;opacity:0;transition:opacity .35s ease .15s;}',
-      '#' + ID + ' .rf-dot.rf-expand .rf-text{opacity:1;}',
-      // 字号：下限够大保证可读，上限受控；比例自然
-      '#' + ID + ' .rf-title{color:#fff;font-weight:700;font-size:var(--rf-fs);letter-spacing:.3px;',
-      'text-shadow:0 1px 2px rgba(0,0,0,.25);}',
-      '#' + ID + ' .rf-author{color:rgba(255,255,255,.82);font-weight:500;font-size:var(--rf-fs-sm);}',
-      '@media (prefers-reduced-motion:reduce){',
-      '#' + ID + ' .rf-dot{transition:none;}}'
-    ].join('');
-    document.head.appendChild(s);
-  }
+    // ==================== 1. 注入自定义CSS ====================
+    // 说明：
+    // - 胶囊宽度用 max-width + 内容自适应(min-width)，避免大屏过窄、小屏溢出
+    // - 字号用 clamp()，随视口/字体缩放平滑变化，不写死 px
+    // - 定位用视口单位 vw/vh 辅助，translateX(-50%) 保证任意宽度严格居中
+    // - 监听 zoom/dpr：CSS 使用相对/视口单位，浏览器缩放时自动重排
+    var css = `
+/* ===== 参赛作品标志 - 灵动岛 样式（自定义CSS，无外部依赖） ===== */
+@keyframes rfDropIn {
+    0%   { transform: translateY(-14vh) scale(0.6); opacity: 0; }
+    60%  { transform: translateY(2.6vh) scale(1.15); opacity: 1; }
+    80%  { transform: translateY(1.4vh) scale(0.95); }
+    100% { transform: translateY(2vh) scale(1); opacity: 1; }
+}
+@keyframes rfExpand {
+    0%   { width: 34px; height: 34px; border-radius: 50%; }
+    60%  { width: 92vw; max-width: 340px; height: 68px; border-radius: 34px; }
+    100% { width: 92vw; max-width: 320px; height: 60px; border-radius: 30px; }
+}
+@keyframes rfShrink {
+    0%   { width: 92vw; max-width: 320px; height: 60px; border-radius: 30px; opacity: 1; }
+    100% { width: 0; height: 0; border-radius: 50%; opacity: 0; transform: translateY(2vh) scale(0); }
+}
+@keyframes rfContentFadeIn {
+    0%   { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes rfOrbPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 133, 0.5), 0 6px 20px rgba(0,0,0,0.25); }
+    50%      { box-shadow: 0 0 0 10px rgba(255, 92, 133, 0), 0 6px 20px rgba(0,0,0,0.25); }
+}
 
-  // ---------- 尺寸：简洁自然，clamp 由 CSS 变量承载，JS 只算宽度 ----------
-  function updateSizes() {
-    var root = document.getElementById(ID);
-    if (!root) return;
-    // 胶囊高：36~52px，随视口自然放大，灵动岛扁长感
-    var h = Math.round(Math.max(36, Math.min(window.innerWidth * 0.034, 52)));
-    // 标题字号：15~19px，比之前更大更醒目
-    var fs = Math.round(Math.max(15, Math.min(window.innerWidth * 0.0135, 19)));
-    var fsSm = Math.round(fs * 0.78);
-    var dot = root.querySelector('.rf-dot');
-    var titleEl = root.querySelector('.rf-title');
-    var authorEl = root.querySelector('.rf-author');
-    var title = '商汤小浣熊参赛作品', author = '作者 · 软软的小窝';
-    if (titleEl) titleEl.textContent = title;
-    if (authorEl) authorEl.textContent = author;
-    // 测量文字实际宽度，胶囊随内容自适应
-    var measure = document.getElementById(ID + '-measure');
-    if (!measure) {
-      measure = document.createElement('div');
-      measure.id = ID + '-measure';
-      measure.style.cssText = 'position:fixed;left:-9999px;top:-9999px;visibility:hidden;';
-      measure.style.fontFamily = '-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif';
-      measure.innerHTML = '<span class="m-t" style="font-weight:700;font-size:' + fs + 'px">' + title + '</span>';
-      document.body.appendChild(measure);
-    } else {
-      measure.querySelector('.m-t').style.fontSize = fs + 'px';
-      measure.querySelector('.m-t').textContent = title;
+.rf-island-wrap {
+    position: fixed;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    z-index: 2147483640;
+    pointer-events: none;
+    display: flex; justify-content: center;
+    width: 100vw;            /* 撑满视口，便于内部居中 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* 字号根：用 clamp 响应式，随屏幕宽度与大字体模式同步缩放 */
+    font-size: clamp(14px, 1.05vw + 0.6rem, 20px);
+}
+.rf-island {
+    position: relative;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5c85 0%, #ff8a5c 55%, #ffd25c 100%);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    /* 动画默认不运行；由 JS 在"页面加载完成 + 500ms"后添加 .rf-started 触发 */
+    opacity: 0;
+    pointer-events: auto;
+    /* 避免缩放导致模糊 */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+.rf-island.rf-expand {
+    animation: rfExpand 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    cursor: default;
+}
+.rf-island.rf-shrink {
+    animation: rfShrink 0.6s cubic-bezier(0.4, 0, 1, 1) forwards;
+    pointer-events: none;
+}
+.rf-island-content {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    white-space: nowrap; opacity: 0;
+    color: #fff; text-align: center; line-height: 1.25;
+    /* 字体距边缘 +2px：左右 padding 由 clamp(12px,2vw,20px) 加大为 clamp(14px,2vw,22px) */
+    padding: 0 clamp(14px, 2vw, 22px);
+}
+.rf-island-content.rf-show { animation: rfContentFadeIn 0.5s ease 0.25s forwards; }
+.rf-island-title {
+    font-size: clamp(13px, 1vw + 0.5rem, 17px); font-weight: 700; letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+.rf-island-sub {
+    font-size: clamp(10px, 0.75vw + 0.4rem, 13px); font-weight: 500; opacity: 0.92; margin-top: 3px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+}
+.rf-island-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 0 6px rgba(255,255,255,0.7);
+}
+.rf-island.rf-expand .rf-island-dot { display: none; }
+
+/* 启动态：页面加载完成 + 500ms 后由 JS 添加，触发下落与脉冲动画 */
+.rf-island.rf-started {
+    opacity: 1;
+    animation: rfDropIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+               rfOrbPulse 2.4s ease-in-out 0.9s infinite;
+}
+
+/* ===== 适配：小屏 / 字体极大 / 大屏 ===== */
+@media (max-width: 380px) {
+    .rf-island.rf-expand { width: 90vw !important; max-width: 280px !important; }
+    .rf-island-title { font-size: clamp(12px, 3.6vw, 14px); }
+}
+/* 超大屏(>=1600px)：限制最大尺寸，避免过宽破坏灵动岛比例 */
+@media (min-width: 1600px) {
+    .rf-island.rf-expand { max-width: 360px; }
+}
+`;
+
+    var styleEl = document.createElement('style');
+    styleEl.setAttribute('data-raccoon-fit', 'island-style');
+    styleEl.textContent = css;
+    document.head.appendChild(styleEl);
+
+    // ==================== 2. 构建DOM ====================
+    var wrap = document.createElement('div');
+    wrap.className = 'rf-island-wrap';
+
+    var island = document.createElement('div');
+    island.className = 'rf-island';
+
+    var dot = document.createElement('div');
+    dot.className = 'rf-island-dot';
+
+    var content = document.createElement('div');
+    content.className = 'rf-island-content';
+    content.innerHTML =
+        '<div class="rf-island-title">商汤小浣熊参赛作品</div>' +
+        '<div class="rf-island-sub">作者 · 软软的小窝</div>';
+
+    island.appendChild(dot);
+    island.appendChild(content);
+    wrap.appendChild(island);
+    document.body.appendChild(wrap);
+
+    // ==================== 3. 自适应宽度精修 ====================
+    // 展开后根据内容实际宽度微调胶囊，避免大字体下文字被截断或胶囊过宽
+    // 留白 28（由原 24 +2px*2 而来），与内容左右 padding 加大保持一致
+    function fitToContent() {
+        try {
+            var pad = parseFloat(getComputedStyle(content).paddingLeft) +
+                      parseFloat(getComputedStyle(content).paddingRight);
+            var needed = content.scrollWidth + pad + 28; // 两侧留白（较原版 +4 总宽）
+            var max = Math.min(window.innerWidth * 0.92, 360);
+            var w = Math.max(180, Math.min(Math.ceil(needed), max));
+            island.style.width = w + 'px';
+        } catch (e) { /* 非关键，静默 */ }
     }
-    var txtW = measure.querySelector('.m-t').getBoundingClientRect().width || 0;
-    var pad = 44, authorW = Math.ceil(txtW * 0.82); // pad 44 对应胶囊左右padding各22，字体距边缘+2px不挤
-    var contentW = Math.max(txtW, authorW) + pad;
-    var maxW = Math.min(window.innerWidth * 0.88, 340); // 大屏封顶 340，保持灵动岛比例
-    var w = Math.max(170, Math.min(Math.round(contentW), Math.max(170, Math.round(maxW))));
-    root.style.setProperty('--rf-w', w + 'px');
-    root.style.setProperty('--rf-h', h + 'px');
-    root.style.setProperty('--rf-fs', fs + 'px');
-    root.style.setProperty('--rf-fs-sm', fsSm + 'px');
-  }
 
-  function build() {
-    if (document.getElementById(ID)) return;
-    injectStyle();
-    var root = document.createElement('div');
-    root.id = ID;
-    root.innerHTML = '<div class="rf-dot"><div class="rf-text"><span class="rf-title"></span>'
-                  + '<span class="rf-author"></span></div></div>';
-    document.body.appendChild(root);
-    updateSizes();
-    var dot = root.querySelector('.rf-dot');
-    // 页面加载完成后再等 500ms 开始下落动画
-    var startAnim = function () { setTimeout(function () {
-      requestAnimationFrame(function () {
-        dot.classList.add('rf-in');
-        setTimeout(function () { dot.classList.add('rf-expand'); }, 520);
-        setTimeout(function () { dot.classList.remove('rf-expand'); dot.classList.add('rf-shrink'); }, 5520);
-        setTimeout(function () {
-          try {
-            root.parentNode && root.parentNode.removeChild(root);
-            var m = document.getElementById(ID + '-measure'); m && m.parentNode.removeChild(m);
-            var st = document.getElementById(STYLE_ID); st && st.parentNode.removeChild(st);
-          } catch (e) {}
-        }, 6200);
-      });
-    }, 500); };
-    if (document.readyState === 'complete') startAnim();
-    else window.addEventListener('load', startAnim, { once: true });
-  }
+    // ==================== 4. 动画流程控制 ====================
+    var DISPLAY_MS = 5000;      // 灵动岛展开后显示5秒
+    var START_DELAY_MS = 500;   // 页面加载完成后再延迟 500ms 开始下落动画
 
-  function init() {
-    if (document.body) build();
-    else document.addEventListener('DOMContentLoaded', build, { once: true });
-  }
-  init();
+    function expand() {
+        island.classList.add('rf-expand');
+        content.classList.add('rf-show');
+        requestAnimationFrame(function () { setTimeout(fitToContent, 60); });
+    }
+
+    function shrinkAndRemove() {
+        island.classList.remove('rf-expand');
+        island.classList.add('rf-shrink');
+        island.addEventListener('animationend', function handler(e) {
+            if (e.animationName !== 'rfShrink') return;
+            island.removeEventListener('animationend', handler);
+            if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+            if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
+        });
+    }
+
+    // 小球掉落动画结束后(0.9s)放大为灵动岛
+    island.addEventListener('animationend', function handler(e) {
+        if (e.animationName !== 'rfDropIn') return;
+        island.removeEventListener('animationend', handler);
+        setTimeout(expand, 350);
+    });
+
+    // 用 MutationObserver 监听 expand class 添加，精确计时显示时长
+    var observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+            if (m.attributeName === 'class' &&
+                island.classList.contains('rf-expand')) {
+                observer.disconnect();
+                setTimeout(shrinkAndRemove, DISPLAY_MS);
+            }
+        });
+    });
+    observer.observe(island, { attributes: true });
+
+    // ==================== 5. 启动：等页面加载完成后再延迟 START_DELAY_MS 开始下落动画 ====================
+    function startAfterLoad() {
+        var begin = function () { setTimeout(function () { island.classList.add('rf-started'); }, START_DELAY_MS); };
+        if (document.readyState === 'complete') { begin(); }
+        else { window.addEventListener('load', begin, { once: true }); }
+    }
+    startAfterLoad();
+
 })();

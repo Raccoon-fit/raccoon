@@ -2983,8 +2983,10 @@ case 'textviewer':
                         navItems.forEach(i => i.classList.remove('active'));
                         item.classList.add('active');
                         const page = item.dataset.page;
-                        document.getElementById('settings-main-content').innerHTML = this.getSettingsContent(page);
+                        const mainContent = document.getElementById('settings-main-content');
+                        mainContent.innerHTML = this.getSettingsContent(page);
                         this.bindSettingsEvents(page);
+                        mainContent.scrollTop = 0;
                     });
                 });
 
@@ -5804,6 +5806,7 @@ createSettingsWindow(id) {
                         const mainContent = content.querySelector('#settings-main-content');
                         mainContent.innerHTML = this.getSettingsContent(page);
                         this.bindSettingsEvents(page);
+                        mainContent.scrollTop = 0;
                     });
                 });
                 navItems[0].classList.add('active');

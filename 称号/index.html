@@ -1,200 +1,405 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>称号查询系统 | 软软的小窝</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦝%3C/text%3E%3C/svg%3E">
-    <link href="http://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <script src="http://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: #020202;
-            background-image: radial-gradient(circle at 20% 20%, rgba(255, 127, 80, 0.08) 0%, transparent 40%),
-                              radial-gradient(circle at 80% 80%, rgba(205, 132, 63, 0.05) 0%, transparent 40%),
-                              url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            color: #f1f1f1;
-            font-smooth: antialiased;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-        .glass-card {
-            background: rgba(20, 20, 28, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 32px;
-            transition: all 0.3s ease;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        .glass-card:hover {
-            border-color: rgba(255, 127, 80, 0.4);
-            background: rgba(25, 25, 35, 0.8);
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 127, 80, 0.2);
-        }
-        .input-modern {
-            background: #0a0a0a;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 0.875rem 1.25rem;
-            color: #ffffff;
-            font-size: 1rem;
-            transition: all 0.2s;
-            width: 100%;
-            outline: none;
-            caret-color: #FF7F50;
-        }
-        .input-modern::placeholder {
-            color: #6b6b6b;
-        }
-        .input-modern:focus {
-            border-color: #FF7F50;
-            box-shadow: 0 0 0 2px rgba(255, 127, 80, 0.3);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #FF7F50 0%, #E8642E 100%);
-            color: white;
-            font-weight: 700;
-            border-radius: 20px;
-            border: none;
-            padding: 0.875rem 1.5rem;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-            box-shadow: 0 8px 20px rgba(255, 127, 80, 0.2);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(255, 127, 80, 0.3);
-        }
-        .btn-outline {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 0.75rem 1.5rem;
-            color: #f1f1f1;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #FF7F50;
-            color: #FF9F6E;
-        }
-        .badge-result {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 28px;
-            padding: 1.5rem;
-            text-align: center;
-            border: 1px dashed rgba(255, 127, 80, 0.3);
-        }
-        @media (max-width: 640px) {
-            body { padding: 1rem; }
-            .glass-card { border-radius: 28px; }
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .float-icon { animation: float 4s ease-in-out infinite; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>称号图鉴 · 像素掌机版</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎮%3C/text%3E%3C/svg%3E">
+  <style>
+    /* 页面用途：把称号查询器重构成复古掌机风，全部资源内置，离线也可使用。 */
+    :root {
+      --ink: #201a2a;
+      --shell: #f4c95d;
+      --shell-dark: #d99d3f;
+      --screen: #b8d68c;
+      --screen-dark: #344c35;
+      --pink: #e94f75;
+      --blue: #3c8da8;
+      --cream: #fff5d6;
+      --shadow: #4d3147;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: "Courier New", "Microsoft YaHei", monospace;
+      background-color: #28213b;
+      background-image:
+        linear-gradient(45deg, #302849 25%, transparent 25%),
+        linear-gradient(-45deg, #302849 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #302849 75%),
+        linear-gradient(-45deg, transparent 75%, #302849 75%);
+      background-size: 32px 32px;
+      background-position: 0 0, 0 16px, 16px -16px, -16px 0;
+    }
+
+    /* 星空粒子使用纯 CSS 生成，避免依赖外部图片。 */
+    body::before {
+      content: "·  ✦  ·  ★  ·  ✦  ·  ★  ·";
+      position: fixed;
+      inset: 18px 0 auto;
+      color: #f7dc6f;
+      font-size: 18px;
+      letter-spacing: 18px;
+      text-align: center;
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    .page { width: min(100%, 620px); }
+
+    .brand {
+      margin: 0 0 14px;
+      color: var(--cream);
+      text-align: center;
+      font-size: clamp(14px, 3vw, 19px);
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 0 #8f3f68;
+    }
+
+    .console {
+      position: relative;
+      padding: 22px 22px 30px;
+      border: 5px solid var(--ink);
+      border-radius: 20px 20px 54px 20px;
+      background: var(--shell);
+      box-shadow: 0 9px 0 var(--shell-dark), 0 14px 0 var(--ink), 14px 22px 0 rgba(0,0,0,.2);
+    }
+
+    .console::after {
+      content: "";
+      position: absolute;
+      right: 25px;
+      bottom: 17px;
+      width: 72px;
+      height: 5px;
+      background: repeating-linear-gradient(90deg, var(--ink) 0 5px, transparent 5px 10px);
+      opacity: .55;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .power { display: flex; align-items: center; gap: 7px; }
+    .power-dot {
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: #ff526e;
+      box-shadow: 0 0 0 2px rgba(255,82,110,.25);
+      animation: blink 1.5s steps(2) infinite;
+    }
+
+    .screen-frame {
+      padding: 17px;
+      border: 5px solid var(--ink);
+      border-radius: 12px 12px 28px 12px;
+      background: #4f5168;
+      box-shadow: inset 0 0 0 4px #76778a;
+    }
+
+    .screen {
+      position: relative;
+      min-height: 360px;
+      padding: 27px 24px 22px;
+      overflow: hidden;
+      border: 5px solid #252932;
+      background: var(--screen);
+      color: var(--screen-dark);
+      box-shadow: inset 7px 7px 0 rgba(38,58,42,.18);
+    }
+
+    /* 横向扫描线提升旧液晶屏质感。 */
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .13;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, #243b2c 3px 4px);
+    }
+
+    .screen-content { position: relative; z-index: 1; }
+
+    .pixel-raccoon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 10px;
+      display: grid;
+      place-items: center;
+      border: 4px solid var(--screen-dark);
+      color: var(--screen-dark);
+      font-size: 36px;
+      background: rgba(255,255,255,.18);
+      box-shadow: 6px 6px 0 rgba(52,76,53,.22);
+      image-rendering: pixelated;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(22px, 5vw, 34px);
+      line-height: 1.15;
+      letter-spacing: 2px;
+      text-shadow: 3px 3px 0 rgba(255,255,255,.3);
+    }
+
+    .subtitle {
+      margin: 9px 0 22px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .input-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+
+    input {
+      min-width: 0;
+      width: 100%;
+      padding: 13px 14px;
+      border: 4px solid var(--screen-dark);
+      border-radius: 0;
+      outline: 0;
+      color: var(--screen-dark);
+      background: #dce8b1;
+      font: 900 17px/1 "Courier New", monospace;
+      box-shadow: inset 4px 4px 0 rgba(52,76,53,.15);
+    }
+
+    input:focus { background: #eff5ce; }
+    input::placeholder { color: #718069; opacity: 1; }
+
+    button, .home-link {
+      border: 4px solid var(--ink);
+      border-radius: 0;
+      color: #fff;
+      background: var(--pink);
+      box-shadow: 4px 4px 0 var(--ink);
+      font: 900 14px/1 "Courier New", "Microsoft YaHei", monospace;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .08s, box-shadow .08s;
+    }
+
+    button { padding: 12px 16px; }
+    button:hover, .home-link:hover { filter: brightness(1.08); }
+    button:active, .home-link:active { transform: translate(4px,4px); box-shadow: none; }
+
+    .result {
+      display: none;
+      margin-top: 18px;
+      padding: 15px;
+      border: 4px dashed var(--screen-dark);
+      background: rgba(239,245,206,.52);
+      text-align: center;
+    }
+
+    .result.show { display: block; animation: pop .22s steps(2); }
+    .result-kicker { margin: 0 0 8px; font-size: 11px; font-weight: 900; }
+    .badge { font-size: clamp(18px, 4vw, 26px); font-weight: 900; }
+    .message { margin: 8px 0 0; font-size: 11px; font-weight: 700; }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 24px;
+      padding: 0 9px;
+    }
+
+    .dpad {
+      position: relative;
+      width: 82px;
+      height: 82px;
+    }
+    .dpad::before, .dpad::after {
+      content: "";
+      position: absolute;
+      background: #332b3e;
+      border: 4px solid var(--ink);
+    }
+    .dpad::before { left: 26px; top: 0; width: 30px; height: 82px; }
+    .dpad::after { left: 0; top: 26px; width: 82px; height: 30px; }
+
+    .actions { display: flex; gap: 13px; transform: rotate(-10deg); }
+    .action-key {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border: 4px solid var(--ink);
+      border-radius: 50%;
+      color: white;
+      background: var(--pink);
+      box-shadow: 4px 5px 0 var(--ink);
+      font-weight: 900;
+    }
+    .action-key:first-child { background: var(--blue); }
+
+    .bottom {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .home-link { display: inline-block; padding: 11px 15px; background: var(--blue); }
+
+    .copyright {
+      margin: 24px 0 0;
+      color: #fff2bd;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.8;
+      text-shadow: 2px 2px 0 #4d3147;
+    }
+
+    @keyframes blink { 50% { opacity: .35; } }
+    @keyframes pop { from { transform: scale(.92); } to { transform: scale(1); } }
+
+    @media (max-width: 520px) {
+      body { padding: 20px 10px; }
+      .console { padding: 16px 13px 25px; }
+      .screen-frame { padding: 10px; }
+      .screen { min-height: 340px; padding: 22px 14px 18px; }
+      .input-row { grid-template-columns: 1fr; }
+      button { width: 100%; }
+      .controls { transform: scale(.88); margin-inline: -10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
-<div class="w-full max-w-2xl mx-auto">
-    <div class="glass-card p-6 md:p-10 relative overflow-hidden">
-        <div class="absolute -top-10 -right-10 text-8xl opacity-10 float-icon">🦝</div>
-        <div class="absolute -bottom-10 -left-10 text-8xl opacity-10 float-icon" style="animation-delay: 2s;">🏅</div>
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500/20 to-transparent rounded-2xl text-4xl mb-4">🏷️</div>
-            <h1 class="text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">称号查询系统</h1>
-            <p class="text-gray-400 mt-2 text-sm">输入QQ号，解锁你的专属身份标识</p>
-        </div>
-        <div class="space-y-5">
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">QQ号码</label>
-                <input type="text" id="qqInput" class="input-modern" placeholder="请输入QQ号码" autocomplete="off">
+  <main class="page">
+    <p class="brand">RACCOON POCKET SYSTEM</p>
+
+    <section class="console" aria-label="称号查询掌机">
+      <div class="topbar">
+        <span class="power"><i class="power-dot"></i> POWER</span>
+        <span>8-BIT TITLE DEX</span>
+      </div>
+
+      <div class="screen-frame">
+        <div class="screen">
+          <div class="screen-content">
+            <div class="pixel-raccoon" aria-hidden="true">🦝</div>
+            <h1>称号图鉴</h1>
+            <p class="subtitle">输入玩家号码 · 读取隐藏身份</p>
+
+            <label for="qqInput">▶ PLAYER ID / QQ号码</label>
+            <div class="input-row">
+              <input id="qqInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="20" placeholder="请输入纯数字" autocomplete="off">
+              <button id="searchBtn" type="button">START!</button>
             </div>
-            <button id="searchBtn" class="btn-primary">查询称号 →</button>
+
+            <section id="resultArea" class="result" aria-live="polite">
+              <p class="result-kicker">╔═ 查询结果 ═╗</p>
+              <div id="badgeDisplay" class="badge"></div>
+              <p id="extraMsg" class="message"></p>
+            </section>
+          </div>
         </div>
-        <div id="resultArea" class="mt-8 hidden">
-            <div class="badge-result">
-                <p class="text-gray-400 text-sm mb-2">查询结果</p>
-                <div id="badgeDisplay" class="text-2xl font-bold text-orange-400"></div>
-                <p id="extraMsg" class="text-xs text-gray-500 mt-3"></p>
-            </div>
+      </div>
+
+      <div class="controls" aria-hidden="true">
+        <div class="dpad"></div>
+        <div class="actions">
+          <span class="action-key">B</span>
+          <span class="action-key">A</span>
         </div>
-        <div class="mt-8 text-center">
-            <a href="http://raccoon.fit" class="btn-outline inline-flex items-center gap-2">
-                <span>🏠</span> 返回软软的小窝
-            </a>
-        </div>
-    </div>
-    <div class="text-center mt-6 text-gray-500 text-xs font-mono">Raccoon.Fit · 身份铭牌系统 | 丙午马年 荣耀上线</div>
-</div>
-<script>
-(function(){
-    function obscure(qq){
-        return qq.split('').map(ch => ('0' + ch.charCodeAt(0).toString(16)).slice(-2)).join('');
-    }
-    const titles = {
+      </div>
+
+      <div class="bottom">
+        <a class="home-link" href="http://raccoon.fit">⌂ 返回软软的小窝</a>
+      </div>
+    </section>
+
+    <p class="copyright">RACCOON.FIT © 丙午马年<br>PRESS START TO FIND YOUR TITLE</p>
+  </main>
+
+  <script>
+    /* 查询逻辑：把输入号码转换为十六进制键，避免在映射表中直接保存原号码。 */
+    (() => {
+      const obscure = (qq) => qq
+        .split("")
+        .map((char) => ("0" + char.charCodeAt(0).toString(16)).slice(-2))
+        .join("");
+
+      const titles = {
         "32303531373735353035": "【网站创建者】",
         "32303739303737383039": "【云端筑盒师】",
         "31353537303335333238": "【星链架构师】"
-    };
-    const input = document.getElementById('qqInput');
-    const btn = document.getElementById('searchBtn');
-    const resultDiv = document.getElementById('resultArea');
-    const badgeSpan = document.getElementById('badgeDisplay');
-    const extraSpan = document.getElementById('extraMsg');
-    function search(){
-        let val = input.value.trim();
-        if(!val){
-            resultDiv.classList.remove('hidden');
-            badgeSpan.textContent = '⚠️ 请输入QQ号';
-            extraSpan.textContent = '在输入框中填写您的QQ号码再查询吧';
-            badgeSpan.style.color = '#ffaa66';
-            return;
+      };
+
+      const input = document.getElementById("qqInput");
+      const button = document.getElementById("searchBtn");
+      const result = document.getElementById("resultArea");
+      const badge = document.getElementById("badgeDisplay");
+      const message = document.getElementById("extraMsg");
+
+      /* 统一渲染查询状态，确保读屏软件能获得更新后的内容。 */
+      function showResult(title, detail) {
+        badge.textContent = title;
+        message.textContent = detail;
+        result.classList.remove("show");
+        void result.offsetWidth;
+        result.classList.add("show");
+      }
+
+      function search() {
+        const value = input.value.trim();
+
+        if (!value) {
+          showResult("⚠ 请输入QQ号", "先填写玩家号码，再按 START");
+          input.focus();
+          return;
         }
-        if(!/^\d+$/.test(val)){
-            resultDiv.classList.remove('hidden');
-            badgeSpan.textContent = '❌ 无效格式';
-            extraSpan.textContent = '请输入纯数字QQ号';
-            badgeSpan.style.color = '#ff8888';
-            return;
+
+        if (!/^\d+$/.test(value)) {
+          showResult("× 格式错误", "PLAYER ID 仅支持数字");
+          input.focus();
+          return;
         }
-        let key = obscure(val);
-        let title = titles[key];
-        resultDiv.classList.remove('hidden');
-        if(title){
-            badgeSpan.textContent = title;
-            extraSpan.textContent = '身份验证成功，致敬贡献者！';
-            badgeSpan.style.color = '#FF9F6E';
+
+        const title = titles[obscure(value)];
+        if (title) {
+          showResult(title, "★ 身份验证成功 · 稀有称号已解锁 ★");
         } else {
-            badgeSpan.textContent = '无称号';
-            extraSpan.textContent = '暂未获得称号，保持活跃，未来可期～';
-            badgeSpan.style.color = '#a0a0a0';
+          showResult("暂无称号", "继续冒险，新的成就正在路上！");
         }
-    }
-    btn.addEventListener('click', search);
-    input.addEventListener('keypress', function(e){
-        if(e.key === 'Enter') search();
-    });
-    input.focus();
-})();
-</script>
+      }
+
+      button.addEventListener("click", search);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") search();
+      });
+      input.focus();
+    })();
+  </script>
 </body>
 </html>

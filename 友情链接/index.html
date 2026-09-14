@@ -2,216 +2,94 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07060e">
 <title>软软的小窝 · 友情链接</title>
 <style>
-:root{
-  --bg:#0b0b14;
-  --ink:#ecedf5;
-  --muted:#9b97b0;
-  --acc:#b9a6ff;
-  --acc2:#7fd6ff;
-  --pink:#ff9ec6;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
+/* 页面用途：以沉浸式宇宙玻璃风格展示友情链接，并保留原有数据、排序与跳转逻辑。 */
+:root{color-scheme:dark;--bg:#07060e;--ink:#faf8ff;--muted:#aaa5bd;--violet:#b7a0ff;--cyan:#76dcff;--pink:#ff8fcb;--line:rgba(255,255,255,.11);--radius:28px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;overflow-x:hidden;background:var(--bg);color:var(--ink);font:15px/1.65 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,input,select{-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,select:focus-visible,.card:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
 
-/* ===== 背景系统 ===== */
-body{
-  background:var(--bg);
-  color:var(--ink);
-  font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-.bg-system{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  z-index:0;pointer-events:none;overflow:hidden;
-}
-/* 动态光斑 */
-.orb{
-  position:absolute;border-radius:50%;filter:blur(80px);
-  opacity:.5;animation:float 20s ease-in-out infinite;
-}
-.orb-1{width:600px;height:600px;background:#b9a6ff;top:-200px;left:-100px;animation-delay:0s}
-.orb-2{width:500px;height:500px;background:#7fd6ff;bottom:-150px;right:-100px;animation-delay:-5s}
-.orb-3{width:400px;height:400px;background:#ff9ec6;top:40%;left:60%;animation-delay:-10s;opacity:.25}
-@keyframes float{
-  0%,100%{transform:translate(0,0) scale(1)}
-  33%{transform:translate(30px,-50px) scale(1.1)}
-  66%{transform:translate(-20px,30px) scale(0.95)}
-}
-/* 网格 */
-.grid-overlay{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-  background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 40%,transparent 80%);
-}
-/* 噪点 */
-.noise{
-  position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-}
+/* 背景由星云、星点、网格和晕影组成，全部不拦截页面交互。 */
+.cosmos{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 50% -15%,#211a46 0%,#0c0a19 42%,#07060e 78%)}
+.cosmos::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.72) 0 1px,transparent 1.4px),radial-gradient(circle,rgba(183,160,255,.48) 0 1px,transparent 1.5px);background-position:0 0,31px 47px;background-size:84px 84px,127px 127px;opacity:.22;mask-image:linear-gradient(to bottom,#000,transparent 90%)}
+.cosmos::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse at 50% 20%,#000,transparent 72%)}
+.aurora{position:absolute;border-radius:50%;filter:blur(110px);mix-blend-mode:screen;will-change:transform;animation:drift 18s ease-in-out infinite alternate}
+.aurora-a{width:55vw;height:42vw;left:-20vw;top:-16vw;background:rgba(132,83,255,.3)}.aurora-b{width:42vw;height:42vw;right:-13vw;top:20vh;background:rgba(36,188,255,.23);animation-delay:-7s}.aurora-c{width:35vw;height:35vw;left:38vw;bottom:-22vw;background:rgba(255,75,166,.16);animation-delay:-12s}
+.grain{position:absolute;inset:0;opacity:.15;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
+@keyframes drift{from{transform:translate3d(-3%,-2%,0) scale(.94)}to{transform:translate3d(8%,7%,0) scale(1.1)}}
 
-/* ===== 内容层 ===== */
-header,p,main,footer{position:relative;z-index:1}
-header{padding:44px 24px 14px;max-width:980px;margin:auto}
-.brand{color:var(--muted);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
-h1{font-size:28px;margin:8px 0 6px;font-weight:900;letter-spacing:.01em;background:linear-gradient(90deg,var(--ink),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{color:var(--muted);font-size:13px;max-width:640px}
+.shell{width:min(1180px,calc(100% - 44px));margin:auto}.hero{position:relative;min-height:520px;padding:88px 0 58px;display:flex;align-items:center}.hero-copy{position:relative;z-index:2;max-width:790px}.orbital{position:absolute;right:-50px;top:30px;width:460px;height:460px;opacity:.9;pointer-events:none}.orbit{position:absolute;inset:12%;border:1px solid rgba(183,160,255,.18);border-radius:50%;transform:rotate(-18deg);animation:spin 28s linear infinite}.orbit:nth-child(2){inset:25%;border-color:rgba(118,220,255,.2);animation-duration:19s;animation-direction:reverse}.planet{position:absolute;width:12px;height:12px;left:12%;top:47%;border-radius:50%;background:#fff;box-shadow:0 0 9px #fff,0 0 28px var(--violet)}.core{position:absolute;inset:36%;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff 0 2%,#d6caff 9%,#8867ff 35%,rgba(66,37,143,.18) 68%,transparent 70%);filter:drop-shadow(0 0 45px rgba(145,106,255,.42));animation:pulse 5s ease-in-out infinite}.core::after{content:"";position:absolute;inset:-34%;border-radius:50%;border:1px solid rgba(255,255,255,.13);transform:rotate(25deg) scaleY(.3)}
+@keyframes spin{to{transform:rotate(342deg)}}@keyframes pulse{50%{transform:scale(1.06);filter:drop-shadow(0 0 70px rgba(145,106,255,.58))}}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;padding:7px 12px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(16px);color:#d7ccff;font-size:11px;font-weight:750;letter-spacing:.16em;text-transform:uppercase}.eyebrow i{width:7px;height:7px;border-radius:50%;background:#95ffd0;box-shadow:0 0 14px #95ffd0}
+h1{margin:0;font-size:clamp(54px,9.6vw,112px);line-height:.9;letter-spacing:-.07em;font-weight:900;background:linear-gradient(115deg,#fff 5%,#ece7ff 35%,#bda9ff 63%,#79dfff 95%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 12px 35px rgba(119,91,211,.18))}.hero-en{display:block;margin:15px 0 17px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22);font-size:clamp(20px,3.2vw,37px);font-weight:850;letter-spacing:.12em;line-height:1}.sub{max-width:625px;margin:0;color:var(--muted);font-size:clamp(14px,1.8vw,17px)}.hero-meta{display:flex;gap:18px;margin-top:27px;color:#817c94;font-size:12px}.hero-meta span{display:flex;align-items:center;gap:8px}.hero-meta span::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
 
-/* 排序控制栏 */
-.controls{display:none;max-width:980px;margin:10px auto 0;padding:0 24px;position:relative;z-index:1}
-.controls-inner{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 18px;width:fit-content;box-shadow:0 4px 20px rgba(0,0,0,.2)}
-.controls-inner label{font-size:13px;color:var(--muted);font-weight:600}
-.glass-select{appearance:none;-webkit-appearance:none;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--ink);font-size:13px;font-weight:600;padding:6px 32px 6px 12px;cursor:pointer;outline:none;transition:.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23b9a6ff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.glass-select:hover,.glass-select:focus{border-color:var(--acc);background-color:rgba(185,166,255,.1)}
+/* 工具栏在滚动时形成悬浮玻璃胶囊。 */
+.controls{display:none;position:sticky;top:12px;z-index:20;margin-bottom:28px}.controls-inner{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:9px;border:1px solid rgba(255,255,255,.1);border-radius:20px;background:rgba(12,10,24,.66);box-shadow:0 18px 55px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.06);backdrop-filter:blur(28px) saturate(155%);-webkit-backdrop-filter:blur(28px) saturate(155%)}.search-wrap{position:relative}.search-icon{position:absolute;left:15px;top:50%;width:17px;transform:translateY(-50%);color:#8b859f;pointer-events:none}.glass-input,.glass-select{height:46px;width:100%;border:1px solid transparent;border-radius:14px;color:var(--ink);background:rgba(255,255,255,.05);transition:.25s}.glass-input{padding:0 44px}.glass-input::placeholder{color:#767186}.glass-input:hover,.glass-input:focus,.glass-select:hover,.glass-select:focus{border-color:rgba(183,160,255,.32);background:rgba(183,160,255,.09);box-shadow:0 0 0 4px rgba(183,160,255,.045)}.clear-search{position:absolute;right:8px;top:8px;width:30px;height:30px;border:0;border-radius:10px;color:#938da2;background:transparent;cursor:pointer;visibility:hidden}.clear-search.show{visibility:visible}.clear-search:hover{color:white;background:rgba(255,255,255,.08)}.select-wrap{display:flex;align-items:center;gap:10px;min-width:250px}.select-wrap label{padding-left:8px;color:#918b9f;font-size:12px;white-space:nowrap}.glass-select{appearance:none;padding:0 40px 0 14px;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--violet) 50%),linear-gradient(135deg,var(--violet) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat}.glass-select option{background:#151225}
 
-/* ===== 卡片网格 ===== */
-main{max-width:980px;margin:auto;padding:16px 24px 80px;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+main{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding-bottom:110px}.card{--hue:265;position:relative;min-height:225px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.105);border-radius:var(--radius);background:linear-gradient(150deg,rgba(255,255,255,.09),rgba(255,255,255,.026) 48%,rgba(255,255,255,.045));box-shadow:0 18px 60px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(21px) saturate(145%);-webkit-backdrop-filter:blur(21px) saturate(145%);transition:transform .45s cubic-bezier(.16,1,.3,1),border-color .35s,box-shadow .35s;animation:rise .7s both}.card::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(440px circle at var(--mx,50%) var(--my,15%),hsla(var(--hue),100%,90%,.17),transparent 40%);opacity:0;transition:opacity .35s}.card::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,hsla(var(--hue),100%,88%,.48),transparent 33%,transparent 72%,hsla(calc(var(--hue) + 55),100%,75%,.25));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.42;pointer-events:none}.card:hover{transform:translateY(-9px) scale(1.01);border-color:hsla(var(--hue),90%,80%,.28);box-shadow:0 34px 90px rgba(0,0,0,.4),0 0 48px hsla(var(--hue),95%,65%,.11)}.card:hover::before{opacity:1}.card-glow{position:absolute;width:180px;height:180px;right:-76px;top:-82px;border-radius:50%;background:hsla(var(--hue),90%,68%,.18);filter:blur(8px);box-shadow:0 0 70px hsla(var(--hue),90%,65%,.2);pointer-events:none}.card-body{position:relative;z-index:3;display:flex;min-height:225px;flex-direction:column;padding:24px}.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.icon{width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);border-radius:16px;background:linear-gradient(145deg,hsla(var(--hue),90%,70%,.19),rgba(255,255,255,.04));box-shadow:inset 0 1px rgba(255,255,255,.12),0 12px 30px hsla(var(--hue),80%,50%,.1);color:hsla(var(--hue),100%,88%,.95);font-size:20px}.index{padding-top:4px;color:#6f697f;font:600 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.1em}.name{margin-top:18px;font-size:22px;font-weight:850;line-height:1.25;letter-spacing:-.025em;word-break:break-word}.meta{display:flex;align-items:center;gap:8px;margin-top:8px;color:#928ca1;font-size:11px}.dot{width:4px;height:4px;border-radius:50%;background:hsla(var(--hue),90%,76%,.7)}.row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:18px}.btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(255,255,255,.11);border-radius:999px;color:#d8ceff;background:rgba(255,255,255,.05);font-size:11px;font-weight:750;cursor:pointer;transition:.2s}.btn:hover{color:white;border-color:hsla(var(--hue),90%,75%,.4);background:hsla(var(--hue),80%,60%,.12)}.arrow{transition:transform .2s}.card:hover .arrow{transform:translateX(4px)}.card-code{color:#5d586c;font:600 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em}@keyframes rise{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 
-.card{
-  position:relative;
-  background:rgba(255,255,255,.04);
-  backdrop-filter:blur(20px) saturate(150%);
-  -webkit-backdrop-filter:blur(20px) saturate(150%);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-  padding:16px 16px 14px;
-  display:flex;flex-direction:column;gap:8px;
-  cursor:pointer;overflow:hidden;
-  transition:.35s cubic-bezier(.2,.8,.2,1);
-  animation:fadeInUp .6s ease-out both;
-}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
-}
-.card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(185,166,255,.35);
-  box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 30px rgba(185,166,255,.1);
-  background:rgba(255,255,255,.06);
-}
-.ico{
-  width:38px;height:38px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:18px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
-  color:var(--acc);backdrop-filter:blur(6px);
-}
-.name{
-  font-weight:900;word-break:break-all;font-size:19px;line-height:1.3;
-  background:linear-gradient(135deg,var(--ink),var(--acc),var(--pink));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.meta{color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap}
-.row{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
-.btn{
-  flex:0 0 auto;color:var(--acc);text-decoration:none;font-size:12px;font-weight:700;
-  border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 12px;
-  cursor:pointer;background:rgba(255,255,255,.05);font-family:inherit;
-  transition:.2s;backdrop-filter:blur(6px);
-}
-.btn:hover{background:rgba(127,214,255,.12);color:var(--acc2);border-color:rgba(127,214,255,.3)}
+#status,.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:65px 20px}.skel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.skel{height:225px;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);background:linear-gradient(105deg,rgba(255,255,255,.025) 20%,rgba(255,255,255,.075) 38%,rgba(255,255,255,.025) 56%);background-size:200% 100%;animation:sh 1.5s infinite}@keyframes sh{to{background-position:-200% 0}}.empty{border:1px dashed rgba(255,255,255,.14);border-radius:var(--radius);background:rgba(255,255,255,.025)}.empty b{display:block;margin-bottom:5px;color:white;font-size:17px}footer{padding:0 0 42px;text-align:center;color:#5e596c;font-size:11px;letter-spacing:.08em}.to-top{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));z-index:25;width:46px;height:46px;border:1px solid rgba(255,255,255,.12);border-radius:15px;color:white;background:rgba(16,13,29,.72);box-shadow:0 15px 40px rgba(0,0,0,.35);backdrop-filter:blur(18px);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(8px);transition:.25s}.to-top.show{opacity:1;visibility:visible;transform:none}.to-top:hover{border-color:rgba(183,160,255,.4);background:rgba(42,34,73,.8)}
 
-/* 状态 */
-#status{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 20px}
-.skel{height:80px;border-radius:14px;background:linear-gradient(90deg,#15141f,#1c1a2c,#15141f);background-size:200% 100%;animation:sh 1.4s infinite}
-@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.empty{background:#15141f;border:1px dashed var(--line);border-radius:14px;padding:38px 22px;color:var(--muted);grid-column:1/-1}
-.empty b{color:var(--ink)}
-footer{max-width:980px;margin:auto;padding:0 24px 40px;color:#5e5a72;font-size:12px;text-align:center;position:relative;z-index:1}
+@media(max-width:920px){.orbital{right:-170px;opacity:.55}main,.skel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.shell{width:min(100% - 28px,1180px)}.hero{min-height:440px;padding:64px 0 45px}.orbital{width:330px;height:330px;right:-155px;top:64px;opacity:.45}.hero-en{letter-spacing:.07em}.hero-meta{flex-wrap:wrap;gap:8px 15px}.controls{top:8px}.controls-inner{grid-template-columns:1fr}.select-wrap{min-width:0}.select-wrap label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}main,.skel-grid{grid-template-columns:1fr;gap:14px}.card,.card-body{min-height:215px}.to-top{right:14px;bottom:14px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.aurora{display:none}.card:hover{transform:none}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.controls-inner,.card,.to-top{background:#151225}}
 </style>
 </head>
 <body>
-
-<!-- 背景系统 -->
-<div class="bg-system">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="grid-overlay"></div>
-  <div class="noise"></div>
-</div>
-
-<header>
-  <div class="brand">Raccoon.Fit · 软软的小窝</div>
-  <h1>友情链接</h1>
-  <div class="sub">在梦境中保持清醒 · 在现实中保持想象 — 新增友情链接推送后自动出现在列表</div>
-</header>
-
-<div class="controls" id="controls">
-  <div class="controls-inner">
-    <label for="sortSelect">排序方式</label>
-    <select id="sortSelect" class="glass-select">
-      <option value="name-asc">名称 (A-Z)</option>
-      <option value="name-desc">名称 (Z-A)</option>
-      <option value="size-asc">文件大小 (小到大)</option>
-      <option value="size-desc">文件大小 (大到小)</option>
-    </select>
+<div class="cosmos" aria-hidden="true"><div class="aurora aurora-a"></div><div class="aurora aurora-b"></div><div class="aurora aurora-c"></div><div class="grain"></div></div>
+<header class="shell hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><i></i>Raccoon.Fit · 软软的小窝</div>
+    <h1>友情链接</h1><span class="hero-en">FRIENDS IN ORBIT</span>
+    <p class="sub">在梦境中保持清醒，在现实中保持想象。每一个闪烁的坐标，都通往互联网宇宙里一颗独特的星球。</p>
+    <div class="hero-meta" aria-label="页面说明"><span>推送后自动更新</span><span id="friendCount">正在同步星图</span></div>
   </div>
-</div>
-
-<main id="app"><div id="status">正在加载友情链接列表…</div></main>
-<footer>© 2025-2026 软软 · 超现实设计哲学 · DREAM AWAKE · CREATE BEYOND</footer>
-
+  <div class="orbital" aria-hidden="true"><div class="orbit"><i class="planet"></i></div><div class="orbit"></div><div class="core"></div></div>
+</header>
+<section class="shell controls" id="controls" aria-label="列表工具"><div class="controls-inner">
+  <div class="search-wrap"><svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.7-3.7"></path></svg><input id="searchInput" class="glass-input" type="search" placeholder="搜索一颗星球…" autocomplete="off" aria-label="搜索友情链接"><button id="clearSearch" class="clear-search" type="button" aria-label="清空搜索">×</button></div>
+  <div class="select-wrap"><label for="sortSelect">星图排序</label><select id="sortSelect" class="glass-select"><option value="name-asc">名称（A–Z）</option><option value="name-desc">名称（Z–A）</option><option value="size-asc">文件大小（小到大）</option><option value="size-desc">文件大小（大到小）</option></select></div>
+</div></section>
+<main class="shell" id="app" aria-live="polite"><div id="status"><div class="skel-grid" aria-hidden="true"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div><div style="margin-top:18px">正在绘制友情链接星图…</div></div></main>
+<footer class="shell">© 2025–2026 软软 · DREAM AWAKE · CREATE BEYOND</footer>
+<button class="to-top" id="toTop" type="button" aria-label="返回顶部">↑</button>
 <script>
+/* 数据源配置：严格保留原仓库、目录和访问地址。 */
 const OWNER="Raccoon-fit",REPO="raccoon",DIR="友情链接",SITE="https://raccoon.fit",BRANCH="main";
 const DIR_ENC=DIR.split("/").map(encodeURIComponent).join("/");
-const API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+DIR_ENC;
-const app=document.getElementById("app"),status=document.getElementById("status"),controls=document.getElementById("controls");
-const sortSelect=document.getElementById("sortSelect");
+const API="https://api.github.com/repos/"+OWNER+"/"+REPO+"/contents/"+DIR_ENC+"?ref="+encodeURIComponent(BRANCH);
+const app=document.getElementById("app"),controls=document.getElementById("controls"),sortSelect=document.getElementById("sortSelect"),searchInput=document.getElementById("searchInput"),clearSearch=document.getElementById("clearSearch"),friendCount=document.getElementById("friendCount"),toTop=document.getElementById("toTop");
 let allItems=[];
-
-function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
-function fmt(n){if(!n&&n!==0)return"";if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";return(n/1048576).toFixed(2)+" MB"}
+/* 远程文件名必须转义后再写入页面，避免被解释为 HTML。 */
+function esc(value){const node=document.createElement("div");node.textContent=String(value);return node.innerHTML}
+function fmt(bytes){if(!bytes&&bytes!==0)return"";if(bytes<1024)return bytes+" B";if(bytes<1048576)return(bytes/1024).toFixed(1)+" KB";return(bytes/1048576).toFixed(2)+" MB"}
 function siteLink(name){return SITE+"/"+DIR.split("/").map(encodeURIComponent).join("/")+"/"+encodeURIComponent(name)}
-
-function parseItem(it){
-  const nameDisplay = it.name.replace(/\.html$/i, "");
-  return {...it, nameDisplay};
-}
-
-function sortItems(items, sortBy){
-  const sorted=[...items];
-  switch(sortBy){
-    case 'name-desc': sorted.sort((a,b)=>b.nameDisplay.localeCompare(b.nameDisplay,'zh')); break;
-    case 'size-asc': sorted.sort((a,b)=>(a.size||0)-(b.size||0)); break;
-    case 'size-desc': sorted.sort((a,b)=>(b.size||0)-(a.size||0)); break;
-    case 'name-asc':
-    default: sorted.sort((a,b)=>a.nameDisplay.localeCompare(b.nameDisplay,'zh'));
-  }
-  return sorted;
-}
-
+function parseItem(item){return{...item,nameDisplay:item.name.replace(/\.html$/i,"")}}
+function sortItems(items,sortBy){const sorted=[...items];switch(sortBy){case"name-desc":sorted.sort((a,b)=>b.nameDisplay.localeCompare(a.nameDisplay,"zh"));break;case"size-asc":sorted.sort((a,b)=>(a.size||0)-(b.size||0));break;case"size-desc":sorted.sort((a,b)=>(b.size||0)-(a.size||0));break;default:sorted.sort((a,b)=>a.nameDisplay.localeCompare(b.nameDisplay,"zh"))}return sorted}
+function openItem(item){window.open(siteLink(item.name),"_blank","noopener,noreferrer")}
+/* 用文件名生成稳定色相，让每张艺术封面不同，但无需任何外部图片资源。 */
+function itemHue(name){let hash=0;for(const char of name)hash=(hash*31+char.codePointAt(0))>>>0;return 220+(hash%120)}
 function render(){
-  app.innerHTML="";
-  const sorted=sortItems(allItems,sortSelect.value);
-  sorted.forEach((it, index) => {
-    const card=document.createElement("div");card.className="card";
-    card.style.animationDelay = `${index * 0.06}s`;
-    card.innerHTML='<div class="ico">✦</div><div class="name">'+esc(it.nameDisplay)+'</div><div class="meta">'+(it.size?fmt(it.size):"")+' · 友情链接</div><div class="row"><button class="btn" data-act="site">打开 →</button></div>';
-    card.addEventListener("click",()=>window.open(siteLink(it.name),"_blank","noopener"));
+  const keyword=searchInput.value.trim().toLocaleLowerCase("zh-CN");
+  const sorted=sortItems(allItems.filter(item=>item.nameDisplay.toLocaleLowerCase("zh-CN").includes(keyword)),sortSelect.value);
+  app.innerHTML="";friendCount.textContent=keyword?`找到 ${sorted.length} 个坐标`:`${allItems.length} 颗星球`;
+  if(!sorted.length){app.innerHTML='<div class="empty"><b>没有找到匹配的星球</b><span>换一个关键词试试看，或清空搜索条件。</span></div>';return}
+  sorted.forEach((item,index)=>{
+    const card=document.createElement("article"),hue=itemHue(item.nameDisplay);
+    card.className="card";card.tabIndex=0;card.setAttribute("role","link");card.setAttribute("aria-label","打开 "+item.nameDisplay);card.style.setProperty("--hue",hue);card.style.animationDelay=Math.min(index,12)*.055+"s";
+    card.innerHTML='<div class="card-glow" aria-hidden="true"></div><div class="card-body"><div class="card-head"><div class="icon" aria-hidden="true">✦</div><span class="index">ORBIT / '+String(index+1).padStart(2,"0")+'</span></div><div class="name">'+esc(item.nameDisplay)+'</div><div class="meta"><span>'+(item.size?fmt(item.size):"HTML")+'</span><span class="dot"></span><span>FRIEND LINK</span></div><div class="row"><button class="btn" type="button" aria-label="打开 '+esc(item.nameDisplay)+'">进入星球 <span class="arrow">→</span></button><span class="card-code">RA-'+String(hue).slice(-3)+'</span></div></div>';
+    card.addEventListener("click",()=>openItem(item));
+    card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openItem(item)}});
+    /* 鼠标光照只更新样式变量，不改变原有点击和数据逻辑。 */
+    card.addEventListener("pointermove",event=>{const rect=card.getBoundingClientRect();card.style.setProperty("--mx",event.clientX-rect.left+"px");card.style.setProperty("--my",event.clientY-rect.top+"px")});
     app.appendChild(card);
   });
 }
-
-sortSelect.addEventListener("change",render);
-
-async function load(){try{
-  status.innerHTML='<div class="skel" style="max-width:520px;margin:auto"></div><div style="margin-top:14px;font-size:13px">正在拉取友情链接列表…</div>';
-  const r=await fetch(API,{headers:{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});
-  if(!r.ok)throw new Error("HTTP "+r.status);let items=await r.json();
-  if(!Array.isArray(items))throw new Error("非目录");
-  items=items.filter(i=>i.type==="file"&&i.name.toLowerCase().endsWith(".html")&&i.name!=="index.html");
-  if(!items.length){status.outerHTML='<div class="empty"><b>目录中暂无其他友情链接</b><br><span style="font-size:12.5px">把作品 HTML 与 index.html 放在同一目录（'+esc(DIR)+'），推送后刷新即可自动出现。</span></div>';return}
-  
-  allItems=items.map(parseItem);
-  status.remove();
-  controls.style.display="block";
-  render();
-}catch(e){status.innerHTML='加载失败：'+esc(e.message)+'<br><span style="font-size:12px">请确认仓库为公开，且 OWNER/REPO 已正确配置。</span>';console.error(e)}}
+sortSelect.addEventListener("change",render);searchInput.addEventListener("input",()=>{clearSearch.classList.toggle("show",Boolean(searchInput.value));render()});clearSearch.addEventListener("click",()=>{searchInput.value="";clearSearch.classList.remove("show");searchInput.focus();render()});toTop.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));window.addEventListener("scroll",()=>toTop.classList.toggle("show",window.scrollY>420),{passive:true});
+async function load(){try{const response=await fetch(API,{headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});if(!response.ok)throw new Error("HTTP "+response.status);let items=await response.json();if(!Array.isArray(items))throw new Error("返回内容不是目录");items=items.filter(item=>item.type==="file"&&item.name.toLowerCase().endsWith(".html")&&item.name!=="index.html");if(!items.length){app.innerHTML='<div class="empty"><b>星图中还没有其他朋友</b><span>把作品 HTML 与 index.html 放在同一目录，推送后刷新即可自动出现。</span></div>';friendCount.textContent="暂无星球";return}allItems=items.map(parseItem);controls.style.display="block";render()}catch(error){app.innerHTML='<div class="empty"><b>友情链接加载失败</b><span>'+esc(error.message)+'。请确认仓库为公开状态，并检查数据源配置。</span></div>';friendCount.textContent="同步失败";console.error(error)}}
 load();
 </script>
-</body></html>
+</body>
+</html>

@@ -1,881 +1,2145 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>软软扑克 - 斗地主</title>
-    <style>
-        :root {
-            --bg: #1a1a2e;
-            --panel-bg: #1e2a3a;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0d1117;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Microsoft YaHei', 'PingFang SC', 'SimHei', 'Arial', sans-serif;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-        }
-        .game-container {
-            position: relative;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            aspect-ratio: 1100/720;
-            max-height: 95vh;
-        }
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-        }
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.65);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            border-radius: 12px;
-        }
-        .overlay.active { display: flex; }
-        .settings-panel {
-            background: #1e2a3a;
-            border: 3px solid #5a7aac;
-            border-radius: 16px;
-            padding: 28px 32px 24px;
-            width: 85%;
-            max-width: 420px;
-            color: #fff;
-            position: relative;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.6);
-        }
-        .settings-panel h3 {
-            text-align: center;
-            margin-bottom: 18px;
-            font-size: 1.4em;
-            letter-spacing: 2px;
-            color: #ffd740;
-        }
-        .settings-panel .close-btn {
-            position: absolute;
-            top: 10px; right: 16px;
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            background: #c0392b;
-            color: #fff;
-            border: none;
-            font-size: 1.2em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .settings-panel .close-btn:hover { background: #e74c3c; }
-        .settings-panel .row {
-            display: flex;
-            align-items: center;
-            margin: 12px 0;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .settings-panel .row label { font-weight: bold; min-width: 50px; font-size: 1em; letter-spacing: 1px; }
-        .settings-panel .row button {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 2px solid #5a7aac;
-            background: #2a3a50;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-        .settings-panel .row button:hover { background: #3a5070; color: #fff; border-color: #8ab4f0; }
-        .settings-panel .row button.active { background: #2980b9; color: #fff; border-color: #ffd740; font-weight: bold; }
-        .settings-panel .row button.danger { border-color: #c0392b; background: #3a1a1a; }
-        .settings-panel .row button.danger:hover { background: #5a2020; border-color: #e74c3c; }
-        @media (max-width: 768px) {
-            .game-container { max-height: 98vh; aspect-ratio: auto; height: auto; min-height: 520px; }
-            canvas { border-radius: 0; box-shadow: none; }
-            .settings-panel { width: 92%; padding: 20px 16px 16px; max-width: 360px; }
-            .settings-panel h3 { font-size: 1.2em; margin-bottom: 12px; }
-            .settings-panel .row button { padding: 7px 12px; font-size: 0.8em; }
-            .settings-panel .row { gap: 6px; margin: 8px 0; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>软软扑克 · 斗地主</title>
+<style>
+    :root {
+        --bg: #0b1220;
+        --panel: #16233a;
+        --panel-border: #3d5a8a;
+        --gold: #ffd740;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+        height: 100%;
+        background: radial-gradient(circle at 50% 0%, #16243c 0%, #070c15 70%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Segoe UI', Arial, sans-serif;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+    }
+    .game-container {
+        position: relative;
+        width: 100%;
+        max-width: 1100px;
+        aspect-ratio: 1100 / 720;
+        max-height: 100vh;
+        margin: 0 auto;
+    }
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 14px;
+        cursor: pointer;
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(120, 170, 255, 0.14);
+    }
+    /* ===== 设置面板 ===== */
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(4, 8, 16, 0.72);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        border-radius: 14px;
+        animation: fadeIn .18s ease;
+    }
+    .overlay.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes panelIn {
+        from { opacity: 0; transform: translateY(16px) scale(.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .settings-panel {
+        background: linear-gradient(160deg, #1d2c47 0%, #131d31 100%);
+        border: 2px solid var(--panel-border);
+        border-radius: 18px;
+        padding: 26px 30px 22px;
+        width: 86%;
+        max-width: 440px;
+        color: #e8eefc;
+        position: relative;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255,255,255,.07);
+        animation: panelIn .24s cubic-bezier(.22,1,.36,1);
+    }
+    .settings-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(120,180,255,.10), transparent 40%);
+        pointer-events: none;
+    }
+    .settings-panel h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.32em;
+        letter-spacing: 4px;
+        color: var(--gold);
+        text-shadow: 0 2px 12px rgba(255, 215, 64, .35);
+    }
+    .close-btn {
+        position: absolute;
+        top: 12px; right: 14px;
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, #e74c3c, #a8281c);
+        color: #fff;
+        border: none;
+        font-size: 1em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform .18s, filter .18s;
+        box-shadow: 0 4px 12px rgba(200, 40, 30, .45);
+    }
+    .close-btn:hover { transform: scale(1.1) rotate(90deg); filter: brightness(1.15); }
+    .row {
+        display: flex;
+        align-items: center;
+        margin: 14px 0;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .row label {
+        font-weight: 700;
+        min-width: 56px;
+        font-size: .96em;
+        letter-spacing: 1px;
+        color: #9fb6d8;
+    }
+    .row button {
+        padding: 9px 18px;
+        border-radius: 10px;
+        border: 1.5px solid #365party;
+        border: 1.5px solid #365party;
+        border: 1.5px solid #365272;
+        background: linear-gradient(180deg, #253category;
+        background: linear-gradient(180deg, #253a58, #1a2a42);
+        color: #b9cbe4;
+        cursor: pointer;
+        font-size: .9em;
+        font-weight: 600;
+        letter-spacing: 1px;
+        transition: all .18s ease;
+        white-space: nowrap;
+    }
+    .row button:hover {
+        background: linear-gradient(180deg, #34527c, #24395a);
+        color: #fff;
+        border-color: #6d9bdc;
+        transform: translateY(-1px);
+    }
+    .row button.active {
+        background: linear-gradient(180deg, #3f8de0, #2563b0);
+        color: #fff;
+        border-color: var(--gold);
+        box-shadow: 0 0 16px rgba(255, 215, 64, .35);
+    }
+    @media (max-width: 768px) {
+        .game-container { max-height: 100vh; aspect-ratio: auto; height: 100vh; }
+        canvas { border-radius: 0; box-shadow: none; }
+        .settings-panel { width: 92%; padding: 20px 16px 16px; }
+        .settings-panel h3 { font-size: 1.15em; margin-bottom: 14px; }
+        .row button { padding: 8px 13px; font-size: .82em; }
+        .row { gap: 7px; margin: 10px 0; }
+    }
+</style>
 </head>
 <body>
-    <div class="game-container" id="gameContainer">
-        <canvas id="gameCanvas"></canvas>
-        <div class="overlay" id="settingsOverlay">
-            <div class="settings-panel">
-                <button class="close-btn" id="settingsClose">✕</button>
-                <h3 id="settingsTitle">设置</h3>
-                <div class="row">
-                    <label id="diffLabel">难度：</label>
-                    <button data-diff="easy" id="diffEasy">简单</button>
-                    <button data-diff="normal" id="diffNormal">普通</button>
-                    <button data-diff="hard" id="diffHard">困难</button>
-                </div>
-                <div class="row">
-                    <label id="langLabel">语言：</label>
-                    <button data-lang="zh" id="langZh">中文</button>
-                    <button data-lang="en" id="langEn">English</button>
-                </div>
+<div class="game-container" id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    <div class="overlay" id="settingsOverlay">
+        <div class="settings-panel">
+            <button class="close-btn" id="settingsClose">✕</button>
+            <h3 id="settingsTitle">设置</h3>
+            <div class="row">
+                <label id="diffLabel">难度：</label>
+                <button data-diff="easy" id="diffEasy">简单</button>
+                <button data-diff="normal" id="diffNormal">普通</button>
+                <button data-diff="hard" id="diffHard">困难</button>
+            </div>
+            <div class="row">
+                <label id="langLabel">语言：</label>
+                <button data-lang="zh" id="langZh">中文</button>
+                <button data-lang="en" id="langEn">English</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        (function() {
-            const CANVAS_WIDTH = 1100;
-            const CANVAS_HEIGHT = 720;
-            const CARD_WIDTH = 72;
-            const CARD_HEIGHT = 100;
-            const CARD_RADIUS = 8;
-            const CARD_SELECTED_OFFSET = 22;
+<script>
+(function () {
+'use strict';
 
-            const SUIT_SPADE = 0;
-            const SUIT_HEART = 1;
-            const SUIT_CLUB = 2;
-            const SUIT_DIAMOND = 3;
-            const SUIT_JOKER = 4;
+/* ══════════════════════════════════════════════════════
+   常量
+   ══════════════════════════════════════════════════════ */
+const CANVAS_WIDTH  = 1100;
+const CANVAS_HEIGHT = 720;
+const CARD_WIDTH    = 72;
+const CARD_HEIGHT   = 100;
+const CARD_RADIUS   = 8;
+const CARD_SELECTED_OFFSET = 24;
 
-            const SUIT_SYMBOLS = { [SUIT_SPADE]: '♠', [SUIT_HEART]: '♥', [SUIT_CLUB]: '♣', [SUIT_DIAMOND]: '♦', [SUIT_JOKER]: '🃏' };
-            const RANK_NAMES_ZH = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'小',17:'大' };
-            const RANK_NAMES_EN = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'Jo',17:'JO' };
+const SUIT_SPADE = 0, SUIT_HEART = 1, SUIT_CLUB = 2, SUIT_DIAMOND = 3, SUIT_JOKER = 4;
+const SUIT_SYMBOLS = {
+    [SUIT_SPADE]: '♠', [SUIT_HEART]: '♥', [SUIT_CLUB]: '♣',
+    [SUIT_DIAMOND]: '♦', [SUIT_JOKER]: '★'
+};
+const RANK_NAMES_ZH = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'小',17:'大' };
+const RANK_NAMES_EN = { 3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A',15:'2',16:'Jo',17:'JO' };
 
-            const TEXTS = {
-                zh: { title:'软软扑克', start:'开始游戏', restart:'重新开始', settings:'设置', difficulty:'难度', easy:'简单', normal:'普通', hard:'困难', language:'语言', chinese:'中文', english:'English', call_landlord:'叫地主', no_call:'不叫', grab_landlord:'抢地主', no_grab:'不抢', play:'出牌', pass:'过', hint:'提示', landlord:'地主', farmer:'农民', you_win:'你赢了！', you_lose:'你输了！', waiting:'等待中...', thinking:'思考中...', close:'关闭', you:'你', ai1:'AI 1', ai2:'AI 2', cards_count:'张', bottom_cards:'底牌', new_round:'新一轮，请出牌', invalid_play:'无效牌型！', cant_beat:'打不过上家的牌！', must_play:'新一轮必须出牌！', select_cards:'请选择要出的牌', no_one_call:'没人叫地主，重新发牌...', no_one_grab:'没人抢地主，重新发牌...', ai_pass:'过', ai_play:'出牌' },
-                en: { title:'RuanRuan Poker', start:'Start', restart:'Restart', settings:'Settings', difficulty:'Difficulty', easy:'Easy', normal:'Normal', hard:'Hard', language:'Language', chinese:'中文', english:'English', call_landlord:'Call', no_call:'Pass', grab_landlord:'Grab', no_grab:'Pass', play:'Play', pass:'Pass', hint:'Hint', landlord:'Landlord', farmer:'Farmer', you_win:'You Win!', you_lose:'You Lose!', waiting:'Waiting...', thinking:'Thinking...', close:'Close', you:'You', ai1:'AI 1', ai2:'AI 2', cards_count:' cards', bottom_cards:'Bottom Cards', new_round:'New round, play!', invalid_play:'Invalid play!', cant_beat:"Can't beat that!", must_play:'Must play a card!', select_cards:'Select cards to play', no_one_call:'No one called, redealing...', no_one_grab:'No one grabbed, redealing...', ai_pass:'Pass', ai_play:'Play' }
-            };
+const TEXTS = {
+    zh: {
+        title:'软 软 扑 克', start:'开始游戏', restart:'再来一局', settings:'设置',
+        difficulty:'难度', easy:'简单', normal:'普通', hard:'困难',
+        language:'语言', chinese:'中文', english:'English',
+        call_landlord:'叫地主', no_call:'不叫', grab_landlord:'抢地主', no_grab:'不抢',
+        play:'出牌', pass:'不出', hint:'提示',
+        landlord:'地主', farmer:'农民',
+        you_win:'🎉 你赢了！', you_lose:'💔 你输了…',
+        close:'关闭', you:'你', ai1:'电脑 A', ai2:'电脑 B',
+        cards_count:'张', bottom_cards:'底 牌',
+        new_round:'新一轮 · 请出牌', invalid_play:'无效牌型！',
+        cant_beat:'打不过上家！', must_play:'新一轮必须出牌',
+        select_cards:'请先选牌', no_one_call:'无人叫地主，重新发牌…',
+        no_one_grab:'无人抢地主，重新发牌…',
+        ai_play:'出牌', ai_pass:'不出', thinking:'思考中'
+    },
+    en: {
+        title:'R U A N  P O K E R', start:'Start', restart:'Play Again', settings:'Settings',
+        difficulty:'Difficulty', easy:'Easy', normal:'Normal', hard:'Hard',
+        language:'Language', chinese:'中文', english:'English',
+        call_landlord:'Call', no_call:'Pass', grab_landlord:'Grab', no_grab:'Pass',
+        play:'Play', pass:'Pass', hint:'Hint',
+        landlord:'Landlord', farmer:'Farmer',
+        you_win:'🎉 You Win!', you_lose:'💔 You Lose…',
+        close:'Close', you:'You', ai1:'AI 1', ai2:'AI 2',
+        cards_count:'', bottom_cards:'BOTTOM',
+        new_round:'New round · play!', invalid_play:'Invalid play!',
+        cant_beat:"Can't beat that!", must_play:'Must play a card',
+        select_cards:'Select cards first', no_one_call:'Nobody called — redealing…',
+        no_one_grab:'Nobody grabbed — redealing…',
+        ai_play:'plays', ai_pass:'passes', thinking:'thinking'
+    }
+};
 
-            const canvas = document.getElementById('gameCanvas');
-            canvas.width = CANVAS_WIDTH;
-            canvas.height = CANVAS_HEIGHT;
-            const ctx = canvas.getContext('2d');
+/* ══════════════════════════════════════════════════════
+   Canvas & DOM
+   ══════════════════════════════════════════════════════ */
+const canvas = document.getElementById('gameCanvas');
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+const ctx = canvas.getContext('2d');
 
-            const gameContainer = document.getElementById('gameContainer');
-            const settingsOverlay = document.getElementById('settingsOverlay');
-            const settingsClose = document.getElementById('settingsClose');
-            const diffEasy = document.getElementById('diffEasy');
-            const diffNormal = document.getElementById('diffNormal');
-            const diffHard = document.getElementById('diffHard');
-            const langZh = document.getElementById('langZh');
-            const langEn = document.getElementById('langEn');
-            const settingsTitle = document.getElementById('settingsTitle');
-            const diffLabel = document.getElementById('diffLabel');
-            const langLabel = document.getElementById('langLabel');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const settingsClose   = document.getElementById('settingsClose');
+const diffEasy = document.getElementById('diffEasy');
+const diffNormal = document.getElementById('diffNormal');
+const diffHard = document.getElementById('diffHard');
+const langZh = document.getElementById('langZh');
+const langEn = document.getElementById('langEn');
+const settingsTitle = document.getElementById('settingsTitle');
+const diffLabel = document.getElementById('diffLabel');
+const langLabel = document.getElementById('langLabel');
 
-            function getCanvasPos(e) {
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = CANVAS_WIDTH / rect.width;
-                const scaleY = CANVAS_HEIGHT / rect.height;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+function getCanvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = CANVAS_WIDTH / rect.width;
+    const sy = CANVAS_HEIGHT / rect.height;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
+}
+
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ══════════════════════════════════════════════════════
+   牌
+   ══════════════════════════════════════════════════════ */
+class Card {
+    constructor(suit, rank) {
+        this.suit = suit;
+        this.rank = rank;
+        this.selected = false;
+        this.faceUp = true;
+        this.x = 0; this.y = 0;
+        this.targetX = 0; this.targetY = 0;
+        this.animSpeed = 0.18;
+    }
+    get isRed() {
+        return this.suit === SUIT_HEART || this.suit === SUIT_DIAMOND ||
+               (this.suit === SUIT_JOKER && this.rank === 17);
+    }
+    get displayRank() {
+        return (window._lang === 'en' ? RANK_NAMES_EN : RANK_NAMES_ZH)[this.rank] || String(this.rank);
+    }
+    get displaySuit() { return SUIT_SYMBOLS[this.suit] || ''; }
+
+    updatePosition() {
+        this.x = lerp(this.x, this.targetX, this.animSpeed);
+        this.y = lerp(this.y, this.targetY, this.animSpeed);
+        if (Math.abs(this.x - this.targetX) < 0.4) this.x = this.targetX;
+        if (Math.abs(this.y - this.targetY) < 0.4) this.y = this.targetY;
+    }
+    setTarget(x, y) { this.targetX = x; this.targetY = y; }
+    snapToTarget() { this.x = this.targetX; this.y = this.targetY; }
+    containsPoint(px, py) {
+        const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
+        return px >= this.x && px <= this.x + CARD_WIDTH && py >= cy && py <= cy + CARD_HEIGHT;
+    }
+
+    draw(ctx, lang) {
+        const x = this.x;
+        const y = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
+        const w = CARD_WIDTH, h = CARD_HEIGHT, r = CARD_RADIUS;
+
+        ctx.save();
+        if (this.selected) {
+            ctx.shadowColor = 'rgba(255,215,64,.85)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetY = 0;
+        } else {
+            ctx.shadowColor = 'rgba(0,0,0,.45)';
+            ctx.shadowBlur = 7;
+            ctx.shadowOffsetY = 3;
+        }
+
+        if (this.faceUp) {
+            /* ——— 正面 ——— */
+            const g = ctx.createLinearGradient(x, y, x, y + h);
+            g.addColorStop(0, '#ffffff');
+            g.addColorStop(1, '#f3efe3');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, x, y, w, h, r);
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = this.selected ? '#f5b301' : 'rgba(0,0,0,.16)';
+            ctx.lineWidth = this.selected ? 2 : 1;
+            this._roundRect(ctx, x, y, w, h, r);
+            ctx.stroke();
+
+            // 左上角装饰条
+            ctx.save();
+            ctx.beginPath();
+            this._roundRect(ctx, x, y, w, h, r);
+            ctx.clip();
+            const strip = ctx.createLinearGradient(x, y, x, y + 46);
+            strip.addColorStop(0, this.isRed ? 'rgba(224,49,49,.10)' : 'rgba(33,37,41,.08)');
+            strip.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = strip;
+            ctx.fillRect(x, y, w, 46);
+            ctx.restore();
+
+            const color = this.isRed ? '#d02a2a' : '#1b1f28';
+
+            if (this.suit === SUIT_JOKER) {
+                const jcolor = this.rank === 17 ? '#d02a2a' : '#3a3f4a';
+                const main = this.rank === 17 ? (lang === 'en' ? 'JO' : '大') : (lang === 'en' ? 'Jo' : '小');
+                ctx.fillStyle = jcolor;
+                ctx.font = 'bold 24px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(main, x + w / 2, y + h / 2 - 4);
+                ctx.font = 'bold 10px "Segoe UI",sans-serif';
+                ctx.fillStyle = this.rank === 17 ? '#e05555' : '#8a8f9a';
+                ctx.fillText('JOKER', x + w / 2, y + h / 2 + 22);
+                // 星形点缀
+                ctx.font = '13px serif';
+                ctx.fillStyle = jcolor;
+                ctx.globalAlpha = .55;
+                ctx.fillText('★', x + w / 2, y + h / 2 - 30);
+                ctx.fillText('★', x + w / 2, y + h / 2 + 38);
+                ctx.globalAlpha = 1;
+            } else {
+                ctx.textBaseline = 'alphabetic';
+                // 左上
+                ctx.fillStyle = color;
+                ctx.font = 'bold 19px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(this.displayRank, x + 7, y + 23);
+                ctx.font = '15px "Segoe UI Symbol",serif';
+                ctx.fillText(this.displaySuit, x + 7, y + 41);
+                // 中央
+                ctx.font = '36px "Segoe UI Symbol",serif';
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = .92;
+                ctx.fillText(this.displaySuit, x + w / 2, y + h / 2 + 13);
+                ctx.globalAlpha = 1;
+                // 右下（倒置）
+                ctx.save();
+                ctx.translate(x + w - 7, y + h - 7);
+                ctx.rotate(Math.PI);
+                ctx.fillStyle = color;
+                ctx.font = 'bold 19px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(this.displayRank, 0, 19);
+                ctx.font = '15px "Segoe UI Symbol",serif';
+                ctx.fillText(this.displaySuit, 0, 37);
+                ctx.restore();
             }
+        } else {
+            /* ——— 背面 ——— */
+            const g = ctx.createLinearGradient(x, y, x + w, y + h);
+            g.addColorStop(0, '#3a63c8');
+            g.addColorStop(1, '#1c3374');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, x, y, w, h, r);
+            ctx.fill();
 
-            function lerp(a, b, t) { return a + (b - a) * t; }
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(180,205,255,.45)';
+            ctx.lineWidth = 1.5;
+            this._roundRect(ctx, x, y, w, h, r);
+            ctx.stroke();
 
-            class Card {
-                constructor(suit, rank) {
-                    this.suit = suit;
-                    this.rank = rank;
-                    this.selected = false;
-                    this.faceUp = true;
-                    this.x = 0; this.y = 0;
-                    this.targetX = 0; this.targetY = 0;
-                    this.animSpeed = 0.15;
-                }
-                get isRed() { return this.suit === SUIT_HEART || this.suit === SUIT_DIAMOND || (this.suit === SUIT_JOKER && this.rank === 17); }
-                get displayRank() { return (window._lang === 'en' ? RANK_NAMES_EN : RANK_NAMES_ZH)[this.rank] || String(this.rank); }
-                get displaySuit() { return SUIT_SYMBOLS[this.suit] || ''; }
-                updatePosition() {
-                    this.x = lerp(this.x, this.targetX, this.animSpeed);
-                    this.y = lerp(this.y, this.targetY, this.animSpeed);
-                    if (Math.abs(this.x - this.targetX) < 0.3) this.x = this.targetX;
-                    if (Math.abs(this.y - this.targetY) < 0.3) this.y = this.targetY;
-                }
-                setTarget(x, y) { this.targetX = x; this.targetY = y; }
-                snapToTarget() { this.x = this.targetX; this.y = this.targetY; }
-                containsPoint(px, py) {
-                    const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
-                    return px >= this.x && px <= this.x + CARD_WIDTH && py >= cy && py <= cy + CARD_HEIGHT;
-                }
-                draw(ctx, lang) {
-                    const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
-                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                    this._roundRect(ctx, this.x+3, cy+3, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                    ctx.fill();
-                    if (this.faceUp) {
-                        ctx.fillStyle = '#faf8f0';
-                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                        ctx.fill();
-                        ctx.strokeStyle = '#bbb';
-                        ctx.lineWidth = 1;
-                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                        ctx.stroke();
-                        const color = this.isRed ? '#d63031' : '#1a1a1a';
-                        if (this.suit === SUIT_JOKER) {
-                            const jcolor = this.rank === 17 ? '#d63031' : '#555';
-                            const text = this.rank === 17 ? (lang==='en'?'JO':'大') : (lang==='en'?'Jo':'小');
-                            ctx.fillStyle = jcolor;
-                            ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.fillText(text, this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 6);
-                            if (this.rank === 16) {
-                                ctx.font = '11px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                                ctx.fillText('JOKER', this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 26);
-                            }
-                        } else {
-                            ctx.fillStyle = color;
-                            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                            ctx.textAlign = 'left';
-                            ctx.fillText(this.displayRank, this.x+6, cy+20);
-                            ctx.font = '13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                            ctx.fillText(this.displaySuit, this.x+6, cy+37);
-                            ctx.font = '32px serif';
-                            ctx.textAlign = 'center';
-                            ctx.fillText(this.displaySuit, this.x + CARD_WIDTH/2, cy + CARD_HEIGHT/2 + 10);
-                            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                            ctx.textAlign = 'right';
-                            ctx.fillText(this.displayRank, this.x + CARD_WIDTH-6, cy + CARD_HEIGHT-10);
-                            ctx.font = '13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                            ctx.fillText(this.displaySuit, this.x + CARD_WIDTH-6, cy + CARD_HEIGHT-26);
-                        }
-                    } else {
-                        ctx.fillStyle = '#2850a0';
-                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                        ctx.fill();
-                        ctx.strokeStyle = '#1a3870';
-                        ctx.lineWidth = 2;
-                        this._roundRect(ctx, this.x, cy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                        ctx.stroke();
-                        ctx.fillStyle = '#3868c0';
-                        this._roundRect(ctx, this.x+8, cy+8, CARD_WIDTH-16, CARD_HEIGHT-16, 4);
-                        ctx.fill();
-                        const cx = this.x + CARD_WIDTH/2;
-                        const mcy = cy + CARD_HEIGHT/2;
-                        ctx.fillStyle = '#6090d8';
-                        ctx.beginPath();
-                        ctx.moveTo(cx, mcy-14);
-                        ctx.lineTo(cx+10, mcy);
-                        ctx.lineTo(cx, mcy+14);
-                        ctx.lineTo(cx-10, mcy);
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                    ctx.textAlign = 'start';
-                }
-                _roundRect(ctx, x, y, w, h, r) {
-                    ctx.beginPath();
-                    ctx.moveTo(x+r, y);
-                    ctx.lineTo(x+w-r, y);
-                    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-                    ctx.lineTo(x+w, y+h-r);
-                    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-                    ctx.lineTo(x+r, y+h);
-                    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-                    ctx.lineTo(x, y+r);
-                    ctx.quadraticCurveTo(x, y, x+r, y);
-                    ctx.closePath();
+            // 内框
+            ctx.strokeStyle = 'rgba(160,190,255,.35)';
+            ctx.lineWidth = 1;
+            this._roundRect(ctx, x + 7, y + 7, w - 14, h - 14, 5);
+            ctx.stroke();
+
+            // 中央菱形
+            const cx = x + w / 2, cy = y + h / 2;
+            ctx.fillStyle = 'rgba(130,175,255,.42)';
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - 17);
+            ctx.lineTo(cx + 12, cy);
+            ctx.lineTo(cx, cy + 17);
+            ctx.lineTo(cx - 12, cy);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(200,225,255,.65)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(230,240,255,.55)';
+            ctx.fill();
+        }
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _roundRect(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   牌型分析
+   ══════════════════════════════════════════════════════ */
+function getRankCounts(cards) {
+    const c = {};
+    for (const card of cards) c[card.rank] = (c[card.rank] || 0) + 1;
+    return c;
+}
+
+function analyzeHand(cards) {
+    if (!cards || !cards.length) return null;
+    const n = cards.length;
+    const counts = getRankCounts(cards);
+    const ranks = Object.keys(counts).map(Number).sort((a, b) => a - b);
+    const vals = ranks.map(r => counts[r]).sort((a, b) => a - b);
+
+    // 王炸
+    if (n === 2 && counts[16] === 1 && counts[17] === 1)
+        return { type: 'rocket', mainRank: 100, length: 1 };
+    // 炸弹
+    if (n === 4 && ranks.length === 1)
+        return { type: 'bomb', mainRank: ranks[0], length: 1 };
+    // 单张
+    if (n === 1) return { type: 'single', mainRank: ranks[0], length: 1 };
+    // 对子
+    if (n === 2 && ranks.length === 1) return { type: 'pair', mainRank: ranks[0], length: 1 };
+    // 三张
+    if (n === 3 && ranks.length === 1) return { type: 'triple', mainRank: ranks[0], length: 1 };
+    // 三带一
+    if (n === 4 && vals.length === 2 && vals[0] === 1 && vals[1] === 3)
+        return { type: 'triple_one', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
+    // 三带二
+    if (n === 5 && vals.length === 2 && vals[0] === 2 && vals[1] === 3)
+        return { type: 'triple_two', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
+    // 四带二单
+    if (n === 6 && vals.length === 3 && vals[0] === 1 && vals[1] === 1 && vals[2] === 4)
+        return { type: 'quad_two', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
+    // 四带两对
+    if (n === 8 && vals.length === 3 && vals[0] === 2 && vals[1] === 2 && vals[2] === 4)
+        return { type: 'quad_two_pair', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
+
+    // 顺子（5 张以上，不含 2 和王）
+    if (n >= 5 && ranks.length === n && ranks[n - 1] <= 14 && ranks[n - 1] - ranks[0] === n - 1)
+        return { type: 'straight', mainRank: ranks[n - 1], length: n };
+
+    // 连对（3 对以上）
+    if (n >= 6 && n % 2 === 0 && ranks.length === n / 2 &&
+        ranks.every(r => counts[r] === 2) && ranks[ranks.length - 1] <= 14 &&
+        ranks[ranks.length - 1] - ranks[0] === ranks.length - 1)
+        return { type: 'straight_pair', mainRank: ranks[ranks.length - 1], length: ranks.length };
+
+    // 飞机
+    const tripleRanks = ranks.filter(r => counts[r] >= 3 && r <= 14);
+    const maxLen = Math.min(6, Math.floor(tripleRanks.length));
+    for (let len = maxLen; len >= 2; len--) {
+        for (let s = 0; s + len <= tripleRanks.length; s++) {
+            const seq = tripleRanks.slice(s, s + len);
+            if (seq[seq.length - 1] - seq[0] !== len - 1) continue;
+            if (!seq.every(r => counts[r] >= 3)) continue;
+
+            const tripCount = len * 3;
+            const rem = n - tripCount;
+            const wing = {};
+            for (const r of ranks) wing[r] = counts[r];
+            for (const r of seq) wing[r] -= 3;
+            const wingRanks = Object.keys(wing).map(Number).filter(r => wing[r] > 0);
+            const wingTotal = wingRanks.reduce((a, r) => a + wing[r], 0);
+
+            if (rem === 0 && seq.every(r => counts[r] === 3))
+                return { type: 'plane', mainRank: seq[seq.length - 1], length: len };
+            if (rem === len && wingTotal === len)
+                return { type: 'plane_single', mainRank: seq[seq.length - 1], length: len };
+            if (rem === len * 2 && wingRanks.length === len && wingRanks.every(r => wing[r] === 2))
+                return { type: 'plane_pair', mainRank: seq[seq.length - 1], length: len };
+        }
+    }
+    return null;
+}
+
+function canBeat(newT, lastT) {
+    if (!newT) return false;
+    if (!lastT) return true;
+    if (newT.type === 'rocket') return true;
+    if (lastT.type === 'rocket') return false;
+    if (newT.type === 'bomb') {
+        if (lastT.type !== 'bomb') return true;
+        return newT.mainRank > lastT.mainRank;
+    }
+    if (lastT.type === 'bomb') return false;
+    if (newT.type === lastT.type && newT.length === lastT.length)
+        return newT.mainRank > lastT.mainRank;
+    return false;
+}
+
+/* ══════════════════════════════════════════════════════
+   AI
+   ══════════════════════════════════════════════════════ */
+class AIPlayer {
+    constructor(playerId, difficulty = 'normal') {
+        this.playerId = playerId;
+        this.difficulty = difficulty;
+        this.hand = [];
+        this.isLandlord = false;
+    }
+
+    /* ——— 主入口：返回要出的牌，或 null 表示不要 ——— */
+    findPlay(game) {
+        if (!this.hand.length) return null;
+        const last = game.lastPlayInfo;
+
+        // 能一把甩完就甩完
+        const whole = analyzeHand(this.hand);
+        if (whole && canBeat(whole, last)) return [...this.hand];
+
+        if (!last) return this._leadPlay(game);
+
+        // 队友出的牌 —— 农民之间一般不互相压
+        if (this._isTeammate(game, game.lastPlayedBy)) {
+            // 除非自己马上就能走完
+            if (this.hand.length <= 2) {
+                const trySame = this._followPlay(game, last);
+                if (trySame && trySame.length === this.hand.length) return trySame;
+            }
+            return null;
+        }
+
+        return this._followPlay(game, last);
+    }
+
+    /* ——— 判断队友 ——— */
+    _isTeammate(game, pid) {
+        if (pid === -1 || pid === this.playerId) return false;
+        if (this.isLandlord) return false;
+        return pid !== game.landlordId;
+    }
+    _getEnemies(game) {
+        if (this.isLandlord) return [0, 1, 2].filter(p => p !== this.playerId);
+        return [game.landlordId].filter(p => p >= 0);
+    }
+
+    /* ═══════ 领出（自己先手） ═══════ */
+    _leadPlay(game) {
+        const hand = this.hand;
+        const n = hand.length;
+        if (n === 1) return [...hand];
+
+        const counts = getRankCounts(hand);
+        const byRank = {};
+        for (const c of hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const ranksAsc = Object.keys(byRank).map(Number).sort((a, b) => a - b);
+
+        const enemies = this._getEnemies(game);
+        const enemyMin = enemies.length
+            ? Math.min(...enemies.map(p => game.playersHand[p].length))
+            : 99;
+
+        // 对手只剩一张 → 出对子 / 大牌压制
+        if (enemyMin === 1) {
+            const pairsDesc = ranksAsc.filter(r => counts[r] >= 2 && r <= 15).sort((a, b) => b - a);
+            if (pairsDesc.length) return byRank[pairsDesc[0]].slice(0, 2);
+            const triDesc = ranksAsc.filter(r => counts[r] >= 3).sort((a, b) => b - a);
+            if (triDesc.length) return byRank[triDesc[0]].slice(0, 3);
+            return [byRank[ranksAsc[ranksAsc.length - 1]][0]];
+        }
+
+        // 困难 / 普通：优先甩长顺子
+        if (this.difficulty !== 'easy') {
+            const st = this._findLongestStraight();
+            if (st && st.length >= 5) return st;
+        }
+
+        // 只剩两手且能组成"三带一/三带二"时优先
+        if (this.difficulty === 'hard') {
+            const tri = ranksAsc.filter(r => counts[r] === 3);
+            if (tri.length && n <= 8) {
+                const r = tri[0];
+                const tr = byRank[r].slice(0, 3);
+                const rem = hand.filter(c => !tr.includes(c));
+                if (rem.length === 1) return [...tr, rem[0]];
+                if (rem.length === 2 && rem[0].rank === rem[1].rank) return [...tr, ...rem];
+            }
+        }
+
+        // 单张（不拆炸弹/三张）
+        const singles = ranksAsc.filter(r => counts[r] === 1);
+        if (singles.length) return [byRank[singles[0]][0]];
+
+        // 对子
+        const pairs = ranksAsc.filter(r => counts[r] === 2 && r <= 15);
+        if (pairs.length) return byRank[pairs[0]].slice(0, 2);
+
+        // 三张
+        const triples = ranksAsc.filter(r => counts[r] === 3);
+        if (triples.length) {
+            const tr = byRank[triples[0]].slice(0, 3);
+            const rem = hand.filter(c => !tr.includes(c));
+            // 带一张散牌
+            if (rem.length && this.difficulty !== 'easy' && rem.length <= 2) {
+                const remSorted = [...rem].sort((a, b) => a.rank - b.rank);
+                return [...tr, remSorted[0]];
+            }
+            return tr;
+        }
+
+        // 只剩炸弹了
+        return [byRank[ranksAsc[0]][0]];
+    }
+
+    /* ═══════ 跟牌 ═══════ */
+    _followPlay(game, last) {
+        const enemies = this._getEnemies(game);
+        const enemyMin = enemies.length
+            ? Math.min(...enemies.map(p => game.playersHand[p].length))
+            : 99;
+        const desperate = enemyMin <= 2;
+
+        // 先试着按同牌型压
+        const same = this._findBeatingSame(last);
+        if (same) {
+            const info = analyzeHand(same);
+            // 尽量不拆炸弹来压普通牌
+            if (info && info.type === 'bomb' && last.type !== 'bomb' && last.type !== 'rocket') {
+                if (this.difficulty === 'easy') return Math.random() < 0.5 ? same : null;
+                if (!desperate && this.hand.length > 5) return null;
+            }
+            // 拆对子/三张压制时，如果手上的牌还很多，适当克制
+            return same;
+        }
+
+        // 炸弹
+        const bomb = this._findSmallestBomb();
+        if (bomb) {
+            const bInfo = analyzeHand(bomb);
+            if (canBeat(bInfo, last)) {
+                if (desperate) return bomb;
+                if (last.type === 'bomb') return bomb;
+                if (this.hand.length <= 5) return bomb;
+                if (this.difficulty === 'hard' && this.hand.length <= 8) return bomb;
+                if (this.difficulty === 'normal' && Math.random() < 0.3) return bomb;
+                if (this.difficulty === 'easy' && Math.random() < 0.12) return bomb;
+            }
+        }
+
+        // 火箭
+        if (desperate || this.difficulty === 'hard') {
+            const rocket = this._findRocket();
+            if (rocket) {
+                const rInfo = analyzeHand(rocket);
+                if (canBeat(rInfo, last)) {
+                    if (desperate || Math.random() < 0.4) return rocket;
                 }
             }
+        }
+        return null;
+    }
 
-            function getRankCounts(cards) { const cts={}; for(const c of cards) cts[c.rank]=(cts[c.rank]||0)+1; return cts; }
+    _findBeatingSame(info) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const sRanks = Object.keys(byRank).map(Number).sort((a, b) => a - b);
 
-            function analyzeHand(cards) {
-                if (!cards || !cards.length) return null;
-                const n = cards.length;
-                const ranks = cards.map(c=>c.rank).sort((a,b)=>a-b);
-                const counts = getRankCounts(cards);
-                const uniqueRanks = Object.keys(counts).map(Number).sort((a,b)=>a-b);
-                const vals = Object.values(counts).sort((a,b)=>a-b);
-                if (n===2 && counts[16]===1 && counts[17]===1) return {type:'rocket',weight:1000,mainRank:17,length:1};
-                if (n===4 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===4) return {type:'bomb',weight:500+uniqueRanks[0],mainRank:uniqueRanks[0],length:1};
-                if (n===4 && vals.join(',')==='1,3') { const mr = uniqueRanks.find(r=>counts[r]===3); return {type:'triple_one',weight:mr,mainRank:mr,length:1}; }
-                if (n===5 && vals.join(',')==='2,3') { const mr = uniqueRanks.find(r=>counts[r]===3); return {type:'triple_two',weight:mr,mainRank:mr,length:1}; }
-                if (n===6 && (vals.join(',')==='1,1,4'||vals.join(',')==='2,4')) { const mr = uniqueRanks.find(r=>counts[r]===4); return {type:'quad_two',weight:400+mr,mainRank:mr,length:1}; }
-                if (n===8 && vals.join(',')==='2,2,4') { const mr = uniqueRanks.find(r=>counts[r]===4); return {type:'quad_two_pair',weight:400+mr,mainRank:mr,length:1}; }
-                if (n===1) return {type:'single',weight:ranks[0],mainRank:ranks[0],length:1};
-                if (n===2 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===2) return {type:'pair',weight:ranks[0],mainRank:ranks[0],length:1};
-                if (n===3 && uniqueRanks.length===1 && counts[uniqueRanks[0]]===3) return {type:'triple',weight:ranks[0],mainRank:ranks[0],length:1};
-                if (n>=5 && uniqueRanks.length===n && uniqueRanks.every(r=>counts[r]===1) && uniqueRanks[n-1]<=14 && uniqueRanks[n-1]-uniqueRanks[0]===n-1 && uniqueRanks.every(r=>r<=14))
-                    return {type:'straight',weight:uniqueRanks[n-1],mainRank:uniqueRanks[n-1],length:n};
-                if (n>=6 && n%2===0 && uniqueRanks.every(r=>counts[r]===2) && uniqueRanks.length>=3 && uniqueRanks[uniqueRanks.length-1]<=14 && uniqueRanks[uniqueRanks.length-1]-uniqueRanks[0]===uniqueRanks.length-1 && uniqueRanks.every(r=>r<=14))
-                    return {type:'straight_pair',weight:uniqueRanks[uniqueRanks.length-1],mainRank:uniqueRanks[uniqueRanks.length-1],length:uniqueRanks.length};
-                const triples = uniqueRanks.filter(r=>counts[r]>=3&&r<=14).sort((a,b)=>a-b);
-                for(let si=0; si<triples.length; si++) {
-                    for(let ei=si+1; ei<triples.length; ei++) {
-                        const seq = triples.slice(si,ei+1);
-                        if(seq[ei]-seq[0]===seq.length-1 && seq.length>=2) {
-                            const tripCnt = seq.reduce((s,r)=>s+counts[r],0);
-                            const rem = n - tripCnt;
-                            if(rem===0 && seq.every(r=>counts[r]===3)) return {type:'plane',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
-                            if(rem===seq.length && rem>0) return {type:'plane_single',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
-                            if(rem===seq.length*2) {
-                                const wingRanks = uniqueRanks.filter(r=>!seq.includes(r));
-                                if(wingRanks.length===seq.length && wingRanks.every(r=>counts[r]===2))
-                                    return {type:'plane_pair',weight:seq[seq.length-1],mainRank:seq[seq.length-1],length:seq.length};
-                            }
-                        }
+        const lt = info.type, lr = info.mainRank, ll = info.length;
+        // 拆牌代价：单张最优，炸弹最差
+        const cost = n => (n === 1 ? 0 : n === 2 ? 1 : n === 3 ? 2 : 20);
+
+        if (lt === 'single') {
+            const cands = sRanks.filter(r => r > lr);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return [byRank[cands[0]][0]];
+        }
+        if (lt === 'pair') {
+            const cands = sRanks.filter(r => r > lr && byRank[r].length >= 2);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return byRank[cands[0]].slice(0, 2);
+        }
+        if (lt === 'triple') {
+            const cands = sRanks.filter(r => r > lr && byRank[r].length >= 3);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return byRank[cands[0]].slice(0, 3);
+        }
+        if (lt === 'triple_one' || lt === 'triple_two') {
+            const need = lt === 'triple_one' ? 1 : 2;
+            for (const r of sRanks) {
+                if (r <= lr || byRank[r].length < 3) continue;
+                const tr = byRank[r].slice(0, 3);
+                const rem = this.hand.filter(c => !tr.includes(c));
+                if (need === 1) {
+                    if (rem.length >= 1) {
+                        const rc = getRankCounts(rem);
+                        const wr = Object.keys(rc).map(Number)
+                            .sort((a, b) => rc[a] - rc[b] || a - b);
+                        return [...tr, rem.find(c => c.rank === wr[0])];
                     }
-                }
-                return null;
-            }
-
-            function canBeat(newT, lastT) {
-                if(!lastT) return true;
-                if(newT.type==='rocket') return true;
-                if(lastT.type==='rocket') return false;
-                if(newT.type==='bomb') { if(lastT.type!=='bomb') return true; return newT.mainRank > lastT.mainRank; }
-                if(lastT.type==='bomb') return false;
-                if(newT.type===lastT.type && newT.length===lastT.length) return newT.mainRank > lastT.mainRank;
-                return false;
-            }
-
-            class AIPlayer {
-                constructor(playerId, difficulty='normal') {
-                    this.playerId = playerId;
-                    this.difficulty = difficulty;
-                    this.hand = [];
-                    this.isLandlord = false;
-                }
-                findSmallestPlayable(lastInfo) {
-                    if(!lastInfo) return this._findOpening();
-                    const same = this._findBeatingSame(lastInfo);
-                    if(same) return same;
-                    if(this.difficulty!=='easy') { const b = this._findSmallestBomb(); if(b && (this.difficulty==='hard'||Math.random()<0.5)) return b; }
-                    if(this.difficulty==='hard') { const r = this._findRocket(); if(r) return r; }
-                    if(this.difficulty==='easy') { const b = this._findSmallestBomb(); if(b && Math.random()<0.3) return b; }
-                    return null;
-                }
-                _findOpening() {
-                    if(!this.hand.length) return null;
-                    const counts = getRankCounts(this.hand);
-                    const sorted = [...this.hand].sort((a,b)=>a.rank-b.rank);
-                    if(this.difficulty==='easy') return [sorted[0]];
-                    if(this.difficulty==='normal') {
-                        const st = this._findLongestStraight();
-                        if(st && st.length>=5) return st;
-                        return [sorted[0]];
-                    }
-                    const st = this._findLongestStraight();
-                    if(st && st.length>=5 && Math.random()<0.5) return st;
-                    const pairs = Object.keys(counts).map(Number).filter(r=>counts[r]>=2&&r<=14);
-                    if(pairs.length && Math.random()<0.4) {
-                        const mp = Math.min(...pairs);
-                        return this.hand.filter(c=>c.rank===mp).slice(0,2);
-                    }
-                    return [sorted[0]];
-                }
-                _findBeatingSame(info) {
-                    const counts = getRankCounts(this.hand);
-                    const byRank = {};
-                    for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    const sRanks = Object.keys(byRank).map(Number).sort((a,b)=>a-b);
-                    const lt = info.type, lr = info.mainRank, ll = info.length;
-                    if(lt==='single') { for(const r of sRanks) if(r>lr) return [byRank[r][0]]; return null; }
-                    if(lt==='pair') { for(const r of sRanks) if(r>lr && byRank[r].length>=2) return byRank[r].slice(0,2); return null; }
-                    if(lt==='triple') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) return byRank[r].slice(0,3); return null; }
-                    if(lt==='triple_one') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) { const tr=byRank[r].slice(0,3); const rem=this.hand.filter(c=>!tr.includes(c)); if(rem.length) return [...tr, rem[0]]; } return null; }
-                    if(lt==='triple_two') { for(const r of sRanks) if(r>lr && byRank[r].length>=3) { const tr=byRank[r].slice(0,3); const rem=this.hand.filter(c=>!tr.includes(c)); const rc=getRankCounts(rem); const pr=Object.keys(rc).map(Number).find(rr=>rc[rr]>=2); if(pr!==undefined) { const pc=rem.filter(c=>c.rank===pr).slice(0,2); return [...tr,...pc]; } } return null; }
-                    if(lt==='straight') return this._findBeatingStraight(lr,ll);
-                    if(lt==='straight_pair') return this._findBeatingStraightPair(lr,ll);
-                    if(['plane','plane_single','plane_pair'].includes(lt)) return this._findBeatingPlane(lt,lr,ll);
-                    if(lt==='quad_two'||lt==='quad_two_pair') { for(const r of sRanks) if(r>lr && byRank[r].length>=4) { const qd=byRank[r].slice(0,4); const rem=this.hand.filter(c=>!qd.includes(c)); if(rem.length>=2) return [...qd,...rem.slice(0,2)]; } return null; }
-                    return null;
-                }
-                _findBeatingStraight(lr,ll) {
-                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    for(let sr=3; sr<=14-ll+1; sr++) { const er=sr+ll-1; if(er>lr && er<=14) { let ok=true; for(let r=sr; r<=er; r++) if(!byRank[r]||byRank[r].length<1) { ok=false; break; } if(ok) { const res=[]; for(let r=sr; r<=er; r++) res.push(byRank[r][0]); return res; } } }
-                    return null;
-                }
-                _findBeatingStraightPair(lr,ll) {
-                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    for(let sr=3; sr<=14-ll+1; sr++) { const er=sr+ll-1; if(er>lr && er<=14) { let ok=true; for(let r=sr; r<=er; r++) if(!byRank[r]||byRank[r].length<2) { ok=false; break; } if(ok) { const res=[]; for(let r=sr; r<=er; r++) res.push(...byRank[r].slice(0,2)); return res; } } }
-                    return null;
-                }
-                _findBeatingPlane(lt,lr,ll) {
-                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    const trs = Object.keys(byRank).map(Number).filter(r=>byRank[r].length>=3&&r<=14).sort((a,b)=>a-b);
-                    for(let si=0; si<trs.length; si++) {
-                        for(let ei=si+ll-1; ei<trs.length; ei++) {
-                            const seq = trs.slice(si,ei+1);
-                            if(seq.length===ll && seq[ei]-seq[0]===ll-1 && seq[ei]>lr) {
-                                const tripCards = []; for(const r of seq) tripCards.push(...byRank[r].slice(0,3));
-                                const rem = this.hand.filter(c=>!tripCards.includes(c));
-                                if(lt==='plane') return tripCards;
-                                if(lt==='plane_single' && rem.length>=ll) return [...tripCards,...rem.slice(0,ll)];
-                                if(lt==='plane_pair') {
-                                    const rc = getRankCounts(rem);
-                                    const prs = Object.keys(rc).map(Number).filter(r=>rc[r]>=2);
-                                    if(prs.length>=ll) { const wing=[]; for(const r of prs.slice(0,ll)) wing.push(...rem.filter(c=>c.rank===r).slice(0,2)); return [...tripCards,...wing]; }
-                                }
-                            }
-                        }
-                    }
-                    return null;
-                }
-                _findSmallestBomb() {
-                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    const bombs = Object.entries(byRank).filter(([,cs])=>cs.length>=4).map(([r,cs])=>[Number(r),cs]).sort((a,b)=>a[0]-b[0]);
-                    return bombs.length ? bombs[0][1].slice(0,4) : null;
-                }
-                _findRocket() { const hs=this.hand.some(c=>c.rank===16), hb=this.hand.some(c=>c.rank===17); if(hs&&hb) return this.hand.filter(c=>c.rank===16||c.rank===17); return null; }
-                _findLongestStraight() {
-                    const byRank = {}; for(const c of this.hand) { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); }
-                    let best=null;
-                    for(let sr=3; sr<=10; sr++) { const cur=[]; for(let r=sr; r<=14; r++) { if(byRank[r]&&byRank[r].length>=1) cur.push(r); else break; } if(cur.length>=5 && (!best || cur.length>best.length)) best=cur; }
-                    if(best) { const res=[]; for(const r of best) res.push(byRank[r][0]); return res; }
-                    return null;
-                }
-            }
-
-            class Game {
-                constructor() {
-                    this.lang = 'zh';
-                    window._lang = 'zh';
-                    this.difficulty = 'normal';
-                    this.settingsOpen = false;
-                    this.state = 'idle';
-                    this.playersHand = [[],[],[]];
-                    this.landlordCards = [];
-                    this.landlordId = -1;
-                    this.currentPlayer = 0;
-                    this.lastPlayedCards = [];
-                    this.lastPlayedBy = -1;
-                    this.lastPlayInfo = null;
-                    this.passCount = 0;
-                    this.callScores = [0,0,0];
-                    this.callStartPlayer = 0;
-                    this.callCurrent = 0;
-                    this.grabPhase = false;
-                    this.grabScores = [0,0,0];
-                    this.grabCurrent = 0;
-                    this.grabStart = 0;
-                    this.winner = -1;
-                    this.message = '';
-                    this.messageTimer = 0;
-                    this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
-                    this.aiTimer = null;
-                    this._mouseX = -100; this._mouseY = -100;
-                    this._playBtnRect = null; this._passBtnRect = null;
-                    this._callBtnRect = null; this._noCallBtnRect = null;
-                    this._grabBtnRect = null; this._noGrabBtnRect = null;
-                    this._startBtnRect = null;
-                    this.initNewGame();
-                }
-                t(key) { return (TEXTS[this.lang]||TEXTS['zh'])[key]||key; }
-
-                initNewGame() {
-                    if(this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
-                    const deck = [];
-                    for(const s of [SUIT_SPADE,SUIT_HEART,SUIT_CLUB,SUIT_DIAMOND]) for(let r=3; r<=15; r++) deck.push(new Card(s,r));
-                    deck.push(new Card(SUIT_JOKER,16), new Card(SUIT_JOKER,17));
-                    for(let i=deck.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
-                    this.playersHand = [deck.slice(0,17), deck.slice(17,34), deck.slice(34,51)];
-                    this.landlordCards = deck.slice(51,54);
-                    this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
-                    this.aiPlayers[1].hand = [...this.playersHand[1]];
-                    this.aiPlayers[2].hand = [...this.playersHand[2]];
-                    for(const c of this.playersHand[0]) c.faceUp = true;
-                    for(const c of this.playersHand[1]) c.faceUp = false;
-                    for(const c of this.playersHand[2]) c.faceUp = false;
-                    for(const c of this.landlordCards) c.faceUp = false;
-                    this.state = 'idle'; this.landlordId = -1; this.currentPlayer = -1;
-                    this.lastPlayedCards = []; this.lastPlayedBy = -1; this.lastPlayInfo = null; this.passCount = 0;
-                    this.callScores = [0,0,0]; this.callStartPlayer = Math.floor(Math.random()*3); this.callCurrent = this.callStartPlayer;
-                    this.grabPhase = false; this.grabScores = [0,0,0]; this.grabCurrent = 0; this.grabStart = 0;
-                    this.winner = -1; this.message = ''; this.messageTimer = 0;
-                    for(let i=0;i<3;i++) this.playersHand[i].sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
-                    this.landlordCards.sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
-                    this._layoutAllCards();
-                }
-
-                _layoutAllCards() {
-                    const hand0 = this.playersHand[0];
-                    const totalW0 = hand0.length * CARD_WIDTH + (hand0.length-1)*8;
-                    let spacing0 = 8;
-                    if(totalW0 > CANVAS_WIDTH-100) spacing0 = -(totalW0 - (CANVAS_WIDTH-100)) / Math.max(hand0.length-1,1);
-                    const startX0 = (CANVAS_WIDTH - (hand0.length*(CARD_WIDTH+spacing0)-spacing0)) / 2;
-                    const baseY0 = CANVAS_HEIGHT - CARD_HEIGHT - 50;  // 上移手牌，避免按钮遮挡
-                    for(let i=0; i<hand0.length; i++) {
-                        hand0[i].setTarget(startX0 + i*(CARD_WIDTH+spacing0), baseY0);
-                        hand0[i].snapToTarget();
-                    }
-                    const hand1 = this.playersHand[1];
-                    for(let i=0; i<hand1.length; i++) { hand1[i].setTarget(25 + i*21, 45); hand1[i].snapToTarget(); }
-                    const hand2 = this.playersHand[2];
-                    const totalW2 = hand2.length*21;
-                    const ai2StartX = CANVAS_WIDTH - 25 - totalW2;
-                    for(let i=0; i<hand2.length; i++) { hand2[i].setTarget(ai2StartX + i*21, 45); hand2[i].snapToTarget(); }
-                    for(let i=0; i<this.landlordCards.length; i++) {
-                        this.landlordCards[i].setTarget(CANVAS_WIDTH/2 - 55 + i*50, CANVAS_HEIGHT/2 - 55);
-                        this.landlordCards[i].snapToTarget();
-                    }
-                }
-
-                startCallingPhase() {
-                    this.state='calling'; this.callScores=[0,0,0]; this.callStartPlayer=Math.floor(Math.random()*3); this.callCurrent=this.callStartPlayer; this.grabPhase=false; this.message=''; this.messageTimer=0;
-                    this._processCurrentCaller();
-                }
-                _processCurrentCaller() { if(this.state!=='calling') return; this.currentPlayer=this.callCurrent; if(this.callCurrent===0) this.message=''; else this._aiCallLandlord(this.callCurrent); }
-                _aiCallLandlord(pid) {
-                    const ai=this.aiPlayers[pid]; const score=this._evaluateHandStrength(ai.hand);
-                    const th=this.difficulty==='easy'?40:(this.difficulty==='normal'?30:20);
-                    if(score>th || (this.callScores.every(s=>s===0) && score>15)) {
-                        let cs=1; if(this.difficulty==='hard'&&score>60) cs=Math.min(3,1+Math.floor(score/30)); else if(this.difficulty==='normal'&&score>50) cs=2;
-                        this.callScores[pid]=cs; this.message=`AI${pid} ${this.t('call_landlord')} (${cs}分)`;
-                    } else { this.callScores[pid]=0; this.message=`AI${pid} ${this.t('no_call')}`; }
-                    this.messageTimer=55; this.aiTimer=setTimeout(()=>this._advanceCalling(),700);
-                }
-                _evaluateHandStrength(hand) {
-                    if(!hand.length) return 0; const counts=getRankCounts(hand); let score=0;
-                    const bombs=Object.values(counts).filter(c=>c>=4).length; score+=bombs*15;
-                    if(counts[16]&&counts[17]) score+=25;
-                    for(const r of [15,14,13,12]) if(counts[r]) score+=counts[r]*3;
-                    const ranks=[...new Set(hand.map(c=>c.rank).filter(r=>r<=14))].sort((a,b)=>a-b);
-                    let consec=0,maxC=0; for(let i=0;i<ranks.length-1;i++) { if(ranks[i+1]-ranks[i]===1) { consec++; maxC=Math.max(maxC,consec); } else consec=0; }
-                    score+=maxC*5;
-                    score+=Object.values(counts).filter(c=>c>=3).length*8;
-                    score+=Object.values(counts).filter(c=>c>=2).length*2;
-                    return Math.min(100,score);
-                }
-                _advanceCalling() { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.callCurrent=(this.callCurrent+1)%3; if(this.callCurrent===this.callStartPlayer) this._resolveCalling(); else this._processCurrentCaller(); }
-                _resolveCalling() {
-                    const maxS=Math.max(...this.callScores); if(maxS===0) { this.message=this.t('no_one_call'); this.messageTimer=80; this.aiTimer=setTimeout(()=>{this.initNewGame();this.startCallingPhase();},1400); return; }
-                    const cands=[]; for(let i=0;i<3;i++) if(this.callScores[i]===maxS) cands.push(i);
-                    if(cands.length===1) this._setLandlord(cands[0]); else this._startGrabPhase(cands);
-                }
-                _startGrabPhase(cands) { this.state='grabbing'; this.grabPhase=true; this.grabScores=[0,0,0]; this.grabStart=(cands[0]+1)%3; this.grabCurrent=this.grabStart; this._processGrabber(); }
-                _processGrabber() { if(this.grabCurrent===0) { this.currentPlayer=0; this.message=''; } else this._aiGrabLandlord(this.grabCurrent); }
-                _aiGrabLandlord(pid) {
-                    const ai=this.aiPlayers[pid]; const score=this._evaluateHandStrength(ai.hand);
-                    const th=this.difficulty==='easy'?50:(this.difficulty==='normal'?40:30);
-                    if(score>th) { this.grabScores[pid]=(this.callScores[pid]||1)+1; this.message=`AI${pid} ${this.t('grab_landlord')}!`; }
-                    else { this.grabScores[pid]=0; this.message=`AI${pid} ${this.t('no_grab')}`; }
-                    this.messageTimer=55; this.aiTimer=setTimeout(()=>this._advanceGrabbing(),700);
-                }
-                _advanceGrabbing() { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.grabCurrent=(this.grabCurrent+1)%3; if(this.grabCurrent===this.grabStart) this._resolveGrabbing(); else this._processGrabber(); }
-                _resolveGrabbing() {
-                    const all=[]; for(let i=0;i<3;i++) { if(this.grabScores[i]>0) all.push([i,this.grabScores[i]]); else if(this.callScores[i]>0) all.push([i,this.callScores[i]]); }
-                    if(!all.length) { this.message=this.t('no_one_grab'); this.messageTimer=80; this.aiTimer=setTimeout(()=>{this.initNewGame();this.startCallingPhase();},1400); return; }
-                    all.sort((a,b)=>b[1]-a[1]); this._setLandlord(all[0][0]);
-                }
-                _setLandlord(pid) {
-                    this.landlordId=pid; this.aiPlayers[1].isLandlord=(pid===1); this.aiPlayers[2].isLandlord=(pid===2);
-                    for(const c of this.landlordCards) { c.faceUp=true; this.playersHand[pid].push(c); }
-                    if(pid!==0) this.aiPlayers[pid].hand=[...this.playersHand[pid]];
-                    this.playersHand[pid].sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
-                    if(pid!==0) this.aiPlayers[pid].hand.sort((a,b)=>a.rank-b.rank||a.suit-b.suit);
-                    this._layoutAllCards(); this.state='playing'; this.currentPlayer=pid;
-                    this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
-                    this.message=`${this.t('landlord')}: ${pid===0?this.t('you'):'AI'+pid}`; this.messageTimer=55;
-                    if(pid!==0) this._aiTurn(pid);
-                }
-                _aiTurn(pid) {
-                    if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;}
-                    this.currentPlayer=pid; const ai=this.aiPlayers[pid]; const cards=ai.findSmallestPlayable(this.lastPlayInfo);
-                    if(cards && cards.length) {
-                        const info=analyzeHand(cards);
-                        if(info && canBeat(info, this.lastPlayInfo)) {
-                            for(const c of cards) { const idx=ai.hand.indexOf(c); if(idx>=0) ai.hand.splice(idx,1); const idx2=this.playersHand[pid].indexOf(c); if(idx2>=0) this.playersHand[pid].splice(idx2,1); }
-                            this.lastPlayedCards=cards; this.lastPlayedBy=pid; this.lastPlayInfo=info; this.passCount=0;
-                            for(const c of cards) c.faceUp=true;
-                            this._layoutAllCards(); this.message=`AI${pid} ${this.t('ai_play')}`; this.messageTimer=35;
-                            if(this.playersHand[pid].length===0) { this._gameOver(pid); return; }
-                            this.currentPlayer=this._getNextPlayer(pid);
-                            this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); return;
-                        }
-                    }
-                    this._aiPass(pid);
-                }
-                _aiTurnIfNeeded() { if(this.state==='playing' && this.currentPlayer!==0) this._aiTurn(this.currentPlayer); }
-                _aiPass(pid) {
-                    if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;}
-                    if(!this.lastPlayInfo) {
-                        const ai=this.aiPlayers[pid]; if(ai.hand.length) {
-                            const sorted=[...ai.hand].sort((a,b)=>a.rank-b.rank); const card=sorted[0]; const info=analyzeHand([card]);
-                            if(info) {
-                                const idx=ai.hand.indexOf(card); if(idx>=0) ai.hand.splice(idx,1);
-                                const idx2=this.playersHand[pid].indexOf(card); if(idx2>=0) this.playersHand[pid].splice(idx2,1);
-                                this.lastPlayedCards=[card]; this.lastPlayedBy=pid; this.lastPlayInfo=info; this.passCount=0;
-                                card.faceUp=true; this._layoutAllCards(); this.message=`AI${pid} ${this.t('ai_play')}`; this.messageTimer=35;
-                                if(this.playersHand[pid].length===0) { this._gameOver(pid); return; }
-                                this.currentPlayer=this._getNextPlayer(pid);
-                                this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); return;
-                            }
-                        }
-                    }
-                    this.passCount++; this.message=`AI${pid} ${this.t('ai_pass')}`; this.messageTimer=35;
-                    if(this.passCount>=2) {
-                        this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
-                        this.currentPlayer=this._getNextPlayer(this.currentPlayer);
-                        if(this.currentPlayer===0) { this.message=this.t('new_round'); this.messageTimer=50; }
-                        else this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500);
-                    } else { this.currentPlayer=this._getNextPlayer(pid); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500); }
-                }
-                _getNextPlayer(pid) { return (pid+1)%3; }
-
-                playerPlayCards(selected) {
-                    if(this.currentPlayer!==0||this.state!=='playing') return false;
-                    const info=analyzeHand(selected); if(!info) { this.message=this.t('invalid_play'); this.messageTimer=45; return false; }
-                    if(!canBeat(info,this.lastPlayInfo)) { this.message=this.t('cant_beat'); this.messageTimer=45; return false; }
-                    for(const c of selected) { const idx=this.playersHand[0].indexOf(c); if(idx>=0) this.playersHand[0].splice(idx,1); }
-                    this.lastPlayedCards=selected; this.lastPlayedBy=0; this.lastPlayInfo=info; this.passCount=0;
-                    for(const c of this.playersHand[0]) c.selected=false;
-                    this._layoutAllCards(); this.message='';
-                    if(this.playersHand[0].length===0) { this._gameOver(0); return true; }
-                    this.currentPlayer=this._getNextPlayer(0); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),450); return true;
-                }
-                playerPass() {
-                    if(this.currentPlayer!==0||this.state!=='playing') return;
-                    if(!this.lastPlayInfo) { this.message=this.t('must_play'); this.messageTimer=45; return; }
-                    this.passCount++; this.message=this.t('pass'); this.messageTimer=30;
-                    if(this.passCount>=2) {
-                        this.lastPlayedCards=[]; this.lastPlayedBy=-1; this.lastPlayInfo=null; this.passCount=0;
-                        this.currentPlayer=this._getNextPlayer(this.currentPlayer);
-                        if(this.currentPlayer!==0) this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),500);
-                        else { this.message=this.t('new_round'); this.messageTimer=50; }
-                    } else { this.currentPlayer=this._getNextPlayer(0); this.aiTimer=setTimeout(()=>this._aiTurnIfNeeded(),450); }
-                }
-                _gameOver(wid) { if(this.aiTimer){clearTimeout(this.aiTimer);this.aiTimer=null;} this.state='ended'; this.winner=wid; this.message=wid===0?this.t('you_win'):this.t('you_lose'); this.messageTimer=180; for(const h of this.playersHand) for(const c of h) c.faceUp=true; for(const c of this.landlordCards) c.faceUp=true; }
-
-                update() {
-                    const all=[]; for(const h of this.playersHand) all.push(...h); all.push(...this.landlordCards);
-                    for(const c of this.lastPlayedCards) if(!all.includes(c)) all.push(c);
-                    for(const c of all) c.updatePosition();
-                    if(this.messageTimer>0) this.messageTimer--;
-                }
-
-                draw(ctx) {
-                    ctx.fillStyle='#19283d'; ctx.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
-                    const tr={x:70,y:125,w:CANVAS_WIDTH-140,h:CANVAS_HEIGHT-270};
-                    ctx.fillStyle='#1a5c30'; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+tr.h/2,tr.w/2,tr.h/2,0,0,Math.PI*2); ctx.fill();
-                    ctx.strokeStyle='#154a26'; ctx.lineWidth=4; ctx.stroke();
-                    for(let i=0;i<3;i++){ ctx.strokeStyle='#1e7038'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+tr.h/2,tr.w/2-25-i*30,tr.h/2-25-i*30,0,0,Math.PI*2); ctx.stroke(); }
-                    ctx.fillStyle='rgba(80,180,100,0.12)'; ctx.beginPath(); ctx.ellipse(tr.x+tr.w/2,tr.y+50,tr.w/2-70,tr.h/4,0,0,Math.PI*2); ctx.fill();
-
-                    const positions = [
-                        { x: CANVAS_WIDTH/2, y: CANVAS_HEIGHT-175 },
-                        { x: 140, y: 25 },
-                        { x: CANVAS_WIDTH-140, y: 25 }
-                    ];
-                    const names = [this.t('you'), 'AI 1', 'AI 2'];
-                    for(let i=0;i<3;i++) {
-                        const {x,y}=positions[i]; const color=i===this.landlordId?'#ffd740':'#fff';
-                        let label=names[i]; if(i===this.landlordId) label+=` [${this.t('landlord')}]`;
-                        ctx.fillStyle=color; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(label,x,y);
-                        const cnt=this.playersHand[i].length; ctx.fillStyle='#ccc'; ctx.font='13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif';
-                        ctx.fillText(`${cnt}${this.t('cards_count')}`,x,y+22);
-                    }
-                    ctx.textAlign='start';
-
-                    for(const c of this.landlordCards) {
-                        if(c.faceUp) c.draw(ctx,this.lang);
-                        else { const dx=c.targetX,dy=c.targetY; ctx.fillStyle='#5a2020'; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill(); ctx.strokeStyle='#3a1010'; ctx.lineWidth=2; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.stroke(); ctx.fillStyle='#ffd740'; ctx.font='bold 16px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText('?',dx+CARD_WIDTH/2,dy+CARD_HEIGHT/2+5); ctx.textAlign='start'; }
-                    }
-                    if(this.landlordCards.length) { ctx.fillStyle='#ffd740'; ctx.font='13px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText(this.t('bottom_cards'),CANVAS_WIDTH/2,CANVAS_HEIGHT/2-78); ctx.textAlign='start'; }
-
-                    if(this.lastPlayedCards.length) {
-                        const lc=this.lastPlayedCards; const tw=lc.length*CARD_WIDTH+(lc.length-1)*6; const sx=CANVAS_WIDTH/2-tw/2; const by=CANVAS_HEIGHT/2-160;
-                        for(let i=0;i<lc.length;i++) {
-                            const c=lc[i]; c.faceUp=true; const dx=sx+i*(CARD_WIDTH+6),dy=by;
-                            ctx.fillStyle='rgba(0,0,0,0.25)'; c._roundRect(ctx,dx+3,dy+3,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill();
-                            ctx.fillStyle='#faf8f0'; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.fill();
-                            ctx.strokeStyle='#bbb'; ctx.lineWidth=1; c._roundRect(ctx,dx,dy,CARD_WIDTH,CARD_HEIGHT,CARD_RADIUS); ctx.stroke();
-                            const color=c.isRed?'#d63031':'#1a1a1a';
-                            if(c.suit===SUIT_JOKER) {
-                                const jc=c.rank===17?'#d63031':'#555'; const jt=c.rank===17?(this.lang==='en'?'JO':'大'):(this.lang==='en'?'Jo':'小');
-                                ctx.fillStyle=jc; ctx.font='bold 18px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center'; ctx.fillText(jt,dx+CARD_WIDTH/2,dy+CARD_HEIGHT/2+6);
-                            } else {
-                                ctx.fillStyle=color; ctx.font='bold 15px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.fillText(c.displayRank,dx+5,dy+18);
-                                ctx.font='12px serif'; ctx.fillText(c.displaySuit,dx+5,dy+33);
-                            }
-                        }
-                        ctx.fillStyle='#ffd740'; ctx.font='12px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='right';
-                        const byLabel=`← ${this.lastPlayedBy===0?this.t('you'):'AI'+this.lastPlayedBy}`; ctx.fillText(byLabel,sx-10,by+CARD_HEIGHT/2+4); ctx.textAlign='start';
-                    }
-
-                    for(let i=0;i<3;i++) for(const c of this.playersHand[i]) c.draw(ctx,this.lang);
-
-                    if(this.message && this.messageTimer>0) {
-                        const alpha=Math.min(1,this.messageTimer/50); ctx.fillStyle=`rgba(255,215,64,${alpha})`; ctx.font='bold 22px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.message,CANVAS_WIDTH/2,CANVAS_HEIGHT/2+100); ctx.textAlign='start';
-                    }
-
-                    ctx.fillStyle='rgba(180,130,20,0.7)'; ctx.font='bold 36px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                    ctx.fillText(this.t('title'),CANVAS_WIDTH/2+2,38); ctx.fillStyle='#ffd740'; ctx.fillText(this.t('title'),CANVAS_WIDTH/2,36); ctx.textAlign='start';
-
-                    const gx=CANVAS_WIDTH-60, gy=42;
-                    ctx.fillStyle='#3a3a3a'; ctx.beginPath(); ctx.arc(gx,gy,24,0,Math.PI*2); ctx.fill();
-                    ctx.strokeStyle='#aaa'; ctx.lineWidth=2; ctx.stroke();
-                    ctx.strokeStyle='#aaa'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(gx,gy,12,0,Math.PI*2); ctx.stroke();
-                    for(let a=0;a<360;a+=45){ const rad=a*Math.PI/180; ctx.fillStyle='#aaa'; ctx.beginPath(); ctx.arc(gx+Math.cos(rad)*17,gy+Math.sin(rad)*17,4,0,Math.PI*2); ctx.fill(); }
-
-                    this._drawButtons(ctx);
-                }
-
-                _drawButtons(ctx) {
-                    const mx=this._mouseX, my=this._mouseY;
-                    if(this.state==='playing' && this.currentPlayer===0) {
-                        const pw=120, ph=42, px=CANVAS_WIDTH/2 - pw - 18, py=CANVAS_HEIGHT - 68;
-                        const hover=mx>=px&&mx<=px+pw&&my>=py&&my<=py+ph;
-                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,px,py,pw,ph,10); ctx.fill();
-                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,px,py,pw,ph,10); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.t('play'),px+pw/2,py+ph/2+6); ctx.textAlign='start';
-                        this._playBtnRect={x:px,y:py,w:pw,h:ph};
-
-                        if(this.lastPlayInfo) {
-                            const pw2=85, ph2=42, px2=CANVAS_WIDTH/2+18, py2=CANVAS_HEIGHT-68;
-                            const hover2=mx>=px2&&mx<=px2+pw2&&my>=py2&&my<=py2+ph2;
-                            ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,px2,py2,pw2,ph2,10); ctx.fill();
-                            ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,px2,py2,pw2,ph2,10); ctx.stroke();
-                            ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                            ctx.fillText(this.t('pass'),px2+pw2/2,py2+ph2/2+6); ctx.textAlign='start';
-                            this._passBtnRect={x:px2,y:py2,w:pw2,h:ph2};
-                        } else this._passBtnRect=null;
-                    } else { this._playBtnRect=null; this._passBtnRect=null; }
-
-                    if(this.state==='calling' && this.callCurrent===0) {
-                        const cw=130, ch=46, cx=CANVAS_WIDTH/2-cw-25, cy=CANVAS_HEIGHT/2+55;
-                        const hover=mx>=cx&&mx<=cx+cw&&my>=cy&&my<=cy+ch;
-                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,cx,cy,cw,ch,10); ctx.fill();
-                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,cx,cy,cw,ch,10); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.t('call_landlord'),cx+cw/2,cy+ch/2+6); ctx.textAlign='start';
-                        this._callBtnRect={x:cx,y:cy,w:cw,h:ch};
-
-                        const ncw=100, nch=46, ncx=CANVAS_WIDTH/2+25, ncy=CANVAS_HEIGHT/2+55;
-                        const hover2=mx>=ncx&&mx<=ncx+ncw&&my>=ncy&&my<=ncy+nch;
-                        ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,ncx,ncy,ncw,nch,10); ctx.fill();
-                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,ncx,ncy,ncw,nch,10); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.t('no_call'),ncx+ncw/2,ncy+nch/2+6); ctx.textAlign='start';
-                        this._noCallBtnRect={x:ncx,y:ncy,w:ncw,h:nch};
-                    } else { this._callBtnRect=null; this._noCallBtnRect=null; }
-
-                    if(this.state==='grabbing' && this.grabCurrent===0) {
-                        const gw=130, gh=46, gx=CANVAS_WIDTH/2-gw-25, gy=CANVAS_HEIGHT/2+55;
-                        const hover=mx>=gx&&mx<=gx+gw&&my>=gy&&my<=gy+gh;
-                        ctx.fillStyle=hover?'#e05040':'#c03020'; this._roundRect(ctx,gx,gy,gw,gh,10); ctx.fill();
-                        ctx.strokeStyle='#ffd740'; ctx.lineWidth=2; this._roundRect(ctx,gx,gy,gw,gh,10); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.t('grab_landlord'),gx+gw/2,gy+gh/2+6); ctx.textAlign='start';
-                        this._grabBtnRect={x:gx,y:gy,w:gw,h:gh};
-
-                        const ngw=100, ngh=46, ngx=CANVAS_WIDTH/2+25, ngy=CANVAS_HEIGHT/2+55;
-                        const hover2=mx>=ngx&&mx<=ngx+ngw&&my>=ngy&&my<=ngy+ngh;
-                        ctx.fillStyle=hover2?'#d08040':'#b06030'; this._roundRect(ctx,ngx,ngy,ngw,ngh,10); ctx.fill();
-                        ctx.strokeStyle='#fff'; ctx.lineWidth=2; this._roundRect(ctx,ngx,ngy,ngw,ngh,10); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 17px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        ctx.fillText(this.t('no_grab'),ngx+ngw/2,ngy+ngh/2+6); ctx.textAlign='start';
-                        this._noGrabBtnRect={x:ngx,y:ngy,w:ngw,h:ngh};
-                    } else { this._grabBtnRect=null; this._noGrabBtnRect=null; }
-
-                    if(this.state==='idle'||this.state==='ended') {
-                        const sw=160, sh=50, sx=CANVAS_WIDTH/2-sw/2, sy=CANVAS_HEIGHT/2+15;
-                        const hover=mx>=sx&&mx<=sx+sw&&my>=sy&&my<=sy+sh;
-                        ctx.fillStyle=hover?'#5098e0':'#3a78c0'; this._roundRect(ctx,sx,sy,sw,sh,12); ctx.fill();
-                        ctx.strokeStyle='#ffd740'; ctx.lineWidth=2; this._roundRect(ctx,sx,sy,sw,sh,12); ctx.stroke();
-                        ctx.fillStyle='#fff'; ctx.font='bold 20px "Microsoft YaHei","PingFang SC","SimHei",sans-serif'; ctx.textAlign='center';
-                        const txtKey=this.state==='ended'?'restart':'start'; ctx.fillText(this.t(txtKey),sx+sw/2,sy+sh/2+7); ctx.textAlign='start';
-                        this._startBtnRect={x:sx,y:sy,w:sw,h:sh};
-                    } else this._startBtnRect=null;
-                }
-
-                _roundRect(ctx,x,y,w,h,r) {
-                    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-                    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
-                    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
-                }
-
-                handleClick(pos) {
-                    const {x,y}=pos;
-                    if(Math.hypot(x-(CANVAS_WIDTH-60), y-42) < 26) { this.settingsOpen=true; settingsOverlay.classList.add('active'); return; }
-                    if(this._startBtnRect && x>=this._startBtnRect.x && x<=this._startBtnRect.x+this._startBtnRect.w && y>=this._startBtnRect.y && y<=this._startBtnRect.y+this._startBtnRect.h) { this.initNewGame(); this.startCallingPhase(); return; }
-                    if(this._callBtnRect && x>=this._callBtnRect.x && x<=this._callBtnRect.x+this._callBtnRect.w && y>=this._callBtnRect.y && y<=this._callBtnRect.y+this._callBtnRect.h) { this.callScores[0]=1; this.message='你叫地主！'; this.messageTimer=50; this._advanceCalling(); return; }
-                    if(this._noCallBtnRect && x>=this._noCallBtnRect.x && x<=this._noCallBtnRect.x+this._noCallBtnRect.w && y>=this._noCallBtnRect.y && y<=this._noCallBtnRect.y+this._noCallBtnRect.h) { this.callScores[0]=0; this.message='你不叫'; this.messageTimer=50; this._advanceCalling(); return; }
-                    if(this._grabBtnRect && x>=this._grabBtnRect.x && x<=this._grabBtnRect.x+this._grabBtnRect.w && y>=this._grabBtnRect.y && y<=this._grabBtnRect.y+this._grabBtnRect.h) { this.grabScores[0]=Math.max(this.callScores[0],...this.grabScores)+1; this.message='你抢地主！'; this.messageTimer=50; this._advanceGrabbing(); return; }
-                    if(this._noGrabBtnRect && x>=this._noGrabBtnRect.x && x<=this._noGrabBtnRect.x+this._noGrabBtnRect.w && y>=this._noGrabBtnRect.y && y<=this._noGrabBtnRect.y+this._noGrabBtnRect.h) { this.grabScores[0]=0; this.message='你不抢'; this.messageTimer=50; this._advanceGrabbing(); return; }
-                    if(this._playBtnRect && x>=this._playBtnRect.x && x<=this._playBtnRect.x+this._playBtnRect.w && y>=this._playBtnRect.y && y<=this._playBtnRect.y+this._playBtnRect.h) { const sel=this.playersHand[0].filter(c=>c.selected); if(sel.length) this.playerPlayCards(sel); else { this.message=this.t('select_cards'); this.messageTimer=45; } return; }
-                    if(this._passBtnRect && x>=this._passBtnRect.x && x<=this._passBtnRect.x+this._passBtnRect.w && y>=this._passBtnRect.y && y<=this._passBtnRect.y+this._passBtnRect.h) { this.playerPass(); return; }
-                    if(this.state==='playing' && this.currentPlayer===0) {
-                        const h0=this.playersHand[0];
-                        for(let i=h0.length-1; i>=0; i--) { if(h0[i].containsPoint(x,y)) { h0[i].selected=!h0[i].selected; return; } }
+                } else {
+                    const rc = getRankCounts(rem);
+                    const pr = Object.keys(rc).map(Number)
+                        .filter(x => rc[x] >= 2)
+                        .sort((a, b) => rc[a] - rc[b] || a - b);
+                    if (pr.length) {
+                        const pc = rem.filter(c => c.rank === pr[0]).slice(0, 2);
+                        return [...tr, ...pc];
                     }
                 }
             }
-
-            const game = new Game();
-
-            function updateSettingsUI() {
-                diffEasy.classList.toggle('active', game.difficulty==='easy');
-                diffNormal.classList.toggle('active', game.difficulty==='normal');
-                diffHard.classList.toggle('active', game.difficulty==='hard');
-                langZh.classList.toggle('active', game.lang==='zh');
-                langEn.classList.toggle('active', game.lang==='en');
-                settingsTitle.textContent = game.t('settings');
-                diffLabel.textContent = game.t('difficulty')+'：';
-                langLabel.textContent = game.t('language')+'：';
-                diffEasy.textContent = game.t('easy');
-                diffNormal.textContent = game.t('normal');
-                diffHard.textContent = game.t('hard');
-                langZh.textContent = game.t('chinese');
-                langEn.textContent = game.t('english');
+            return null;
+        }
+        if (lt === 'straight') return this._findBeatingStraight(lr, ll);
+        if (lt === 'straight_pair') return this._findBeatingStraightPair(lr, ll);
+        if (lt === 'plane' || lt === 'plane_single' || lt === 'plane_pair')
+            return this._findBeatingPlane(lt, lr, ll);
+        if (lt === 'quad_two' || lt === 'quad_two_pair') {
+            for (const r of sRanks) {
+                if (r <= lr || byRank[r].length < 4) continue;
+                const qd = byRank[r].slice(0, 4);
+                const rem = this.hand.filter(c => !qd.includes(c));
+                if (lt === 'quad_two') {
+                    if (rem.length >= 2) {
+                        const sorted = [...rem].sort((a, b) => a.rank - b.rank);
+                        return [...qd, sorted[0], sorted[1]];
+                    }
+                } else {
+                    const rc = getRankCounts(rem);
+                    const pr = Object.keys(rc).map(Number).filter(x => rc[x] >= 2);
+                    if (pr.length >= 2) {
+                        const w = [];
+                        for (const x of pr.slice(0, 2)) w.push(...rem.filter(c => c.rank === x).slice(0, 2));
+                        return [...qd, ...w];
+                    }
+                }
             }
+            return null;
+        }
+        return null;
+    }
 
-            settingsClose.addEventListener('click', ()=>{ game.settingsOpen=false; settingsOverlay.classList.remove('active'); });
-            settingsOverlay.addEventListener('click', (e)=>{ if(e.target===settingsOverlay) { game.settingsOpen=false; settingsOverlay.classList.remove('active'); } });
-            diffEasy.addEventListener('click', ()=>{ game.difficulty='easy'; game._updateAIDifficulty(); updateSettingsUI(); });
-            diffNormal.addEventListener('click', ()=>{ game.difficulty='normal'; game._updateAIDifficulty(); updateSettingsUI(); });
-            diffHard.addEventListener('click', ()=>{ game.difficulty='hard'; game._updateAIDifficulty(); updateSettingsUI(); });
-            langZh.addEventListener('click', ()=>{ game.lang='zh'; window._lang='zh'; updateSettingsUI(); });
-            langEn.addEventListener('click', ()=>{ game.lang='en'; window._lang='en'; updateSettingsUI(); });
-
-            game._updateAIDifficulty = function() {
-                if(this.aiPlayers[1]) this.aiPlayers[1].difficulty = this.difficulty;
-                if(this.aiPlayers[2]) this.aiPlayers[2].difficulty = this.difficulty;
-            };
-
-            canvas.addEventListener('mousedown', (e)=>{ if(e.button===0) { const pos=getCanvasPos(e); game.handleClick(pos); } });
-            canvas.addEventListener('mousemove', (e)=>{ const pos=getCanvasPos(e); game._mouseX=pos.x; game._mouseY=pos.y; });
-            canvas.addEventListener('mouseleave', ()=>{ game._mouseX=-100; game._mouseY=-100; });
-            canvas.addEventListener('touchstart', (e)=>{ e.preventDefault(); const pos=getCanvasPos(e); game.handleClick(pos); }, {passive:false});
-            canvas.addEventListener('touchmove', (e)=>{ e.preventDefault(); const pos=getCanvasPos(e); game._mouseX=pos.x; game._mouseY=pos.y; }, {passive:false});
-            canvas.addEventListener('touchend', ()=>{ game._mouseX=-100; game._mouseY=-100; });
-            document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && game.settingsOpen) { game.settingsOpen=false; settingsOverlay.classList.remove('active'); } });
-
-            function gameLoop() {
-                game.update();
-                ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
-                game.draw(ctx);
-                updateSettingsUI();
-                requestAnimationFrame(gameLoop);
+    _findBeatingStraight(lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        for (let sr = 3; sr + ll - 1 <= 14; sr++) {
+            const er = sr + ll - 1;
+            if (er <= lr) continue;
+            let ok = true;
+            for (let r = sr; r <= er; r++) {
+                if (!byRank[r] || !byRank[r].length) { ok = false; break; }
             }
-            game.state='idle'; game.message='';
-            updateSettingsUI();
-            gameLoop();
-        })();
-    </script>
+            if (!ok) continue;
+            const res = [];
+            for (let r = sr; r <= er; r++) res.push(byRank[r][0]);
+            return res;
+        }
+        return null;
+    }
+
+    _findBeatingStraightPair(lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        for (let sr = 3; sr + ll - 1 <= 14; sr++) {
+            const er = sr + ll - 1;
+            if (er <= lr) continue;
+            let ok = true;
+            for (let r = sr; r <= er; r++) {
+                if (!byRank[r] || byRank[r].length < 2) { ok = false; break; }
+            }
+            if (!ok) continue;
+            const res = [];
+            for (let r = sr; r <= er; r++) res.push(...byRank[r].slice(0, 2));
+            return res;
+        }
+        return null;
+    }
+
+    _findBeatingPlane(lt, lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const trs = Object.keys(byRank).map(Number)
+            .filter(r => byRank[r].length >= 3 && r <= 14)
+            .sort((a, b) => a - b);
+
+        for (let s = 0; s + ll <= trs.length; s++) {
+            const seq = trs.slice(s, s + ll);
+            if (seq[seq.length - 1] - seq[0] !== ll - 1) continue;
+            if (seq[seq.length - 1] <= lr) continue;
+
+            const tripCards = [];
+            for (const r of seq) tripCards.push(...byRank[r].slice(0, 3));
+            const rem = this.hand.filter(c => !tripCards.includes(c));
+
+            if (lt === 'plane') return tripCards;
+            if (lt === 'plane_single') {
+                if (rem.length >= ll) {
+                    const sorted = [...rem].sort((a, b) => a.rank - b.rank);
+                    return [...tripCards, ...sorted.slice(0, ll)];
+                }
+            }
+            if (lt === 'plane_pair') {
+                const rc = getRankCounts(rem);
+                const prs = Object.keys(rc).map(Number).filter(r => rc[r] >= 2);
+                if (prs.length >= ll) {
+                    const w = [];
+                    for (const r of prs.slice(0, ll)) w.push(...rem.filter(c => c.rank === r).slice(0, 2));
+                    return [...tripCards, ...w];
+                }
+            }
+        }
+        return null;
+    }
+
+    _findSmallestBomb() {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const bombs = Object.entries(byRank)
+            .filter(([, cs]) => cs.length >= 4)
+            .map(([r, cs]) => [Number(r), cs])
+            .sort((a, b) => a[0] - b[0]);
+        return bombs.length ? bombs[0][1].slice(0, 4) : null;
+    }
+
+    _findRocket() {
+        const hasSmall = this.hand.some(c => c.rank === 16);
+        const hasBig = this.hand.some(c => c.rank === 17);
+        if (hasSmall && hasBig) return this.hand.filter(c => c.rank === 16 || c.rank === 17);
+        return null;
+    }
+
+    _findLongestStraight() {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        let best = null;
+        for (let sr = 3; sr <= 10; sr++) {
+            const cur = [];
+            for (let r = sr; r <= 14; r++) {
+                if (byRank[r] && byRank[r].length) cur.push(r);
+                else break;
+            }
+            if (cur.length >= 5 && (!best || cur.length > best.length)) best = cur;
+        }
+        if (!best) return null;
+        // 避免拆炸弹
+        const counts = getRankCounts(this.hand);
+        if (best.some(r => counts[r] >= 4)) return null;
+        return best.map(r => byRank[r][0]);
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   游戏
+   ══════════════════════════════════════════════════════ */
+class Game {
+    constructor() {
+        this.lang = 'zh';
+        window._lang = 'zh';
+        this.difficulty = 'normal';
+        this.settingsOpen = false;
+        this.state = 'idle';
+        this.playersHand = [[], [], []];
+        this.landlordCards = [];
+        this.landlordId = -1;
+        this.currentPlayer = -1;
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+        this.callScores = [0, 0, 0];
+        this.callStartPlayer = 0;
+        this.callCurrent = 0;
+        this.grabPhase = false;
+        this.grabScores = [0, 0, 0];
+        this.grabCurrent = 0;
+        this.grabStart = 0;
+        this.winner = -1;
+        this.message = '';
+        this.messageTimer = 0;
+        this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+        this.aiTimer = null;
+        this._mouseX = -999; this._mouseY = -999;
+        this._playBtnRect = null; this._passBtnRect = null;
+        this._callBtnRect = null; this._noCallBtnRect = null;
+        this._grabBtnRect = null; this._noGrabBtnRect = null;
+        this._startBtnRect = null;
+        this._tick = 0;
+        this.initNewGame();
+    }
+
+    t(key) { return (TEXTS[this.lang] || TEXTS.zh)[key] || key; }
+
+    /* ───────── 初始化 ───────── */
+    initNewGame() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        const deck = [];
+        for (const s of [SUIT_SPADE, SUIT_HEART, SUIT_CLUB, SUIT_DIAMOND])
+            for (let r = 3; r <= 15; r++) deck.push(new Card(s, r));
+        deck.push(new Card(SUIT_JOKER, 16), new Card(SUIT_JOKER, 17));
+
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+
+        this.playersHand = [deck.slice(0, 17), deck.slice(17, 34), deck.slice(34, 51)];
+        this.landlordCards = deck.slice(51, 54);
+
+        this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+        this.aiPlayers[1].hand = [...this.playersHand[1]];
+        this.aiPlayers[2].hand = [...this.playersHand[2]];
+
+        for (const c of this.playersHand[0]) c.faceUp = true;
+        for (const c of this.playersHand[1]) c.faceUp = false;
+        for (const c of this.playersHand[2]) c.faceUp = false;
+        for (const c of this.landlordCards) c.faceUp = false;
+
+        this.state = 'idle';
+        this.landlordId = -1;
+        this.currentPlayer = -1;
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+        this.callScores = [0, 0, 0];
+        this.callStartPlayer = Math.floor(Math.random() * 3);
+        this.callCurrent = this.callStartPlayer;
+        this.grabPhase = false;
+        this.grabScores = [0, 0, 0];
+        this.grabCurrent = 0;
+        this.grabStart = 0;
+        this.winner = -1;
+        this.message = '';
+        this.messageTimer = 0;
+
+        for (let i = 0; i < 3; i++)
+            this.playersHand[i].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+        this.landlordCards.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+
+        this._layoutAllCards();
+    }
+
+    _layoutAllCards() {
+        /* 玩家手牌 */
+        const hand0 = this.playersHand[0];
+        const n0 = hand0.length;
+        const maxW = CANVAS_WIDTH - 200;
+        let sp0 = 46;
+        if (n0 > 1 && (n0 - 1) * sp0 + CARD_WIDTH > maxW)
+            sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+        const totalW0 = n0 > 1 ? (n0 - 1) * sp0 + CARD_WIDTH : CARD_WIDTH;
+        const startX0 = (CANVAS_WIDTH - totalW0) / 2;
+        const baseY0 = 545;
+        for (let i = 0; i < n0; i++) {
+            hand0[i].setTarget(startX0 + i * sp0, baseY0);
+            hand0[i].snapToTarget();
+        }
+
+        /* AI 1 手牌（左上） */
+        const hand1 = this.playersHand[1];
+        const n1 = hand1.length;
+        const sp1 = n1 > 14 ? 18 : 22;
+        for (let i = 0; i < n1; i++) {
+            hand1[i].setTarget(24 + i * sp1, 74);
+            hand1[i].snapToTarget();
+        }
+
+        /* AI 2 手牌（右上） */
+        const hand2 = this.playersHand[2];
+        const n2 = hand2.length;
+        const sp2 = n2 > 14 ? 18 : 22;
+        const totalW2 = n2 > 1 ? (n2 - 1) * sp2 + CARD_WIDTH : CARD_WIDTH;
+        const startX2 = CANVAS_WIDTH - 24 - totalW2;
+        for (let i = 0; i < n2; i++) {
+            hand2[i].setTarget(startX2 + i * sp2, 74);
+            hand2[i].snapToTarget();
+        }
+
+        /* 底牌 */
+        const n3 = this.landlordCards.length;
+        const sp3 = 52;
+        const totalW3 = n3 > 1 ? (n3 - 1) * sp3 + CARD_WIDTH : CARD_WIDTH;
+        const startX3 = (CANVAS_WIDTH - totalW3) / 2;
+        for (let i = 0; i < n3; i++) {
+            this.landlordCards[i].setTarget(startX3 + i * sp3, 22);
+            this.landlordCards[i].snapToTarget();
+        }
+    }
+
+    /* ───────── 叫地主 ───────── */
+    startCallingPhase() {
+        this.state = 'calling';
+        this.callScores = [0, 0, 0];
+        this.callStartPlayer = Math.floor(Math.random() * 3);
+        this.callCurrent = this.callStartPlayer;
+        this.grabPhase = false;
+        this.message = '';
+        this.messageTimer = 0;
+        this._processCurrentCaller();
+    }
+
+    _processCurrentCaller() {
+        if (this.state !== 'calling') return;
+        this.currentPlayer = this.callCurrent;
+        if (this.callCurrent === 0) { this.message = ''; }
+        else this._aiCallLandlord(this.callCurrent);
+    }
+
+    _aiCallLandlord(pid) {
+        const ai = this.aiPlayers[pid];
+        const score = this._evaluateHandStrength(ai.hand);
+        const th = this.difficulty === 'easy' ? 42 : (this.difficulty === 'normal' ? 32 : 22);
+        const noOneYet = this.callScores.every(s => s === 0);
+
+        if (score > th || (noOneYet && score > 16)) {
+            let cs = 1;
+            if (this.difficulty === 'hard' && score > 62) cs = Math.min(3, 1 + Math.floor(score / 30));
+            else if (this.difficulty === 'normal' && score > 52) cs = 2;
+            this.callScores[pid] = cs;
+            this.message = `AI ${pid} · ${this.t('call_landlord')} ${cs}`;
+        } else {
+            this.callScores[pid] = 0;
+            this.message = `AI ${pid} · ${this.t('no_call')}`;
+        }
+        this.messageTimer = 60;
+        this.aiTimer = setTimeout(() => this._advanceCalling(), 720);
+    }
+
+    _evaluateHandStrength(hand) {
+        if (!hand || !hand.length) return 0;
+        const counts = getRankCounts(hand);
+        let score = 0;
+        const bombs = Object.values(counts).filter(c => c >= 4).length;
+        score += bombs * 16;
+        if (counts[16] && counts[17]) score += 26;
+        else if (counts[16] || counts[17]) score += 9;
+        for (const r of [15, 14, 13, 12]) if (counts[r]) score += counts[r] * 3;
+
+        const ranks = [...new Set(hand.map(c => c.rank).filter(r => r <= 14))].sort((a, b) => a - b);
+        let consec = 0, maxC = 0;
+        for (let i = 0; i < ranks.length - 1; i++) {
+            if (ranks[i + 1] - ranks[i] === 1) { consec++; maxC = Math.max(maxC, consec); }
+            else consec = 0;
+        }
+        score += maxC * 5;
+        score += Object.values(counts).filter(c => c >= 3).length * 8;
+        score += Object.values(counts).filter(c => c >= 2).length * 2;
+        return Math.min(100, score);
+    }
+
+    _advanceCalling() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.callCurrent = (this.callCurrent + 1) % 3;
+        if (this.callCurrent === this.callStartPlayer) this._resolveCalling();
+        else this._processCurrentCaller();
+    }
+
+    _resolveCalling() {
+        const maxS = Math.max(...this.callScores);
+        if (maxS === 0) {
+            this.message = this.t('no_one_call');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); this.startCallingPhase(); }, 1400);
+            return;
+        }
+        const cands = [];
+        for (let i = 0; i < 3; i++) if (this.callScores[i] === maxS) cands.push(i);
+        if (cands.length === 1) this._setLandlord(cands[0]);
+        else this._startGrabPhase(cands);
+    }
+
+    _startGrabPhase(cands) {
+        this.state = 'grabbing';
+        this.grabPhase = true;
+        this.grabScores = [0, 0, 0];
+        this.grabStart = (cands[0] + 1) % 3;
+        this.grabCurrent = this.grabStart;
+        this._processGrabber();
+    }
+
+    _processGrabber() {
+        if (this.grabCurrent === 0) { this.currentPlayer = 0; this.message = ''; }
+        else this._aiGrabLandlord(this.grabCurrent);
+    }
+
+    _aiGrabLandlord(pid) {
+        const ai = this.aiPlayers[pid];
+        const score = this._evaluateHandStrength(ai.hand);
+        const th = this.difficulty === 'easy' ? 52 : (this.difficulty === 'normal' ? 42 : 32);
+        if (score > th) {
+            this.grabScores[pid] = (this.callScores[pid] || 1) + 1;
+            this.message = `AI ${pid} · ${this.t('grab_landlord')}!`;
+        } else {
+            this.grabScores[pid] = 0;
+            this.message = `AI ${pid} · ${this.t('no_grab')}`;
+        }
+        this.messageTimer = 60;
+        this.aiTimer = setTimeout(() => this._advanceGrabbing(), 720);
+    }
+
+    _advanceGrabbing() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.grabCurrent = (this.grabCurrent + 1) % 3;
+        if (this.grabCurrent === this.grabStart) this._resolveGrabbing();
+        else this._processGrabber();
+    }
+
+    _resolveGrabbing() {
+        const all = [];
+        for (let i = 0; i < 3; i++) {
+            if (this.grabScores[i] > 0) all.push([i, this.grabScores[i]]);
+            else if (this.callScores[i] > 0) all.push([i, this.callScores[i]]);
+        }
+        if (!all.length) {
+            this.message = this.t('no_one_grab');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); this.startCallingPhase(); }, 1400);
+            return;
+        }
+        all.sort((a, b) => b[1] - a[1]);
+        this._setLandlord(all[0][0]);
+    }
+
+    _setLandlord(pid) {
+        this.landlordId = pid;
+        this.aiPlayers[1].isLandlord = (pid === 1);
+        this.aiPlayers[2].isLandlord = (pid === 2);
+
+        for (const c of this.landlordCards) {
+            c.faceUp = true;
+            this.playersHand[pid].push(c);
+        }
+        if (pid !== 0) this.aiPlayers[pid].hand = [...this.playersHand[pid]];
+
+        this.playersHand[pid].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+        if (pid !== 0) this.aiPlayers[pid].hand.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+
+        this._layoutAllCards();
+        this.state = 'playing';
+        this.currentPlayer = pid;
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+        this.message = `${pid === 0 ? this.t('you') : 'AI ' + pid} · ${this.t('landlord')}`;
+        this.messageTimer = 70;
+
+        if (pid !== 0) this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 900);
+    }
+
+    /* ───────── AI 回合 ───────── */
+    _aiTurn(pid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.state !== 'playing') return;
+        this.currentPlayer = pid;
+        const ai = this.aiPlayers[pid];
+        if (!ai || !this.playersHand[pid].length) { this._aiPass(pid); return; }
+
+        let cards = null;
+        try { cards = ai.findPlay(this); } catch (e) { cards = null; }
+
+        if (cards && cards.length) {
+            const info = analyzeHand(cards);
+            if (info && canBeat(info, this.lastPlayInfo)) {
+                this._commitPlay(pid, cards, info);
+                return;
+            }
+        }
+        this._aiPass(pid);
+    }
+
+    _commitPlay(pid, cards, info) {
+        const ai = this.aiPlayers[pid];
+        for (const c of cards) {
+            if (ai) { const i1 = ai.hand.indexOf(c); if (i1 >= 0) ai.hand.splice(i1, 1); }
+            const i2 = this.playersHand[pid].indexOf(c);
+            if (i2 >= 0) this.playersHand[pid].splice(i2, 1);
+            c.faceUp = true;
+        }
+        this.lastPlayedCards = cards;
+        this.lastPlayedBy = pid;
+        this.lastPlayInfo = info;
+        this.passCount = 0;
+        this._layoutAllCards();
+        this.message = `AI ${pid} · ${this.t('ai_play')}`;
+        this.messageTimer = 40;
+
+        if (this.playersHand[pid].length === 0) { this._gameOver(pid); return; }
+        this.currentPlayer = this._getNextPlayer(pid);
+        this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+    }
+
+    _aiTurnIfNeeded() {
+        if (this.state === 'playing' && this.currentPlayer !== 0)
+            this._aiTurn(this.currentPlayer);
+    }
+
+    _aiPass(pid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.state !== 'playing') return;
+
+        // 新一轮不能过，必须出牌
+        if (!this.lastPlayInfo) {
+            const ai = this.aiPlayers[pid];
+            if (ai && ai.hand.length) {
+                const sorted = [...ai.hand].sort((a, b) => a.rank - b.rank);
+                const card = sorted[0];
+                const info = analyzeHand([card]);
+                if (info) { this._commitPlay(pid, [card], info); return; }
+            }
+        }
+
+        this.passCount++;
+        this.message = `AI ${pid} · ${this.t('ai_pass')}`;
+        this.messageTimer = 40;
+
+        if (this.passCount >= 2) {
+            this.lastPlayedCards = [];
+            this.lastPlayedBy = -1;
+            this.lastPlayInfo = null;
+            this.passCount = 0;
+            this.currentPlayer = this._getNextPlayer(this.currentPlayer);
+            if (this.currentPlayer === 0) {
+                this.message = this.t('new_round');
+                this.messageTimer = 60;
+            } else {
+                this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+            }
+        } else {
+            this.currentPlayer = this._getNextPlayer(pid);
+            this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+        }
+    }
+
+    _getNextPlayer(pid) { return (pid + 1) % 3; }
+
+    /* ───────── 玩家操作 ───────── */
+    playerPlayCards(selected) {
+        if (this.currentPlayer !== 0 || this.state !== 'playing') return false;
+        const info = analyzeHand(selected);
+        if (!info) { this.message = this.t('invalid_play'); this.messageTimer = 50; return false; }
+        if (!canBeat(info, this.lastPlayInfo)) { this.message = this.t('cant_beat'); this.messageTimer = 50; return false; }
+
+        for (const c of selected) {
+            const idx = this.playersHand[0].indexOf(c);
+            if (idx >= 0) this.playersHand[0].splice(idx, 1);
+        }
+        this.lastPlayedCards = selected;
+        this.lastPlayedBy = 0;
+        this.lastPlayInfo = info;
+        this.passCount = 0;
+        for (const c of this.playersHand[0]) c.selected = false;
+        this._layoutAllCards();
+        this.message = '';
+        this.messageTimer = 0;
+
+        if (this.playersHand[0].length === 0) { this._gameOver(0); return true; }
+        this.currentPlayer = this._getNextPlayer(0);
+        this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 520);
+        return true;
+    }
+
+    playerPass() {
+        if (this.currentPlayer !== 0 || this.state !== 'playing') return;
+        if (!this.lastPlayInfo) { this.message = this.t('must_play'); this.messageTimer = 50; return; }
+        this.passCount++;
+        this.message = this.t('pass');
+        this.messageTimer = 35;
+
+        if (this.passCount >= 2) {
+            this.lastPlayedCards = [];
+            this.lastPlayedBy = -1;
+            this.lastPlayInfo = null;
+            this.passCount = 0;
+            this.currentPlayer = this._getNextPlayer(this.currentPlayer);
+            if (this.currentPlayer !== 0) this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+            else { this.message = this.t('new_round'); this.messageTimer = 60; }
+        } else {
+            this.currentPlayer = this._getNextPlayer(0);
+            this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 520);
+        }
+    }
+
+    _gameOver(wid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.state = 'ended';
+        this.winner = wid;
+        const humanWin = (wid === 0) ||
+            (this.landlordId !== 0 && wid !== this.landlordId);
+        this.message = humanWin ? this.t('you_win') : this.t('you_lose');
+        this.messageTimer = 9999;
+        for (const h of this.playersHand) for (const c of h) c.faceUp = true;
+        for (const c of this.landlordCards) c.faceUp = true;
+    }
+
+    /* ───────── 更新 ───────── */
+    update() {
+        this._tick++;
+        const all = [];
+        for (const h of this.playersHand) all.push(...h);
+        all.push(...this.landlordCards);
+        for (const c of all) c.updatePosition();
+        if (this.messageTimer > 0 && this.messageTimer < 9000) this.messageTimer--;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       绘制
+       ═══════════════════════════════════════════════════ */
+    draw(ctx) {
+        this._drawBackground(ctx);
+        this._drawTable(ctx);
+        this._drawAIPanels(ctx);
+        this._drawBottomCards(ctx);
+        this._drawPlayedCards(ctx);
+        this._drawHands(ctx);
+        this._drawPlayerLabel(ctx);
+        this._drawTitle(ctx);
+        this._drawGear(ctx);
+        this._drawMessage(ctx);
+        this._drawButtons(ctx);
+    }
+
+    _drawBackground(ctx) {
+        const g = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+        g.addColorStop(0, '#152942');
+        g.addColorStop(0.5, '#0d1a2c');
+        g.addColorStop(1, '#070f1a');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // 星光点缀
+        ctx.save();
+        for (let i = 0; i < 40; i++) {
+            const px = (i * 137.508) % CANVAS_WIDTH;
+            const py = (i * 219.31) % CANVAS_HEIGHT;
+            const a = 0.03 + 0.05 * Math.abs(Math.sin((this._tick + i * 40) / 120));
+            ctx.fillStyle = `rgba(160,200,255,${a})`;
+            ctx.beginPath();
+            ctx.arc(px, py, 1.4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+
+        // 暗角
+        const vg = ctx.createRadialGradient(
+            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 200,
+            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 760
+        );
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.55)');
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+
+    _drawTable(ctx) {
+        const cx = CANVAS_WIDTH / 2, cy = 360, rx = 462, ry = 182;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,.65)';
+        ctx.shadowBlur = 44;
+        ctx.shadowOffsetY = 12;
+        const g = ctx.createRadialGradient(cx, cy - 70, 30, cx, cy, rx);
+        g.addColorStop(0, '#2f8f5c');
+        g.addColorStop(0.55, '#1d6a42');
+        g.addColorStop(1, '#0d4227');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.strokeStyle = 'rgba(255,215,64,.22)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255,255,255,.07)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx - 10, ry - 8, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        for (let i = 0; i < 3; i++) {
+            ctx.strokeStyle = `rgba(255,255,255,${0.055 - i * 0.014})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, rx - 62 - i * 62, ry - 34 - i * 34, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 中央水印
+        ctx.save();
+        ctx.globalAlpha = 0.055;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 120px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('♠', cx - 170, cy);
+        ctx.fillText('♥', cx + 170, cy);
+        ctx.font = 'bold 96px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.fillText('斗', cx, cy - 30);
+        ctx.font = 'bold 26px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.globalAlpha = 0.09;
+        ctx.fillText('D O U   D I   Z H U', cx, cy + 42);
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _drawAIPanels(ctx) {
+        const panels = [
+            { id: 1, x: 16, y: 8, name: this.t('ai1') },
+            { id: 2, x: CANVAS_WIDTH - 216, y: 8, name: this.t('ai2') }
+        ];
+        for (const p of panels) {
+            const w = 200, h = 58;
+            const isLandlord = this.landlordId === p.id;
+            const isTurn = this.currentPlayer === p.id && (this.state === 'playing' || this.state === 'calling' || this.state === 'grabbing');
+
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,.45)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 3;
+            const g = ctx.createLinearGradient(p.x, p.y, p.x, p.y + h);
+            g.addColorStop(0, isTurn ? 'rgba(58,100,160,.92)' : 'rgba(28,45,72,.9)');
+            g.addColorStop(1, isTurn ? 'rgba(34,62,108,.92)' : 'rgba(17,28,48,.9)');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, p.x, p.y, w, h, 14);
+            ctx.fill();
+            ctx.restore();
+
+            ctx.strokeStyle = isTurn ? '#ffd740' : 'rgba(120,165,235,.35)';
+            ctx.lineWidth = isTurn ? 2 : 1.2;
+            this._roundRect(ctx, p.x, p.y, w, h, 14);
+            ctx.stroke();
+
+            // 头像
+            const ax = p.x + 31, ay = p.y + h / 2;
+            const ag = ctx.createRadialGradient(ax - 5, ay - 6, 2, ax, ay, 21);
+            if (isLandlord) { ag.addColorStop(0, '#e8b93a'); ag.addColorStop(1, '#a37811'); }
+            else { ag.addColorStop(0, '#6f8fc0'); ag.addColorStop(1, '#3a5480'); }
+            ctx.fillStyle = ag;
+            ctx.beginPath();
+            ctx.arc(ax, ay, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = isLandlord ? '#ffd740' : 'rgba(200,220,255,.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(isLandlord ? '👑' : 'AI', ax, ay + 1);
+
+            // 名字 & 张数
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = isLandlord ? '#ffd740' : '#e6eefc';
+            ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.fillText(p.name + (isLandlord ? ' · ' + this.t('landlord') : ''), p.x + 58, p.y + 26);
+
+            ctx.fillStyle = '#9fb6d8';
+            ctx.font = '13px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.fillText('🂠 ' + this.playersHand[p.id].length + this.t('cards_count'), p.x + 58, p.y + 45);
+
+            // 回合指示
+            if (isTurn) {
+                const pulse = 0.5 + 0.5 * Math.sin(this._tick / 12);
+                ctx.fillStyle = `rgba(255,215,64,${0.35 + pulse * 0.65})`;
+                ctx.beginPath();
+                ctx.arc(p.x + w - 14, p.y + 14, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _drawBottomCards(ctx) {
+        // 底牌区背景
+        const n = this.landlordCards.length;
+        if (!n) return;
+        const sp = 52;
+        const totalW = (n - 1) * sp + CARD_WIDTH;
+        const sx = (CANVAS_WIDTH - totalW) / 2;
+        const by = 14;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(10,20,35,.55)';
+        this._roundRect(ctx, sx - 16, by, totalW + 32, 116, 12);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,215,64,.3)';
+        ctx.lineWidth = 1.2;
+        this._roundRect(ctx, sx - 16, by, totalW + 32, 116, 12);
+        ctx.stroke();
+        ctx.restore();
+
+        for (const c of this.landlordCards) {
+            if (c.faceUp) c.draw(ctx, this.lang);
+            else {
+                const dx = c.targetX, dy = c.targetY;
+                ctx.save();
+                ctx.shadowColor = 'rgba(0,0,0,.5)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetY = 3;
+                const g = ctx.createLinearGradient(dx, dy, dx + CARD_WIDTH, dy + CARD_HEIGHT);
+                g.addColorStop(0, '#7a2222');
+                g.addColorStop(1, '#3d0f0f');
+                ctx.fillStyle = g;
+                c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                ctx.fill();
+                ctx.restore();
+
+                ctx.strokeStyle = 'rgba(255,215,64,.4)';
+                ctx.lineWidth = 1.5;
+                c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255,215,64,.75)';
+                ctx.font = 'bold 30px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('?', dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2 + 2);
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            }
+        }
+
+        ctx.fillStyle = 'rgba(255,215,64,.85)';
+        ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.t('bottom_cards'), sx - 16 - 30, by + 60);
+        ctx.textAlign = 'start';
+    }
+
+    _drawPlayedCards(ctx) {
+        if (!this.lastPlayedCards.length) return;
+        const lc = this.lastPlayedCards;
+        const sp = lc.length > 8 ? 34 : 44;
+        const totalW = (lc.length - 1) * sp + CARD_WIDTH;
+        const sx = CANVAS_WIDTH / 2 - totalW / 2;
+        const by = 300;
+
+        // 底垫
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,.22)';
+        this._roundRect(ctx, sx - 18, by - 12, totalW + 36, CARD_HEIGHT + 24, 14);
+        ctx.fill();
+        ctx.restore();
+
+        for (let i = 0; i < lc.length; i++) {
+            const c = lc[i];
+            c.faceUp = true;
+            const dx = sx + i * sp, dy = by;
+
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,.5)';
+            ctx.shadowBlur = 9;
+            ctx.shadowOffsetY = 4;
+            const g = ctx.createLinearGradient(dx, dy, dx, dy + CARD_HEIGHT);
+            g.addColorStop(0, '#ffffff');
+            g.addColorStop(1, '#f2eee2');
+            ctx.fillStyle = g;
+            c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+            ctx.fill();
+            ctx.restore();
+
+            ctx.strokeStyle = 'rgba(0,0,0,.18)';
+            ctx.lineWidth = 1;
+            c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
+            ctx.stroke();
+
+            const color = c.isRed ? '#d02a2a' : '#1b1f28';
+            if (c.suit === SUIT_JOKER) {
+                const jc = c.rank === 17 ? '#d02a2a' : '#3a3f4a';
+                const jt = c.rank === 17 ? (this.lang === 'en' ? 'JO' : '大') : (this.lang === 'en' ? 'Jo' : '小');
+                ctx.fillStyle = jc;
+                ctx.font = 'bold 22px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(jt, dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2);
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            } else {
+                ctx.fillStyle = color;
+                ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(c.displayRank, dx + 6, dy + 20);
+                ctx.font = '14px "Segoe UI Symbol",serif';
+                ctx.fillText(c.displaySuit, dx + 6, dy + 37);
+                ctx.font = '30px "Segoe UI Symbol",serif';
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = .9;
+                ctx.fillText(c.displaySuit, dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2 + 11);
+                ctx.globalAlpha = 1;
+                ctx.textAlign = 'start';
+            }
+        }
+
+        // 出牌者标签
+        const label = this.lastPlayedBy === 0
+            ? this.t('you')
+            : 'AI ' + this.lastPlayedBy;
+        ctx.font = 'bold 13px "Microsoft YaHei","PingFang SC",sans-serif';
+        const tw = ctx.measureText(label).width;
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        this._roundRect(ctx, sx - 22 - tw - 14, by + CARD_HEIGHT / 2 - 13, tw + 22, 26, 13);
+        ctx.fill();
+        ctx.fillStyle = '#ffd740';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, sx - 22 - tw / 2 - 3, by + CARD_HEIGHT / 2);
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _drawHands(ctx) {
+        for (let i = 0; i < 3; i++)
+            for (const c of this.playersHand[i]) c.draw(ctx, this.lang);
+    }
+
+    _drawPlayerLabel(ctx) {
+        const name = this.t('you') + (this.landlordId === 0 ? ' · ' + this.t('landlord') : '');
+        const cnt = this.playersHand[0].length + this.t('cards_count');
+        const text = `${name}   ${cnt}`;
+        ctx.font = 'bold 16px "Microsoft YaHei","PingFang SC",sans-serif';
+        const tw = ctx.measureText(text).width;
+        const bx = CANVAS_WIDTH / 2 - tw / 2 - 18;
+        const by = 506;
+
+        ctx.fillStyle = 'rgba(10,20,35,.72)';
+        this._roundRect(ctx, bx, by, tw + 36, 30, 15);
+        ctx.fill();
+        ctx.strokeStyle = this.landlordId === 0 ? 'rgba(255,215,64,.6)' : 'rgba(120,165,235,.35)';
+        ctx.lineWidth = 1.2;
+        this._roundRect(ctx, bx, by, tw + 36, 30, 15);
+        ctx.stroke();
+
+        ctx.fillStyle = this.landlordId === 0 ? '#ffd740' : '#dce8fa';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, CANVAS_WIDTH / 2, by + 16);
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+
+        // 回合提示
+        if (this.currentPlayer === 0 && this.state === 'playing') {
+            const pulse = 0.45 + 0.55 * Math.abs(Math.sin(this._tick / 22));
+            ctx.save();
+            ctx.globalAlpha = pulse;
+            ctx.strokeStyle = '#ffd740';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#ffd740';
+            ctx.shadowBlur = 14;
+            this._roundRect(ctx, bx, by, tw + 36, 30, 15);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    _drawTitle(ctx) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 26px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.fillStyle = 'rgba(255,190,20,.28)';
+        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2 + 1.5, 43);
+        const g = ctx.createLinearGradient(0, 20, 0, 48);
+        g.addColorStop(0, '#fff2b8');
+        g.addColorStop(0.5, '#ffd740');
+        g.addColorStop(1, '#e0a500');
+        ctx.fillStyle = g;
+        ctx.shadowColor = 'rgba(255,200,40,.55)';
+        ctx.shadowBlur = 16;
+        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2, 41.5);
+        ctx.restore();
+        ctx.textAlign = 'start';
+    }
+
+    _drawGear(ctx) {
+        const gx = CANVAS_WIDTH - 46, gy = 42, r = 22;
+        const hover = Math.hypot(this._mouseX - gx, this._mouseY - gy) < r;
+        ctx.save();
+        const g = ctx.createRadialGradient(gx - 6, gy - 8, 3, gx, gy, r);
+        if (hover) { g.addColorStop(0, '#5b86c4'); g.addColorStop(1, '#2f5488'); }
+        else { g.addColorStop(0, '#2c3f5c'); g.addColorStop(1, '#182436'); }
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(gx, gy, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = hover ? '#ffd740' : 'rgba(150,180,225,.45)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.strokeStyle = hover ? '#ffd740' : '#b8cae4';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(gx, gy, 6.5, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let a = 0; a < 360; a += 45) {
+            const rad = a * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(gx + Math.cos(rad) * 9, gy + Math.sin(rad) * 9);
+            ctx.lineTo(gx + Math.cos(rad) * 14, gy + Math.sin(rad) * 14);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    _drawMessage(ctx) {
+        if (!this.message || this.messageTimer <= 0) return;
+        const alpha = this.messageTimer > 9000 ? 1 : Math.min(1, this.messageTimer / 40);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font = 'bold 21px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const tw = ctx.measureText(this.message).width;
+        const bw = tw + 56, bh = 48;
+        const bx = CANVAS_WIDTH / 2 - bw / 2;
+        const by = CANVAS_HEIGHT / 2 + 52;
+
+        ctx.shadowColor = 'rgba(0,0,0,.6)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 4;
+        ctx.fillStyle = 'rgba(8,16,28,.82)';
+        this._roundRect(ctx, bx, by, bw, bh, bh / 2);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        const isWin = this.state === 'ended' && (this.message.includes('赢') || this.message.includes('Win'));
+        const isLose = this.state === 'ended' && !isWin;
+        ctx.strokeStyle = isWin ? 'rgba(120,240,150,.8)' : isLose ? 'rgba(255,120,120,.75)' : 'rgba(255,215,64,.65)';
+        ctx.lineWidth = 2;
+        this._roundRect(ctx, bx, by, bw, bh, bh / 2);
+        ctx.stroke();
+
+        const tg = ctx.createLinearGradient(0, by, 0, by + bh);
+        if (isWin) { tg.addColorStop(0, '#b6ffcf'); tg.addColorStop(1, '#4ce07a'); }
+        else if (isLose) { tg.addColorStop(0, '#ffd0d0'); tg.addColorStop(1, '#ff7b7b'); }
+        else { tg.addColorStop(0, '#fff4c0'); tg.addColorStop(1, '#ffd740'); }
+        ctx.fillStyle = tg;
+        ctx.fillText(this.message, CANVAS_WIDTH / 2, by + bh / 2 + 1);
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    /* ───────── 按钮 ───────── */
+    _button(ctx, x, y, w, h, text, scheme) {
+        const hover = this._mouseX >= x && this._mouseX <= x + w &&
+                      this._mouseY >= y && this._mouseY <= y + h;
+        const s = hover ? 1.035 : 1;
+        const cx = x + w / 2, cy = y + h / 2;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+        ctx.translate(-w / 2, -h / 2);
+
+        ctx.shadowColor = scheme.glow || 'rgba(0,0,0,.5)';
+        ctx.shadowBlur = hover ? 22 : 12;
+        ctx.shadowOffsetY = 4;
+
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, hover ? scheme.topHover : scheme.top);
+        g.addColorStop(1, hover ? scheme.botHover : scheme.bot);
+        ctx.fillStyle = g;
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.fill();
+
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+
+        // 顶部高光
+        ctx.save();
+        ctx.beginPath();
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.clip();
+        const hg = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+        hg.addColorStop(0, 'rgba(255,255,255,.28)');
+        hg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hg;
+        ctx.fillRect(0, 0, w, h * 0.55);
+        ctx.restore();
+
+        ctx.strokeStyle = scheme.border || 'rgba(255,255,255,.5)';
+        ctx.lineWidth = 2;
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0,0,0,.35)';
+        ctx.shadowBlur = 3;
+        ctx.fillText(text, w / 2, h / 2 + 1);
+        ctx.restore();
+
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _drawButtons(ctx) {
+        this._playBtnRect = null;
+        this._passBtnRect = null;
+        this._callBtnRect = null;
+        this._noCallBtnRect = null;
+        this._grabBtnRect = null;
+        this._noGrabBtnRect = null;
+        this._startBtnRect = null;
+
+        const BTN_Y = 654, BTN_H = 46;
+
+        if (this.state === 'playing' && this.currentPlayer === 0) {
+            const selCount = this.playersHand[0].filter(c => c.selected).length;
+            const playLabel = this.t('play') + (selCount ? ` (${selCount})` : '');
+            const pw = 132, px = CANVAS_WIDTH / 2 - pw - 12;
+            this._button(ctx, px, BTN_Y, pw, BTN_H, playLabel, {
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#79bdfb', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.55)'
+            });
+            this._playBtnRect = { x: px, y: BTN_Y, w: pw, h: BTN_H };
+
+            if (this.lastPlayInfo) {
+                const pw2 = 96, px2 = CANVAS_WIDTH / 2 + 12;
+                this._button(ctx, px2, BTN_Y, pw2, BTN_H, this.t('pass'), {
+                    top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
+                    border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+                });
+                this._passBtnRect = { x: px2, y: BTN_Y, w: pw2, h: BTN_H };
+            }
+        }
+
+        if (this.state === 'calling' && this.callCurrent === 0) {
+            const cw = 148, ch = 48, cx = CANVAS_WIDTH / 2 - cw - 12;
+            this._button(ctx, cx, BTN_Y, cw, ch, this.t('call_landlord'), {
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#79bdfb', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.55)'
+            });
+            this._callBtnRect = { x: cx, y: BTN_Y, w: cw, h: ch };
+
+            const ncw = 110, ncx = CANVAS_WIDTH / 2 + 12;
+            this._button(ctx, ncx, BTN_Y, ncw, ch, this.t('no_call'), {
+                top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+            });
+            this._noCallBtnRect = { x: ncx, y: BTN_Y, w: ncw, h: ch };
+        }
+
+        if (this.state === 'grabbing' && this.grabCurrent === 0) {
+            const gw = 148, gh = 48, gx = CANVAS_WIDTH / 2 - gw - 12;
+            this._button(ctx, gx, BTN_Y, gw, gh, this.t('grab_landlord'), {
+                top: '#f2685a', bot: '#bb3225', topHover: '#ff8577', botHover: '#d24334',
+                border: 'rgba(255,210,150,.85)', glow: 'rgba(230,80,60,.55)'
+            });
+            this._grabBtnRect = { x: gx, y: BTN_Y, w: gw, h: gh };
+
+            const ngw = 110, ngx = CANVAS_WIDTH / 2 + 12;
+            this._button(ctx, ngx, BTN_Y, ngw, gh, this.t('no_grab'), {
+                top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+            });
+            this._noGrabBtnRect = { x: ngx, y: BTN_Y, w: ngw, h: gh };
+        }
+
+        if (this.state === 'idle' || this.state === 'ended') {
+            const sw = 190, sh = 56;
+            const sx = CANVAS_WIDTH / 2 - sw / 2;
+            const sy = CANVAS_HEIGHT / 2 + 110;
+            const key = this.state === 'ended' ? 'restart' : 'start';
+            // 呼吸光
+            const pulse = 0.5 + 0.5 * Math.sin(this._tick / 26);
+            ctx.save();
+            ctx.globalAlpha = 0.28 + pulse * 0.35;
+            ctx.shadowColor = '#ffd740';
+            ctx.shadowBlur = 26;
+            ctx.strokeStyle = 'rgba(255,215,64,.9)';
+            ctx.lineWidth = 2;
+            this._roundRect(ctx, sx - 4, sy - 4, sw + 8, sh + 8, 16);
+            ctx.stroke();
+            ctx.restore();
+
+            this._button(ctx, sx, sy, sw, sh, this.t(key), {
+                top: '#ffd45e', bot: '#d99a10', topHover: '#ffe283', botHover: '#eba91c',
+                border: 'rgba(255,250,210,.9)', glow: 'rgba(255,200,50,.65)'
+            });
+            // 深色文字
+            ctx.save();
+            ctx.fillStyle = '#3a2600';
+            ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.t(key), sx + sw / 2, sy + sh / 2 + 1);
+            ctx.restore();
+            ctx.textAlign = 'start';
+            ctx.textBaseline = 'alphabetic';
+
+            this._startBtnRect = { x: sx, y: sy, w: sw, h: sh };
+        }
+    }
+
+    _roundRect(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    /* ───────── 点击处理 ───────── */
+    handleClick(pos) {
+        const { x, y } = pos;
+
+        // 设置齿轮
+        if (Math.hypot(x - (CANVAS_WIDTH - 46), y - 42) < 26) {
+            this.settingsOpen = true;
+            settingsOverlay.classList.add('active');
+            return;
+        }
+
+        const inRect = r => r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+
+        if (inRect(this._startBtnRect)) { this.initNewGame(); this.startCallingPhase(); return; }
+
+        if (inRect(this._callBtnRect)) {
+            this.callScores[0] = 1;
+            this.message = this.t('you') + ' · ' + this.t('call_landlord');
+            this.messageTimer = 60;
+            this._advanceCalling();
+            return;
+        }
+        if (inRect(this._noCallBtnRect)) {
+            this.callScores[0] = 0;
+            this.message = this.t('you') + ' · ' + this.t('no_call');
+            this.messageTimer = 60;
+            this._advanceCalling();
+            return;
+        }
+        if (inRect(this._grabBtnRect)) {
+            const base = Math.max(this.callScores[0], ...this.grabScores);
+            this.grabScores[0] = base + 1;
+            this.message = this.t('you') + ' · ' + this.t('grab_landlord');
+            this.messageTimer = 60;
+            this._advanceGrabbing();
+            return;
+        }
+        if (inRect(this._noGrabBtnRect)) {
+            this.grabScores[0] = 0;
+            this.message = this.t('you') + ' · ' + this.t('no_grab');
+            this.messageTimer = 60;
+            this._advanceGrabbing();
+            return;
+        }
+        if (inRect(this._playBtnRect)) {
+            const sel = this.playersHand[0].filter(c => c.selected);
+            if (sel.length) this.playerPlayCards(sel);
+            else { this.message = this.t('select_cards'); this.messageTimer = 50; }
+            return;
+        }
+        if (inRect(this._passBtnRect)) { this.playerPass(); return; }
+
+        // 选牌
+        if (this.state === 'playing' && this.currentPlayer === 0) {
+            const h0 = this.playersHand[0];
+            for (let i = h0.length - 1; i >= 0; i--) {
+                if (h0[i].containsPoint(x, y)) {
+                    h0[i].selected = !h0[i].selected;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+/* ══════════════════════════════════════════════════════
+   启动
+   ══════════════════════════════════════════════════════ */
+const game = new Game();
+
+game._updateAIDifficulty = function () {
+    if (this.aiPlayers[1]) this.aiPlayers[1].difficulty = this.difficulty;
+    if (this.aiPlayers[2]) this.aiPlayers[2].difficulty = this.difficulty;
+};
+
+let _lastUISig = '';
+function updateSettingsUI() {
+    const sig = [game.difficulty, game.lang].join('|');
+    if (sig === _lastUISig) return;
+    _lastUISig = sig;
+    diffEasy.classList.toggle('active', game.difficulty === 'easy');
+    diffNormal.classList.toggle('active', game.difficulty === 'normal');
+    diffHard.classList.toggle('active', game.difficulty === 'hard');
+    langZh.classList.toggle('active', game.lang === 'zh');
+    langEn.classList.toggle('active', game.lang === 'en');
+    settingsTitle.textContent = game.t('settings');
+    diffLabel.textContent = game.t('difficulty') + '：';
+    langLabel.textContent = game.t('language') + '：';
+    diffEasy.textContent = game.t('easy');
+    diffNormal.textContent = game.t('normal');
+    diffHard.textContent = game.t('hard');
+    langZh.textContent = game.t('chinese');
+    langEn.textContent = game.t('english');
+}
+
+settingsClose.addEventListener('click', () => {
+    game.settingsOpen = false;
+    settingsOverlay.classList.remove('active');
+});
+settingsOverlay.addEventListener('click', e => {
+    if (e.target === settingsOverlay) {
+        game.settingsOpen = false;
+        settingsOverlay.classList.remove('active');
+    }
+});
+diffEasy.addEventListener('click', () => { game.difficulty = 'easy'; game._updateAIDifficulty(); updateSettingsUI(); });
+diffNormal.addEventListener('click', () => { game.difficulty = 'normal'; game._updateAIDifficulty(); updateSettingsUI(); });
+diffHard.addEventListener('click', () => { game.difficulty = 'hard'; game._updateAIDifficulty(); updateSettingsUI(); });
+langZh.addEventListener('click', () => { game.lang = 'zh'; window._lang = 'zh'; updateSettingsUI(); });
+langEn.addEventListener('click', () => { game.lang = 'en'; window._lang = 'en'; updateSettingsUI(); });
+
+canvas.addEventListener('mousedown', e => {
+    if (e.button === 0) game.handleClick(getCanvasPos(e));
+});
+canvas.addEventListener('mousemove', e => {
+    const p = getCanvasPos(e);
+    game._mouseX = p.x; game._mouseY = p.y;
+});
+canvas.addEventListener('mouseleave', () => { game._mouseX = -999; game._mouseY = -999; });
+
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const p = getCanvasPos(e);
+    game._mouseX = p.x; game._mouseY = p.y;
+    game.handleClick(p);
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const p = getCanvasPos(e);
+    game._mouseX = p.x; game._mouseY = p.y;
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    game._mouseX = -999; game._mouseY = -999;
+}, { passive: false });
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && game.settingsOpen) {
+        game.settingsOpen = false;
+        settingsOverlay.classList.remove('active');
+    }
+    if (e.code === 'Space' && game.state === 'playing' && game.currentPlayer === 0) {
+        e.preventDefault();
+        const sel = game.playersHand[0].filter(c => c.selected);
+        if (sel.length) game.playerPlayCards(sel);
+    }
+    if (e.key === 'p' || e.key === 'P') {
+        if (game.state === 'playing' && game.currentPlayer === 0 && game.lastPlayInfo) game.playerPass();
+    }
+    if (e.key === 'a' || e.key === 'A') {
+        if (game.state === 'playing' && game.currentPlayer === 0)
+            game.playersHand[0].forEach(c => c.selected = !c.selected);
+    }
+});
+
+/* ───────── 主循环 ───────── */
+function gameLoop() {
+    game.update();
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    game.draw(ctx);
+    updateSettingsUI();
+    requestAnimationFrame(gameLoop);
+}
+
+game.state = 'idle';
+game.message = '';
+updateSettingsUI();
+gameLoop();
+
+})();
+</script>
 </body>
 </html>

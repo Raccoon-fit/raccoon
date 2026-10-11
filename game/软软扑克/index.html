@@ -3,150 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>软软扑克 · 斗地主</title>
+<title>软软扑克 · 3D 斗地主</title>
 <style>
-    :root {
-        --bg: #0b1220;
-        --panel: #16233a;
-        --panel-border: #3d5a8a;
-        --gold: #ffd740;
-    }
+    :root { --gold: #ffd740; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
         height: 100%;
-        background: radial-gradient(circle at 50% 0%, #16243c 0%, #070c15 70%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        background: radial-gradient(circle at 50% 12%, #16243c 0%, #060a12 68%);
+        display: flex; justify-content: center; align-items: center;
         font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Segoe UI', Arial, sans-serif;
         overflow: hidden;
         -webkit-tap-highlight-color: transparent;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
+        user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
     }
     .game-container {
-        position: relative;
-        width: 100%;
-        max-width: 1100px;
-        aspect-ratio: 1100 / 720;
-        max-height: 100vh;
-        margin: 0 auto;
+        position: relative; width: 100%; max-width: 1100px;
+        aspect-ratio: 1100 / 720; max-height: 100vh; margin: 0 auto;
     }
     canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 14px;
-        cursor: pointer;
-        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(120, 170, 255, 0.14);
+        display: block; width: 100%; height: 100%;
+        border-radius: 14px; cursor: pointer;
+        box-shadow: 0 30px 90px rgba(0,0,0,.85), 0 0 0 1px rgba(120,170,255,.12);
     }
-    /* ===== 设置面板 ===== */
     .overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(4, 8, 16, 0.72);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
-        border-radius: 14px;
-        animation: fadeIn .18s ease;
+        position: absolute; inset: 0;
+        background: rgba(4,8,16,.74);
+        backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+        display: none; justify-content: center; align-items: center;
+        z-index: 10; border-radius: 14px; animation: fadeIn .18s ease;
     }
     .overlay.active { display: flex; }
     @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
     @keyframes panelIn {
-        from { opacity: 0; transform: translateY(16px) scale(.96); }
+        from { opacity: 0; transform: translateY(18px) scale(.95); }
         to   { opacity: 1; transform: translateY(0) scale(1); }
     }
     .settings-panel {
-        background: linear-gradient(160deg, #1d2c47 0%, #131d31 100%);
-        border: 2px solid var(--panel-border);
-        border-radius: 18px;
-        padding: 26px 30px 22px;
-        width: 86%;
-        max-width: 440px;
-        color: #e8eefc;
-        position: relative;
-        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255,255,255,.07);
+        background: linear-gradient(160deg, #1d2c47 0%, #101a2c 100%);
+        border: 2px solid #3d5a8a; border-radius: 18px;
+        padding: 26px 30px 22px; width: 86%; max-width: 440px;
+        color: #e8eefc; position: relative;
+        box-shadow: 0 24px 70px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.07);
         animation: panelIn .24s cubic-bezier(.22,1,.36,1);
     }
-    .settings-panel::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 18px;
-        background: linear-gradient(180deg, rgba(120,180,255,.10), transparent 40%);
-        pointer-events: none;
-    }
     .settings-panel h3 {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 1.32em;
-        letter-spacing: 4px;
-        color: var(--gold);
-        text-shadow: 0 2px 12px rgba(255, 215, 64, .35);
+        text-align: center; margin-bottom: 20px; font-size: 1.3em;
+        letter-spacing: 4px; color: var(--gold);
+        text-shadow: 0 2px 12px rgba(255,215,64,.35);
     }
     .close-btn {
-        position: absolute;
-        top: 12px; right: 14px;
-        width: 34px; height: 34px;
-        border-radius: 50%;
-        background: linear-gradient(180deg, #e74c3c, #a8281c);
-        color: #fff;
-        border: none;
-        font-size: 1em;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: absolute; top: 12px; right: 14px; width: 34px; height: 34px;
+        border-radius: 50%; background: linear-gradient(180deg,#e74c3c,#a8281c);
+        color: #fff; border: none; font-size: 1em; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
         transition: transform .18s, filter .18s;
-        box-shadow: 0 4px 12px rgba(200, 40, 30, .45);
+        box-shadow: 0 4px 12px rgba(200,40,30,.45);
     }
     .close-btn:hover { transform: scale(1.1) rotate(90deg); filter: brightness(1.15); }
-    .row {
-        display: flex;
-        align-items: center;
-        margin: 14px 0;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    .row label {
-        font-weight: 700;
-        min-width: 56px;
-        font-size: .96em;
-        letter-spacing: 1px;
-        color: #9fb6d8;
-    }
+    .row { display: flex; align-items: center; margin: 14px 0; gap: 10px; flex-wrap: wrap; }
+    .row label { font-weight: 700; min-width: 56px; font-size: .96em; letter-spacing: 1px; color: #9fb6d8; }
     .row button {
-        padding: 9px 18px;
-        border-radius: 10px;
-        border: 1.5px solid #365party;
-        border: 1.5px solid #365party;
-        border: 1.5px solid #365272;
-        background: linear-gradient(180deg, #253category;
-        background: linear-gradient(180deg, #253a58, #1a2a42);
-        color: #b9cbe4;
-        cursor: pointer;
-        font-size: .9em;
-        font-weight: 600;
-        letter-spacing: 1px;
-        transition: all .18s ease;
-        white-space: nowrap;
+        padding: 9px 18px; border-radius: 10px; border: 1.5px solid #365272;
+        background: linear-gradient(180deg,#253a58,#1a2a42);
+        color: #b9cbe4; cursor: pointer; font-size: .9em; font-weight: 600;
+        letter-spacing: 1px; transition: all .18s ease; white-space: nowrap;
     }
     .row button:hover {
-        background: linear-gradient(180deg, #34527c, #24395a);
-        color: #fff;
-        border-color: #6d9bdc;
-        transform: translateY(-1px);
+        background: linear-gradient(180deg,#34527c,#24395a);
+        color: #fff; border-color: #6d9bdc; transform: translateY(-1px);
     }
     .row button.active {
-        background: linear-gradient(180deg, #3f8de0, #2563b0);
-        color: #fff;
-        border-color: var(--gold);
-        box-shadow: 0 0 16px rgba(255, 215, 64, .35);
+        background: linear-gradient(180deg,#3f8de0,#2563b0);
+        color: #fff; border-color: var(--gold);
+        box-shadow: 0 0 16px rgba(255,215,64,.35);
     }
     @media (max-width: 768px) {
         .game-container { max-height: 100vh; aspect-ratio: auto; height: 100vh; }
@@ -184,15 +113,15 @@
 (function () {
 'use strict';
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    常量
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 const CANVAS_WIDTH  = 1100;
 const CANVAS_HEIGHT = 720;
 const CARD_WIDTH    = 72;
 const CARD_HEIGHT   = 100;
 const CARD_RADIUS   = 8;
-const CARD_SELECTED_OFFSET = 24;
+const CARD_SELECTED_OFFSET = 26;
 
 const SUIT_SPADE = 0, SUIT_HEART = 1, SUIT_CLUB = 2, SUIT_DIAMOND = 3, SUIT_JOKER = 4;
 const SUIT_SYMBOLS = {
@@ -211,13 +140,14 @@ const TEXTS = {
         play:'出牌', pass:'不出', hint:'提示',
         landlord:'地主', farmer:'农民',
         you_win:'🎉 你赢了！', you_lose:'💔 你输了…',
-        close:'关闭', you:'你', ai1:'电脑 A', ai2:'电脑 B',
+        you:'你', ai1:'电脑 A', ai2:'电脑 B',
         cards_count:'张', bottom_cards:'底 牌',
         new_round:'新一轮 · 请出牌', invalid_play:'无效牌型！',
         cant_beat:'打不过上家！', must_play:'新一轮必须出牌',
         select_cards:'请先选牌', no_one_call:'无人叫地主，重新发牌…',
         no_one_grab:'无人抢地主，重新发牌…',
-        ai_play:'出牌', ai_pass:'不出', thinking:'思考中'
+        ai_play:'出牌', ai_pass:'不出', thinking:'思考中',
+        dealing:'发牌中…'
     },
     en: {
         title:'R U A N  P O K E R', start:'Start', restart:'Play Again', settings:'Settings',
@@ -227,19 +157,20 @@ const TEXTS = {
         play:'Play', pass:'Pass', hint:'Hint',
         landlord:'Landlord', farmer:'Farmer',
         you_win:'🎉 You Win!', you_lose:'💔 You Lose…',
-        close:'Close', you:'You', ai1:'AI 1', ai2:'AI 2',
+        you:'You', ai1:'AI 1', ai2:'AI 2',
         cards_count:'', bottom_cards:'BOTTOM',
         new_round:'New round · play!', invalid_play:'Invalid play!',
         cant_beat:"Can't beat that!", must_play:'Must play a card',
         select_cards:'Select cards first', no_one_call:'Nobody called — redealing…',
         no_one_grab:'Nobody grabbed — redealing…',
-        ai_play:'plays', ai_pass:'passes', thinking:'thinking'
+        ai_play:'plays', ai_pass:'passes', thinking:'thinking',
+        dealing:'Dealing…'
     }
 };
 
-/* ══════════════════════════════════════════════════════
-   Canvas & DOM
-   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   Canvas / DOM
+   ══════════════════════════════════════════ */
 const canvas = document.getElementById('gameCanvas');
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -264,13 +195,11 @@ function getCanvasPos(e) {
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
     return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
 }
-
 const lerp = (a, b, t) => a + (b - a) * t;
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-/* ══════════════════════════════════════════════════════
-   牌
-   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   牌（支持旋转 / 缩放 —— 营造 3D 透视感）
+   ══════════════════════════════════════════ */
 class Card {
     constructor(suit, rank) {
         this.suit = suit;
@@ -279,7 +208,9 @@ class Card {
         this.faceUp = true;
         this.x = 0; this.y = 0;
         this.targetX = 0; this.targetY = 0;
-        this.animSpeed = 0.18;
+        this.rotation = 0; this.targetRotation = 0;
+        this.scale = 1;   this.targetScale = 1;
+        this.animSpeed = 0.16;
     }
     get isRed() {
         return this.suit === SUIT_HEART || this.suit === SUIT_DIAMOND ||
@@ -293,58 +224,91 @@ class Card {
     updatePosition() {
         this.x = lerp(this.x, this.targetX, this.animSpeed);
         this.y = lerp(this.y, this.targetY, this.animSpeed);
+        this.rotation = lerp(this.rotation, this.targetRotation, this.animSpeed * 1.4);
+        this.scale  = lerp(this.scale, this.targetScale, this.animSpeed * 1.4);
         if (Math.abs(this.x - this.targetX) < 0.4) this.x = this.targetX;
         if (Math.abs(this.y - this.targetY) < 0.4) this.y = this.targetY;
+        if (Math.abs(this.rotation - this.targetRotation) < 0.002) this.rotation = this.targetRotation;
+        if (Math.abs(this.scale - this.targetScale) < 0.004) this.scale = this.targetScale;
     }
-    setTarget(x, y) { this.targetX = x; this.targetY = y; }
-    snapToTarget() { this.x = this.targetX; this.y = this.targetY; }
+    setTarget(x, y, rot, sc) {
+        this.targetX = x; this.targetY = y;
+        if (rot !== undefined) this.targetRotation = rot;
+        if (sc !== undefined) this.targetScale = sc;
+    }
+    snapToTarget() {
+        this.x = this.targetX; this.y = this.targetY;
+        this.rotation = this.targetRotation;
+        this.scale = this.targetScale;
+    }
     containsPoint(px, py) {
-        const cy = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
-        return px >= this.x && px <= this.x + CARD_WIDTH && py >= cy && py <= cy + CARD_HEIGHT;
+        const sel = this.selected ? -CARD_SELECTED_OFFSET : 0;
+        const cx = this.x + CARD_WIDTH / 2;
+        const cy = this.y + CARD_HEIGHT / 2 + sel;
+        const dx = px - cx, dy = py - cy;
+        const cos = Math.cos(-this.rotation), sin = Math.sin(-this.rotation);
+        const lx = dx * cos - dy * sin;
+        const ly = dx * sin + dy * cos;
+        return Math.abs(lx) <= (CARD_WIDTH * this.scale) / 2 &&
+               Math.abs(ly) <= (CARD_HEIGHT * this.scale) / 2;
     }
 
+    /* —— 带 3D 透视的绘制 —— */
     draw(ctx, lang) {
-        const x = this.x;
-        const y = this.selected ? this.y - CARD_SELECTED_OFFSET : this.y;
-        const w = CARD_WIDTH, h = CARD_HEIGHT, r = CARD_RADIUS;
+        const sel = this.selected ? -CARD_SELECTED_OFFSET : 0;
+        const cx = this.x + CARD_WIDTH / 2;
+        const cy = this.y + CARD_HEIGHT / 2 + sel;
 
         ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale, this.scale);
+
         if (this.selected) {
             ctx.shadowColor = 'rgba(255,215,64,.85)';
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetY = 0;
+            ctx.shadowBlur = 24;
+            ctx.shadowOffsetY = -4;
         } else {
-            ctx.shadowColor = 'rgba(0,0,0,.45)';
-            ctx.shadowBlur = 7;
-            ctx.shadowOffsetY = 3;
+            ctx.shadowColor = 'rgba(0,0,0,.6)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetY = 6;
         }
 
+        ctx.translate(-CARD_WIDTH / 2, -CARD_HEIGHT / 2);
+
+        const w = CARD_WIDTH, h = CARD_HEIGHT, r = CARD_RADIUS;
+
         if (this.faceUp) {
-            /* ——— 正面 ——— */
-            const g = ctx.createLinearGradient(x, y, x, y + h);
+            // 牌的“厚度”侧面
+            ctx.fillStyle = 'rgba(196,190,172,.95)';
+            this._roundRect(ctx, 2.5, 4, w, h, r);
+            ctx.fill();
+
+            const g = ctx.createLinearGradient(0, 0, 0, h);
             g.addColorStop(0, '#ffffff');
-            g.addColorStop(1, '#f3efe3');
+            g.addColorStop(0.55, '#fbf9f3');
+            g.addColorStop(1, '#eee9dc');
             ctx.fillStyle = g;
-            this._roundRect(ctx, x, y, w, h, r);
+            this._roundRect(ctx, 0, 0, w, h, r);
             ctx.fill();
 
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
             ctx.strokeStyle = this.selected ? '#f5b301' : 'rgba(0,0,0,.16)';
-            ctx.lineWidth = this.selected ? 2 : 1;
-            this._roundRect(ctx, x, y, w, h, r);
+            ctx.lineWidth = this.selected ? 2.2 : 1;
+            this._roundRect(ctx, 0, 0, w, h, r);
             ctx.stroke();
 
-            // 左上角装饰条
+            // 左上角高光
             ctx.save();
             ctx.beginPath();
-            this._roundRect(ctx, x, y, w, h, r);
+            this._roundRect(ctx, 0, 0, w, h, r);
             ctx.clip();
-            const strip = ctx.createLinearGradient(x, y, x, y + 46);
-            strip.addColorStop(0, this.isRed ? 'rgba(224,49,49,.10)' : 'rgba(33,37,41,.08)');
-            strip.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = strip;
-            ctx.fillRect(x, y, w, 46);
+            const sg = ctx.createLinearGradient(0, 0, w * 0.75, h * 0.5);
+            sg.addColorStop(0, 'rgba(255,255,255,.85)');
+            sg.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = sg;
+            ctx.fillRect(0, 0, w, h);
             ctx.restore();
 
             const color = this.isRed ? '#d02a2a' : '#1b1f28';
@@ -356,35 +320,33 @@ class Card {
                 ctx.font = 'bold 24px "Microsoft YaHei","PingFang SC",sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(main, x + w / 2, y + h / 2 - 4);
+                ctx.fillText(main, w / 2, h / 2 - 4);
                 ctx.font = 'bold 10px "Segoe UI",sans-serif';
                 ctx.fillStyle = this.rank === 17 ? '#e05555' : '#8a8f9a';
-                ctx.fillText('JOKER', x + w / 2, y + h / 2 + 22);
-                // 星形点缀
+                ctx.fillText('JOKER', w / 2, h / 2 + 22);
                 ctx.font = '13px serif';
                 ctx.fillStyle = jcolor;
-                ctx.globalAlpha = .55;
-                ctx.fillText('★', x + w / 2, y + h / 2 - 30);
-                ctx.fillText('★', x + w / 2, y + h / 2 + 38);
+                ctx.globalAlpha = .5;
+                ctx.fillText('★', w / 2, h / 2 - 30);
+                ctx.fillText('★', w / 2, h / 2 + 38);
                 ctx.globalAlpha = 1;
             } else {
                 ctx.textBaseline = 'alphabetic';
-                // 左上
                 ctx.fillStyle = color;
                 ctx.font = 'bold 19px "Microsoft YaHei","PingFang SC",sans-serif';
                 ctx.textAlign = 'left';
-                ctx.fillText(this.displayRank, x + 7, y + 23);
+                ctx.fillText(this.displayRank, 7, 23);
                 ctx.font = '15px "Segoe UI Symbol",serif';
-                ctx.fillText(this.displaySuit, x + 7, y + 41);
-                // 中央
+                ctx.fillText(this.displaySuit, 7, 41);
+
                 ctx.font = '36px "Segoe UI Symbol",serif';
                 ctx.textAlign = 'center';
                 ctx.globalAlpha = .92;
-                ctx.fillText(this.displaySuit, x + w / 2, y + h / 2 + 13);
+                ctx.fillText(this.displaySuit, w / 2, h / 2 + 13);
                 ctx.globalAlpha = 1;
-                // 右下（倒置）
+
                 ctx.save();
-                ctx.translate(x + w - 7, y + h - 7);
+                ctx.translate(w - 7, h - 7);
                 ctx.rotate(Math.PI);
                 ctx.fillStyle = color;
                 ctx.font = 'bold 19px "Microsoft YaHei","PingFang SC",sans-serif';
@@ -395,42 +357,45 @@ class Card {
                 ctx.restore();
             }
         } else {
-            /* ——— 背面 ——— */
-            const g = ctx.createLinearGradient(x, y, x + w, y + h);
-            g.addColorStop(0, '#3a63c8');
-            g.addColorStop(1, '#1c3374');
+            // 背面厚度
+            ctx.fillStyle = 'rgba(22,40,86,.95)';
+            this._roundRect(ctx, 2.5, 4, w, h, r);
+            ctx.fill();
+
+            const g = ctx.createLinearGradient(0, 0, w, h);
+            g.addColorStop(0, '#3f6ad4');
+            g.addColorStop(0.5, '#2a4ba8');
+            g.addColorStop(1, '#16295e');
             ctx.fillStyle = g;
-            this._roundRect(ctx, x, y, w, h, r);
+            this._roundRect(ctx, 0, 0, w, h, r);
             ctx.fill();
 
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
-            ctx.strokeStyle = 'rgba(180,205,255,.45)';
+            ctx.strokeStyle = 'rgba(180,205,255,.5)';
             ctx.lineWidth = 1.5;
-            this._roundRect(ctx, x, y, w, h, r);
+            this._roundRect(ctx, 0, 0, w, h, r);
             ctx.stroke();
 
-            // 内框
-            ctx.strokeStyle = 'rgba(160,190,255,.35)';
+            ctx.strokeStyle = 'rgba(160,190,255,.32)';
             ctx.lineWidth = 1;
-            this._roundRect(ctx, x + 7, y + 7, w - 14, h - 14, 5);
+            this._roundRect(ctx, 7, 7, w - 14, h - 14, 5);
             ctx.stroke();
 
-            // 中央菱形
-            const cx = x + w / 2, cy = y + h / 2;
+            const cx2 = w / 2, cy2 = h / 2;
             ctx.fillStyle = 'rgba(130,175,255,.42)';
             ctx.beginPath();
-            ctx.moveTo(cx, cy - 17);
-            ctx.lineTo(cx + 12, cy);
-            ctx.lineTo(cx, cy + 17);
-            ctx.lineTo(cx - 12, cy);
+            ctx.moveTo(cx2, cy2 - 17);
+            ctx.lineTo(cx2 + 12, cy2);
+            ctx.lineTo(cx2, cy2 + 17);
+            ctx.lineTo(cx2 - 12, cy2);
             ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = 'rgba(200,225,255,.65)';
+            ctx.strokeStyle = 'rgba(200,225,255,.62)';
             ctx.lineWidth = 1.2;
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.arc(cx2, cy2, 5, 0, Math.PI * 2);
             ctx.fillStyle = 'rgba(230,240,255,.55)';
             ctx.fill();
         }
@@ -455,9 +420,9 @@ class Card {
     }
 }
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    牌型分析
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 function getRankCounts(cards) {
     const c = {};
     for (const card of cards) c[card.rank] = (c[card.rank] || 0) + 1;
@@ -471,42 +436,30 @@ function analyzeHand(cards) {
     const ranks = Object.keys(counts).map(Number).sort((a, b) => a - b);
     const vals = ranks.map(r => counts[r]).sort((a, b) => a - b);
 
-    // 王炸
     if (n === 2 && counts[16] === 1 && counts[17] === 1)
         return { type: 'rocket', mainRank: 100, length: 1 };
-    // 炸弹
     if (n === 4 && ranks.length === 1)
         return { type: 'bomb', mainRank: ranks[0], length: 1 };
-    // 单张
     if (n === 1) return { type: 'single', mainRank: ranks[0], length: 1 };
-    // 对子
     if (n === 2 && ranks.length === 1) return { type: 'pair', mainRank: ranks[0], length: 1 };
-    // 三张
     if (n === 3 && ranks.length === 1) return { type: 'triple', mainRank: ranks[0], length: 1 };
-    // 三带一
     if (n === 4 && vals.length === 2 && vals[0] === 1 && vals[1] === 3)
         return { type: 'triple_one', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
-    // 三带二
     if (n === 5 && vals.length === 2 && vals[0] === 2 && vals[1] === 3)
         return { type: 'triple_two', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
-    // 四带二单
     if (n === 6 && vals.length === 3 && vals[0] === 1 && vals[1] === 1 && vals[2] === 4)
         return { type: 'quad_two', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
-    // 四带两对
     if (n === 8 && vals.length === 3 && vals[0] === 2 && vals[1] === 2 && vals[2] === 4)
         return { type: 'quad_two_pair', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
 
-    // 顺子（5 张以上，不含 2 和王）
     if (n >= 5 && ranks.length === n && ranks[n - 1] <= 14 && ranks[n - 1] - ranks[0] === n - 1)
         return { type: 'straight', mainRank: ranks[n - 1], length: n };
 
-    // 连对（3 对以上）
     if (n >= 6 && n % 2 === 0 && ranks.length === n / 2 &&
         ranks.every(r => counts[r] === 2) && ranks[ranks.length - 1] <= 14 &&
         ranks[ranks.length - 1] - ranks[0] === ranks.length - 1)
         return { type: 'straight_pair', mainRank: ranks[ranks.length - 1], length: ranks.length };
 
-    // 飞机
     const tripleRanks = ranks.filter(r => counts[r] >= 3 && r <= 14);
     const maxLen = Math.min(6, Math.floor(tripleRanks.length));
     for (let len = maxLen; len >= 2; len--) {
@@ -514,7 +467,6 @@ function analyzeHand(cards) {
             const seq = tripleRanks.slice(s, s + len);
             if (seq[seq.length - 1] - seq[0] !== len - 1) continue;
             if (!seq.every(r => counts[r] >= 3)) continue;
-
             const tripCount = len * 3;
             const rem = n - tripCount;
             const wing = {};
@@ -549,9 +501,9 @@ function canBeat(newT, lastT) {
     return false;
 }
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    AI
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 class AIPlayer {
     constructor(playerId, difficulty = 'normal') {
         this.playerId = playerId;
@@ -560,31 +512,25 @@ class AIPlayer {
         this.isLandlord = false;
     }
 
-    /* ——— 主入口：返回要出的牌，或 null 表示不要 ——— */
     findPlay(game) {
         if (!this.hand.length) return null;
         const last = game.lastPlayInfo;
 
-        // 能一把甩完就甩完
         const whole = analyzeHand(this.hand);
         if (whole && canBeat(whole, last)) return [...this.hand];
 
         if (!last) return this._leadPlay(game);
 
-        // 队友出的牌 —— 农民之间一般不互相压
         if (this._isTeammate(game, game.lastPlayedBy)) {
-            // 除非自己马上就能走完
             if (this.hand.length <= 2) {
                 const trySame = this._followPlay(game, last);
                 if (trySame && trySame.length === this.hand.length) return trySame;
             }
             return null;
         }
-
         return this._followPlay(game, last);
     }
 
-    /* ——— 判断队友 ——— */
     _isTeammate(game, pid) {
         if (pid === -1 || pid === this.playerId) return false;
         if (this.isLandlord) return false;
@@ -595,7 +541,6 @@ class AIPlayer {
         return [game.landlordId].filter(p => p >= 0);
     }
 
-    /* ═══════ 领出（自己先手） ═══════ */
     _leadPlay(game) {
         const hand = this.hand;
         const n = hand.length;
@@ -607,11 +552,8 @@ class AIPlayer {
         const ranksAsc = Object.keys(byRank).map(Number).sort((a, b) => a - b);
 
         const enemies = this._getEnemies(game);
-        const enemyMin = enemies.length
-            ? Math.min(...enemies.map(p => game.playersHand[p].length))
-            : 99;
+        const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
 
-        // 对手只剩一张 → 出对子 / 大牌压制
         if (enemyMin === 1) {
             const pairsDesc = ranksAsc.filter(r => counts[r] >= 2 && r <= 15).sort((a, b) => b - a);
             if (pairsDesc.length) return byRank[pairsDesc[0]].slice(0, 2);
@@ -620,13 +562,11 @@ class AIPlayer {
             return [byRank[ranksAsc[ranksAsc.length - 1]][0]];
         }
 
-        // 困难 / 普通：优先甩长顺子
         if (this.difficulty !== 'easy') {
             const st = this._findLongestStraight();
             if (st && st.length >= 5) return st;
         }
 
-        // 只剩两手且能组成"三带一/三带二"时优先
         if (this.difficulty === 'hard') {
             const tri = ranksAsc.filter(r => counts[r] === 3);
             if (tri.length && n <= 8) {
@@ -638,53 +578,40 @@ class AIPlayer {
             }
         }
 
-        // 单张（不拆炸弹/三张）
         const singles = ranksAsc.filter(r => counts[r] === 1);
         if (singles.length) return [byRank[singles[0]][0]];
 
-        // 对子
         const pairs = ranksAsc.filter(r => counts[r] === 2 && r <= 15);
         if (pairs.length) return byRank[pairs[0]].slice(0, 2);
 
-        // 三张
         const triples = ranksAsc.filter(r => counts[r] === 3);
         if (triples.length) {
             const tr = byRank[triples[0]].slice(0, 3);
             const rem = hand.filter(c => !tr.includes(c));
-            // 带一张散牌
             if (rem.length && this.difficulty !== 'easy' && rem.length <= 2) {
                 const remSorted = [...rem].sort((a, b) => a.rank - b.rank);
                 return [...tr, remSorted[0]];
             }
             return tr;
         }
-
-        // 只剩炸弹了
         return [byRank[ranksAsc[0]][0]];
     }
 
-    /* ═══════ 跟牌 ═══════ */
     _followPlay(game, last) {
         const enemies = this._getEnemies(game);
-        const enemyMin = enemies.length
-            ? Math.min(...enemies.map(p => game.playersHand[p].length))
-            : 99;
+        const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
         const desperate = enemyMin <= 2;
 
-        // 先试着按同牌型压
         const same = this._findBeatingSame(last);
         if (same) {
             const info = analyzeHand(same);
-            // 尽量不拆炸弹来压普通牌
             if (info && info.type === 'bomb' && last.type !== 'bomb' && last.type !== 'rocket') {
                 if (this.difficulty === 'easy') return Math.random() < 0.5 ? same : null;
                 if (!desperate && this.hand.length > 5) return null;
             }
-            // 拆对子/三张压制时，如果手上的牌还很多，适当克制
             return same;
         }
 
-        // 炸弹
         const bomb = this._findSmallestBomb();
         if (bomb) {
             const bInfo = analyzeHand(bomb);
@@ -698,7 +625,6 @@ class AIPlayer {
             }
         }
 
-        // 火箭
         if (desperate || this.difficulty === 'hard') {
             const rocket = this._findRocket();
             if (rocket) {
@@ -715,9 +641,7 @@ class AIPlayer {
         const byRank = {};
         for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
         const sRanks = Object.keys(byRank).map(Number).sort((a, b) => a - b);
-
         const lt = info.type, lr = info.mainRank, ll = info.length;
-        // 拆牌代价：单张最优，炸弹最差
         const cost = n => (n === 1 ? 0 : n === 2 ? 1 : n === 3 ? 2 : 20);
 
         if (lt === 'single') {
@@ -747,14 +671,12 @@ class AIPlayer {
                 if (need === 1) {
                     if (rem.length >= 1) {
                         const rc = getRankCounts(rem);
-                        const wr = Object.keys(rc).map(Number)
-                            .sort((a, b) => rc[a] - rc[b] || a - b);
+                        const wr = Object.keys(rc).map(Number).sort((a, b) => rc[a] - rc[b] || a - b);
                         return [...tr, rem.find(c => c.rank === wr[0])];
                     }
                 } else {
                     const rc = getRankCounts(rem);
-                    const pr = Object.keys(rc).map(Number)
-                        .filter(x => rc[x] >= 2)
+                    const pr = Object.keys(rc).map(Number).filter(x => rc[x] >= 2)
                         .sort((a, b) => rc[a] - rc[b] || a - b);
                     if (pr.length) {
                         const pc = rem.filter(c => c.rank === pr[0]).slice(0, 2);
@@ -800,9 +722,7 @@ class AIPlayer {
             const er = sr + ll - 1;
             if (er <= lr) continue;
             let ok = true;
-            for (let r = sr; r <= er; r++) {
-                if (!byRank[r] || !byRank[r].length) { ok = false; break; }
-            }
+            for (let r = sr; r <= er; r++) if (!byRank[r] || !byRank[r].length) { ok = false; break; }
             if (!ok) continue;
             const res = [];
             for (let r = sr; r <= er; r++) res.push(byRank[r][0]);
@@ -818,9 +738,7 @@ class AIPlayer {
             const er = sr + ll - 1;
             if (er <= lr) continue;
             let ok = true;
-            for (let r = sr; r <= er; r++) {
-                if (!byRank[r] || byRank[r].length < 2) { ok = false; break; }
-            }
+            for (let r = sr; r <= er; r++) if (!byRank[r] || byRank[r].length < 2) { ok = false; break; }
             if (!ok) continue;
             const res = [];
             for (let r = sr; r <= er; r++) res.push(...byRank[r].slice(0, 2));
@@ -832,9 +750,7 @@ class AIPlayer {
     _findBeatingPlane(lt, lr, ll) {
         const byRank = {};
         for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
-        const trs = Object.keys(byRank).map(Number)
-            .filter(r => byRank[r].length >= 3 && r <= 14)
-            .sort((a, b) => a - b);
+        const trs = Object.keys(byRank).map(Number).filter(r => byRank[r].length >= 3 && r <= 14).sort((a, b) => a - b);
 
         for (let s = 0; s + ll <= trs.length; s++) {
             const seq = trs.slice(s, s + ll);
@@ -868,17 +784,15 @@ class AIPlayer {
     _findSmallestBomb() {
         const byRank = {};
         for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
-        const bombs = Object.entries(byRank)
-            .filter(([, cs]) => cs.length >= 4)
-            .map(([r, cs]) => [Number(r), cs])
-            .sort((a, b) => a[0] - b[0]);
+        const bombs = Object.entries(byRank).filter(([, cs]) => cs.length >= 4)
+            .map(([r, cs]) => [Number(r), cs]).sort((a, b) => a[0] - b[0]);
         return bombs.length ? bombs[0][1].slice(0, 4) : null;
     }
 
     _findRocket() {
-        const hasSmall = this.hand.some(c => c.rank === 16);
-        const hasBig = this.hand.some(c => c.rank === 17);
-        if (hasSmall && hasBig) return this.hand.filter(c => c.rank === 16 || c.rank === 17);
+        const hasS = this.hand.some(c => c.rank === 16);
+        const hasB = this.hand.some(c => c.rank === 17);
+        if (hasS && hasB) return this.hand.filter(c => c.rank === 16 || c.rank === 17);
         return null;
     }
 
@@ -895,16 +809,15 @@ class AIPlayer {
             if (cur.length >= 5 && (!best || cur.length > best.length)) best = cur;
         }
         if (!best) return null;
-        // 避免拆炸弹
         const counts = getRankCounts(this.hand);
         if (best.some(r => counts[r] >= 4)) return null;
         return best.map(r => byRank[r][0]);
     }
 }
 
-/* ══════════════════════════════════════════════════════
-   游戏
-   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   游戏主类
+   ══════════════════════════════════════════ */
 class Game {
     constructor() {
         this.lang = 'zh';
@@ -912,14 +825,21 @@ class Game {
         this.difficulty = 'normal';
         this.settingsOpen = false;
         this.state = 'idle';
+
         this.playersHand = [[], [], []];
         this.landlordCards = [];
         this.landlordId = -1;
         this.currentPlayer = -1;
+
+        /* 三家各自的出牌区 */
+        this.tableCards  = [[], [], []];
+        this.tablePassed = [false, false, false];
+
         this.lastPlayedCards = [];
         this.lastPlayedBy = -1;
         this.lastPlayInfo = null;
         this.passCount = 0;
+
         this.callScores = [0, 0, 0];
         this.callStartPlayer = 0;
         this.callCurrent = 0;
@@ -927,25 +847,47 @@ class Game {
         this.grabScores = [0, 0, 0];
         this.grabCurrent = 0;
         this.grabStart = 0;
+
         this.winner = -1;
         this.message = '';
         this.messageTimer = 0;
+        this.thinkingPid = -1;
+
         this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
         this.aiTimer = null;
+
         this._mouseX = -999; this._mouseY = -999;
         this._playBtnRect = null; this._passBtnRect = null;
         this._callBtnRect = null; this._noCallBtnRect = null;
         this._grabBtnRect = null; this._noGrabBtnRect = null;
         this._startBtnRect = null;
         this._tick = 0;
+
         this.initNewGame();
     }
 
     t(key) { return (TEXTS[this.lang] || TEXTS.zh)[key] || key; }
 
+    /* ───────── 出牌区坐标（3D 桌面上的三个位置） ───────── */
+    _tableZone(pid) {
+        if (pid === 0) return { x: 362, y: 392, w: 376, h: 118 };
+        if (pid === 1) return { x: 128, y: 226, w: 300, h: 112 };
+        return { x: 672, y: 226, w: 300, h: 112 };
+    }
+
+    /* ───────── AI 思考延迟 ───────── */
+    _aiDelay() {
+        const base = this.difficulty === 'easy' ? 1050
+                   : this.difficulty === 'normal' ? 880
+                   : 700;
+        return base + Math.random() * 850;
+    }
+
     /* ───────── 初始化 ───────── */
     initNewGame() {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
+
         const deck = [];
         for (const s of [SUIT_SPADE, SUIT_HEART, SUIT_CLUB, SUIT_DIAMOND])
             for (let r = 3; r <= 15; r++) deck.push(new Card(s, r));
@@ -968,6 +910,24 @@ class Game {
         for (const c of this.playersHand[2]) c.faceUp = false;
         for (const c of this.landlordCards) c.faceUp = false;
 
+        /* 所有牌从桌面中心「飞」出来 */
+        const dealX = CANVAS_WIDTH / 2 - CARD_WIDTH / 2;
+        const dealY = CANVAS_HEIGHT / 2 - CARD_HEIGHT / 2;
+        for (const h of this.playersHand) {
+            for (const c of h) {
+                c.x = dealX; c.y = dealY;
+                c.scale = 0.2; c.targetScale = 1;
+                c.rotation = (Math.random() - 0.5) * 1.2;
+                c.setTarget(dealX, dealY);
+            }
+        }
+        for (const c of this.landlordCards) {
+            c.x = dealX; c.y = dealY;
+            c.scale = 0.2; c.targetScale = 1;
+            c.rotation = (Math.random() - 0.5) * 1.2;
+            c.setTarget(dealX, dealY);
+        }
+
         this.state = 'idle';
         this.landlordId = -1;
         this.currentPlayer = -1;
@@ -983,60 +943,124 @@ class Game {
         this.grabCurrent = 0;
         this.grabStart = 0;
         this.winner = -1;
-        this.message = '';
-        this.messageTimer = 0;
+        this.message = this.t('dealing');
+        this.messageTimer = 90;
+        this.tableCards = [[], [], []];
+        this.tablePassed = [false, false, false];
 
         for (let i = 0; i < 3; i++)
             this.playersHand[i].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
         this.landlordCards.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
 
-        this._layoutAllCards();
+        this._layoutAllCards(false);
+
+        /* 发牌动画结束后进入叫地主 */
+        this.aiTimer = setTimeout(() => {
+            this.aiTimer = null;
+            if (this.state === 'idle') this.startCallingPhase();
+        }, 1200);
     }
 
-    _layoutAllCards() {
-        /* 玩家手牌 */
+    /* ───────── 布局 ───────── */
+    _layoutAllCards(snap = true) {
+        /* —— 玩家手牌：扇形 —— */
         const hand0 = this.playersHand[0];
         const n0 = hand0.length;
-        const maxW = CANVAS_WIDTH - 200;
-        let sp0 = 46;
-        if (n0 > 1 && (n0 - 1) * sp0 + CARD_WIDTH > maxW)
-            sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
-        const totalW0 = n0 > 1 ? (n0 - 1) * sp0 + CARD_WIDTH : CARD_WIDTH;
-        const startX0 = (CANVAS_WIDTH - totalW0) / 2;
-        const baseY0 = 545;
-        for (let i = 0; i < n0; i++) {
-            hand0[i].setTarget(startX0 + i * sp0, baseY0);
-            hand0[i].snapToTarget();
+        if (n0) {
+            const maxW = CANVAS_WIDTH - 220;
+            let sp0 = 46;
+            if (n0 > 1 && (n0 - 1) * sp0 + CARD_WIDTH > maxW)
+                sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+            if (n0 > 1 && sp0 < 20) sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+            const totalW0 = n0 > 1 ? (n0 - 1) * sp0 + CARD_WIDTH : CARD_WIDTH;
+            const startX0 = (CANVAS_WIDTH - totalW0) / 2;
+            const baseY0 = 548;
+            const maxA = n0 > 1 ? Math.min(0.11, n0 * 0.007) : 0;
+
+            for (let i = 0; i < n0; i++) {
+                const t = n0 > 1 ? (i - (n0 - 1) / 2) / ((n0 - 1) / 2) : 0;
+                const c = hand0[i];
+                c.setTarget(startX0 + i * sp0,
+                            baseY0 + Math.abs(t) * 12,
+                            t * maxA,
+                            1);
+                if (snap) c.snapToTarget();
+            }
         }
 
-        /* AI 1 手牌（左上） */
+        /* —— AI 1 手牌（左上） —— */
         const hand1 = this.playersHand[1];
         const n1 = hand1.length;
-        const sp1 = n1 > 14 ? 18 : 22;
-        for (let i = 0; i < n1; i++) {
-            hand1[i].setTarget(24 + i * sp1, 74);
-            hand1[i].snapToTarget();
+        if (n1) {
+            const sp1 = n1 > 14 ? 17 : 21;
+            const maxA1 = n1 > 1 ? Math.min(0.09, n1 * 0.006) : 0;
+            for (let i = 0; i < n1; i++) {
+                const t = n1 > 1 ? (i - (n1 - 1) / 2) / ((n1 - 1) / 2) : 0;
+                const c = hand1[i];
+                c.setTarget(22 + i * sp1, 82 + Math.abs(t) * 8, t * maxA1, 0.6);
+                if (snap) c.snapToTarget();
+            }
         }
 
-        /* AI 2 手牌（右上） */
+        /* —— AI 2 手牌（右上） —— */
         const hand2 = this.playersHand[2];
         const n2 = hand2.length;
-        const sp2 = n2 > 14 ? 18 : 22;
-        const totalW2 = n2 > 1 ? (n2 - 1) * sp2 + CARD_WIDTH : CARD_WIDTH;
-        const startX2 = CANVAS_WIDTH - 24 - totalW2;
-        for (let i = 0; i < n2; i++) {
-            hand2[i].setTarget(startX2 + i * sp2, 74);
-            hand2[i].snapToTarget();
+        if (n2) {
+            const sp2 = n2 > 14 ? 17 : 21;
+            const visW = CARD_WIDTH * 0.6;
+            const totalW2 = (n2 - 1) * sp2 + visW;
+            const startX2 = CANVAS_WIDTH - 22 - totalW2 + (CARD_WIDTH - visW) / 2;
+            const maxA2 = n2 > 1 ? Math.min(0.09, n2 * 0.006) : 0;
+            for (let i = 0; i < n2; i++) {
+                const t = n2 > 1 ? (i - (n2 - 1) / 2) / ((n2 - 1) / 2) : 0;
+                const c = hand2[i];
+                c.setTarget(startX2 + i * sp2, 82 + Math.abs(t) * 8, t * maxA2, 0.6);
+                if (snap) c.snapToTarget();
+            }
         }
 
-        /* 底牌 */
+        /* —— 底牌（顶部居中） —— */
         const n3 = this.landlordCards.length;
-        const sp3 = 52;
-        const totalW3 = n3 > 1 ? (n3 - 1) * sp3 + CARD_WIDTH : CARD_WIDTH;
-        const startX3 = (CANVAS_WIDTH - totalW3) / 2;
-        for (let i = 0; i < n3; i++) {
-            this.landlordCards[i].setTarget(startX3 + i * sp3, 22);
-            this.landlordCards[i].snapToTarget();
+        if (n3) {
+            const sp3 = 52;
+            const totalW3 = (n3 - 1) * sp3 + CARD_WIDTH;
+            const startX3 = (CANVAS_WIDTH - totalW3) / 2;
+            for (let i = 0; i < n3; i++) {
+                const c = this.landlordCards[i];
+                c.setTarget(startX3 + i * sp3, 16, 0, 0.82);
+                if (snap) c.snapToTarget();
+            }
+        }
+
+        this._layoutTableCards(snap);
+    }
+
+    _layoutTableCards(snap = true) {
+        for (let pid = 0; pid < 3; pid++) {
+            const cards = this.tableCards[pid];
+            if (!cards || !cards.length) continue;
+            const zone = this._tableZone(pid);
+            const n = cards.length;
+            const sc = 0.74;
+            const visW = CARD_WIDTH * sc;
+            const centerX = zone.x + zone.w / 2;
+            const centerY = zone.y + zone.h / 2;
+
+            let sp;
+            if (n === 1) sp = 0;
+            else sp = Math.min(visW * 0.72, (zone.w - 30 - visW) / (n - 1));
+
+            const totalVisW = (n - 1) * sp + visW;
+            const startCX = centerX - totalVisW / 2 + visW / 2;
+
+            for (let i = 0; i < n; i++) {
+                const c = cards[i];
+                c.selected = false;
+                c.setTarget(startCX + i * sp - CARD_WIDTH / 2,
+                            centerY - CARD_HEIGHT / 2,
+                            0, sc);
+                if (snap) c.snapToTarget();
+            }
         }
     }
 
@@ -1076,7 +1100,7 @@ class Game {
             this.message = `AI ${pid} · ${this.t('no_call')}`;
         }
         this.messageTimer = 60;
-        this.aiTimer = setTimeout(() => this._advanceCalling(), 720);
+        this.aiTimer = setTimeout(() => this._advanceCalling(), 720 + Math.random() * 400);
     }
 
     _evaluateHandStrength(hand) {
@@ -1113,7 +1137,7 @@ class Game {
         if (maxS === 0) {
             this.message = this.t('no_one_call');
             this.messageTimer = 90;
-            this.aiTimer = setTimeout(() => { this.initNewGame(); this.startCallingPhase(); }, 1400);
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
             return;
         }
         const cands = [];
@@ -1148,7 +1172,7 @@ class Game {
             this.message = `AI ${pid} · ${this.t('no_grab')}`;
         }
         this.messageTimer = 60;
-        this.aiTimer = setTimeout(() => this._advanceGrabbing(), 720);
+        this.aiTimer = setTimeout(() => this._advanceGrabbing(), 720 + Math.random() * 400);
     }
 
     _advanceGrabbing() {
@@ -1167,7 +1191,7 @@ class Game {
         if (!all.length) {
             this.message = this.t('no_one_grab');
             this.messageTimer = 90;
-            this.aiTimer = setTimeout(() => { this.initNewGame(); this.startCallingPhase(); }, 1400);
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
             return;
         }
         all.sort((a, b) => b[1] - a[1]);
@@ -1188,7 +1212,10 @@ class Game {
         this.playersHand[pid].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
         if (pid !== 0) this.aiPlayers[pid].hand.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
 
-        this._layoutAllCards();
+        /* 底牌飞向地主手牌 */
+        this._clearTable();
+        this._layoutAllCards(false);
+
         this.state = 'playing';
         this.currentPlayer = pid;
         this.lastPlayedCards = [];
@@ -1196,12 +1223,37 @@ class Game {
         this.lastPlayInfo = null;
         this.passCount = 0;
         this.message = `${pid === 0 ? this.t('you') : 'AI ' + pid} · ${this.t('landlord')}`;
-        this.messageTimer = 70;
+        this.messageTimer = 80;
 
-        if (pid !== 0) this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 900);
+        if (pid !== 0) this._scheduleAI(pid, 1200);
     }
 
-    /* ───────── AI 回合 ───────── */
+    /* ───────── 出牌区管理 ───────── */
+    _clearTable() {
+        for (let i = 0; i < 3; i++) {
+            this.tableCards[i] = [];
+            this.tablePassed[i] = false;
+        }
+    }
+
+    /* ───────── AI 调度（带延迟） ───────── */
+    _scheduleAI(pid, extra = 0) {
+        if (this.state !== 'playing') return;
+        if (pid === 0) return;
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = pid;
+        this.aiTimer = setTimeout(() => {
+            this.aiTimer = null;
+            this.thinkingPid = -1;
+            this._aiTurnIfNeeded();
+        }, this._aiDelay() + extra);
+    }
+
+    _aiTurnIfNeeded() {
+        if (this.state === 'playing' && this.currentPlayer !== 0)
+            this._aiTurn(this.currentPlayer);
+    }
+
     _aiTurn(pid) {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         if (this.state !== 'playing') return;
@@ -1229,30 +1281,33 @@ class Game {
             const i2 = this.playersHand[pid].indexOf(c);
             if (i2 >= 0) this.playersHand[pid].splice(i2, 1);
             c.faceUp = true;
+            c.selected = false;
         }
         this.lastPlayedCards = cards;
         this.lastPlayedBy = pid;
         this.lastPlayInfo = info;
         this.passCount = 0;
-        this._layoutAllCards();
+
+        this.tableCards[pid] = cards;
+        this.tablePassed[pid] = false;
+
+        this._layoutAllCards(false);
+        this._layoutTableCards(false);
+
         this.message = `AI ${pid} · ${this.t('ai_play')}`;
-        this.messageTimer = 40;
+        this.messageTimer = 45;
 
         if (this.playersHand[pid].length === 0) { this._gameOver(pid); return; }
         this.currentPlayer = this._getNextPlayer(pid);
-        this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
-    }
-
-    _aiTurnIfNeeded() {
-        if (this.state === 'playing' && this.currentPlayer !== 0)
-            this._aiTurn(this.currentPlayer);
+        this._scheduleAI(this.currentPlayer, 300);
     }
 
     _aiPass(pid) {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         if (this.state !== 'playing') return;
+        this.thinkingPid = -1;
 
-        // 新一轮不能过，必须出牌
+        /* 新一轮不能过，必须出牌 */
         if (!this.lastPlayInfo) {
             const ai = this.aiPlayers[pid];
             if (ai && ai.hand.length) {
@@ -1264,24 +1319,27 @@ class Game {
         }
 
         this.passCount++;
+        this.tableCards[pid] = [];
+        this.tablePassed[pid] = true;
         this.message = `AI ${pid} · ${this.t('ai_pass')}`;
-        this.messageTimer = 40;
+        this.messageTimer = 45;
 
         if (this.passCount >= 2) {
             this.lastPlayedCards = [];
             this.lastPlayedBy = -1;
             this.lastPlayInfo = null;
             this.passCount = 0;
+            this._clearTable();
             this.currentPlayer = this._getNextPlayer(this.currentPlayer);
             if (this.currentPlayer === 0) {
                 this.message = this.t('new_round');
-                this.messageTimer = 60;
+                this.messageTimer = 70;
             } else {
-                this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+                this._scheduleAI(this.currentPlayer, 400);
             }
         } else {
             this.currentPlayer = this._getNextPlayer(pid);
-            this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
+            this._scheduleAI(this.currentPlayer, 350);
         }
     }
 
@@ -1291,8 +1349,8 @@ class Game {
     playerPlayCards(selected) {
         if (this.currentPlayer !== 0 || this.state !== 'playing') return false;
         const info = analyzeHand(selected);
-        if (!info) { this.message = this.t('invalid_play'); this.messageTimer = 50; return false; }
-        if (!canBeat(info, this.lastPlayInfo)) { this.message = this.t('cant_beat'); this.messageTimer = 50; return false; }
+        if (!info) { this.message = this.t('invalid_play'); this.messageTimer = 55; return false; }
+        if (!canBeat(info, this.lastPlayInfo)) { this.message = this.t('cant_beat'); this.messageTimer = 55; return false; }
 
         for (const c of selected) {
             const idx = this.playersHand[0].indexOf(c);
@@ -1303,43 +1361,51 @@ class Game {
         this.lastPlayInfo = info;
         this.passCount = 0;
         for (const c of this.playersHand[0]) c.selected = false;
-        this._layoutAllCards();
+
+        this.tableCards[0] = selected;
+        this.tablePassed[0] = false;
+
+        this._layoutAllCards(false);
+        this._layoutTableCards(false);
         this.message = '';
         this.messageTimer = 0;
 
         if (this.playersHand[0].length === 0) { this._gameOver(0); return true; }
         this.currentPlayer = this._getNextPlayer(0);
-        this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 520);
+        this._scheduleAI(this.currentPlayer, 350);
         return true;
     }
 
     playerPass() {
         if (this.currentPlayer !== 0 || this.state !== 'playing') return;
-        if (!this.lastPlayInfo) { this.message = this.t('must_play'); this.messageTimer = 50; return; }
+        if (!this.lastPlayInfo) { this.message = this.t('must_play'); this.messageTimer = 55; return; }
         this.passCount++;
+        this.tableCards[0] = [];
+        this.tablePassed[0] = true;
         this.message = this.t('pass');
-        this.messageTimer = 35;
+        this.messageTimer = 40;
 
         if (this.passCount >= 2) {
             this.lastPlayedCards = [];
             this.lastPlayedBy = -1;
             this.lastPlayInfo = null;
             this.passCount = 0;
+            this._clearTable();
             this.currentPlayer = this._getNextPlayer(this.currentPlayer);
-            if (this.currentPlayer !== 0) this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 560);
-            else { this.message = this.t('new_round'); this.messageTimer = 60; }
+            if (this.currentPlayer !== 0) this._scheduleAI(this.currentPlayer, 400);
+            else { this.message = this.t('new_round'); this.messageTimer = 70; }
         } else {
             this.currentPlayer = this._getNextPlayer(0);
-            this.aiTimer = setTimeout(() => this._aiTurnIfNeeded(), 520);
+            this._scheduleAI(this.currentPlayer, 350);
         }
     }
 
     _gameOver(wid) {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
         this.state = 'ended';
         this.winner = wid;
-        const humanWin = (wid === 0) ||
-            (this.landlordId !== 0 && wid !== this.landlordId);
+        const humanWin = (wid === 0) || (this.landlordId !== 0 && wid !== this.landlordId);
         this.message = humanWin ? this.t('you_win') : this.t('you_lose');
         this.messageTimer = 9999;
         for (const h of this.playersHand) for (const c of h) c.faceUp = true;
@@ -1352,173 +1418,344 @@ class Game {
         const all = [];
         for (const h of this.playersHand) all.push(...h);
         all.push(...this.landlordCards);
+        const seen = new Set(all);
+        for (let p = 0; p < 3; p++)
+            for (const c of this.tableCards[p]) if (!seen.has(c)) { seen.add(c); all.push(c); }
         for (const c of all) c.updatePosition();
         if (this.messageTimer > 0 && this.messageTimer < 9000) this.messageTimer--;
     }
 
-    /* ═══════════════════════════════════════════════════
+    /* ═══════════════════════════════════════
        绘制
-       ═══════════════════════════════════════════════════ */
+       ═══════════════════════════════════════ */
     draw(ctx) {
         this._drawBackground(ctx);
-        this._drawTable(ctx);
-        this._drawAIPanels(ctx);
-        this._drawBottomCards(ctx);
-        this._drawPlayedCards(ctx);
-        this._drawHands(ctx);
+        this._drawTable(ctx);          // 3D 桌面
+        this._drawTableZones(ctx);     // 三家出牌区
+        this._drawBottomCards(ctx);    // 底牌
+        this._drawAIPanels(ctx);       // AI 信息面板
+        this._drawHands(ctx);          // 手牌
         this._drawPlayerLabel(ctx);
-        this._drawTitle(ctx);
+        if (this.state === 'idle' || this.state === 'ended') this._drawTitle(ctx);
         this._drawGear(ctx);
         this._drawMessage(ctx);
         this._drawButtons(ctx);
     }
 
+    /* —— 背景 —— */
     _drawBackground(ctx) {
         const g = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
-        g.addColorStop(0, '#152942');
-        g.addColorStop(0.5, '#0d1a2c');
-        g.addColorStop(1, '#070f1a');
+        g.addColorStop(0, '#16294a');
+        g.addColorStop(0.45, '#0c1728');
+        g.addColorStop(1, '#05090f');
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // 星光点缀
+        /* 透视网格（地板纵深） */
         ctx.save();
-        for (let i = 0; i < 40; i++) {
-            const px = (i * 137.508) % CANVAS_WIDTH;
-            const py = (i * 219.31) % CANVAS_HEIGHT;
-            const a = 0.03 + 0.05 * Math.abs(Math.sin((this._tick + i * 40) / 120));
-            ctx.fillStyle = `rgba(160,200,255,${a})`;
+        ctx.strokeStyle = 'rgba(80,130,200,.05)';
+        ctx.lineWidth = 1;
+        const vpx = CANVAS_WIDTH / 2, vpy = 300;
+        for (let i = -14; i <= 14; i++) {
             ctx.beginPath();
-            ctx.arc(px, py, 1.4, 0, Math.PI * 2);
+            ctx.moveTo(vpx + i * 130, CANVAS_HEIGHT + 120);
+            ctx.lineTo(vpx + i * 26, vpy);
+            ctx.stroke();
+        }
+        for (let k = 1; k <= 7; k++) {
+            const t = k / 7;
+            const y = vpy + (CANVAS_HEIGHT + 120 - vpy) * Math.pow(t, 2.1);
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(CANVAS_WIDTH, y);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        /* 星点 */
+        ctx.save();
+        for (let i = 0; i < 46; i++) {
+            const px = (i * 137.508) % CANVAS_WIDTH;
+            const py = (i * 219.31) % (CANVAS_HEIGHT * 0.6);
+            const a = 0.025 + 0.05 * Math.abs(Math.sin((this._tick + i * 40) / 130));
+            ctx.fillStyle = `rgba(170,210,255,${a})`;
+            ctx.beginPath();
+            ctx.arc(px, py, 1.3, 0, Math.PI * 2);
             ctx.fill();
         }
         ctx.restore();
 
-        // 暗角
+        /* 暗角 */
         const vg = ctx.createRadialGradient(
-            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 200,
-            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 760
+            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40, 200,
+            CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 780
         );
         vg.addColorStop(0, 'rgba(0,0,0,0)');
-        vg.addColorStop(1, 'rgba(0,0,0,0.55)');
+        vg.addColorStop(1, 'rgba(0,0,0,.62)');
         ctx.fillStyle = vg;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 
+    /* —— 3D 桌面 —— */
     _drawTable(ctx) {
-        const cx = CANVAS_WIDTH / 2, cy = 360, rx = 462, ry = 182;
+        const cx = CANVAS_WIDTH / 2;
+        const cy = 350;
+        const rx = 468;
+        const ry = 188;
 
+        /* 1. 地面投影 */
         ctx.save();
-        ctx.shadowColor = 'rgba(0,0,0,.65)';
-        ctx.shadowBlur = 44;
-        ctx.shadowOffsetY = 12;
-        const g = ctx.createRadialGradient(cx, cy - 70, 30, cx, cy, rx);
-        g.addColorStop(0, '#2f8f5c');
-        g.addColorStop(0.55, '#1d6a42');
-        g.addColorStop(1, '#0d4227');
-        ctx.fillStyle = g;
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.filter = 'blur(18px)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 40, rx + 30, ry + 26, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* 2. 桌体侧壁（厚度） */
+        ctx.save();
+        const sideG = ctx.createLinearGradient(0, cy, 0, cy + ry + 60);
+        sideG.addColorStop(0, '#3a2a18');
+        sideG.addColorStop(0.4, '#241a10');
+        sideG.addColorStop(1, '#0d0906');
+        ctx.fillStyle = sideG;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 24, rx + 8, ry + 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* 3. 木质桌沿 */
+        ctx.save();
+        const rimG = ctx.createLinearGradient(0, cy - ry, 0, cy + ry);
+        rimG.addColorStop(0, '#6b4a28');
+        rimG.addColorStop(0.35, '#4a3218');
+        rimG.addColorStop(1, '#2a1c0e');
+        ctx.fillStyle = rimG;
         ctx.beginPath();
         ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
 
-        ctx.strokeStyle = 'rgba(255,215,64,.22)';
-        ctx.lineWidth = 3;
+        /* 4. 绿色绒面 */
+        ctx.save();
+        const feltG = ctx.createRadialGradient(cx, cy - 78, 24, cx, cy + 10, rx);
+        feltG.addColorStop(0, '#3ea370');
+        feltG.addColorStop(0.42, '#237a4a');
+        feltG.addColorStop(0.78, '#145233');
+        feltG.addColorStop(1, '#0a3520');
+        ctx.fillStyle = feltG;
         ctx.beginPath();
-        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.ellipse(cx, cy, rx - 16, ry - 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
 
-        ctx.strokeStyle = 'rgba(255,255,255,.07)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, rx - 10, ry - 8, 0, 0, Math.PI * 2);
-        ctx.stroke();
-
+        /* 5. 内圈装饰线 */
+        ctx.save();
         for (let i = 0; i < 3; i++) {
-            ctx.strokeStyle = `rgba(255,255,255,${0.055 - i * 0.014})`;
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = `rgba(255,235,170,${0.10 - i * 0.026})`;
+            ctx.lineWidth = i === 0 ? 2.2 : 1;
             ctx.beginPath();
-            ctx.ellipse(cx, cy, rx - 62 - i * 62, ry - 34 - i * 34, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx, cy, rx - 34 - i * 56, ry - 30 - i * 40, 0, 0, Math.PI * 2);
             ctx.stroke();
         }
+        ctx.restore();
 
-        // 中央水印
+        /* 6. 桌面高光 */
         ctx.save();
-        ctx.globalAlpha = 0.055;
+        ctx.globalAlpha = 0.16;
+        const hg = ctx.createRadialGradient(cx - 130, cy - 110, 10, cx - 130, cy - 110, 340);
+        hg.addColorStop(0, 'rgba(255,255,255,.9)');
+        hg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx - 16, ry - 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        /* 7. 中央水印 */
+        ctx.save();
+        ctx.globalAlpha = 0.05;
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 120px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.font = 'bold 130px "Microsoft YaHei","PingFang SC",sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('♠', cx - 170, cy);
-        ctx.fillText('♥', cx + 170, cy);
-        ctx.font = 'bold 96px "Microsoft YaHei","PingFang SC",sans-serif';
-        ctx.fillText('斗', cx, cy - 30);
-        ctx.font = 'bold 26px "Microsoft YaHei","PingFang SC",sans-serif';
-        ctx.globalAlpha = 0.09;
-        ctx.fillText('D O U   D I   Z H U', cx, cy + 42);
+        ctx.fillText('♠', cx - 195, cy + 10);
+        ctx.fillText('♥', cx + 195, cy + 10);
+        ctx.globalAlpha = 0.065;
+        ctx.font = 'bold 100px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.fillText('斗', cx, cy - 26);
+        ctx.globalAlpha = 0.10;
+        ctx.font = 'bold 22px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.fillText('D O U   D I   Z H U', cx, cy + 46);
         ctx.restore();
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
     }
 
+    /* —— 三家出牌区 —— */
+    _drawTableZones(ctx) {
+        for (let pid = 0; pid < 3; pid++) {
+            const zone = this._tableZone(pid);
+            const cards = this.tableCards[pid];
+            const passed = this.tablePassed[pid];
+            const hasCards = cards && cards.length;
+            if (!hasCards && !passed) continue;
+
+            /* 区域底垫 */
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,.20)';
+            this._roundRect(ctx, zone.x, zone.y, zone.w, zone.h, 14);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,.06)';
+            ctx.lineWidth = 1;
+            this._roundRect(ctx, zone.x, zone.y, zone.w, zone.h, 14);
+            ctx.stroke();
+            ctx.restore();
+
+            /* 出过的牌 */
+            if (hasCards) {
+                for (const c of cards) c.draw(ctx, this.lang);
+            }
+
+            /* 不出标签 */
+            if (passed && !hasCards) {
+                const label = this.t('pass');
+                ctx.save();
+                ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
+                const tw = ctx.measureText(label).width;
+                const bx = zone.x + zone.w / 2 - tw / 2 - 16;
+                const by = zone.y + zone.h / 2 - 17;
+                ctx.fillStyle = 'rgba(0,0,0,.42)';
+                this._roundRect(ctx, bx, by, tw + 32, 34, 17);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(200,210,230,.35)';
+                ctx.lineWidth = 1.2;
+                this._roundRect(ctx, bx, by, tw + 32, 34, 17);
+                ctx.stroke();
+                ctx.fillStyle = '#c8d4e8';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, zone.x + zone.w / 2, zone.y + zone.h / 2);
+                ctx.restore();
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            }
+
+            /* 思考中指示 */
+            if (this.thinkingPid === pid && this.state === 'playing') {
+                const dots = '.'.repeat(1 + (Math.floor(this._tick / 18) % 3));
+                const label = this.t('thinking') + dots;
+                ctx.save();
+                ctx.font = 'bold 14px "Microsoft YaHei","PingFang SC",sans-serif';
+                const tw = ctx.measureText(label).width;
+                const bx = zone.x + zone.w / 2 - tw / 2 - 14;
+                const by = zone.y - 26;
+                ctx.fillStyle = 'rgba(20,40,70,.88)';
+                this._roundRect(ctx, bx, by, tw + 28, 24, 12);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,215,64,.45)';
+                ctx.lineWidth = 1;
+                this._roundRect(ctx, bx, by, tw + 28, 24, 12);
+                ctx.stroke();
+                ctx.fillStyle = '#ffd740';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, zone.x + zone.w / 2, by + 12);
+                ctx.restore();
+                ctx.textAlign = 'start';
+                ctx.textBaseline = 'alphabetic';
+            }
+        }
+    }
+
+    /* —— 底牌 —— */
+    _drawBottomCards(ctx) {
+        const n = this.landlordCards.length;
+        if (!n) return;
+        const sp3 = 52;
+        const totalW = (n - 1) * sp3 + CARD_WIDTH;
+        const sx = (CANVAS_WIDTH - totalW) / 2;
+        const by = 8;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(8,16,30,.62)';
+        this._roundRect(ctx, sx - 30, by, totalW + 60, 106, 12);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,215,64,.22)';
+        ctx.lineWidth = 1.2;
+        this._roundRect(ctx, sx - 30, by, totalW + 60, 106, 12);
+        ctx.stroke();
+        ctx.restore();
+
+        for (const c of this.landlordCards) c.draw(ctx, this.lang);
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,215,64,.8)';
+        ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.t('bottom_cards'), sx - 30, by + 58);
+        ctx.restore();
+        ctx.textAlign = 'start';
+    }
+
+    /* —— AI 面板 —— */
     _drawAIPanels(ctx) {
         const panels = [
             { id: 1, x: 16, y: 8, name: this.t('ai1') },
             { id: 2, x: CANVAS_WIDTH - 216, y: 8, name: this.t('ai2') }
         ];
         for (const p of panels) {
-            const w = 200, h = 58;
+            const w = 200, h = 56;
             const isLandlord = this.landlordId === p.id;
-            const isTurn = this.currentPlayer === p.id && (this.state === 'playing' || this.state === 'calling' || this.state === 'grabbing');
+            const isTurn = (this.currentPlayer === p.id) &&
+                (this.state === 'playing' || this.state === 'calling' || this.state === 'grabbing');
 
             ctx.save();
-            ctx.shadowColor = 'rgba(0,0,0,.45)';
-            ctx.shadowBlur = 12;
-            ctx.shadowOffsetY = 3;
+            ctx.shadowColor = 'rgba(0,0,0,.5)';
+            ctx.shadowBlur = 14;
+            ctx.shadowOffsetY = 4;
             const g = ctx.createLinearGradient(p.x, p.y, p.x, p.y + h);
-            g.addColorStop(0, isTurn ? 'rgba(58,100,160,.92)' : 'rgba(28,45,72,.9)');
-            g.addColorStop(1, isTurn ? 'rgba(34,62,108,.92)' : 'rgba(17,28,48,.9)');
+            g.addColorStop(0, isTurn ? 'rgba(60,105,170,.95)' : 'rgba(26,42,68,.92)');
+            g.addColorStop(1, isTurn ? 'rgba(34,62,108,.95)' : 'rgba(15,26,44,.92)');
             ctx.fillStyle = g;
             this._roundRect(ctx, p.x, p.y, w, h, 14);
             ctx.fill();
             ctx.restore();
 
-            ctx.strokeStyle = isTurn ? '#ffd740' : 'rgba(120,165,235,.35)';
+            ctx.strokeStyle = isTurn ? '#ffd740' : 'rgba(120,165,235,.32)';
             ctx.lineWidth = isTurn ? 2 : 1.2;
             this._roundRect(ctx, p.x, p.y, w, h, 14);
             ctx.stroke();
 
-            // 头像
-            const ax = p.x + 31, ay = p.y + h / 2;
+            /* 头像 */
+            const ax = p.x + 30, ay = p.y + h / 2;
             const ag = ctx.createRadialGradient(ax - 5, ay - 6, 2, ax, ay, 21);
-            if (isLandlord) { ag.addColorStop(0, '#e8b93a'); ag.addColorStop(1, '#a37811'); }
-            else { ag.addColorStop(0, '#6f8fc0'); ag.addColorStop(1, '#3a5480'); }
+            if (isLandlord) { ag.addColorStop(0, '#f0c34a'); ag.addColorStop(1, '#9a7110'); }
+            else { ag.addColorStop(0, '#7092c6'); ag.addColorStop(1, '#334c78'); }
             ctx.fillStyle = ag;
             ctx.beginPath();
             ctx.arc(ax, ay, 20, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = isLandlord ? '#ffd740' : 'rgba(200,220,255,.5)';
+            ctx.strokeStyle = isLandlord ? '#ffd740' : 'rgba(200,220,255,.45)';
             ctx.lineWidth = 2;
             ctx.stroke();
 
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.font = '15px "Segoe UI Symbol",sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(isLandlord ? '👑' : 'AI', ax, ay + 1);
+            ctx.fillText(isLandlord ? '👑' : '🤖', ax, ay + 1);
 
-            // 名字 & 张数
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
             ctx.fillStyle = isLandlord ? '#ffd740' : '#e6eefc';
             ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
-            ctx.fillText(p.name + (isLandlord ? ' · ' + this.t('landlord') : ''), p.x + 58, p.y + 26);
+            ctx.fillText(p.name + (isLandlord ? ' · ' + this.t('landlord') : ''), p.x + 58, p.y + 24);
 
             ctx.fillStyle = '#9fb6d8';
             ctx.font = '13px "Microsoft YaHei","PingFang SC",sans-serif';
-            ctx.fillText('🂠 ' + this.playersHand[p.id].length + this.t('cards_count'), p.x + 58, p.y + 45);
+            ctx.fillText('🂠 ' + this.playersHand[p.id].length + this.t('cards_count'), p.x + 58, p.y + 43);
 
-            // 回合指示
             if (isTurn) {
                 const pulse = 0.5 + 0.5 * Math.sin(this._tick / 12);
                 ctx.fillStyle = `rgba(255,215,64,${0.35 + pulse * 0.65})`;
@@ -1527,144 +1764,6 @@ class Game {
                 ctx.fill();
             }
         }
-        ctx.textAlign = 'start';
-        ctx.textBaseline = 'alphabetic';
-    }
-
-    _drawBottomCards(ctx) {
-        // 底牌区背景
-        const n = this.landlordCards.length;
-        if (!n) return;
-        const sp = 52;
-        const totalW = (n - 1) * sp + CARD_WIDTH;
-        const sx = (CANVAS_WIDTH - totalW) / 2;
-        const by = 14;
-
-        ctx.save();
-        ctx.fillStyle = 'rgba(10,20,35,.55)';
-        this._roundRect(ctx, sx - 16, by, totalW + 32, 116, 12);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,215,64,.3)';
-        ctx.lineWidth = 1.2;
-        this._roundRect(ctx, sx - 16, by, totalW + 32, 116, 12);
-        ctx.stroke();
-        ctx.restore();
-
-        for (const c of this.landlordCards) {
-            if (c.faceUp) c.draw(ctx, this.lang);
-            else {
-                const dx = c.targetX, dy = c.targetY;
-                ctx.save();
-                ctx.shadowColor = 'rgba(0,0,0,.5)';
-                ctx.shadowBlur = 8;
-                ctx.shadowOffsetY = 3;
-                const g = ctx.createLinearGradient(dx, dy, dx + CARD_WIDTH, dy + CARD_HEIGHT);
-                g.addColorStop(0, '#7a2222');
-                g.addColorStop(1, '#3d0f0f');
-                ctx.fillStyle = g;
-                c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                ctx.fill();
-                ctx.restore();
-
-                ctx.strokeStyle = 'rgba(255,215,64,.4)';
-                ctx.lineWidth = 1.5;
-                c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-                ctx.stroke();
-
-                ctx.fillStyle = 'rgba(255,215,64,.75)';
-                ctx.font = 'bold 30px "Microsoft YaHei","PingFang SC",sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('?', dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2 + 2);
-                ctx.textAlign = 'start';
-                ctx.textBaseline = 'alphabetic';
-            }
-        }
-
-        ctx.fillStyle = 'rgba(255,215,64,.85)';
-        ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(this.t('bottom_cards'), sx - 16 - 30, by + 60);
-        ctx.textAlign = 'start';
-    }
-
-    _drawPlayedCards(ctx) {
-        if (!this.lastPlayedCards.length) return;
-        const lc = this.lastPlayedCards;
-        const sp = lc.length > 8 ? 34 : 44;
-        const totalW = (lc.length - 1) * sp + CARD_WIDTH;
-        const sx = CANVAS_WIDTH / 2 - totalW / 2;
-        const by = 300;
-
-        // 底垫
-        ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,.22)';
-        this._roundRect(ctx, sx - 18, by - 12, totalW + 36, CARD_HEIGHT + 24, 14);
-        ctx.fill();
-        ctx.restore();
-
-        for (let i = 0; i < lc.length; i++) {
-            const c = lc[i];
-            c.faceUp = true;
-            const dx = sx + i * sp, dy = by;
-
-            ctx.save();
-            ctx.shadowColor = 'rgba(0,0,0,.5)';
-            ctx.shadowBlur = 9;
-            ctx.shadowOffsetY = 4;
-            const g = ctx.createLinearGradient(dx, dy, dx, dy + CARD_HEIGHT);
-            g.addColorStop(0, '#ffffff');
-            g.addColorStop(1, '#f2eee2');
-            ctx.fillStyle = g;
-            c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-            ctx.fill();
-            ctx.restore();
-
-            ctx.strokeStyle = 'rgba(0,0,0,.18)';
-            ctx.lineWidth = 1;
-            c._roundRect(ctx, dx, dy, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS);
-            ctx.stroke();
-
-            const color = c.isRed ? '#d02a2a' : '#1b1f28';
-            if (c.suit === SUIT_JOKER) {
-                const jc = c.rank === 17 ? '#d02a2a' : '#3a3f4a';
-                const jt = c.rank === 17 ? (this.lang === 'en' ? 'JO' : '大') : (this.lang === 'en' ? 'Jo' : '小');
-                ctx.fillStyle = jc;
-                ctx.font = 'bold 22px "Microsoft YaHei","PingFang SC",sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(jt, dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2);
-                ctx.textAlign = 'start';
-                ctx.textBaseline = 'alphabetic';
-            } else {
-                ctx.fillStyle = color;
-                ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText(c.displayRank, dx + 6, dy + 20);
-                ctx.font = '14px "Segoe UI Symbol",serif';
-                ctx.fillText(c.displaySuit, dx + 6, dy + 37);
-                ctx.font = '30px "Segoe UI Symbol",serif';
-                ctx.textAlign = 'center';
-                ctx.globalAlpha = .9;
-                ctx.fillText(c.displaySuit, dx + CARD_WIDTH / 2, dy + CARD_HEIGHT / 2 + 11);
-                ctx.globalAlpha = 1;
-                ctx.textAlign = 'start';
-            }
-        }
-
-        // 出牌者标签
-        const label = this.lastPlayedBy === 0
-            ? this.t('you')
-            : 'AI ' + this.lastPlayedBy;
-        ctx.font = 'bold 13px "Microsoft YaHei","PingFang SC",sans-serif';
-        const tw = ctx.measureText(label).width;
-        ctx.fillStyle = 'rgba(0,0,0,.55)';
-        this._roundRect(ctx, sx - 22 - tw - 14, by + CARD_HEIGHT / 2 - 13, tw + 22, 26, 13);
-        ctx.fill();
-        ctx.fillStyle = '#ffd740';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(label, sx - 22 - tw / 2 - 3, by + CARD_HEIGHT / 2);
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
     }
@@ -1681,12 +1780,12 @@ class Game {
         ctx.font = 'bold 16px "Microsoft YaHei","PingFang SC",sans-serif';
         const tw = ctx.measureText(text).width;
         const bx = CANVAS_WIDTH / 2 - tw / 2 - 18;
-        const by = 506;
+        const by = 508;
 
-        ctx.fillStyle = 'rgba(10,20,35,.72)';
+        ctx.fillStyle = 'rgba(8,16,30,.75)';
         this._roundRect(ctx, bx, by, tw + 36, 30, 15);
         ctx.fill();
-        ctx.strokeStyle = this.landlordId === 0 ? 'rgba(255,215,64,.6)' : 'rgba(120,165,235,.35)';
+        ctx.strokeStyle = this.landlordId === 0 ? 'rgba(255,215,64,.6)' : 'rgba(120,165,235,.32)';
         ctx.lineWidth = 1.2;
         this._roundRect(ctx, bx, by, tw + 36, 30, 15);
         ctx.stroke();
@@ -1698,7 +1797,6 @@ class Game {
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
 
-        // 回合提示
         if (this.currentPlayer === 0 && this.state === 'playing') {
             const pulse = 0.45 + 0.55 * Math.abs(Math.sin(this._tick / 22));
             ctx.save();
@@ -1706,7 +1804,7 @@ class Game {
             ctx.strokeStyle = '#ffd740';
             ctx.lineWidth = 2.5;
             ctx.shadowColor = '#ffd740';
-            ctx.shadowBlur = 14;
+            ctx.shadowBlur = 16;
             this._roundRect(ctx, bx, by, tw + 36, 30, 15);
             ctx.stroke();
             ctx.restore();
@@ -1716,17 +1814,17 @@ class Game {
     _drawTitle(ctx) {
         ctx.save();
         ctx.textAlign = 'center';
-        ctx.font = 'bold 26px "Microsoft YaHei","PingFang SC",sans-serif';
-        ctx.fillStyle = 'rgba(255,190,20,.28)';
-        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2 + 1.5, 43);
-        const g = ctx.createLinearGradient(0, 20, 0, 48);
-        g.addColorStop(0, '#fff2b8');
+        ctx.font = 'bold 34px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.fillStyle = 'rgba(255,190,20,.22)';
+        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2 + 2, 100);
+        const g = ctx.createLinearGradient(0, 70, 0, 108);
+        g.addColorStop(0, '#fff4c4');
         g.addColorStop(0.5, '#ffd740');
-        g.addColorStop(1, '#e0a500');
+        g.addColorStop(1, '#dfa200');
         ctx.fillStyle = g;
-        ctx.shadowColor = 'rgba(255,200,40,.55)';
-        ctx.shadowBlur = 16;
-        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2, 41.5);
+        ctx.shadowColor = 'rgba(255,200,40,.6)';
+        ctx.shadowBlur = 22;
+        ctx.fillText(this.t('title'), CANVAS_WIDTH / 2, 98);
         ctx.restore();
         ctx.textAlign = 'start';
     }
@@ -1736,13 +1834,13 @@ class Game {
         const hover = Math.hypot(this._mouseX - gx, this._mouseY - gy) < r;
         ctx.save();
         const g = ctx.createRadialGradient(gx - 6, gy - 8, 3, gx, gy, r);
-        if (hover) { g.addColorStop(0, '#5b86c4'); g.addColorStop(1, '#2f5488'); }
-        else { g.addColorStop(0, '#2c3f5c'); g.addColorStop(1, '#182436'); }
+        if (hover) { g.addColorStop(0, '#5f8bc9'); g.addColorStop(1, '#2f5488'); }
+        else { g.addColorStop(0, '#2c3f5c'); g.addColorStop(1, '#16202f'); }
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(gx, gy, r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = hover ? '#ffd740' : 'rgba(150,180,225,.45)';
+        ctx.strokeStyle = hover ? '#ffd740' : 'rgba(150,180,225,.42)';
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -1770,29 +1868,31 @@ class Game {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         const tw = ctx.measureText(this.message).width;
-        const bw = tw + 56, bh = 48;
+        const bw = tw + 58, bh = 50;
         const bx = CANVAS_WIDTH / 2 - bw / 2;
-        const by = CANVAS_HEIGHT / 2 + 52;
+        const by = CANVAS_HEIGHT / 2 + 58;
 
-        ctx.shadowColor = 'rgba(0,0,0,.6)';
-        ctx.shadowBlur = 18;
-        ctx.shadowOffsetY = 4;
-        ctx.fillStyle = 'rgba(8,16,28,.82)';
+        ctx.shadowColor = 'rgba(0,0,0,.65)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetY = 5;
+        ctx.fillStyle = 'rgba(6,14,26,.86)';
         this._roundRect(ctx, bx, by, bw, bh, bh / 2);
         ctx.fill();
         ctx.shadowColor = 'transparent';
 
         const isWin = this.state === 'ended' && (this.message.includes('赢') || this.message.includes('Win'));
         const isLose = this.state === 'ended' && !isWin;
-        ctx.strokeStyle = isWin ? 'rgba(120,240,150,.8)' : isLose ? 'rgba(255,120,120,.75)' : 'rgba(255,215,64,.65)';
+        ctx.strokeStyle = isWin ? 'rgba(120,240,150,.85)'
+                       : isLose ? 'rgba(255,120,120,.8)'
+                       : 'rgba(255,215,64,.68)';
         ctx.lineWidth = 2;
         this._roundRect(ctx, bx, by, bw, bh, bh / 2);
         ctx.stroke();
 
         const tg = ctx.createLinearGradient(0, by, 0, by + bh);
-        if (isWin) { tg.addColorStop(0, '#b6ffcf'); tg.addColorStop(1, '#4ce07a'); }
-        else if (isLose) { tg.addColorStop(0, '#ffd0d0'); tg.addColorStop(1, '#ff7b7b'); }
-        else { tg.addColorStop(0, '#fff4c0'); tg.addColorStop(1, '#ffd740'); }
+        if (isWin) { tg.addColorStop(0, '#c2ffd8'); tg.addColorStop(1, '#4ce07a'); }
+        else if (isLose) { tg.addColorStop(0, '#ffd6d6'); tg.addColorStop(1, '#ff7b7b'); }
+        else { tg.addColorStop(0, '#fff6cc'); tg.addColorStop(1, '#ffd740'); }
         ctx.fillStyle = tg;
         ctx.fillText(this.message, CANVAS_WIDTH / 2, by + bh / 2 + 1);
         ctx.restore();
@@ -1800,7 +1900,7 @@ class Game {
         ctx.textBaseline = 'alphabetic';
     }
 
-    /* ───────── 按钮 ───────── */
+    /* —— 按钮 —— */
     _button(ctx, x, y, w, h, text, scheme) {
         const hover = this._mouseX >= x && this._mouseX <= x + w &&
                       this._mouseY >= y && this._mouseY <= y + h;
@@ -1813,8 +1913,8 @@ class Game {
         ctx.translate(-w / 2, -h / 2);
 
         ctx.shadowColor = scheme.glow || 'rgba(0,0,0,.5)';
-        ctx.shadowBlur = hover ? 22 : 12;
-        ctx.shadowOffsetY = 4;
+        ctx.shadowBlur = hover ? 24 : 12;
+        ctx.shadowOffsetY = 5;
 
         const g = ctx.createLinearGradient(0, 0, 0, h);
         g.addColorStop(0, hover ? scheme.topHover : scheme.top);
@@ -1826,13 +1926,12 @@ class Game {
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
 
-        // 顶部高光
         ctx.save();
         ctx.beginPath();
         this._roundRect(ctx, 0, 0, w, h, 12);
         ctx.clip();
         const hg = ctx.createLinearGradient(0, 0, 0, h * 0.55);
-        hg.addColorStop(0, 'rgba(255,255,255,.28)');
+        hg.addColorStop(0, 'rgba(255,255,255,.3)');
         hg.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.fillStyle = hg;
         ctx.fillRect(0, 0, w, h * 0.55);
@@ -1843,7 +1942,7 @@ class Game {
         this._roundRect(ctx, 0, 0, w, h, 12);
         ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = scheme.textColor || '#ffffff';
         ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1865,85 +1964,85 @@ class Game {
         this._noGrabBtnRect = null;
         this._startBtnRect = null;
 
-        const BTN_Y = 654, BTN_H = 46;
+        const BTN_Y = 662, BTN_H = 46;
 
         if (this.state === 'playing' && this.currentPlayer === 0) {
             const selCount = this.playersHand[0].filter(c => c.selected).length;
             const playLabel = this.t('play') + (selCount ? ` (${selCount})` : '');
-            const pw = 132, px = CANVAS_WIDTH / 2 - pw - 12;
+            const pw = 136, px = CANVAS_WIDTH / 2 - pw - 12;
             this._button(ctx, px, BTN_Y, pw, BTN_H, playLabel, {
-                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#79bdfb', botHover: '#3d84d8',
-                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.55)'
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#7cc0fc', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.6)'
             });
             this._playBtnRect = { x: px, y: BTN_Y, w: pw, h: BTN_H };
 
             if (this.lastPlayInfo) {
-                const pw2 = 96, px2 = CANVAS_WIDTH / 2 + 12;
+                const pw2 = 100, px2 = CANVAS_WIDTH / 2 + 12;
                 this._button(ctx, px2, BTN_Y, pw2, BTN_H, this.t('pass'), {
-                    top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
-                    border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+                    top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                    border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
                 });
                 this._passBtnRect = { x: px2, y: BTN_Y, w: pw2, h: BTN_H };
             }
         }
 
         if (this.state === 'calling' && this.callCurrent === 0) {
-            const cw = 148, ch = 48, cx = CANVAS_WIDTH / 2 - cw - 12;
+            const cw = 152, ch = 48, cx = CANVAS_WIDTH / 2 - cw - 12;
             this._button(ctx, cx, BTN_Y, cw, ch, this.t('call_landlord'), {
-                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#79bdfb', botHover: '#3d84d8',
-                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.55)'
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#7cc0fc', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.6)'
             });
             this._callBtnRect = { x: cx, y: BTN_Y, w: cw, h: ch };
 
-            const ncw = 110, ncx = CANVAS_WIDTH / 2 + 12;
+            const ncw = 112, ncx = CANVAS_WIDTH / 2 + 12;
             this._button(ctx, ncx, BTN_Y, ncw, ch, this.t('no_call'), {
-                top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
-                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+                top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
             });
             this._noCallBtnRect = { x: ncx, y: BTN_Y, w: ncw, h: ch };
         }
 
         if (this.state === 'grabbing' && this.grabCurrent === 0) {
-            const gw = 148, gh = 48, gx = CANVAS_WIDTH / 2 - gw - 12;
+            const gw = 152, gh = 48, gx = CANVAS_WIDTH / 2 - gw - 12;
             this._button(ctx, gx, BTN_Y, gw, gh, this.t('grab_landlord'), {
-                top: '#f2685a', bot: '#bb3225', topHover: '#ff8577', botHover: '#d24334',
-                border: 'rgba(255,210,150,.85)', glow: 'rgba(230,80,60,.55)'
+                top: '#f2685a', bot: '#bb3225', topHover: '#ff8a7c', botHover: '#d24334',
+                border: 'rgba(255,210,150,.85)', glow: 'rgba(230,80,60,.6)'
             });
             this._grabBtnRect = { x: gx, y: BTN_Y, w: gw, h: gh };
 
-            const ngw = 110, ngx = CANVAS_WIDTH / 2 + 12;
+            const ngw = 112, ngx = CANVAS_WIDTH / 2 + 12;
             this._button(ctx, ngx, BTN_Y, ngw, gh, this.t('no_grab'), {
-                top: '#e8a04c', bot: '#b06725', topHover: '#f5b568', botHover: '#c47c36',
-                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.5)'
+                top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
             });
             this._noGrabBtnRect = { x: ngx, y: BTN_Y, w: ngw, h: gh };
         }
 
         if (this.state === 'idle' || this.state === 'ended') {
-            const sw = 190, sh = 56;
+            const sw = 200, sh = 58;
             const sx = CANVAS_WIDTH / 2 - sw / 2;
-            const sy = CANVAS_HEIGHT / 2 + 110;
+            const sy = CANVAS_HEIGHT / 2 + 118;
             const key = this.state === 'ended' ? 'restart' : 'start';
-            // 呼吸光
+
             const pulse = 0.5 + 0.5 * Math.sin(this._tick / 26);
             ctx.save();
-            ctx.globalAlpha = 0.28 + pulse * 0.35;
+            ctx.globalAlpha = 0.25 + pulse * 0.4;
             ctx.shadowColor = '#ffd740';
-            ctx.shadowBlur = 26;
-            ctx.strokeStyle = 'rgba(255,215,64,.9)';
+            ctx.shadowBlur = 30;
+            ctx.strokeStyle = 'rgba(255,215,64,.95)';
             ctx.lineWidth = 2;
-            this._roundRect(ctx, sx - 4, sy - 4, sw + 8, sh + 8, 16);
+            this._roundRect(ctx, sx - 5, sy - 5, sw + 10, sh + 10, 18);
             ctx.stroke();
             ctx.restore();
 
-            this._button(ctx, sx, sy, sw, sh, this.t(key), {
+            this._button(ctx, sx, sy, sw, sh, '', {
                 top: '#ffd45e', bot: '#d99a10', topHover: '#ffe283', botHover: '#eba91c',
-                border: 'rgba(255,250,210,.9)', glow: 'rgba(255,200,50,.65)'
+                border: 'rgba(255,250,210,.9)', glow: 'rgba(255,200,50,.7)'
             });
-            // 深色文字
+
             ctx.save();
             ctx.fillStyle = '#3a2600';
-            ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.font = 'bold 21px "Microsoft YaHei","PingFang SC",sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(this.t(key), sx + sw / 2, sy + sh / 2 + 1);
@@ -1974,7 +2073,6 @@ class Game {
     handleClick(pos) {
         const { x, y } = pos;
 
-        // 设置齿轮
         if (Math.hypot(x - (CANVAS_WIDTH - 46), y - 42) < 26) {
             this.settingsOpen = true;
             settingsOverlay.classList.add('active');
@@ -1983,7 +2081,7 @@ class Game {
 
         const inRect = r => r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 
-        if (inRect(this._startBtnRect)) { this.initNewGame(); this.startCallingPhase(); return; }
+        if (inRect(this._startBtnRect)) { this.initNewGame(); return; }
 
         if (inRect(this._callBtnRect)) {
             this.callScores[0] = 1;
@@ -2017,12 +2115,11 @@ class Game {
         if (inRect(this._playBtnRect)) {
             const sel = this.playersHand[0].filter(c => c.selected);
             if (sel.length) this.playerPlayCards(sel);
-            else { this.message = this.t('select_cards'); this.messageTimer = 50; }
+            else { this.message = this.t('select_cards'); this.messageTimer = 55; }
             return;
         }
         if (inRect(this._passBtnRect)) { this.playerPass(); return; }
 
-        // 选牌
         if (this.state === 'playing' && this.currentPlayer === 0) {
             const h0 = this.playersHand[0];
             for (let i = h0.length - 1; i >= 0; i--) {
@@ -2035,9 +2132,9 @@ class Game {
     }
 }
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════
    启动
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════ */
 const game = new Game();
 
 game._updateAIDifficulty = function () {
@@ -2081,9 +2178,7 @@ diffHard.addEventListener('click', () => { game.difficulty = 'hard'; game._updat
 langZh.addEventListener('click', () => { game.lang = 'zh'; window._lang = 'zh'; updateSettingsUI(); });
 langEn.addEventListener('click', () => { game.lang = 'en'; window._lang = 'en'; updateSettingsUI(); });
 
-canvas.addEventListener('mousedown', e => {
-    if (e.button === 0) game.handleClick(getCanvasPos(e));
-});
+canvas.addEventListener('mousedown', e => { if (e.button === 0) game.handleClick(getCanvasPos(e)); });
 canvas.addEventListener('mousemove', e => {
     const p = getCanvasPos(e);
     game._mouseX = p.x; game._mouseY = p.y;
@@ -2125,7 +2220,6 @@ document.addEventListener('keydown', e => {
     }
 });
 
-/* ───────── 主循环 ───────── */
 function gameLoop() {
     game.update();
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -2135,7 +2229,6 @@ function gameLoop() {
 }
 
 game.state = 'idle';
-game.message = '';
 updateSettingsUI();
 gameLoop();
 

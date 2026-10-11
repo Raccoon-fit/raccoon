@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>软软扑克 · 3D 斗地主</title>
+<title>软软扑克 · 3D 斗地主 · 手枪玩法</title>
 <style>
     :root { --gold: #ffd740; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -137,7 +137,7 @@ const TEXTS = {
         difficulty:'难度', easy:'简单', normal:'普通', hard:'困难',
         language:'语言', chinese:'中文', english:'English',
         call_landlord:'叫地主', no_call:'不叫', grab_landlord:'抢地主', no_grab:'不抢',
-        play:'出牌', pass:'不出', hint:'提示',
+        play:'出牌', pass:'不出',
         landlord:'地主', farmer:'农民',
         you_win:'🎉 你赢了！', you_lose:'💔 你输了…',
         you:'你', ai1:'电脑 A', ai2:'电脑 B',
@@ -147,14 +147,20 @@ const TEXTS = {
         select_cards:'请先选牌', no_one_call:'无人叫地主，重新发牌…',
         no_one_grab:'无人抢地主，重新发牌…',
         ai_play:'出牌', ai_pass:'不出', thinking:'思考中',
-        dealing:'发牌中…'
+        dealing:'发牌中…',
+        gun_ready:'手枪', gun_used:'已用',
+        aim_prompt:'点击机器人面板击毙',
+        shot_ok:'击毙成功！',
+        shot_kill_landlord:'地主被击毙！农民获胜！',
+        dead:'已淘汰', your_turn:'轮到你出牌',
+        gun_tip:'手枪 · 一局一发'
     },
     en: {
         title:'R U A N  P O K E R', start:'Start', restart:'Play Again', settings:'Settings',
         difficulty:'Difficulty', easy:'Easy', normal:'Normal', hard:'Hard',
         language:'Language', chinese:'中文', english:'English',
         call_landlord:'Call', no_call:'Pass', grab_landlord:'Grab', no_grab:'Pass',
-        play:'Play', pass:'Pass', hint:'Hint',
+        play:'Play', pass:'Pass',
         landlord:'Landlord', farmer:'Farmer',
         you_win:'🎉 You Win!', you_lose:'💔 You Lose…',
         you:'You', ai1:'AI 1', ai2:'AI 2',
@@ -164,7 +170,13 @@ const TEXTS = {
         select_cards:'Select cards first', no_one_call:'Nobody called — redealing…',
         no_one_grab:'Nobody grabbed — redealing…',
         ai_play:'plays', ai_pass:'passes', thinking:'thinking',
-        dealing:'Dealing…'
+        dealing:'Dealing…',
+        gun_ready:'Gun', gun_used:'Used',
+        aim_prompt:'Click a robot panel to shoot',
+        shot_ok:'Target eliminated!',
+        shot_kill_landlord:'Landlord down! Farmers win!',
+        dead:'Eliminated', your_turn:'Your turn',
+        gun_tip:'Gun · one shot per game'
     }
 };
 
@@ -197,8 +209,12 @@ function getCanvasPos(e) {
 }
 const lerp = (a, b, t) => a + (b - a) * t;
 
+/* AI 面板固定区域 */
+const PANEL_AI1 = { x: 16, y: 8, w: 200, h: 56 };
+const PANEL_AI2 = { x: CANVAS_WIDTH - 216, y: 8, w: 200, h: 56 };
+
 /* ══════════════════════════════════════════
-   牌（支持旋转 / 缩放 —— 营造 3D 透视感）
+   牌
    ══════════════════════════════════════════ */
 class Card {
     constructor(suit, rank) {
@@ -253,7 +269,6 @@ class Card {
                Math.abs(ly) <= (CARD_HEIGHT * this.scale) / 2;
     }
 
-    /* —— 带 3D 透视的绘制 —— */
     draw(ctx, lang) {
         const sel = this.selected ? -CARD_SELECTED_OFFSET : 0;
         const cx = this.x + CARD_WIDTH / 2;
@@ -275,11 +290,9 @@ class Card {
         }
 
         ctx.translate(-CARD_WIDTH / 2, -CARD_HEIGHT / 2);
-
         const w = CARD_WIDTH, h = CARD_HEIGHT, r = CARD_RADIUS;
 
         if (this.faceUp) {
-            // 牌的“厚度”侧面
             ctx.fillStyle = 'rgba(196,190,172,.95)';
             this._roundRect(ctx, 2.5, 4, w, h, r);
             ctx.fill();
@@ -299,7 +312,6 @@ class Card {
             this._roundRect(ctx, 0, 0, w, h, r);
             ctx.stroke();
 
-            // 左上角高光
             ctx.save();
             ctx.beginPath();
             this._roundRect(ctx, 0, 0, w, h, r);
@@ -338,13 +350,11 @@ class Card {
                 ctx.fillText(this.displayRank, 7, 23);
                 ctx.font = '15px "Segoe UI Symbol",serif';
                 ctx.fillText(this.displaySuit, 7, 41);
-
                 ctx.font = '36px "Segoe UI Symbol",serif';
                 ctx.textAlign = 'center';
                 ctx.globalAlpha = .92;
                 ctx.fillText(this.displaySuit, w / 2, h / 2 + 13);
                 ctx.globalAlpha = 1;
-
                 ctx.save();
                 ctx.translate(w - 7, h - 7);
                 ctx.rotate(Math.PI);
@@ -357,11 +367,9 @@ class Card {
                 ctx.restore();
             }
         } else {
-            // 背面厚度
             ctx.fillStyle = 'rgba(22,40,86,.95)';
             this._roundRect(ctx, 2.5, 4, w, h, r);
             ctx.fill();
-
             const g = ctx.createLinearGradient(0, 0, w, h);
             g.addColorStop(0, '#3f6ad4');
             g.addColorStop(0.5, '#2a4ba8');
@@ -369,19 +377,16 @@ class Card {
             ctx.fillStyle = g;
             this._roundRect(ctx, 0, 0, w, h, r);
             ctx.fill();
-
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
             ctx.strokeStyle = 'rgba(180,205,255,.5)';
             ctx.lineWidth = 1.5;
             this._roundRect(ctx, 0, 0, w, h, r);
             ctx.stroke();
-
             ctx.strokeStyle = 'rgba(160,190,255,.32)';
             ctx.lineWidth = 1;
             this._roundRect(ctx, 7, 7, w - 14, h - 14, 5);
             ctx.stroke();
-
             const cx2 = w / 2, cy2 = h / 2;
             ctx.fillStyle = 'rgba(130,175,255,.42)';
             ctx.beginPath();
@@ -421,7 +426,7 @@ class Card {
 }
 
 /* ══════════════════════════════════════════
-   牌型分析
+   牌型
    ══════════════════════════════════════════ */
 function getRankCounts(cards) {
     const c = {};
@@ -474,7 +479,6 @@ function analyzeHand(cards) {
             for (const r of seq) wing[r] -= 3;
             const wingRanks = Object.keys(wing).map(Number).filter(r => wing[r] > 0);
             const wingTotal = wingRanks.reduce((a, r) => a + wing[r], 0);
-
             if (rem === 0 && seq.every(r => counts[r] === 3))
                 return { type: 'plane', mainRank: seq[seq.length - 1], length: len };
             if (rem === len && wingTotal === len)
@@ -515,12 +519,9 @@ class AIPlayer {
     findPlay(game) {
         if (!this.hand.length) return null;
         const last = game.lastPlayInfo;
-
         const whole = analyzeHand(this.hand);
         if (whole && canBeat(whole, last)) return [...this.hand];
-
         if (!last) return this._leadPlay(game);
-
         if (this._isTeammate(game, game.lastPlayedBy)) {
             if (this.hand.length <= 2) {
                 const trySame = this._followPlay(game, last);
@@ -545,12 +546,10 @@ class AIPlayer {
         const hand = this.hand;
         const n = hand.length;
         if (n === 1) return [...hand];
-
         const counts = getRankCounts(hand);
         const byRank = {};
         for (const c of hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
         const ranksAsc = Object.keys(byRank).map(Number).sort((a, b) => a - b);
-
         const enemies = this._getEnemies(game);
         const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
 
@@ -561,12 +560,10 @@ class AIPlayer {
             if (triDesc.length) return byRank[triDesc[0]].slice(0, 3);
             return [byRank[ranksAsc[ranksAsc.length - 1]][0]];
         }
-
         if (this.difficulty !== 'easy') {
             const st = this._findLongestStraight();
             if (st && st.length >= 5) return st;
         }
-
         if (this.difficulty === 'hard') {
             const tri = ranksAsc.filter(r => counts[r] === 3);
             if (tri.length && n <= 8) {
@@ -577,13 +574,10 @@ class AIPlayer {
                 if (rem.length === 2 && rem[0].rank === rem[1].rank) return [...tr, ...rem];
             }
         }
-
         const singles = ranksAsc.filter(r => counts[r] === 1);
         if (singles.length) return [byRank[singles[0]][0]];
-
         const pairs = ranksAsc.filter(r => counts[r] === 2 && r <= 15);
         if (pairs.length) return byRank[pairs[0]].slice(0, 2);
-
         const triples = ranksAsc.filter(r => counts[r] === 3);
         if (triples.length) {
             const tr = byRank[triples[0]].slice(0, 3);
@@ -601,7 +595,6 @@ class AIPlayer {
         const enemies = this._getEnemies(game);
         const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
         const desperate = enemyMin <= 2;
-
         const same = this._findBeatingSame(last);
         if (same) {
             const info = analyzeHand(same);
@@ -611,7 +604,6 @@ class AIPlayer {
             }
             return same;
         }
-
         const bomb = this._findSmallestBomb();
         if (bomb) {
             const bInfo = analyzeHand(bomb);
@@ -624,7 +616,6 @@ class AIPlayer {
                 if (this.difficulty === 'easy' && Math.random() < 0.12) return bomb;
             }
         }
-
         if (desperate || this.difficulty === 'hard') {
             const rocket = this._findRocket();
             if (rocket) {
@@ -751,16 +742,13 @@ class AIPlayer {
         const byRank = {};
         for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
         const trs = Object.keys(byRank).map(Number).filter(r => byRank[r].length >= 3 && r <= 14).sort((a, b) => a - b);
-
         for (let s = 0; s + ll <= trs.length; s++) {
             const seq = trs.slice(s, s + ll);
             if (seq[seq.length - 1] - seq[0] !== ll - 1) continue;
             if (seq[seq.length - 1] <= lr) continue;
-
             const tripCards = [];
             for (const r of seq) tripCards.push(...byRank[r].slice(0, 3));
             const rem = this.hand.filter(c => !tripCards.includes(c));
-
             if (lt === 'plane') return tripCards;
             if (lt === 'plane_single') {
                 if (rem.length >= ll) {
@@ -788,14 +776,12 @@ class AIPlayer {
             .map(([r, cs]) => [Number(r), cs]).sort((a, b) => a[0] - b[0]);
         return bombs.length ? bombs[0][1].slice(0, 4) : null;
     }
-
     _findRocket() {
         const hasS = this.hand.some(c => c.rank === 16);
         const hasB = this.hand.some(c => c.rank === 17);
         if (hasS && hasB) return this.hand.filter(c => c.rank === 16 || c.rank === 17);
         return null;
     }
-
     _findLongestStraight() {
         const byRank = {};
         for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
@@ -831,7 +817,6 @@ class Game {
         this.landlordId = -1;
         this.currentPlayer = -1;
 
-        /* 三家各自的出牌区 */
         this.tableCards  = [[], [], []];
         this.tablePassed = [false, false, false];
 
@@ -843,15 +828,23 @@ class Game {
         this.callScores = [0, 0, 0];
         this.callStartPlayer = 0;
         this.callCurrent = 0;
+        this.calledSet = new Set();
         this.grabPhase = false;
         this.grabScores = [0, 0, 0];
         this.grabCurrent = 0;
         this.grabStart = 0;
+        this.grabbedSet = new Set();
 
         this.winner = -1;
         this.message = '';
         this.messageTimer = 0;
         this.thinkingPid = -1;
+
+        /* —— 手枪 —— */
+        this.gunUsed = false;
+        this.aiming = false;
+        this.deadPlayers = [false, false, false];
+        this.shotEffects = [];
 
         this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
         this.aiTimer = null;
@@ -861,6 +854,7 @@ class Game {
         this._callBtnRect = null; this._noCallBtnRect = null;
         this._grabBtnRect = null; this._noGrabBtnRect = null;
         this._startBtnRect = null;
+        this._gunBtnRect = null;
         this._tick = 0;
 
         this.initNewGame();
@@ -868,18 +862,15 @@ class Game {
 
     t(key) { return (TEXTS[this.lang] || TEXTS.zh)[key] || key; }
 
-    /* ───────── 出牌区坐标（3D 桌面上的三个位置） ───────── */
     _tableZone(pid) {
         if (pid === 0) return { x: 362, y: 392, w: 376, h: 118 };
         if (pid === 1) return { x: 128, y: 226, w: 300, h: 112 };
         return { x: 672, y: 226, w: 300, h: 112 };
     }
 
-    /* ───────── AI 思考延迟 ───────── */
     _aiDelay() {
         const base = this.difficulty === 'easy' ? 1050
-                   : this.difficulty === 'normal' ? 880
-                   : 700;
+                   : this.difficulty === 'normal' ? 880 : 700;
         return base + Math.random() * 850;
     }
 
@@ -892,7 +883,6 @@ class Game {
         for (const s of [SUIT_SPADE, SUIT_HEART, SUIT_CLUB, SUIT_DIAMOND])
             for (let r = 3; r <= 15; r++) deck.push(new Card(s, r));
         deck.push(new Card(SUIT_JOKER, 16), new Card(SUIT_JOKER, 17));
-
         for (let i = deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -910,7 +900,6 @@ class Game {
         for (const c of this.playersHand[2]) c.faceUp = false;
         for (const c of this.landlordCards) c.faceUp = false;
 
-        /* 所有牌从桌面中心「飞」出来 */
         const dealX = CANVAS_WIDTH / 2 - CARD_WIDTH / 2;
         const dealY = CANVAS_HEIGHT / 2 - CARD_HEIGHT / 2;
         for (const h of this.playersHand) {
@@ -936,17 +925,21 @@ class Game {
         this.lastPlayInfo = null;
         this.passCount = 0;
         this.callScores = [0, 0, 0];
-        this.callStartPlayer = Math.floor(Math.random() * 3);
-        this.callCurrent = this.callStartPlayer;
+        this.calledSet = new Set();
         this.grabPhase = false;
         this.grabScores = [0, 0, 0];
-        this.grabCurrent = 0;
-        this.grabStart = 0;
+        this.grabbedSet = new Set();
         this.winner = -1;
         this.message = this.t('dealing');
         this.messageTimer = 90;
         this.tableCards = [[], [], []];
         this.tablePassed = [false, false, false];
+
+        /* 重置手枪 */
+        this.gunUsed = false;
+        this.aiming = false;
+        this.deadPlayers = [false, false, false];
+        this.shotEffects = [];
 
         for (let i = 0; i < 3; i++)
             this.playersHand[i].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
@@ -954,7 +947,6 @@ class Game {
 
         this._layoutAllCards(false);
 
-        /* 发牌动画结束后进入叫地主 */
         this.aiTimer = setTimeout(() => {
             this.aiTimer = null;
             if (this.state === 'idle') this.startCallingPhase();
@@ -963,32 +955,26 @@ class Game {
 
     /* ───────── 布局 ───────── */
     _layoutAllCards(snap = true) {
-        /* —— 玩家手牌：扇形 —— */
         const hand0 = this.playersHand[0];
         const n0 = hand0.length;
         if (n0) {
-            const maxW = CANVAS_WIDTH - 220;
+            const maxW = CANVAS_WIDTH - 240;
             let sp0 = 46;
             if (n0 > 1 && (n0 - 1) * sp0 + CARD_WIDTH > maxW)
                 sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
-            if (n0 > 1 && sp0 < 20) sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+            if (n0 > 1 && sp0 < 18) sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
             const totalW0 = n0 > 1 ? (n0 - 1) * sp0 + CARD_WIDTH : CARD_WIDTH;
             const startX0 = (CANVAS_WIDTH - totalW0) / 2;
             const baseY0 = 548;
             const maxA = n0 > 1 ? Math.min(0.11, n0 * 0.007) : 0;
-
             for (let i = 0; i < n0; i++) {
                 const t = n0 > 1 ? (i - (n0 - 1) / 2) / ((n0 - 1) / 2) : 0;
                 const c = hand0[i];
-                c.setTarget(startX0 + i * sp0,
-                            baseY0 + Math.abs(t) * 12,
-                            t * maxA,
-                            1);
+                c.setTarget(startX0 + i * sp0, baseY0 + Math.abs(t) * 12, t * maxA, 1);
                 if (snap) c.snapToTarget();
             }
         }
 
-        /* —— AI 1 手牌（左上） —— */
         const hand1 = this.playersHand[1];
         const n1 = hand1.length;
         if (n1) {
@@ -1002,7 +988,6 @@ class Game {
             }
         }
 
-        /* —— AI 2 手牌（右上） —— */
         const hand2 = this.playersHand[2];
         const n2 = hand2.length;
         if (n2) {
@@ -1019,7 +1004,6 @@ class Game {
             }
         }
 
-        /* —— 底牌（顶部居中） —— */
         const n3 = this.landlordCards.length;
         if (n3) {
             const sp3 = 52;
@@ -1045,20 +1029,15 @@ class Game {
             const visW = CARD_WIDTH * sc;
             const centerX = zone.x + zone.w / 2;
             const centerY = zone.y + zone.h / 2;
-
             let sp;
             if (n === 1) sp = 0;
             else sp = Math.min(visW * 0.72, (zone.w - 30 - visW) / (n - 1));
-
             const totalVisW = (n - 1) * sp + visW;
             const startCX = centerX - totalVisW / 2 + visW / 2;
-
             for (let i = 0; i < n; i++) {
                 const c = cards[i];
                 c.selected = false;
-                c.setTarget(startCX + i * sp - CARD_WIDTH / 2,
-                            centerY - CARD_HEIGHT / 2,
-                            0, sc);
+                c.setTarget(startCX + i * sp - CARD_WIDTH / 2, centerY - CARD_HEIGHT / 2, 0, sc);
                 if (snap) c.snapToTarget();
             }
         }
@@ -1068,7 +1047,11 @@ class Game {
     startCallingPhase() {
         this.state = 'calling';
         this.callScores = [0, 0, 0];
-        this.callStartPlayer = Math.floor(Math.random() * 3);
+        this.calledSet = new Set();
+
+        const alive = [0, 1, 2].filter(p => !this.deadPlayers[p]);
+        if (!alive.length) { return; }
+        this.callStartPlayer = alive[Math.floor(Math.random() * alive.length)];
         this.callCurrent = this.callStartPlayer;
         this.grabPhase = false;
         this.message = '';
@@ -1078,6 +1061,10 @@ class Game {
 
     _processCurrentCaller() {
         if (this.state !== 'calling') return;
+        if (this.deadPlayers[this.callCurrent]) {
+            this._advanceCalling();
+            return;
+        }
         this.currentPlayer = this.callCurrent;
         if (this.callCurrent === 0) { this.message = ''; }
         else this._aiCallLandlord(this.callCurrent);
@@ -1088,7 +1075,6 @@ class Game {
         const score = this._evaluateHandStrength(ai.hand);
         const th = this.difficulty === 'easy' ? 42 : (this.difficulty === 'normal' ? 32 : 22);
         const noOneYet = this.callScores.every(s => s === 0);
-
         if (score > th || (noOneYet && score > 16)) {
             let cs = 1;
             if (this.difficulty === 'hard' && score > 62) cs = Math.min(3, 1 + Math.floor(score / 30));
@@ -1112,7 +1098,6 @@ class Game {
         if (counts[16] && counts[17]) score += 26;
         else if (counts[16] || counts[17]) score += 9;
         for (const r of [15, 14, 13, 12]) if (counts[r]) score += counts[r] * 3;
-
         const ranks = [...new Set(hand.map(c => c.rank).filter(r => r <= 14))].sort((a, b) => a - b);
         let consec = 0, maxC = 0;
         for (let i = 0; i < ranks.length - 1; i++) {
@@ -1127,9 +1112,23 @@ class Game {
 
     _advanceCalling() {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
-        this.callCurrent = (this.callCurrent + 1) % 3;
-        if (this.callCurrent === this.callStartPlayer) this._resolveCalling();
-        else this._processCurrentCaller();
+        if (this.calledSet) this.calledSet.add(this.callCurrent);
+
+        let next = this.callCurrent;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next] && !this.calledSet.has(next)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this._resolveCalling();
+        } else {
+            this.callCurrent = next;
+            this._processCurrentCaller();
+        }
     }
 
     _resolveCalling() {
@@ -1141,7 +1140,16 @@ class Game {
             return;
         }
         const cands = [];
-        for (let i = 0; i < 3; i++) if (this.callScores[i] === maxS) cands.push(i);
+        for (let i = 0; i < 3; i++) {
+            if (this.deadPlayers[i]) continue;
+            if (this.callScores[i] === maxS) cands.push(i);
+        }
+        if (!cands.length) {
+            this.message = this.t('no_one_call');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
+            return;
+        }
         if (cands.length === 1) this._setLandlord(cands[0]);
         else this._startGrabPhase(cands);
     }
@@ -1150,12 +1158,27 @@ class Game {
         this.state = 'grabbing';
         this.grabPhase = true;
         this.grabScores = [0, 0, 0];
-        this.grabStart = (cands[0] + 1) % 3;
-        this.grabCurrent = this.grabStart;
+        this.grabbedSet = new Set();
+
+        let start = (cands[0] + 1) % 3;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            if (!this.deadPlayers[start]) { found = true; break; }
+            start = (start + 1) % 3;
+        }
+        if (!found) { this._resolveGrabbing(); return; }
+
+        this.grabStart = start;
+        this.grabCurrent = start;
         this._processGrabber();
     }
 
     _processGrabber() {
+        if (this.state !== 'grabbing') return;
+        if (this.deadPlayers[this.grabCurrent]) {
+            this._advanceGrabbing();
+            return;
+        }
         if (this.grabCurrent === 0) { this.currentPlayer = 0; this.message = ''; }
         else this._aiGrabLandlord(this.grabCurrent);
     }
@@ -1177,14 +1200,29 @@ class Game {
 
     _advanceGrabbing() {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
-        this.grabCurrent = (this.grabCurrent + 1) % 3;
-        if (this.grabCurrent === this.grabStart) this._resolveGrabbing();
-        else this._processGrabber();
+        if (this.grabbedSet) this.grabbedSet.add(this.grabCurrent);
+
+        let next = this.grabCurrent;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next] && !this.grabbedSet.has(next)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this._resolveGrabbing();
+        } else {
+            this.grabCurrent = next;
+            this._processGrabber();
+        }
     }
 
     _resolveGrabbing() {
         const all = [];
         for (let i = 0; i < 3; i++) {
+            if (this.deadPlayers[i]) continue;
             if (this.grabScores[i] > 0) all.push([i, this.grabScores[i]]);
             else if (this.callScores[i] > 0) all.push([i, this.callScores[i]]);
         }
@@ -1212,7 +1250,6 @@ class Game {
         this.playersHand[pid].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
         if (pid !== 0) this.aiPlayers[pid].hand.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
 
-        /* 底牌飞向地主手牌 */
         this._clearTable();
         this._layoutAllCards(false);
 
@@ -1228,7 +1265,6 @@ class Game {
         if (pid !== 0) this._scheduleAI(pid, 1200);
     }
 
-    /* ───────── 出牌区管理 ───────── */
     _clearTable() {
         for (let i = 0; i < 3; i++) {
             this.tableCards[i] = [];
@@ -1236,10 +1272,11 @@ class Game {
         }
     }
 
-    /* ───────── AI 调度（带延迟） ───────── */
+    /* ───────── AI 调度 ───────── */
     _scheduleAI(pid, extra = 0) {
         if (this.state !== 'playing') return;
         if (pid === 0) return;
+        if (this.deadPlayers[pid]) return;
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         this.thinkingPid = pid;
         this.aiTimer = setTimeout(() => {
@@ -1250,13 +1287,18 @@ class Game {
     }
 
     _aiTurnIfNeeded() {
-        if (this.state === 'playing' && this.currentPlayer !== 0)
+        if (this.state === 'playing' && this.currentPlayer !== 0 && !this.deadPlayers[this.currentPlayer])
             this._aiTurn(this.currentPlayer);
     }
 
     _aiTurn(pid) {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         if (this.state !== 'playing') return;
+        if (this.deadPlayers[pid]) {
+            this.currentPlayer = this._getNextPlayer(pid);
+            this._scheduleAI(this.currentPlayer, 300);
+            return;
+        }
         this.currentPlayer = pid;
         const ai = this.aiPlayers[pid];
         if (!ai || !this.playersHand[pid].length) { this._aiPass(pid); return; }
@@ -1287,7 +1329,6 @@ class Game {
         this.lastPlayedBy = pid;
         this.lastPlayInfo = info;
         this.passCount = 0;
-
         this.tableCards[pid] = cards;
         this.tablePassed[pid] = false;
 
@@ -1307,7 +1348,6 @@ class Game {
         if (this.state !== 'playing') return;
         this.thinkingPid = -1;
 
-        /* 新一轮不能过，必须出牌 */
         if (!this.lastPlayInfo) {
             const ai = this.aiPlayers[pid];
             if (ai && ai.hand.length) {
@@ -1343,7 +1383,15 @@ class Game {
         }
     }
 
-    _getNextPlayer(pid) { return (pid + 1) % 3; }
+    /* 跳过死者 */
+    _getNextPlayer(pid) {
+        let next = pid;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next]) return next;
+        }
+        return pid;
+    }
 
     /* ───────── 玩家操作 ───────── */
     playerPlayCards(selected) {
@@ -1400,14 +1448,89 @@ class Game {
         }
     }
 
+    /* ═══════════ 手枪逻辑 ═══════════ */
+    _shootPlayer(pid) {
+        if (this.gunUsed || pid === 0 || pid === -1 || this.deadPlayers[pid]) return false;
+        if (this.state === 'ended') return false;
+
+        this.gunUsed = true;
+        this.aiming = false;
+        this.deadPlayers[pid] = true;
+
+        this.callScores[pid] = 0;
+        this.grabScores[pid] = 0;
+        this.tableCards[pid] = [];
+        this.tablePassed[pid] = false;
+
+        /* 击毙特效位置 */
+        const panel = pid === 1 ? PANEL_AI1 : PANEL_AI2;
+        this.shotEffects.push({
+            x: panel.x + panel.w / 2,
+            y: panel.y + panel.h / 2,
+            t: 65, maxT: 65
+        });
+
+        /* 地主被击毙 → 游戏结束（农民胜） */
+        if (this.landlordId === pid) {
+            if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+            this.thinkingPid = -1;
+            this.message = this.t('shot_kill_landlord');
+            this.messageTimer = 200;
+            this._gameOver(-2);
+            return true;
+        }
+
+        this.message = this.t('shot_ok');
+        this.messageTimer = 90;
+
+        /* 判断是否需要立即推进 */
+        let needAdvance = false;
+        if (this.state === 'calling' && this.callCurrent === pid) needAdvance = true;
+        else if (this.state === 'grabbing' && this.grabCurrent === pid) needAdvance = true;
+        else if (this.state === 'playing' && this.currentPlayer === pid) needAdvance = true;
+        else if (this.thinkingPid === pid) needAdvance = true;
+
+        if (needAdvance) {
+            if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+            this.thinkingPid = -1;
+
+            if (this.state === 'calling') {
+                if (this.calledSet) this.calledSet.add(pid);
+                this._advanceCalling();
+            } else if (this.state === 'grabbing') {
+                if (this.grabbedSet) this.grabbedSet.add(pid);
+                this._advanceGrabbing();
+            } else if (this.state === 'playing') {
+                this.currentPlayer = this._getNextPlayer(pid);
+                if (this.currentPlayer === 0) {
+                    this.message = this.t('your_turn');
+                    this.messageTimer = 80;
+                } else {
+                    this._scheduleAI(this.currentPlayer, 500);
+                }
+            }
+        }
+        return true;
+    }
+
     _gameOver(wid) {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         this.thinkingPid = -1;
         this.state = 'ended';
         this.winner = wid;
-        const humanWin = (wid === 0) || (this.landlordId !== 0 && wid !== this.landlordId);
+
+        let humanWin;
+        if (wid === 0) humanWin = true;
+        else if (wid === -2) humanWin = (this.landlordId !== 0);
+        else {
+            const winnerIsLandlord = (wid === this.landlordId);
+            if (this.landlordId === 0) humanWin = winnerIsLandlord;
+            else humanWin = !winnerIsLandlord;
+        }
+
         this.message = humanWin ? this.t('you_win') : this.t('you_lose');
         this.messageTimer = 9999;
+
         for (const h of this.playersHand) for (const c of h) c.faceUp = true;
         for (const c of this.landlordCards) c.faceUp = true;
     }
@@ -1422,6 +1545,11 @@ class Game {
         for (let p = 0; p < 3; p++)
             for (const c of this.tableCards[p]) if (!seen.has(c)) { seen.add(c); all.push(c); }
         for (const c of all) c.updatePosition();
+
+        for (let i = this.shotEffects.length - 1; i >= 0; i--) {
+            this.shotEffects[i].t--;
+            if (this.shotEffects[i].t <= 0) this.shotEffects.splice(i, 1);
+        }
         if (this.messageTimer > 0 && this.messageTimer < 9000) this.messageTimer--;
     }
 
@@ -1430,19 +1558,21 @@ class Game {
        ═══════════════════════════════════════ */
     draw(ctx) {
         this._drawBackground(ctx);
-        this._drawTable(ctx);          // 3D 桌面
-        this._drawTableZones(ctx);     // 三家出牌区
-        this._drawBottomCards(ctx);    // 底牌
-        this._drawAIPanels(ctx);       // AI 信息面板
-        this._drawHands(ctx);          // 手牌
+        this._drawTable(ctx);
+        this._drawTableZones(ctx);
+        this._drawBottomCards(ctx);
+        this._drawAIPanels(ctx);
+        this._drawHands(ctx);
         this._drawPlayerLabel(ctx);
         if (this.state === 'idle' || this.state === 'ended') this._drawTitle(ctx);
         this._drawGear(ctx);
         this._drawMessage(ctx);
         this._drawButtons(ctx);
+        this._drawAimPrompt(ctx);
+        this._drawShotEffects(ctx);
+        this._drawCrosshair(ctx);
     }
 
-    /* —— 背景 —— */
     _drawBackground(ctx) {
         const g = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
         g.addColorStop(0, '#16294a');
@@ -1451,7 +1581,6 @@ class Game {
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        /* 透视网格（地板纵深） */
         ctx.save();
         ctx.strokeStyle = 'rgba(80,130,200,.05)';
         ctx.lineWidth = 1;
@@ -1472,7 +1601,6 @@ class Game {
         }
         ctx.restore();
 
-        /* 星点 */
         ctx.save();
         for (let i = 0; i < 46; i++) {
             const px = (i * 137.508) % CANVAS_WIDTH;
@@ -1485,7 +1613,6 @@ class Game {
         }
         ctx.restore();
 
-        /* 暗角 */
         const vg = ctx.createRadialGradient(
             CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 40, 200,
             CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 780
@@ -1496,14 +1623,9 @@ class Game {
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
 
-    /* —— 3D 桌面 —— */
     _drawTable(ctx) {
-        const cx = CANVAS_WIDTH / 2;
-        const cy = 350;
-        const rx = 468;
-        const ry = 188;
+        const cx = CANVAS_WIDTH / 2, cy = 350, rx = 468, ry = 188;
 
-        /* 1. 地面投影 */
         ctx.save();
         ctx.fillStyle = 'rgba(0,0,0,.55)';
         ctx.filter = 'blur(18px)';
@@ -1512,7 +1634,6 @@ class Game {
         ctx.fill();
         ctx.restore();
 
-        /* 2. 桌体侧壁（厚度） */
         ctx.save();
         const sideG = ctx.createLinearGradient(0, cy, 0, cy + ry + 60);
         sideG.addColorStop(0, '#3a2a18');
@@ -1524,7 +1645,6 @@ class Game {
         ctx.fill();
         ctx.restore();
 
-        /* 3. 木质桌沿 */
         ctx.save();
         const rimG = ctx.createLinearGradient(0, cy - ry, 0, cy + ry);
         rimG.addColorStop(0, '#6b4a28');
@@ -1536,7 +1656,6 @@ class Game {
         ctx.fill();
         ctx.restore();
 
-        /* 4. 绿色绒面 */
         ctx.save();
         const feltG = ctx.createRadialGradient(cx, cy - 78, 24, cx, cy + 10, rx);
         feltG.addColorStop(0, '#3ea370');
@@ -1549,7 +1668,6 @@ class Game {
         ctx.fill();
         ctx.restore();
 
-        /* 5. 内圈装饰线 */
         ctx.save();
         for (let i = 0; i < 3; i++) {
             ctx.strokeStyle = `rgba(255,235,170,${0.10 - i * 0.026})`;
@@ -1560,7 +1678,6 @@ class Game {
         }
         ctx.restore();
 
-        /* 6. 桌面高光 */
         ctx.save();
         ctx.globalAlpha = 0.16;
         const hg = ctx.createRadialGradient(cx - 130, cy - 110, 10, cx - 130, cy - 110, 340);
@@ -1572,7 +1689,6 @@ class Game {
         ctx.fill();
         ctx.restore();
 
-        /* 7. 中央水印 */
         ctx.save();
         ctx.globalAlpha = 0.05;
         ctx.fillStyle = '#ffffff';
@@ -1592,7 +1708,6 @@ class Game {
         ctx.textBaseline = 'alphabetic';
     }
 
-    /* —— 三家出牌区 —— */
     _drawTableZones(ctx) {
         for (let pid = 0; pid < 3; pid++) {
             const zone = this._tableZone(pid);
@@ -1601,7 +1716,6 @@ class Game {
             const hasCards = cards && cards.length;
             if (!hasCards && !passed) continue;
 
-            /* 区域底垫 */
             ctx.save();
             ctx.fillStyle = 'rgba(0,0,0,.20)';
             this._roundRect(ctx, zone.x, zone.y, zone.w, zone.h, 14);
@@ -1612,12 +1726,8 @@ class Game {
             ctx.stroke();
             ctx.restore();
 
-            /* 出过的牌 */
-            if (hasCards) {
-                for (const c of cards) c.draw(ctx, this.lang);
-            }
+            if (hasCards) for (const c of cards) c.draw(ctx, this.lang);
 
-            /* 不出标签 */
             if (passed && !hasCards) {
                 const label = this.t('pass');
                 ctx.save();
@@ -1641,7 +1751,6 @@ class Game {
                 ctx.textBaseline = 'alphabetic';
             }
 
-            /* 思考中指示 */
             if (this.thinkingPid === pid && this.state === 'playing') {
                 const dots = '.'.repeat(1 + (Math.floor(this._tick / 18) % 3));
                 const label = this.t('thinking') + dots;
@@ -1668,7 +1777,6 @@ class Game {
         }
     }
 
-    /* —— 底牌 —— */
     _drawBottomCards(ctx) {
         const n = this.landlordCards.length;
         if (!n) return;
@@ -1698,16 +1806,16 @@ class Game {
         ctx.textAlign = 'start';
     }
 
-    /* —— AI 面板 —— */
     _drawAIPanels(ctx) {
         const panels = [
-            { id: 1, x: 16, y: 8, name: this.t('ai1') },
-            { id: 2, x: CANVAS_WIDTH - 216, y: 8, name: this.t('ai2') }
+            { id: 1, ...PANEL_AI1, name: this.t('ai1') },
+            { id: 2, ...PANEL_AI2, name: this.t('ai2') }
         ];
         for (const p of panels) {
-            const w = 200, h = 56;
+            const w = p.w, h = p.h;
             const isLandlord = this.landlordId === p.id;
-            const isTurn = (this.currentPlayer === p.id) &&
+            const isDead = this.deadPlayers[p.id];
+            const isTurn = !isDead && (this.currentPlayer === p.id) &&
                 (this.state === 'playing' || this.state === 'calling' || this.state === 'grabbing');
 
             ctx.save();
@@ -1715,28 +1823,47 @@ class Game {
             ctx.shadowBlur = 14;
             ctx.shadowOffsetY = 4;
             const g = ctx.createLinearGradient(p.x, p.y, p.x, p.y + h);
-            g.addColorStop(0, isTurn ? 'rgba(60,105,170,.95)' : 'rgba(26,42,68,.92)');
-            g.addColorStop(1, isTurn ? 'rgba(34,62,108,.95)' : 'rgba(15,26,44,.92)');
+            if (isDead) {
+                g.addColorStop(0, 'rgba(28,28,32,.92)');
+                g.addColorStop(1, 'rgba(14,14,18,.92)');
+            } else if (isTurn) {
+                g.addColorStop(0, 'rgba(60,105,170,.95)');
+                g.addColorStop(1, 'rgba(34,62,108,.95)');
+            } else {
+                g.addColorStop(0, 'rgba(26,42,68,.92)');
+                g.addColorStop(1, 'rgba(15,26,44,.92)');
+            }
             ctx.fillStyle = g;
             this._roundRect(ctx, p.x, p.y, w, h, 14);
             ctx.fill();
             ctx.restore();
 
-            ctx.strokeStyle = isTurn ? '#ffd740' : 'rgba(120,165,235,.32)';
-            ctx.lineWidth = isTurn ? 2 : 1.2;
-            this._roundRect(ctx, p.x, p.y, w, h, 14);
-            ctx.stroke();
+            if (this.aiming && !isDead) {
+                const pulse = 0.5 + 0.5 * Math.sin(this._tick / 8);
+                ctx.strokeStyle = `rgba(255,60,60,${0.4 + pulse * 0.6})`;
+                ctx.lineWidth = 3;
+                this._roundRect(ctx, p.x, p.y, w, h, 14);
+                ctx.stroke();
+            } else {
+                ctx.strokeStyle = isDead ? 'rgba(180,60,60,.55)'
+                                : isTurn ? '#ffd740' : 'rgba(120,165,235,.32)';
+                ctx.lineWidth = isTurn ? 2 : 1.2;
+                this._roundRect(ctx, p.x, p.y, w, h, 14);
+                ctx.stroke();
+            }
 
             /* 头像 */
             const ax = p.x + 30, ay = p.y + h / 2;
             const ag = ctx.createRadialGradient(ax - 5, ay - 6, 2, ax, ay, 21);
-            if (isLandlord) { ag.addColorStop(0, '#f0c34a'); ag.addColorStop(1, '#9a7110'); }
+            if (isDead) { ag.addColorStop(0, '#3a3a40'); ag.addColorStop(1, '#1a1a1e'); }
+            else if (isLandlord) { ag.addColorStop(0, '#f0c34a'); ag.addColorStop(1, '#9a7110'); }
             else { ag.addColorStop(0, '#7092c6'); ag.addColorStop(1, '#334c78'); }
             ctx.fillStyle = ag;
             ctx.beginPath();
             ctx.arc(ax, ay, 20, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = isLandlord ? '#ffd740' : 'rgba(200,220,255,.45)';
+            ctx.strokeStyle = isDead ? 'rgba(150,60,60,.6)'
+                            : isLandlord ? '#ffd740' : 'rgba(200,220,255,.45)';
             ctx.lineWidth = 2;
             ctx.stroke();
 
@@ -1744,17 +1871,26 @@ class Game {
             ctx.font = '15px "Segoe UI Symbol",sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(isLandlord ? '👑' : '🤖', ax, ay + 1);
+            ctx.fillText(isDead ? '✕' : (isLandlord ? '👑' : '🤖'), ax, ay + 1);
 
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
-            ctx.fillStyle = isLandlord ? '#ffd740' : '#e6eefc';
-            ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
-            ctx.fillText(p.name + (isLandlord ? ' · ' + this.t('landlord') : ''), p.x + 58, p.y + 24);
 
-            ctx.fillStyle = '#9fb6d8';
-            ctx.font = '13px "Microsoft YaHei","PingFang SC",sans-serif';
-            ctx.fillText('🂠 ' + this.playersHand[p.id].length + this.t('cards_count'), p.x + 58, p.y + 43);
+            if (isDead) {
+                ctx.fillStyle = '#ff8080';
+                ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.fillText(p.name, p.x + 58, p.y + 24);
+                ctx.fillStyle = '#c05050';
+                ctx.font = 'bold 14px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.fillText('☠ ' + this.t('dead'), p.x + 58, p.y + 43);
+            } else {
+                ctx.fillStyle = isLandlord ? '#ffd740' : '#e6eefc';
+                ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.fillText(p.name + (isLandlord ? ' · ' + this.t('landlord') : ''), p.x + 58, p.y + 24);
+                ctx.fillStyle = '#9fb6d8';
+                ctx.font = '13px "Microsoft YaHei","PingFang SC",sans-serif';
+                ctx.fillText('🂠 ' + this.playersHand[p.id].length + this.t('cards_count'), p.x + 58, p.y + 43);
+            }
 
             if (isTurn) {
                 const pulse = 0.5 + 0.5 * Math.sin(this._tick / 12);
@@ -1769,8 +1905,10 @@ class Game {
     }
 
     _drawHands(ctx) {
-        for (let i = 0; i < 3; i++)
+        for (let i = 0; i < 3; i++) {
+            if (this.deadPlayers[i]) continue;
             for (const c of this.playersHand[i]) c.draw(ctx, this.lang);
+        }
     }
 
     _drawPlayerLabel(ctx) {
@@ -1843,7 +1981,6 @@ class Game {
         ctx.strokeStyle = hover ? '#ffd740' : 'rgba(150,180,225,.42)';
         ctx.lineWidth = 2;
         ctx.stroke();
-
         ctx.strokeStyle = hover ? '#ffd740' : '#b8cae4';
         ctx.lineWidth = 2.2;
         ctx.beginPath();
@@ -1900,7 +2037,6 @@ class Game {
         ctx.textBaseline = 'alphabetic';
     }
 
-    /* —— 按钮 —— */
     _button(ctx, x, y, w, h, text, scheme) {
         const hover = this._mouseX >= x && this._mouseX <= x + w &&
                       this._mouseY >= y && this._mouseY <= y + h;
@@ -1942,17 +2078,48 @@ class Game {
         this._roundRect(ctx, 0, 0, w, h, 12);
         ctx.stroke();
 
-        ctx.fillStyle = scheme.textColor || '#ffffff';
-        ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0,0,0,.35)';
-        ctx.shadowBlur = 3;
-        ctx.fillText(text, w / 2, h / 2 + 1);
+        if (text) {
+            ctx.fillStyle = scheme.textColor || '#ffffff';
+            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,.35)';
+            ctx.shadowBlur = 3;
+            ctx.fillText(text, w / 2, h / 2 + 1);
+        }
         ctx.restore();
-
         ctx.textAlign = 'start';
         ctx.textBaseline = 'alphabetic';
+    }
+
+    /* —— 手枪图标 —— */
+    _drawGunIcon(ctx, cx, cy, scale, color) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = color;
+        /* 枪管 + 套筒 */
+        ctx.fillRect(-20, -7, 30, 8);
+        ctx.fillRect(-10, -11, 18, 4);
+        /* 准星 */
+        ctx.fillRect(2, -14, 4, 3);
+        /* 枪身 */
+        ctx.fillRect(-12, 1, 18, 4);
+        /* 握把 */
+        ctx.beginPath();
+        ctx.moveTo(-11, 5);
+        ctx.lineTo(-2, 5);
+        ctx.lineTo(-6, 17);
+        ctx.lineTo(-15, 17);
+        ctx.closePath();
+        ctx.fill();
+        /* 扳机护圈 */
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(-5, 6, 3.6, 0.15, Math.PI - 0.15);
+        ctx.stroke();
+        ctx.restore();
     }
 
     _drawButtons(ctx) {
@@ -1963,6 +2130,7 @@ class Game {
         this._grabBtnRect = null;
         this._noGrabBtnRect = null;
         this._startBtnRect = null;
+        this._gunBtnRect = null;
 
         const BTN_Y = 662, BTN_H = 46;
 
@@ -2052,6 +2220,217 @@ class Game {
 
             this._startBtnRect = { x: sx, y: sy, w: sw, h: sh };
         }
+
+        /* —— 手枪按钮 —— */
+        this._drawGunButton(ctx);
+    }
+
+    _drawGunButton(ctx) {
+        /* 位置：右下角 */
+        const gw = 84, gh = 72;
+        const gx = CANVAS_WIDTH - 100;
+        const gy = CANVAS_HEIGHT - 160;
+        const used = this.gunUsed;
+        const hover = !used && this._mouseX >= gx && this._mouseX <= gx + gw &&
+                      this._mouseY >= gy && this._mouseY <= gy + gh;
+
+        ctx.save();
+
+        /* 光晕 */
+        if (!used && (this.aiming || hover)) {
+            const pulse = 0.5 + 0.5 * Math.sin(this._tick / 10);
+            ctx.globalAlpha = 0.25 + pulse * 0.4;
+            ctx.shadowColor = this.aiming ? '#ff3030' : '#ffd740';
+            ctx.shadowBlur = 26;
+            ctx.fillStyle = this.aiming ? 'rgba(255,60,60,.5)' : 'rgba(255,215,64,.4)';
+            this._roundRect(ctx, gx - 4, gy - 4, gw + 8, gh + 8, 16);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+
+        /* 背景 */
+        const bg = ctx.createLinearGradient(gx, gy, gx, gy + gh);
+        if (used) {
+            bg.addColorStop(0, 'rgba(38,38,42,.92)');
+            bg.addColorStop(1, 'rgba(20,20,24,.92)');
+        } else if (this.aiming) {
+            bg.addColorStop(0, 'rgba(150,20,20,.95)');
+            bg.addColorStop(1, 'rgba(90,10,10,.95)');
+        } else if (hover) {
+            bg.addColorStop(0, 'rgba(90,60,20,.95)');
+            bg.addColorStop(1, 'rgba(60,38,12,.95)');
+        } else {
+            bg.addColorStop(0, 'rgba(52,36,18,.9)');
+            bg.addColorStop(1, 'rgba(30,20,10,.9)');
+        }
+        ctx.fillStyle = bg;
+        this._roundRect(ctx, gx, gy, gw, gh, 14);
+        ctx.fill();
+
+        /* 边框 */
+        ctx.strokeStyle = used ? 'rgba(120,120,130,.5)'
+                       : this.aiming ? '#ff5050'
+                       : '#ffd740';
+        ctx.lineWidth = this.aiming ? 2.8 : 2.2;
+        this._roundRect(ctx, gx, gy, gw, gh, 14);
+        ctx.stroke();
+
+        /* 手枪图标 */
+        const iconColor = used ? 'rgba(120,120,130,.55)'
+                        : this.aiming ? '#ffb0b0'
+                        : hover ? '#ffe98c'
+                        : '#ffd740';
+        this._drawGunIcon(ctx, gx + gw / 2, gy + gh / 2 - 8, 1.55, iconColor);
+
+        /* 文字 */
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
+        if (used) {
+            ctx.fillStyle = 'rgba(160,160,170,.75)';
+            ctx.fillText(this.t('gun_used'), gx + gw / 2, gy + gh - 12);
+        } else if (this.aiming) {
+            ctx.fillStyle = '#ffb0b0';
+            ctx.fillText('瞄准中…', gx + gw / 2, gy + gh - 12);
+        } else {
+            ctx.fillStyle = '#ffd740';
+            ctx.fillText(this.t('gun_ready'), gx + gw / 2, gy + gh - 12);
+        }
+
+        /* 已使用：划掉 */
+        if (used) {
+            ctx.strokeStyle = 'rgba(200,60,60,.7)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(gx + 14, gy + 14);
+            ctx.lineTo(gx + gw - 14, gy + gh - 14);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+
+        this._gunBtnRect = { x: gx, y: gy, w: gw, h: gh };
+    }
+
+    /* —— 瞄准模式提示 —— */
+    _drawAimPrompt(ctx) {
+        if (!this.aiming) return;
+        ctx.save();
+        ctx.font = 'bold 18px "Microsoft YaHei","PingFang SC",sans-serif';
+        const text = this.t('aim_prompt');
+        const tw = ctx.measureText(text).width;
+        const bw = tw + 62, bh = 48;
+        const bx = CANVAS_WIDTH / 2 - bw / 2;
+        const by = 158;
+
+        const pulse = 0.5 + 0.5 * Math.sin(this._tick / 8);
+        ctx.shadowColor = `rgba(255,50,50,${0.5 + pulse * 0.5})`;
+        ctx.shadowBlur = 22;
+
+        ctx.fillStyle = 'rgba(80,10,10,.94)';
+        this._roundRect(ctx, bx, by, bw, bh, 24);
+        ctx.fill();
+
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = `rgba(255,80,80,${0.6 + pulse * 0.4})`;
+        ctx.lineWidth = 2.5;
+        this._roundRect(ctx, bx, by, bw, bh, 24);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffc0c0';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, CANVAS_WIDTH / 2, by + bh / 2 + 1);
+
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    /* —— 准星 —— */
+    _drawCrosshair(ctx) {
+        if (!this.aiming) return;
+        const mx = this._mouseX, my = this._mouseY;
+        if (mx < 0 || my < 0) return;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,60,60,.92)';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = '#ff3030';
+        ctx.shadowBlur = 10;
+
+        const pulse = 0.5 + 0.5 * Math.sin(this._tick / 6);
+        const r = 20 + pulse * 4;
+
+        ctx.beginPath();
+        ctx.arc(mx, my, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        for (let a = 0; a < 360; a += 90) {
+            const rad = a * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(mx + Math.cos(rad) * (r - 8), my + Math.sin(rad) * (r - 8));
+            ctx.lineTo(mx + Math.cos(rad) * (r + 10), my + Math.sin(rad) * (r + 10));
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = '#ff3030';
+        ctx.beginPath();
+        ctx.arc(mx, my, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    /* —— 击毙特效 —— */
+    _drawShotEffects(ctx) {
+        for (const eff of this.shotEffects) {
+            const progress = 1 - eff.t / eff.maxT;
+            const r = 22 + progress * 78;
+            const alpha = Math.max(0, 1 - progress);
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            /* 外圈冲击波 */
+            ctx.strokeStyle = '#ffaa00';
+            ctx.lineWidth = 5 * (1 - progress) + 1;
+            ctx.shadowColor = '#ff8020';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(eff.x, eff.y, r, 0, Math.PI * 2);
+            ctx.stroke();
+
+            /* 内圈红雾 */
+            ctx.shadowBlur = 0;
+            const g = ctx.createRadialGradient(eff.x, eff.y, 2, eff.x, eff.y, r * 0.55);
+            g.addColorStop(0, `rgba(255,220,120,${alpha})`);
+            g.addColorStop(0.4, `rgba(255,80,40,${alpha * 0.7})`);
+            g.addColorStop(1, 'rgba(180,20,20,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(eff.x, eff.y, r * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+
+            /* 火花 */
+            ctx.strokeStyle = '#ffdd55';
+            ctx.lineWidth = 2.5;
+            for (let a = 0; a < 360; a += 45) {
+                const rad = a * Math.PI / 180;
+                const sr1 = r * 0.7;
+                const sr2 = r * 1.18;
+                ctx.beginPath();
+                ctx.moveTo(eff.x + Math.cos(rad) * sr1, eff.y + Math.sin(rad) * sr1);
+                ctx.lineTo(eff.x + Math.cos(rad) * sr2, eff.y + Math.sin(rad) * sr2);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
     }
 
     _roundRect(ctx, x, y, w, h, r) {
@@ -2073,6 +2452,7 @@ class Game {
     handleClick(pos) {
         const { x, y } = pos;
 
+        /* 设置齿轮 */
         if (Math.hypot(x - (CANVAS_WIDTH - 46), y - 42) < 26) {
             this.settingsOpen = true;
             settingsOverlay.classList.add('active');
@@ -2080,6 +2460,21 @@ class Game {
         }
 
         const inRect = r => r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+
+        /* 手枪按钮点击 */
+        if (inRect(this._gunBtnRect) && !this.gunUsed && this.state !== 'ended') {
+            this.aiming = !this.aiming;
+            return;
+        }
+
+        /* 瞄准模式：点击 AI 面板击毙 */
+        if (this.aiming) {
+            if (inRect(PANEL_AI1) && !this.deadPlayers[1]) { this._shootPlayer(1); return; }
+            if (inRect(PANEL_AI2) && !this.deadPlayers[2]) { this._shootPlayer(2); return; }
+            /* 点击其他区域取消瞄准 */
+            this.aiming = false;
+            return;
+        }
 
         if (inRect(this._startBtnRect)) { this.initNewGame(); return; }
 
@@ -2202,9 +2597,13 @@ canvas.addEventListener('touchend', e => {
 }, { passive: false });
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && game.settingsOpen) {
-        game.settingsOpen = false;
-        settingsOverlay.classList.remove('active');
+    if (e.key === 'Escape') {
+        if (game.settingsOpen) {
+            game.settingsOpen = false;
+            settingsOverlay.classList.remove('active');
+        } else if (game.aiming) {
+            game.aiming = false;
+        }
     }
     if (e.code === 'Space' && game.state === 'playing' && game.currentPlayer === 0) {
         e.preventDefault();
@@ -2218,6 +2617,9 @@ document.addEventListener('keydown', e => {
         if (game.state === 'playing' && game.currentPlayer === 0)
             game.playersHand[0].forEach(c => c.selected = !c.selected);
     }
+    if (e.key === 'g' || e.key === 'G') {
+        if (!game.gunUsed && game.state !== 'ended') game.aiming = !game.aiming;
+    }
 });
 
 function gameLoop() {
@@ -2225,6 +2627,7 @@ function gameLoop() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     game.draw(ctx);
     updateSettingsUI();
+    canvas.style.cursor = game.aiming ? 'crosshair' : 'pointer';
     requestAnimationFrame(gameLoop);
 }
 

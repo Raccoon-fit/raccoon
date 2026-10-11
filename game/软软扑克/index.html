@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>软软扑克 · 3D 斗地主 · 手枪玩法</title>
+<title>软软扑克 · 3D 斗地主 · 自由视角</title>
 <style>
     :root { --gold: #ffd740; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
         height: 100%;
-        background: radial-gradient(circle at 50% 12%, #16243c 0%, #060a12 68%);
+        background: #05080f;
         display: flex; justify-content: center; align-items: center;
         font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Segoe UI', Arial, sans-serif;
         overflow: hidden;
@@ -25,6 +25,22 @@
         border-radius: 14px; cursor: pointer;
         box-shadow: 0 30px 90px rgba(0,0,0,.85), 0 0 0 1px rgba(120,170,255,.12);
     }
+    .hud-hint {
+        position: absolute;
+        top: 12px; left: 50%;
+        transform: translateX(-50%);
+        padding: 6px 18px;
+        background: rgba(10,20,35,.72);
+        border: 1px solid rgba(120,170,255,.3);
+        border-radius: 20px;
+        color: #b8cae4;
+        font-size: 12px;
+        letter-spacing: 1px;
+        pointer-events: none;
+        white-space: nowrap;
+        backdrop-filter: blur(4px);
+    }
+    .hud-hint b { color: var(--gold); font-weight: 700; }
     .overlay {
         position: absolute; inset: 0;
         background: rgba(4,8,16,.74);
@@ -84,12 +100,14 @@
         .settings-panel h3 { font-size: 1.15em; margin-bottom: 14px; }
         .row button { padding: 8px 13px; font-size: .82em; }
         .row { gap: 7px; margin: 10px 0; }
+        .hud-hint { font-size: 10px; padding: 4px 12px; }
     }
 </style>
 </head>
 <body>
 <div class="game-container" id="gameContainer">
     <canvas id="gameCanvas"></canvas>
+    <div class="hud-hint"><b>WASD</b> 移动 · <b>鼠标拖动</b> 旋转视角 · <b>Q/E</b> 升降 · <b>走到机器人身后</b> 看牌</div>
     <div class="overlay" id="settingsOverlay">
         <div class="settings-panel">
             <button class="close-btn" id="settingsClose">✕</button>
@@ -118,6 +136,24 @@
    ══════════════════════════════════════════ */
 const CANVAS_WIDTH  = 1100;
 const CANVAS_HEIGHT = 720;
+
+/* 3D 世界参数 */
+const TABLE_RADIUS   = 260;     // 桌面半径
+const TABLE_HEIGHT   = 0;       // 桌面高度
+const CARD_W_3D      = 56;      // 世界单位下的牌宽
+const CARD_H_3D      = 78;      // 世界单位下的牌高
+
+/* 座位坐标（3D世界） */
+const SEAT_PLAYER = { x: 0,    y: 0, z: -300 };
+const SEAT_AI1    = { x: -280, y: 0, z:  210 };
+const SEAT_AI2    = { x:  280, y: 0, z:  210 };
+
+/* 摄像机与座位的默认角度（用于绕桌子旋转） */
+function seatAngle(seat) {
+    return Math.atan2(seat.x, -seat.z);
+}
+
+/* 卡牌面尺寸（屏幕 HUD 层） */
 const CARD_WIDTH    = 72;
 const CARD_HEIGHT   = 100;
 const CARD_RADIUS   = 8;
@@ -153,7 +189,7 @@ const TEXTS = {
         shot_ok:'击毙成功！',
         shot_kill_landlord:'地主已淘汰！继续对战',
         dead:'已淘汰', your_turn:'轮到你出牌',
-        gun_tip:'手枪 · 一局一发'
+        peeking:'窥视中…'
     },
     en: {
         title:'R U A N  P O K E R', start:'Start', restart:'Play Again', settings:'Settings',
@@ -176,12 +212,12 @@ const TEXTS = {
         shot_ok:'Target eliminated!',
         shot_kill_landlord:'Landlord down! Fight on',
         dead:'Eliminated', your_turn:'Your turn',
-        gun_tip:'Gun · one shot per game'
+        peeking:'Peeking…'
     }
 };
 
 /* ══════════════════════════════════════════
-   Canvas / DOM
+   Canvas & DOM
    ══════════════════════════════════════════ */
 const canvas = document.getElementById('gameCanvas');
 canvas.width = CANVAS_WIDTH;
@@ -208,13 +244,68 @@ function getCanvasPos(e) {
     return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy };
 }
 const lerp = (a, b, t) => a + (b - a) * t;
-
-/* AI 面板固定区域 */
-const PANEL_AI1 = { x: 16, y: 8, w: 200, h: 56 };
-const PANEL_AI2 = { x: CANVAS_WIDTH - 216, y: 8, w: 200, h: 56 };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ══════════════════════════════════════════
-   牌
+   摄像机（3D 透视）
+   ══════════════════════════════════════════ */
+class Camera {
+    constructor() {
+        this.x = 0;
+        this.y = 340;
+        this.z = -620;
+        this.yaw = 0;      // 水平朝向（弧度）
+        this.pitch = -0.45; // 垂直朝向（负数向下看）
+        this.focal = 720;
+        this.lookAt(0, 0, 0);
+    }
+
+    lookAt(tx, ty, tz) {
+        const dx = tx - this.x;
+        const dy = ty - this.y;
+        const dz = tz - this.z;
+        this.yaw = Math.atan2(dx, dz);
+        const hDist = Math.sqrt(dx * dx + dz * dz);
+        this.pitch = Math.atan2(dy, hDist);
+    }
+
+    /* 摄像机 → 3D 世界点投影到屏幕坐标 */
+    project(wx, wy, wz) {
+        const dx = wx - this.x;
+        const dy = wy - this.y;
+        const dz = wz - this.z;
+
+        const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
+        const cy = Math.cos(this.yaw),   sy = Math.sin(this.yaw);
+
+        // forward
+        const fx = sy * cp, fy = sp, fz = cy * cp;
+        // right
+        const rx = cy, ry = 0, rz = -sy;
+        // up = f × r
+        const ux = -sp * sy;
+        const uy = cp;
+        const uz = -sp * cy;
+
+        const camX = dx * rx + dy * ry + dz * rz;
+        const camY = dx * ux + dy * uy + dz * uz;
+        const camZ = dx * fx + dy * fy + dz * fz;
+
+        if (camZ < 5) return null;
+        const scale = this.focal / camZ;
+        return {
+            x: CANVAS_WIDTH / 2 + camX * scale,
+            y: CANVAS_HEIGHT / 2 - camY * scale,
+            scale,
+            depth: camZ,
+            visible: camX > -CANVAS_WIDTH && camX < CANVAS_WIDTH * 2
+                     && camY > -CANVAS_HEIGHT && camY < CANVAS_HEIGHT * 2
+        };
+    }
+}
+
+/* ══════════════════════════════════════════
+   Card（世界坐标 + 屏幕 HUD 双模式绘制）
    ══════════════════════════════════════════ */
 class Card {
     constructor(suit, rank) {
@@ -222,7 +313,7 @@ class Card {
         this.rank = rank;
         this.selected = false;
         this.faceUp = true;
-        this.x = 0; this.y = 0;
+        this.x = 0; this.y = 0;   // HUD 屏幕坐标
         this.targetX = 0; this.targetY = 0;
         this.rotation = 0; this.targetRotation = 0;
         this.scale = 1;   this.targetScale = 1;
@@ -234,6 +325,2659 @@ class Card {
     }
     get displayRank() {
         return (window._lang === 'en' ? RANK_NAMES_EN : RANK_NAMES_ZH)[this.rank] || String(this.rank);
+    }
+    get displaySuit() { return SUIT_SYMBOLS[this.suit] || ''; }
+
+    updatePosition() {
+        this.x = lerp(this.x, this.targetX, this.animSpeed);
+        this.y = lerp(this.y, this.targetY, this.animSpeed);
+        this.rotation = lerp(this.rotation, this.targetRotation, this.animSpeed * 1.4);
+        this.scale  = lerp(this.scale, this.targetScale, this.animSpeed * 1.4);
+        if (Math.abs(this.x - this.targetX) < 0.4) this.x = this.targetX;
+        if (Math.abs(this.y - this.targetY) < 0.4) this.y = this.targetY;
+        if (Math.abs(this.rotation - this.targetRotation) < 0.002) this.rotation = this.targetRotation;
+        if (Math.abs(this.scale - this.targetScale) < 0.004) this.scale = this.targetScale;
+    }
+    setTarget(x, y, rot, sc) {
+        this.targetX = x; this.targetY = y;
+        if (rot !== undefined) this.targetRotation = rot;
+        if (sc !== undefined) this.targetScale = sc;
+    }
+    snapToTarget() {
+        this.x = this.targetX; this.y = this.targetY;
+        this.rotation = this.targetRotation;
+        this.scale = this.targetScale;
+    }
+    containsPoint(px, py) {
+        const sel = this.selected ? -CARD_SELECTED_OFFSET : 0;
+        const cx = this.x + CARD_WIDTH / 2;
+        const cy = this.y + CARD_HEIGHT / 2 + sel;
+        const dx = px - cx, dy = py - cy;
+        const cos = Math.cos(-this.rotation), sin = Math.sin(-this.rotation);
+        const lx = dx * cos - dy * sin;
+        const ly = dx * sin + dy * cos;
+        return Math.abs(lx) <= (CARD_WIDTH * this.scale) / 2 &&
+               Math.abs(ly) <= (CARD_HEIGHT * this.scale) / 2;
+    }
+
+    /* HUD 固定屏幕绘制（玩家手牌、按钮上方） */
+    drawHUD(ctx, lang) {
+        const sel = this.selected ? -CARD_SELECTED_OFFSET : 0;
+        const cx = this.x + CARD_WIDTH / 2;
+        const cy = this.y + CARD_HEIGHT / 2 + sel;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(this.rotation);
+        ctx.scale(this.scale, this.scale);
+        if (this.selected) {
+            ctx.shadowColor = 'rgba(255,215,64,.9)';
+            ctx.shadowBlur = 26; ctx.shadowOffsetY = -4;
+        } else {
+            ctx.shadowColor = 'rgba(0,0,0,.65)';
+            ctx.shadowBlur = 12; ctx.shadowOffsetY = 6;
+        }
+        ctx.translate(-CARD_WIDTH / 2, -CARD_HEIGHT / 2);
+        this._renderFace(ctx, CARD_WIDTH, CARD_HEIGHT, CARD_RADIUS, lang);
+        ctx.restore();
+    }
+
+    _renderFace(ctx, w, h, r, lang) {
+        if (this.faceUp) {
+            ctx.fillStyle = 'rgba(196,190,172,.95)';
+            this._roundRect(ctx, 2.5, 4, w, h, r); ctx.fill();
+            const g = ctx.createLinearGradient(0, 0, 0, h);
+            g.addColorStop(0, '#ffffff');
+            g.addColorStop(0.55, '#fbf9f3');
+            g.addColorStop(1, '#eee9dc');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, 0, 0, w, h, r); ctx.fill();
+            ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+            ctx.strokeStyle = this.selected ? '#f5b301' : 'rgba(0,0,0,.16)';
+            ctx.lineWidth = this.selected ? 2.2 : 1;
+            this._roundRect(ctx, 0, 0, w, h, r); ctx.stroke();
+
+            ctx.save();
+            ctx.beginPath();
+            this._roundRect(ctx, 0, 0, w, h, r);
+            ctx.clip();
+            const sg = ctx.createLinearGradient(0, 0, w * 0.75, h * 0.5);
+            sg.addColorStop(0, 'rgba(255,255,255,.85)');
+            sg.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = sg;
+            ctx.fillRect(0, 0, w, h);
+            ctx.restore();
+
+            const color = this.isRed ? '#d02a2a' : '#1b1f28';
+            if (this.suit === SUIT_JOKER) {
+                const jcolor = this.rank === 17 ? '#d02a2a' : '#3a3f4a';
+                const main = this.rank === 17 ? (lang === 'en' ? 'JO' : '大') : (lang === 'en' ? 'Jo' : '小');
+                ctx.fillStyle = jcolor;
+                ctx.font = `bold ${w * 0.33}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(main, w / 2, h / 2 - 4);
+                ctx.font = `bold ${w * 0.14}px "Segoe UI",sans-serif`;
+                ctx.fillStyle = this.rank === 17 ? '#e05555' : '#8a8f9a';
+                ctx.fillText('JOKER', w / 2, h / 2 + h * 0.22);
+            } else {
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillStyle = color;
+                ctx.font = `bold ${w * 0.27}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                ctx.textAlign = 'left';
+                ctx.fillText(this.displayRank, w * 0.10, h * 0.23);
+                ctx.font = `${w * 0.21}px "Segoe UI Symbol",serif`;
+                ctx.fillText(this.displaySuit, w * 0.10, h * 0.41);
+                ctx.font = `${w * 0.5}px "Segoe UI Symbol",serif`;
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = .92;
+                ctx.fillText(this.displaySuit, w / 2, h / 2 + h * 0.13);
+                ctx.globalAlpha = 1;
+                ctx.save();
+                ctx.translate(w - w * 0.10, h - h * 0.07);
+                ctx.rotate(Math.PI);
+                ctx.fillStyle = color;
+                ctx.font = `bold ${w * 0.27}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                ctx.textAlign = 'left';
+                ctx.fillText(this.displayRank, 0, h * 0.23 - h * 0.07);
+                ctx.font = `${w * 0.21}px "Segoe UI Symbol",serif`;
+                ctx.fillText(this.displaySuit, 0, h * 0.41 - h * 0.07);
+                ctx.restore();
+            }
+        } else {
+            ctx.fillStyle = 'rgba(22,40,86,.95)';
+            this._roundRect(ctx, 2.5, 4, w, h, r); ctx.fill();
+            const g = ctx.createLinearGradient(0, 0, w, h);
+            g.addColorStop(0, '#3f6ad4');
+            g.addColorStop(0.5, '#2a4ba8');
+            g.addColorStop(1, '#16295e');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, 0, 0, w, h, r); ctx.fill();
+            ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(180,205,255,.5)';
+            ctx.lineWidth = 1.5;
+            this._roundRect(ctx, 0, 0, w, h, r); ctx.stroke();
+            ctx.strokeStyle = 'rgba(160,190,255,.32)';
+            ctx.lineWidth = 1;
+            this._roundRect(ctx, 7, 7, w - 14, h - 14, 5); ctx.stroke();
+            const cx2 = w / 2, cy2 = h / 2;
+            ctx.fillStyle = 'rgba(130,175,255,.42)';
+            ctx.beginPath();
+            ctx.moveTo(cx2, cy2 - 17);
+            ctx.lineTo(cx2 + 12, cy2);
+            ctx.lineTo(cx2, cy2 + 17);
+            ctx.lineTo(cx2 - 12, cy2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(200,225,255,.62)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
+    }
+
+    _roundRect(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+}
+
+/* ══════════════════════════════════════════
+   牌型分析
+   ══════════════════════════════════════════ */
+function getRankCounts(cards) {
+    const c = {};
+    for (const card of cards) c[card.rank] = (c[card.rank] || 0) + 1;
+    return c;
+}
+
+function analyzeHand(cards) {
+    if (!cards || !cards.length) return null;
+    const n = cards.length;
+    const counts = getRankCounts(cards);
+    const ranks = Object.keys(counts).map(Number).sort((a, b) => a - b);
+    const vals = ranks.map(r => counts[r]).sort((a, b) => a - b);
+
+    if (n === 2 && counts[16] === 1 && counts[17] === 1)
+        return { type: 'rocket', mainRank: 100, length: 1 };
+    if (n === 4 && ranks.length === 1)
+        return { type: 'bomb', mainRank: ranks[0], length: 1 };
+    if (n === 1) return { type: 'single', mainRank: ranks[0], length: 1 };
+    if (n === 2 && ranks.length === 1) return { type: 'pair', mainRank: ranks[0], length: 1 };
+    if (n === 3 && ranks.length === 1) return { type: 'triple', mainRank: ranks[0], length: 1 };
+    if (n === 4 && vals.length === 2 && vals[0] === 1 && vals[1] === 3)
+        return { type: 'triple_one', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
+    if (n === 5 && vals.length === 2 && vals[0] === 2 && vals[1] === 3)
+        return { type: 'triple_two', mainRank: ranks.find(r => counts[r] === 3), length: 1 };
+    if (n === 6 && vals.length === 3 && vals[0] === 1 && vals[1] === 1 && vals[2] === 4)
+        return { type: 'quad_two', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
+    if (n === 8 && vals.length === 3 && vals[0] === 2 && vals[1] === 2 && vals[2] === 4)
+        return { type: 'quad_two_pair', mainRank: ranks.find(r => counts[r] === 4), length: 1 };
+
+    if (n >= 5 && ranks.length === n && ranks[n - 1] <= 14 && ranks[n - 1] - ranks[0] === n - 1)
+        return { type: 'straight', mainRank: ranks[n - 1], length: n };
+    if (n >= 6 && n % 2 === 0 && ranks.length === n / 2 &&
+        ranks.every(r => counts[r] === 2) && ranks[ranks.length - 1] <= 14 &&
+        ranks[ranks.length - 1] - ranks[0] === ranks.length - 1)
+        return { type: 'straight_pair', mainRank: ranks[ranks.length - 1], length: ranks.length };
+
+    const tripleRanks = ranks.filter(r => counts[r] >= 3 && r <= 14);
+    const maxLen = Math.min(6, Math.floor(tripleRanks.length));
+    for (let len = maxLen; len >= 2; len--) {
+        for (let s = 0; s + len <= tripleRanks.length; s++) {
+            const seq = tripleRanks.slice(s, s + len);
+            if (seq[seq.length - 1] - seq[0] !== len - 1) continue;
+            if (!seq.every(r => counts[r] >= 3)) continue;
+            const tripCount = len * 3;
+            const rem = n - tripCount;
+            const wing = {};
+            for (const r of ranks) wing[r] = counts[r];
+            for (const r of seq) wing[r] -= 3;
+            const wingRanks = Object.keys(wing).map(Number).filter(r => wing[r] > 0);
+            const wingTotal = wingRanks.reduce((a, r) => a + wing[r], 0);
+            if (rem === 0 && seq.every(r => counts[r] === 3))
+                return { type: 'plane', mainRank: seq[seq.length - 1], length: len };
+            if (rem === len && wingTotal === len)
+                return { type: 'plane_single', mainRank: seq[seq.length - 1], length: len };
+            if (rem === len * 2 && wingRanks.length === len && wingRanks.every(r => wing[r] === 2))
+                return { type: 'plane_pair', mainRank: seq[seq.length - 1], length: len };
+        }
+    }
+    return null;
+}
+
+function canBeat(newT, lastT) {
+    if (!newT) return false;
+    if (!lastT) return true;
+    if (newT.type === 'rocket') return true;
+    if (lastT.type === 'rocket') return false;
+    if (newT.type === 'bomb') {
+        if (lastT.type !== 'bomb') return true;
+        return newT.mainRank > lastT.mainRank;
+    }
+    if (lastT.type === 'bomb') return false;
+    if (newT.type === lastT.type && newT.length === lastT.length)
+        return newT.mainRank > lastT.mainRank;
+    return false;
+}
+
+/* ══════════════════════════════════════════
+   AI
+   ══════════════════════════════════════════ */
+class AIPlayer {
+    constructor(playerId, difficulty = 'normal') {
+        this.playerId = playerId;
+        this.difficulty = difficulty;
+        this.hand = [];
+        this.isLandlord = false;
+    }
+
+    findPlay(game) {
+        if (!this.hand.length) return null;
+        const last = game.lastPlayInfo;
+        const whole = analyzeHand(this.hand);
+        if (whole && canBeat(whole, last)) return [...this.hand];
+        if (!last) return this._leadPlay(game);
+        if (this._isTeammate(game, game.lastPlayedBy)) {
+            if (this.hand.length <= 2) {
+                const trySame = this._followPlay(game, last);
+                if (trySame && trySame.length === this.hand.length) return trySame;
+            }
+            return null;
+        }
+        return this._followPlay(game, last);
+    }
+
+    _isTeammate(game, pid) {
+        if (pid === -1 || pid === this.playerId) return false;
+        if (this.isLandlord) return false;
+        return pid !== game.landlordId;
+    }
+    _getEnemies(game) {
+        if (this.isLandlord) return [0, 1, 2].filter(p => p !== this.playerId && !game.deadPlayers[p]);
+        return [game.landlordId].filter(p => p >= 0 && !game.deadPlayers[p]);
+    }
+
+    _leadPlay(game) {
+        const hand = this.hand;
+        const n = hand.length;
+        if (n === 1) return [...hand];
+        if (this.difficulty === 'easy') {
+            const sorted = [...hand].sort((a, b) => a.rank - b.rank);
+            return [sorted[0]];
+        }
+        const counts = getRankCounts(hand);
+        const byRank = {};
+        for (const c of hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const ranksAsc = Object.keys(byRank).map(Number).sort((a, b) => a - b);
+        const enemies = this._getEnemies(game);
+        const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
+
+        if (enemyMin === 1) {
+            const pairsDesc = ranksAsc.filter(r => counts[r] >= 2 && r <= 15).sort((a, b) => b - a);
+            if (pairsDesc.length) return byRank[pairsDesc[0]].slice(0, 2);
+            const triDesc = ranksAsc.filter(r => counts[r] >= 3).sort((a, b) => b - a);
+            if (triDesc.length) return byRank[triDesc[0]].slice(0, 3);
+            return [byRank[ranksAsc[ranksAsc.length - 1]][0]];
+        }
+        const st = this._findLongestStraight();
+        if (st && st.length >= 5) return st;
+        if (this.difficulty === 'hard') {
+            const tri = ranksAsc.filter(r => counts[r] === 3);
+            if (tri.length && n <= 8) {
+                const r = tri[0];
+                const tr = byRank[r].slice(0, 3);
+                const rem = hand.filter(c => !tr.includes(c));
+                if (rem.length === 1) return [...tr, rem[0]];
+                if (rem.length === 2 && rem[0].rank === rem[1].rank) return [...tr, ...rem];
+            }
+        }
+        const singles = ranksAsc.filter(r => counts[r] === 1);
+        if (singles.length) return [byRank[singles[0]][0]];
+        const pairs = ranksAsc.filter(r => counts[r] === 2 && r <= 15);
+        if (pairs.length) return byRank[pairs[0]].slice(0, 2);
+        const triples = ranksAsc.filter(r => counts[r] === 3);
+        if (triples.length) {
+            const tr = byRank[triples[0]].slice(0, 3);
+            const rem = hand.filter(c => !tr.includes(c));
+            if (rem.length && rem.length <= 2) {
+                const remSorted = [...rem].sort((a, b) => a.rank - b.rank);
+                return [...tr, remSorted[0]];
+            }
+            return tr;
+        }
+        return [byRank[ranksAsc[0]][0]];
+    }
+
+    _followPlay(game, last) {
+        const enemies = this._getEnemies(game);
+        const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
+        const desperate = enemyMin <= 2;
+        const same = this._findBeatingSame(last);
+        if (same) {
+            const info = analyzeHand(same);
+            if (info && info.type === 'bomb' && last.type !== 'bomb' && last.type !== 'rocket') {
+                if (this.difficulty === 'easy') {
+                    if (this.hand.length > 3) return null;
+                    return Math.random() < 0.25 ? same : null;
+                }
+                if (!desperate && this.hand.length > 5) return null;
+            }
+            return same;
+        }
+        const bomb = this._findSmallestBomb();
+        if (bomb) {
+            const bInfo = analyzeHand(bomb);
+            if (canBeat(bInfo, last)) {
+                if (desperate) return bomb;
+                if (last.type === 'bomb') return bomb;
+                if (this.hand.length <= 5) return bomb;
+                if (this.difficulty === 'hard' && this.hand.length <= 8) return bomb;
+                if (this.difficulty === 'normal' && Math.random() < 0.3) return bomb;
+                if (this.difficulty === 'easy' && Math.random() < 0.12) return bomb;
+            }
+        }
+        if (desperate || this.difficulty === 'hard') {
+            const rocket = this._findRocket();
+            if (rocket) {
+                const rInfo = analyzeHand(rocket);
+                if (canBeat(rInfo, last)) {
+                    if (desperate || Math.random() < 0.4) return rocket;
+                }
+            }
+        }
+        return null;
+    }
+
+    _findBeatingSame(info) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const sRanks = Object.keys(byRank).map(Number).sort((a, b) => a - b);
+        const lt = info.type, lr = info.mainRank, ll = info.length;
+        const cost = n => (n === 1 ? 0 : n === 2 ? 1 : n === 3 ? 2 : 20);
+
+        if (lt === 'single') {
+            const cands = sRanks.filter(r => r > lr);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return [byRank[cands[0]][0]];
+        }
+        if (lt === 'pair') {
+            const cands = sRanks.filter(r => r > lr && byRank[r].length >= 2);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return byRank[cands[0]].slice(0, 2);
+        }
+        if (lt === 'triple') {
+            const cands = sRanks.filter(r => r > lr && byRank[r].length >= 3);
+            if (!cands.length) return null;
+            cands.sort((a, b) => cost(byRank[a].length) - cost(byRank[b].length) || a - b);
+            return byRank[cands[0]].slice(0, 3);
+        }
+        if (lt === 'triple_one' || lt === 'triple_two') {
+            const need = lt === 'triple_one' ? 1 : 2;
+            for (const r of sRanks) {
+                if (r <= lr || byRank[r].length < 3) continue;
+                const tr = byRank[r].slice(0, 3);
+                const rem = this.hand.filter(c => !tr.includes(c));
+                if (need === 1) {
+                    if (rem.length >= 1) {
+                        const rc = getRankCounts(rem);
+                        const wr = Object.keys(rc).map(Number).sort((a, b) => rc[a] - rc[b] || a - b);
+                        return [...tr, rem.find(c => c.rank === wr[0])];
+                    }
+                } else {
+                    const rc = getRankCounts(rem);
+                    const pr = Object.keys(rc).map(Number).filter(x => rc[x] >= 2)
+                        .sort((a, b) => rc[a] - rc[b] || a - b);
+                    if (pr.length) {
+                        const pc = rem.filter(c => c.rank === pr[0]).slice(0, 2);
+                        return [...tr, ...pc];
+                    }
+                }
+            }
+            return null;
+        }
+        if (lt === 'straight') return this._findBeatingStraight(lr, ll);
+        if (lt === 'straight_pair') return this._findBeatingStraightPair(lr, ll);
+        if (lt === 'plane' || lt === 'plane_single' || lt === 'plane_pair')
+            return this._findBeatingPlane(lt, lr, ll);
+        if (lt === 'quad_two' || lt === 'quad_two_pair') {
+            for (const r of sRanks) {
+                if (r <= lr || byRank[r].length < 4) continue;
+                const qd = byRank[r].slice(0, 4);
+                const rem = this.hand.filter(c => !qd.includes(c));
+                if (lt === 'quad_two') {
+                    if (rem.length >= 2) {
+                        const sorted = [...rem].sort((a, b) => a.rank - b.rank);
+                        return [...qd, sorted[0], sorted[1]];
+                    }
+                } else {
+                    const rc = getRankCounts(rem);
+                    const pr = Object.keys(rc).map(Number).filter(x => rc[x] >= 2);
+                    if (pr.length >= 2) {
+                        const w = [];
+                        for (const x of pr.slice(0, 2)) w.push(...rem.filter(c => c.rank === x).slice(0, 2));
+                        return [...qd, ...w];
+                    }
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
+    _findBeatingStraight(lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        for (let sr = 3; sr + ll - 1 <= 14; sr++) {
+            const er = sr + ll - 1;
+            if (er <= lr) continue;
+            let ok = true;
+            for (let r = sr; r <= er; r++) if (!byRank[r] || !byRank[r].length) { ok = false; break; }
+            if (!ok) continue;
+            const res = [];
+            for (let r = sr; r <= er; r++) res.push(byRank[r][0]);
+            return res;
+        }
+        return null;
+    }
+
+    _findBeatingStraightPair(lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        for (let sr = 3; sr + ll - 1 <= 14; sr++) {
+            const er = sr + ll - 1;
+            if (er <= lr) continue;
+            let ok = true;
+            for (let r = sr; r <= er; r++) if (!byRank[r] || byRank[r].length < 2) { ok = false; break; }
+            if (!ok) continue;
+            const res = [];
+            for (let r = sr; r <= er; r++) res.push(...byRank[r].slice(0, 2));
+            return res;
+        }
+        return null;
+    }
+
+    _findBeatingPlane(lt, lr, ll) {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const trs = Object.keys(byRank).map(Number).filter(r => byRank[r].length >= 3 && r <= 14).sort((a, b) => a - b);
+        for (let s = 0; s + ll <= trs.length; s++) {
+            const seq = trs.slice(s, s + ll);
+            if (seq[seq.length - 1] - seq[0] !== ll - 1) continue;
+            if (seq[seq.length - 1] <= lr) continue;
+            const tripCards = [];
+            for (const r of seq) tripCards.push(...byRank[r].slice(0, 3));
+            const rem = this.hand.filter(c => !tripCards.includes(c));
+            if (lt === 'plane') return tripCards;
+            if (lt === 'plane_single') {
+                if (rem.length >= ll) {
+                    const sorted = [...rem].sort((a, b) => a.rank - b.rank);
+                    return [...tripCards, ...sorted.slice(0, ll)];
+                }
+            }
+            if (lt === 'plane_pair') {
+                const rc = getRankCounts(rem);
+                const prs = Object.keys(rc).map(Number).filter(r => rc[r] >= 2);
+                if (prs.length >= ll) {
+                    const w = [];
+                    for (const r of prs.slice(0, ll)) w.push(...rem.filter(c => c.rank === r).slice(0, 2));
+                    return [...tripCards, ...w];
+                }
+            }
+        }
+        return null;
+    }
+
+    _findSmallestBomb() {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        const bombs = Object.entries(byRank).filter(([, cs]) => cs.length >= 4)
+            .map(([r, cs]) => [Number(r), cs]).sort((a, b) => a[0] - b[0]);
+        return bombs.length ? bombs[0][1].slice(0, 4) : null;
+    }
+    _findRocket() {
+        const hasS = this.hand.some(c => c.rank === 16);
+        const hasB = this.hand.some(c => c.rank === 17);
+        if (hasS && hasB) return this.hand.filter(c => c.rank === 16 || c.rank === 17);
+        return null;
+    }
+    _findLongestStraight() {
+        const byRank = {};
+        for (const c of this.hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
+        let best = null;
+        for (let sr = 3; sr <= 10; sr++) {
+            const cur = [];
+            for (let r = sr; r <= 14; r++) {
+                if (byRank[r] && byRank[r].length) cur.push(r);
+                else break;
+            }
+            if (cur.length >= 5 && (!best || cur.length > best.length)) best = cur;
+        }
+        if (!best) return null;
+        const counts = getRankCounts(this.hand);
+        if (best.some(r => counts[r] >= 4)) return null;
+        return best.map(r => byRank[r][0]);
+    }
+}
+
+/* ══════════════════════════════════════════
+   游戏主类
+   ══════════════════════════════════════════ */
+class Game {
+    constructor() {
+        this.lang = 'zh';
+        window._lang = 'zh';
+        this.difficulty = 'normal';
+        this.settingsOpen = false;
+        this.state = 'idle';
+
+        this.playersHand = [[], [], []];
+        this.landlordCards = [];
+        this.landlordId = -1;
+        this.currentPlayer = -1;
+
+        /* 每家出牌区（世界坐标） */
+        this.tableCards  = [[], [], []];
+        this.tablePassed = [false, false, false];
+
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+
+        this.callScores = [0, 0, 0];
+        this.callStartPlayer = 0;
+        this.callCurrent = 0;
+        this.calledSet = new Set();
+        this.grabPhase = false;
+        this.grabScores = [0, 0, 0];
+        this.grabCurrent = 0;
+        this.grabStart = 0;
+        this.grabbedSet = new Set();
+
+        this.winner = -1;
+        this.message = '';
+        this.messageTimer = 0;
+        this.thinkingPid = -1;
+
+        this.gunUsed = false;
+        this.aiming = false;
+        this.deadPlayers = [false, false, false];
+        this.shotEffects = [];
+
+        /* 摄像机 & 输入 */
+        this.camera = new Camera();
+        this.keys = {};
+        this.mouseDrag = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+        this.cameraMode = 'free'; // 'free' | 'seat'
+        this.cameraAngle = 0;
+        this.cameraRadius = 620;
+        this.cameraHeight = 340;
+        this.peekingAI = -1;  // 正在窥视哪个 AI 的手牌（-1 无）
+
+        this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+        this.aiTimer = null;
+
+        this._mouseX = -999; this._mouseY = -999;
+        this._playBtnRect = null; this._passBtnRect = null;
+        this._callBtnRect = null; this._noCallBtnRect = null;
+        this._grabBtnRect = null; this._noGrabBtnRect = null;
+        this._startBtnRect = null;
+        this._gunBtnRect = null;
+        this._tick = 0;
+
+        this.initNewGame();
+    }
+
+    t(key) { return (TEXTS[this.lang] || TEXTS.zh)[key] || key; }
+
+    _aiDelay() {
+        const base = this.difficulty === 'easy' ? 1050
+                   : this.difficulty === 'normal' ? 880 : 700;
+        return base + Math.random() * 850;
+    }
+
+    initNewGame() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
+
+        const deck = [];
+        for (const s of [SUIT_SPADE, SUIT_HEART, SUIT_CLUB, SUIT_DIAMOND])
+            for (let r = 3; r <= 15; r++) deck.push(new Card(s, r));
+        deck.push(new Card(SUIT_JOKER, 16), new Card(SUIT_JOKER, 17));
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+
+        this.playersHand = [deck.slice(0, 17), deck.slice(17, 34), deck.slice(34, 51)];
+        this.landlordCards = deck.slice(51, 54);
+
+        this.aiPlayers = [null, new AIPlayer(1, this.difficulty), new AIPlayer(2, this.difficulty)];
+        this.aiPlayers[1].hand = [...this.playersHand[1]];
+        this.aiPlayers[2].hand = [...this.playersHand[2]];
+
+        for (const c of this.playersHand[0]) c.faceUp = true;
+        for (const c of this.playersHand[1]) c.faceUp = false;
+        for (const c of this.playersHand[2]) c.faceUp = false;
+        for (const c of this.landlordCards) c.faceUp = false;
+
+        this.state = 'idle';
+        this.landlordId = -1;
+        this.currentPlayer = -1;
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+        this.callScores = [0, 0, 0];
+        this.calledSet = new Set();
+        this.grabPhase = false;
+        this.grabScores = [0, 0, 0];
+        this.grabbedSet = new Set();
+        this.winner = -1;
+        this.message = this.t('dealing');
+        this.messageTimer = 90;
+        this.tableCards = [[], [], []];
+        this.tablePassed = [false, false, false];
+
+        this.gunUsed = false;
+        this.aiming = false;
+        this.deadPlayers = [false, false, false];
+        this.shotEffects = [];
+
+        for (let i = 0; i < 3; i++)
+            this.playersHand[i].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+        this.landlordCards.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+
+        /* 重置摄像机到玩家座位位置 */
+        this.cameraAngle = seatAngle(SEAT_PLAYER);
+        this.cameraRadius = 620;
+        this.cameraHeight = 340;
+        this.updateCameraFromSpherical();
+        this.camera.lookAt(0, 40, 0);
+
+        this._layoutHUDCards();
+
+        this.aiTimer = setTimeout(() => {
+            this.aiTimer = null;
+            if (this.state === 'idle') this.startCallingPhase();
+        }, 1200);
+    }
+
+    updateCameraFromSpherical() {
+        this.camera.x = this.cameraRadius * Math.sin(this.cameraAngle);
+        this.camera.z = -this.cameraRadius * Math.cos(this.cameraAngle);
+        this.camera.y = this.cameraHeight;
+    }
+
+    /* 玩家 HUD 手牌排布 */
+    _layoutHUDCards() {
+        const hand0 = this.playersHand[0];
+        const n0 = hand0.length;
+        if (!n0) return;
+        const maxW = CANVAS_WIDTH - 240;
+        let sp0 = 46;
+        if (n0 > 1 && (n0 - 1) * sp0 + CARD_WIDTH > maxW)
+            sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+        if (n0 > 1 && sp0 < 18) sp0 = (maxW - CARD_WIDTH) / (n0 - 1);
+        const totalW0 = n0 > 1 ? (n0 - 1) * sp0 + CARD_WIDTH : CARD_WIDTH;
+        const startX0 = (CANVAS_WIDTH - totalW0) / 2;
+        const baseY0 = CANVAS_HEIGHT - 130;
+        const maxA = n0 > 1 ? Math.min(0.11, n0 * 0.007) : 0;
+        for (let i = 0; i < n0; i++) {
+            const t = n0 > 1 ? (i - (n0 - 1) / 2) / ((n0 - 1) / 2) : 0;
+            const c = hand0[i];
+            c.setTarget(startX0 + i * sp0, baseY0 + Math.abs(t) * 12, t * maxA, 1);
+        }
+    }
+
+    /* ───────── 叫地主 ───────── */
+    startCallingPhase() {
+        this.state = 'calling';
+        this.callScores = [0, 0, 0];
+        this.calledSet = new Set();
+        const alive = [0, 1, 2].filter(p => !this.deadPlayers[p]);
+        if (!alive.length) return;
+        this.callStartPlayer = alive[Math.floor(Math.random() * alive.length)];
+        this.callCurrent = this.callStartPlayer;
+        this.grabPhase = false;
+        this.message = '';
+        this.messageTimer = 0;
+        this._processCurrentCaller();
+    }
+
+    _processCurrentCaller() {
+        if (this.state !== 'calling') return;
+        if (this.deadPlayers[this.callCurrent]) { this._advanceCalling(); return; }
+        this.currentPlayer = this.callCurrent;
+        if (this.callCurrent === 0) { this.message = ''; }
+        else this._aiCallLandlord(this.callCurrent);
+    }
+
+    _aiCallLandlord(pid) {
+        const ai = this.aiPlayers[pid];
+        const score = this._evaluateHandStrength(ai.hand);
+        const th = this.difficulty === 'easy' ? 42 : (this.difficulty === 'normal' ? 32 : 22);
+        const noOneYet = this.callScores.every(s => s === 0);
+        if (score > th || (noOneYet && score > 16)) {
+            let cs = 1;
+            if (this.difficulty === 'hard' && score > 62) cs = Math.min(3, 1 + Math.floor(score / 30));
+            else if (this.difficulty === 'normal' && score > 52) cs = 2;
+            this.callScores[pid] = cs;
+            this.message = `AI ${pid} · ${this.t('call_landlord')} ${cs}`;
+        } else {
+            this.callScores[pid] = 0;
+            this.message = `AI ${pid} · ${this.t('no_call')}`;
+        }
+        this.messageTimer = 60;
+        this.aiTimer = setTimeout(() => this._advanceCalling(), 720 + Math.random() * 400);
+    }
+
+    _evaluateHandStrength(hand) {
+        if (!hand || !hand.length) return 0;
+        const counts = getRankCounts(hand);
+        let score = 0;
+        const bombs = Object.values(counts).filter(c => c >= 4).length;
+        score += bombs * 16;
+        if (counts[16] && counts[17]) score += 26;
+        else if (counts[16] || counts[17]) score += 9;
+        for (const r of [15, 14, 13, 12]) if (counts[r]) score += counts[r] * 3;
+        const ranks = [...new Set(hand.map(c => c.rank).filter(r => r <= 14))].sort((a, b) => a - b);
+        let consec = 0, maxC = 0;
+        for (let i = 0; i < ranks.length - 1; i++) {
+            if (ranks[i + 1] - ranks[i] === 1) { consec++; maxC = Math.max(maxC, consec); }
+            else consec = 0;
+        }
+        score += maxC * 5;
+        score += Object.values(counts).filter(c => c >= 3).length * 8;
+        score += Object.values(counts).filter(c => c >= 2).length * 2;
+        return Math.min(100, score);
+    }
+
+    _advanceCalling() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.calledSet) this.calledSet.add(this.callCurrent);
+        let next = this.callCurrent;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next] && !this.calledSet.has(next)) { found = true; break; }
+        }
+        if (!found) this._resolveCalling();
+        else { this.callCurrent = next; this._processCurrentCaller(); }
+    }
+
+    _resolveCalling() {
+        const maxS = Math.max(...this.callScores);
+        if (maxS === 0) {
+            this.message = this.t('no_one_call');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
+            return;
+        }
+        const cands = [];
+        for (let i = 0; i < 3; i++) {
+            if (this.deadPlayers[i]) continue;
+            if (this.callScores[i] === maxS) cands.push(i);
+        }
+        if (!cands.length) {
+            this.message = this.t('no_one_call');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
+            return;
+        }
+        if (cands.length === 1) this._setLandlord(cands[0]);
+        else this._startGrabPhase(cands);
+    }
+
+    _startGrabPhase(cands) {
+        this.state = 'grabbing';
+        this.grabPhase = true;
+        this.grabScores = [0, 0, 0];
+        this.grabbedSet = new Set();
+        let start = (cands[0] + 1) % 3;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            if (!this.deadPlayers[start]) { found = true; break; }
+            start = (start + 1) % 3;
+        }
+        if (!found) { this._resolveGrabbing(); return; }
+        this.grabStart = start;
+        this.grabCurrent = start;
+        this._processGrabber();
+    }
+
+    _processGrabber() {
+        if (this.state !== 'grabbing') return;
+        if (this.deadPlayers[this.grabCurrent]) { this._advanceGrabbing(); return; }
+        if (this.grabCurrent === 0) { this.currentPlayer = 0; this.message = ''; }
+        else this._aiGrabLandlord(this.grabCurrent);
+    }
+
+    _aiGrabLandlord(pid) {
+        const ai = this.aiPlayers[pid];
+        const score = this._evaluateHandStrength(ai.hand);
+        const th = this.difficulty === 'easy' ? 52 : (this.difficulty === 'normal' ? 42 : 32);
+        if (score > th) {
+            this.grabScores[pid] = (this.callScores[pid] || 1) + 1;
+            this.message = `AI ${pid} · ${this.t('grab_landlord')}!`;
+        } else {
+            this.grabScores[pid] = 0;
+            this.message = `AI ${pid} · ${this.t('no_grab')}`;
+        }
+        this.messageTimer = 60;
+        this.aiTimer = setTimeout(() => this._advanceGrabbing(), 720 + Math.random() * 400);
+    }
+
+    _advanceGrabbing() {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.grabbedSet) this.grabbedSet.add(this.grabCurrent);
+        let next = this.grabCurrent;
+        let found = false;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next] && !this.grabbedSet.has(next)) { found = true; break; }
+        }
+        if (!found) this._resolveGrabbing();
+        else { this.grabCurrent = next; this._processGrabber(); }
+    }
+
+    _resolveGrabbing() {
+        const all = [];
+        for (let i = 0; i < 3; i++) {
+            if (this.deadPlayers[i]) continue;
+            if (this.grabScores[i] > 0) all.push([i, this.grabScores[i]]);
+            else if (this.callScores[i] > 0) all.push([i, this.callScores[i]]);
+        }
+        if (!all.length) {
+            this.message = this.t('no_one_grab');
+            this.messageTimer = 90;
+            this.aiTimer = setTimeout(() => { this.initNewGame(); }, 1500);
+            return;
+        }
+        all.sort((a, b) => b[1] - a[1]);
+        this._setLandlord(all[0][0]);
+    }
+
+    _setLandlord(pid) {
+        this.landlordId = pid;
+        this.aiPlayers[1].isLandlord = (pid === 1);
+        this.aiPlayers[2].isLandlord = (pid === 2);
+        for (const c of this.landlordCards) {
+            c.faceUp = true;
+            this.playersHand[pid].push(c);
+        }
+        if (pid !== 0) this.aiPlayers[pid].hand = [...this.playersHand[pid]];
+        this.playersHand[pid].sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+        if (pid !== 0) this.aiPlayers[pid].hand.sort((a, b) => a.rank - b.rank || a.suit - b.suit);
+
+        this._clearTable();
+        this._layoutHUDCards();
+
+        this.state = 'playing';
+        this.currentPlayer = pid;
+        this.lastPlayedCards = [];
+        this.lastPlayedBy = -1;
+        this.lastPlayInfo = null;
+        this.passCount = 0;
+        this.message = `${pid === 0 ? this.t('you') : 'AI ' + pid} · ${this.t('landlord')}`;
+        this.messageTimer = 80;
+        if (pid !== 0) this._scheduleAI(pid, 1200);
+    }
+
+    _clearTable() {
+        for (let i = 0; i < 3; i++) {
+            this.tableCards[i] = [];
+            this.tablePassed[i] = false;
+        }
+    }
+
+    _scheduleAI(pid, extra = 0) {
+        if (this.state !== 'playing') return;
+        if (pid === 0) return;
+        if (this.deadPlayers[pid]) return;
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = pid;
+        this.aiTimer = setTimeout(() => {
+            this.aiTimer = null;
+            this.thinkingPid = -1;
+            this._aiTurnIfNeeded();
+        }, this._aiDelay() + extra);
+    }
+
+    _aiTurnIfNeeded() {
+        if (this.state === 'playing' && this.currentPlayer !== 0 && !this.deadPlayers[this.currentPlayer])
+            this._aiTurn(this.currentPlayer);
+    }
+
+    _aiTurn(pid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.state !== 'playing') return;
+        if (this.deadPlayers[pid]) {
+            this.currentPlayer = this._getNextPlayer(pid);
+            this._scheduleAI(this.currentPlayer, 300);
+            return;
+        }
+        this.currentPlayer = pid;
+        const ai = this.aiPlayers[pid];
+        if (!ai || !this.playersHand[pid].length) { this._aiPass(pid); return; }
+
+        let cards = null;
+        try { cards = ai.findPlay(this); } catch (e) { cards = null; }
+
+        if (cards && cards.length) {
+            const info = analyzeHand(cards);
+            if (info && canBeat(info, this.lastPlayInfo)) {
+                this._commitPlay(pid, cards, info);
+                return;
+            }
+        }
+        this._aiPass(pid);
+    }
+
+    _commitPlay(pid, cards, info) {
+        const ai = this.aiPlayers[pid];
+        for (const c of cards) {
+            if (ai) { const i1 = ai.hand.indexOf(c); if (i1 >= 0) ai.hand.splice(i1, 1); }
+            const i2 = this.playersHand[pid].indexOf(c);
+            if (i2 >= 0) this.playersHand[pid].splice(i2, 1);
+            c.faceUp = true;
+            c.selected = false;
+        }
+        this.lastPlayedCards = cards;
+        this.lastPlayedBy = pid;
+        this.lastPlayInfo = info;
+        this.passCount = 0;
+        this.tableCards[pid] = cards;
+        this.tablePassed[pid] = false;
+
+        this.message = `AI ${pid} · ${this.t('ai_play')}`;
+        this.messageTimer = 45;
+
+        if (this.playersHand[pid].length === 0) { this._gameOver(pid); return; }
+        this.currentPlayer = this._getNextPlayer(pid);
+        this._scheduleAI(this.currentPlayer, 300);
+    }
+
+    _aiPass(pid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        if (this.state !== 'playing') return;
+        this.thinkingPid = -1;
+
+        if (!this.lastPlayInfo) {
+            const ai = this.aiPlayers[pid];
+            if (ai && ai.hand.length) {
+                const sorted = [...ai.hand].sort((a, b) => a.rank - b.rank);
+                const card = sorted[0];
+                const info = analyzeHand([card]);
+                if (info) { this._commitPlay(pid, [card], info); return; }
+            }
+        }
+
+        this.passCount++;
+        this.tableCards[pid] = [];
+        this.tablePassed[pid] = true;
+        this.message = `AI ${pid} · ${this.t('ai_pass')}`;
+        this.messageTimer = 45;
+
+        if (this.passCount >= 2) {
+            this.lastPlayedCards = [];
+            this.lastPlayedBy = -1;
+            this.lastPlayInfo = null;
+            this.passCount = 0;
+            this._clearTable();
+            this.currentPlayer = this._getNextPlayer(this.currentPlayer);
+            if (this.currentPlayer === 0) {
+                this.message = this.t('new_round');
+                this.messageTimer = 70;
+            } else {
+                this._scheduleAI(this.currentPlayer, 400);
+            }
+        } else {
+            this.currentPlayer = this._getNextPlayer(pid);
+            this._scheduleAI(this.currentPlayer, 350);
+        }
+    }
+
+    _getNextPlayer(pid) {
+        let next = pid;
+        for (let i = 0; i < 3; i++) {
+            next = (next + 1) % 3;
+            if (!this.deadPlayers[next]) return next;
+        }
+        return pid;
+    }
+
+    playerPlayCards(selected) {
+        if (this.currentPlayer !== 0 || this.state !== 'playing') return false;
+        const info = analyzeHand(selected);
+        if (!info) { this.message = this.t('invalid_play'); this.messageTimer = 55; return false; }
+        if (!canBeat(info, this.lastPlayInfo)) { this.message = this.t('cant_beat'); this.messageTimer = 55; return false; }
+
+        for (const c of selected) {
+            const idx = this.playersHand[0].indexOf(c);
+            if (idx >= 0) this.playersHand[0].splice(idx, 1);
+        }
+        this.lastPlayedCards = selected;
+        this.lastPlayedBy = 0;
+        this.lastPlayInfo = info;
+        this.passCount = 0;
+        for (const c of this.playersHand[0]) c.selected = false;
+
+        this.tableCards[0] = selected;
+        this.tablePassed[0] = false;
+
+        this._layoutHUDCards();
+        this.message = '';
+        this.messageTimer = 0;
+
+        if (this.playersHand[0].length === 0) { this._gameOver(0); return true; }
+        this.currentPlayer = this._getNextPlayer(0);
+        this._scheduleAI(this.currentPlayer, 350);
+        return true;
+    }
+
+    playerPass() {
+        if (this.currentPlayer !== 0 || this.state !== 'playing') return;
+        if (!this.lastPlayInfo) { this.message = this.t('must_play'); this.messageTimer = 55; return; }
+        this.passCount++;
+        this.tableCards[0] = [];
+        this.tablePassed[0] = true;
+        this.message = this.t('pass');
+        this.messageTimer = 40;
+
+        if (this.passCount >= 2) {
+            this.lastPlayedCards = [];
+            this.lastPlayedBy = -1;
+            this.lastPlayInfo = null;
+            this.passCount = 0;
+            this._clearTable();
+            this.currentPlayer = this._getNextPlayer(this.currentPlayer);
+            if (this.currentPlayer !== 0) this._scheduleAI(this.currentPlayer, 400);
+            else { this.message = this.t('new_round'); this.messageTimer = 70; }
+        } else {
+            this.currentPlayer = this._getNextPlayer(0);
+            this._scheduleAI(this.currentPlayer, 350);
+        }
+    }
+
+    _shootPlayer(pid) {
+        if (this.gunUsed || pid === 0 || pid === -1 || this.deadPlayers[pid]) return false;
+        if (this.state === 'ended') return false;
+
+        this.gunUsed = true;
+        this.aiming = false;
+        this.deadPlayers[pid] = true;
+
+        this.callScores[pid] = 0;
+        this.grabScores[pid] = 0;
+        this.tableCards[pid] = [];
+        this.tablePassed[pid] = false;
+
+        const seat = pid === 1 ? SEAT_AI1 : SEAT_AI2;
+        this.shotEffects.push({
+            x: seat.x, y: 60, z: seat.z,
+            t: 65, maxT: 65
+        });
+
+        if (this.landlordId === pid) {
+            this.message = this.t('shot_kill_landlord');
+            this.messageTimer = 160;
+        } else {
+            this.message = this.t('shot_ok');
+            this.messageTimer = 90;
+        }
+
+        const wasActive =
+            (this.state === 'calling'  && this.callCurrent === pid) ||
+            (this.state === 'grabbing' && this.grabCurrent === pid) ||
+            (this.state === 'playing'  && (this.currentPlayer === pid || this.thinkingPid === pid));
+
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
+
+        if (wasActive) {
+            if (this.state === 'calling') this._advanceCalling();
+            else if (this.state === 'grabbing') this._advanceGrabbing();
+            else if (this.state === 'playing') {
+                if (this.playersHand[pid].length === 0) { this._gameOver(pid); return true; }
+                this.currentPlayer = this._getNextPlayer(pid);
+                if (this.currentPlayer === 0) {
+                    this.message = this.t('your_turn');
+                    this.messageTimer = 80;
+                } else {
+                    this._scheduleAI(this.currentPlayer, 500);
+                }
+            }
+        }
+        return true;
+    }
+
+    _gameOver(wid) {
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
+        this.state = 'ended';
+        this.winner = wid;
+        const winnerIsLandlord = (wid === this.landlordId);
+        let humanWin;
+        if (this.landlordId === 0) humanWin = winnerIsLandlord;
+        else humanWin = !winnerIsLandlord;
+        this.message = humanWin ? this.t('you_win') : this.t('you_lose');
+        this.messageTimer = 9999;
+        for (const h of this.playersHand) for (const c of h) c.faceUp = true;
+        for (const c of this.landlordCards) c.faceUp = true;
+    }
+
+    /* ───────── 更新 ───────── */
+    update() {
+        this._tick++;
+        /* HUD 牌动画 */
+        for (const c of this.playersHand[0]) c.updatePosition();
+
+        /* 摄像机 WASD 移动 */
+        if (!this.settingsOpen) this._handleMovement();
+
+        /* 检测玩家是否走到 AI 后面 */
+        this._checkPeeking();
+
+        /* 特效计时 */
+        for (let i = this.shotEffects.length - 1; i >= 0; i--) {
+            this.shotEffects[i].t--;
+            if (this.shotEffects[i].t <= 0) this.shotEffects.splice(i, 1);
+        }
+        if (this.messageTimer > 0 && this.messageTimer < 9000) this.messageTimer--;
+    }
+
+    _handleMovement() {
+        const speed = 5.5;
+        const cam = this.camera;
+        const fx = Math.sin(cam.yaw), fz = Math.cos(cam.yaw);
+        const rx = Math.cos(cam.yaw), rz = -Math.sin(cam.yaw);
+
+        let mvX = 0, mvZ = 0;
+        if (this.keys['w'] || this.keys['W']) { mvX += fx; mvZ += fz; }
+        if (this.keys['s'] || this.keys['S']) { mvX -= fx; mvZ -= fz; }
+        if (this.keys['a'] || this.keys['A']) { mvX -= rx; mvZ -= rz; }
+        if (this.keys['d'] || this.keys['D']) { mvX += rx; mvZ += rz; }
+
+        if (mvX || mvZ) {
+            const len = Math.sqrt(mvX * mvX + mvZ * mvZ);
+            mvX /= len; mvZ /= len;
+            cam.x += mvX * speed;
+            cam.z += mvZ * speed;
+            /* 限制在桌外圈 */
+            const dist = Math.sqrt(cam.x * cam.x + cam.z * cam.z);
+            if (dist < TABLE_RADIUS + 90) {
+                const scale = (TABLE_RADIUS + 90) / dist;
+                cam.x *= scale;
+                cam.z *= scale;
+            }
+            if (dist > 900) {
+                const scale = 900 / dist;
+                cam.x *= scale;
+                cam.z *= scale;
+            }
+        }
+        if (this.keys['q'] || this.keys['Q']) cam.y = clamp(cam.y + speed, 120, 700);
+        if (this.keys['e'] || this.keys['E']) cam.y = clamp(cam.y - speed, 120, 700);
+    }
+
+    _checkPeeking() {
+        const cam = this.camera;
+        this.peekingAI = -1;
+
+        const aiList = [
+            { id: 1, seat: SEAT_AI1, facing: Math.atan2(0 - SEAT_AI1.x, 0 - SEAT_AI1.z) },
+            { id: 2, seat: SEAT_AI2, facing: Math.atan2(0 - SEAT_AI2.x, 0 - SEAT_AI2.z) }
+        ];
+        for (const a of aiList) {
+            if (this.deadPlayers[a.id]) continue;
+            const vx = cam.x - a.seat.x;
+            const vz = cam.z - a.seat.z;
+            const dist = Math.sqrt(vx * vx + vz * vz);
+            if (dist > 220) continue;
+            /* AI 面向桌子的方向 */
+            const afx = Math.sin(a.facing), afz = Math.cos(a.facing);
+            /* 玩家在 AI 背后的判断：玩家到 AI 的向量 与 AI 朝向 反向 */
+            const dot = (vx * afx + vz * afz) / (dist || 1);
+            if (dot < -0.25) {
+                this.peekingAI = a.id;
+                break;
+            }
+        }
+    }
+
+    /* ══════════════════════════════════════════
+       绘制
+       ══════════════════════════════════════════ */
+    draw(ctx) {
+        this._drawSky(ctx);
+        this._drawFloor(ctx);
+        this._drawTable(ctx);
+        this._drawSeatZones(ctx);
+        this._drawPlayers3D(ctx);
+        this._drawShotEffects(ctx);
+        this._drawHUD(ctx);
+        this._drawCrosshair(ctx);
+        this._drawAimPrompt(ctx);
+    }
+
+    /* —— 天空/远景 —— */
+    _drawSky(ctx) {
+        const g = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+        g.addColorStop(0, '#0d1a30');
+        g.addColorStop(0.4, '#0a1526');
+        g.addColorStop(1, '#040810');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        /* 星空（用投影方式） */
+        ctx.save();
+        for (let i = 0; i < 60; i++) {
+            const px = (i * 137.508) % CANVAS_WIDTH;
+            const py = (i * 219.31) % (CANVAS_HEIGHT * 0.55);
+            const a = 0.05 + 0.1 * Math.abs(Math.sin((this._tick + i * 40) / 130));
+            ctx.fillStyle = `rgba(170,210,255,${a})`;
+            ctx.beginPath();
+            ctx.arc(px, py, 1.4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+
+        /* 远景地平线光晕 */
+        const hg = ctx.createRadialGradient(
+            CANVAS_WIDTH / 2, 380, 60,
+            CANVAS_WIDTH / 2, 380, 700
+        );
+        hg.addColorStop(0, 'rgba(60,110,180,.14)');
+        hg.addColorStop(0.5, 'rgba(30,60,110,.06)');
+        hg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = hg;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
+
+    /* —— 3D 地板网格 —— */
+    _drawFloor(ctx) {
+        const cam = this.camera;
+        /* 用一组同心圆和径向线构成地板透视 */
+        ctx.save();
+
+        /* 同心圆（地板圈） */
+        const rings = [300, 420, 560, 720, 900, 1100];
+        for (const r of rings) {
+            const segs = 48;
+            let started = false;
+            ctx.strokeStyle = 'rgba(70,110,180,.10)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let i = 0; i <= segs; i++) {
+                const a = (i / segs) * Math.PI * 2;
+                const wx = r * Math.cos(a);
+                const wz = r * Math.sin(a);
+                const p = cam.project(wx, 0, wz);
+                if (!p) { started = false; continue; }
+                if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+                else ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+
+        /* 径向线 */
+        ctx.strokeStyle = 'rgba(70,110,180,.08)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 24; i++) {
+            const a = (i / 24) * Math.PI * 2;
+            const x1 = 260 * Math.cos(a), z1 = 260 * Math.sin(a);
+            const x2 = 1200 * Math.cos(a), z2 = 1200 * Math.sin(a);
+            const p1 = cam.project(x1, 0, z1);
+            const p2 = cam.project(x2, 0, z2);
+            if (!p1 || !p2) continue;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    /* —— 3D 桌子 —— */
+    _drawTable(ctx) {
+        const cam = this.camera;
+        const segs = 48;
+
+        /* 桌面用多边形填充（径向渐变近似） */
+        const cx = CANVAS_WIDTH / 2, cy = CANVAS_HEIGHT / 2;
+
+        /* 桌子侧壁（底部一圈，比桌面略低） */
+        const drawSideWall = (topY, botY, rTop, rBot, fill) => {
+            for (let i = 0; i < segs; i++) {
+                const a1 = (i / segs) * Math.PI * 2;
+                const a2 = ((i + 1) / segs) * Math.PI * 2;
+                const t1 = cam.project(rTop * Math.cos(a1), topY, rTop * Math.sin(a1));
+                const t2 = cam.project(rTop * Math.cos(a2), topY, rTop * Math.sin(a2));
+                const b1 = cam.project(rBot * Math.cos(a1), botY, rBot * Math.sin(a1));
+                const b2 = cam.project(rBot * Math.cos(a2), botY, rBot * Math.sin(a2));
+                if (!t1 || !t2 || !b1 || !b2) continue;
+                ctx.fillStyle = fill;
+                ctx.beginPath();
+                ctx.moveTo(t1.x, t1.y);
+                ctx.lineTo(t2.x, t2.y);
+                ctx.lineTo(b2.x, b2.y);
+                ctx.lineTo(b1.x, b1.y);
+                ctx.closePath();
+                ctx.fill();
+            }
+        };
+
+        /* 桌腿/侧壁（从上到下三层） */
+        drawSideWall(TABLE_HEIGHT, TABLE_HEIGHT - 60, TABLE_RADIUS, TABLE_RADIUS - 10, '#3a2a18');
+        drawSideWall(TABLE_HEIGHT - 60, TABLE_HEIGHT - 110, TABLE_RADIUS - 10, TABLE_RADIUS - 40, '#2a1c0e');
+        drawSideWall(TABLE_HEIGHT - 110, TABLE_HEIGHT - 150, TABLE_RADIUS - 40, TABLE_RADIUS - 90, '#1a120a');
+
+        /* 桌面：大圆多边形，用径向渐变填充 */
+        ctx.save();
+        const grd = ctx.createRadialGradient(cx, cy - 40, 60, cx, cy + 20, 700);
+        grd.addColorStop(0, '#3ea370');
+        grd.addColorStop(0.35, '#237a4a');
+        grd.addColorStop(0.7, '#145233');
+        grd.addColorStop(1, '#0a3520');
+
+        ctx.beginPath();
+        let started = false;
+        for (let i = 0; i <= segs; i++) {
+            const a = (i / segs) * Math.PI * 2;
+            const p = cam.project(TABLE_RADIUS * Math.cos(a), TABLE_HEIGHT, TABLE_RADIUS * Math.sin(a));
+            if (!p) { started = false; continue; }
+            if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+            else ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        /* 桌面边缘金线 */
+        ctx.strokeStyle = 'rgba(255,215,64,.35)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        /* 内圈装饰线 */
+        ctx.strokeStyle = 'rgba(255,235,170,.14)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        started = false;
+        for (let i = 0; i <= segs; i++) {
+            const a = (i / segs) * Math.PI * 2;
+            const r = TABLE_RADIUS - 40;
+            const p = cam.project(r * Math.cos(a), TABLE_HEIGHT + 0.5, r * Math.sin(a));
+            if (!p) { started = false; continue; }
+            if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+            else ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        /* 中央水印（用投影定位） */
+        const centerP = cam.project(0, TABLE_HEIGHT + 1, 0);
+        if (centerP) {
+            ctx.save();
+            ctx.globalAlpha = 0.10;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${Math.max(40, 130 * centerP.scale)}px "Microsoft YaHei","PingFang SC",sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('斗', centerP.x, centerP.y);
+            ctx.restore();
+        }
+    }
+
+    /* —— 座位区（每家出牌位置） —— */
+    _drawSeatZones(ctx) {
+        const cam = this.camera;
+        const zones = [
+            { pid: 0, x: SEAT_PLAYER.x, z: SEAT_PLAYER.z - 100 },
+            { pid: 1, x: SEAT_AI1.x,    z: SEAT_AI1.z - 130 },
+            { pid: 2, x: SEAT_AI2.x,    z: SEAT_AI2.z - 130 }
+        ];
+        for (const zone of zones) {
+            const cards = this.tableCards[zone.pid];
+            const passed = this.tablePassed[zone.pid];
+
+            if (cards && cards.length) {
+                this._drawCards3D(ctx, cards, zone.x, 30, zone.z, 0, true);
+            } else if (passed) {
+                const p = cam.project(zone.x, 60, zone.z);
+                if (!p) continue;
+                const scale = Math.max(0.4, Math.min(2.2, p.scale));
+                ctx.save();
+                ctx.font = `bold ${20 * scale}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                const tw = ctx.measureText(this.t('pass')).width;
+                ctx.fillStyle = 'rgba(0,0,0,.5)';
+                this._roundRect(ctx, p.x - tw / 2 - 18 * scale, p.y - 20 * scale,
+                                tw + 36 * scale, 40 * scale, 20 * scale);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(200,210,230,.45)';
+                ctx.lineWidth = 1.6 * scale;
+                this._roundRect(ctx, p.x - tw / 2 - 18 * scale, p.y - 20 * scale,
+                                tw + 36 * scale, 40 * scale, 20 * scale);
+                ctx.stroke();
+                ctx.fillStyle = '#dce4f4';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.t('pass'), p.x, p.y);
+                ctx.restore();
+            }
+
+            /* 思考中提示 */
+            if (this.thinkingPid === zone.pid && this.state === 'playing') {
+                const p = cam.project(zone.x, 130, zone.z);
+                if (p) {
+                    const dots = '.'.repeat(1 + (Math.floor(this._tick / 18) % 3));
+                    const label = this.t('thinking') + dots;
+                    const scale = Math.max(0.5, Math.min(1.8, p.scale));
+                    ctx.save();
+                    ctx.font = `bold ${14 * scale}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                    const tw = ctx.measureText(label).width;
+                    ctx.fillStyle = 'rgba(20,40,70,.9)';
+                    this._roundRect(ctx, p.x - tw / 2 - 14 * scale, p.y - 12 * scale,
+                                    tw + 28 * scale, 24 * scale, 12 * scale);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,215,64,.55)';
+                    ctx.lineWidth = 1 * scale;
+                    this._roundRect(ctx, p.x - tw / 2 - 14 * scale, p.y - 12 * scale,
+                                    tw + 28 * scale, 24 * scale, 12 * scale);
+                    ctx.stroke();
+                    ctx.fillStyle = '#ffd740';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(label, p.x, p.y);
+                    ctx.restore();
+                }
+            }
+        }
+    }
+
+    /* —— 3D 卡牌批量绘制 —— */
+    _drawCards3D(ctx, cards, cx, cy, cz, rotation, faceUp) {
+        const cam = this.camera;
+        const n = cards.length;
+        if (!n) return;
+        /* 沿横排均匀分布 */
+        const spacing = CARD_W_3D * 0.42;
+        const totalW = (n - 1) * spacing + CARD_W_3D;
+        const startX = cx - totalW / 2 + CARD_W_3D / 2;
+
+        /* 深度排序（远的先画） */
+        const sorted = [];
+        for (let i = 0; i < n; i++) {
+            const wx = startX + i * spacing;
+            const p = cam.project(wx, cy, cz);
+            sorted.push({
+                card: cards[i],
+                wx, wy: cy, wz: cz,
+                depth: p ? p.depth : 99999,
+                idx: i
+            });
+        }
+        sorted.sort((a, b) => b.depth - a.depth);
+
+        for (const item of sorted) {
+            this._drawCard3D(ctx, item.card, item.wx, item.wy, item.wz,
+                             rotation, faceUp || item.card.faceUp);
+        }
+    }
+
+    /* —— 单张 3D 卡牌 —— */
+    _drawCard3D(ctx, card, cx, cy, cz, rotation, faceUp) {
+        const cam = this.camera;
+        const halfW = CARD_W_3D / 2;
+        const halfH = CARD_H_3D / 2;
+
+        /* 牌平躺，局部坐标：x 沿 rotation 方向，z 垂直 */
+        const cosR = Math.cos(rotation), sinR = Math.sin(rotation);
+        const localCorners = [
+            [-halfW, 0, -halfH],
+            [ halfW, 0, -halfH],
+            [ halfW, 0,  halfH],
+            [-halfW, 0,  halfH]
+        ];
+
+        const screenPts = [];
+        for (const [lx, ly, lz] of localCorners) {
+            const rx = lx * cosR - lz * sinR;
+            const rz = lx * sinR + lz * cosR;
+            const p = cam.project(cx + rx, cy + ly, cz + rz);
+            if (!p) return;
+            screenPts.push(p);
+        }
+
+        /* 裁剪：所有点必须在视锥内 */
+        const centerP = cam.project(cx, cy, cz);
+        if (!centerP) return;
+        if (centerP.x < -200 || centerP.x > CANVAS_WIDTH + 200 ||
+            centerP.y < -200 || centerP.y > CANVAS_HEIGHT + 200) return;
+
+        ctx.save();
+
+        /* 阴影 */
+        ctx.fillStyle = 'rgba(0,0,0,.35)';
+        ctx.beginPath();
+        ctx.moveTo(screenPts[0].x, screenPts[0].y);
+        for (let i = 1; i < 4; i++) ctx.lineTo(screenPts[i].x, screenPts[i].y);
+        ctx.closePath();
+        ctx.fill();
+
+        /* 用 4 点投影得到的包围盒宽度估算缩放 */
+        const bx = Math.max(screenPts[0].x, screenPts[1].x, screenPts[2].x, screenPts[3].x) -
+                   Math.min(screenPts[0].x, screenPts[1].x, screenPts[2].x, screenPts[3].x);
+        const by = Math.max(screenPts[0].y, screenPts[1].y, screenPts[2].y, screenPts[3].y) -
+                   Math.min(screenPts[0].y, screenPts[1].y, screenPts[2].y, screenPts[3].y);
+
+        /* 用仿射近似：把牌绘制到屏幕空间，中心在投影位置 */
+        const screenW = Math.max(bx, 6);
+        const screenH = Math.max(by, 8);
+
+        /* 内容缩放（保持纵横比） */
+        const drawW = screenW;
+        const drawH = screenH;
+
+        ctx.translate(centerP.x, centerP.y);
+
+        /* 正面填充 */
+        if (faceUp) {
+            const g = ctx.createLinearGradient(0, -drawH / 2, 0, drawH / 2);
+            g.addColorStop(0, '#fdfcf8');
+            g.addColorStop(1, '#efe9da');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, -drawW / 2, -drawH / 2, drawW, drawH, Math.min(drawW, drawH) * 0.08);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,.22)';
+            ctx.lineWidth = Math.max(0.8, drawW * 0.008);
+            this._roundRect(ctx, -drawW / 2, -drawH / 2, drawW, drawH, Math.min(drawW, drawH) * 0.08);
+            ctx.stroke();
+
+            /* 内容 */
+            const color = card.isRed ? '#d02a2a' : '#1b1f28';
+            const fontSize = drawW * 0.26;
+            ctx.fillStyle = color;
+            ctx.font = `bold ${fontSize}px "Microsoft YaHei","PingFang SC",sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            const rankText = card.displayRank;
+            const suitText = card.suit === SUIT_JOKER ? '★' : card.displaySuit;
+
+            /* 左上角 */
+            if (card.suit === SUIT_JOKER) {
+                const jcolor = card.rank === 17 ? '#d02a2a' : '#3a3f4a';
+                ctx.fillStyle = jcolor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = `bold ${drawW * 0.32}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                ctx.fillText(card.rank === 17 ? '大' : '小', 0, -drawH * 0.08);
+                ctx.font = `bold ${drawW * 0.16}px "Segoe UI",sans-serif`;
+                ctx.fillStyle = jcolor;
+                ctx.fillText('JOKER', 0, drawH * 0.22);
+            } else {
+                ctx.fillStyle = color;
+                ctx.font = `bold ${fontSize}px "Microsoft YaHei","PingFang SC",sans-serif`;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillText(rankText, -drawW / 2 + drawW * 0.08, -drawH / 2 + drawH * 0.24);
+                ctx.font = `${fontSize * 0.78}px "Segoe UI Symbol",serif`;
+                ctx.fillText(suitText, -drawW / 2 + drawW * 0.08, -drawH / 2 + drawH * 0.42);
+                /* 中央大花色 */
+                ctx.font = `${fontSize * 1.7}px "Segoe UI Symbol",serif`;
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = 0.9;
+                ctx.fillText(suitText, 0, drawH * 0.12);
+                ctx.globalAlpha = 1;
+            }
+        } else {
+            /* 背面 */
+            const g = ctx.createLinearGradient(-drawW / 2, -drawH / 2, drawW / 2, drawH / 2);
+            g.addColorStop(0, '#3f6ad4');
+            g.addColorStop(0.5, '#2a4ba8');
+            g.addColorStop(1, '#16295e');
+            ctx.fillStyle = g;
+            this._roundRect(ctx, -drawW / 2, -drawH / 2, drawW, drawH, Math.min(drawW, drawH) * 0.08);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(180,205,255,.5)';
+            ctx.lineWidth = Math.max(0.8, drawW * 0.008);
+            this._roundRect(ctx, -drawW / 2, -drawH / 2, drawW, drawH, Math.min(drawW, drawH) * 0.08);
+            ctx.stroke();
+
+            /* 内框 */
+            ctx.strokeStyle = 'rgba(200,225,255,.55)';
+            ctx.lineWidth = Math.max(0.6, drawW * 0.006);
+            this._roundRect(ctx, -drawW / 2 + drawW * 0.1, -drawH / 2 + drawH * 0.08,
+                            drawW * 0.8, drawH * 0.84, Math.min(drawW, drawH) * 0.06);
+            ctx.stroke();
+
+            /* 中央菱形 */
+            ctx.fillStyle = 'rgba(140,180,255,.5)';
+            ctx.beginPath();
+            ctx.moveTo(0, -drawH * 0.16);
+            ctx.lineTo(drawW * 0.18, 0);
+            ctx.lineTo(0, drawH * 0.16);
+            ctx.lineTo(-drawW * 0.18, 0);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+
+    /* —— 3D 玩家（玩家 + AI 人物模型） —— */
+    _drawPlayers3D(ctx) {
+        const cam = this.camera;
+
+        /* 玩家自己 */
+        if (!this.deadPlayers[0]) {
+            this._drawCharacter(ctx, SEAT_PLAYER.x, SEAT_PLAYER.z, 0, false, '你');
+        }
+
+        /* AI 1 */
+        this._drawCharacter(ctx, SEAT_AI1.x, SEAT_AI1.z, 1, this.deadPlayers[1], 'AI 1');
+        /* AI 2 */
+        this._drawCharacter(ctx, SEAT_AI2.x, SEAT_AI2.z, 2, this.deadPlayers[2], 'AI 2');
+
+        /* AI 手牌（3D 世界中的牌） */
+        if (!this.deadPlayers[1]) this._drawAIHand3D(ctx, 1, SEAT_AI1.x, SEAT_AI1.z);
+        if (!this.deadPlayers[2]) this._drawAIHand3D(ctx, 2, SEAT_AI2.x, SEAT_AI2.z);
+
+        /* 底牌（桌面中央） */
+        if (this.landlordCards.length) {
+            const n = this.landlordCards.length;
+            const spacing = CARD_W_3D * 0.4;
+            const totalW = (n - 1) * spacing + CARD_W_3D;
+            const startX = -totalW / 2 + CARD_W_3D / 2;
+            for (let i = 0; i < n; i++) {
+                const c = this.landlordCards[i];
+                this._drawCard3D(ctx, c, startX + i * spacing, TABLE_HEIGHT + 2, 80, 0, c.faceUp);
+            }
+        }
+    }
+
+    _drawCharacter(ctx, x, z, pid, isDead, name) {
+        const cam = this.camera;
+
+        /* 身子（圆柱，用两个圆环近似） */
+        const headY = 130;
+        const bodyH = 100;
+
+        /* 身体多边形 */
+        const bodyTop = cam.project(x, headY - 40, z);
+        const bodyBot = cam.project(x, headY - 40 - bodyH, z);
+        if (!bodyTop || !bodyBot) return;
+        const scale = Math.max(0.4, Math.min(2.5, bodyTop.scale));
+
+        /* 身体 */
+        ctx.save();
+        const bg = ctx.createLinearGradient(bodyTop.x, bodyTop.y, bodyBot.x, bodyBot.y);
+        if (isDead) {
+            bg.addColorStop(0, '#3a3a3e');
+            bg.addColorStop(1, '#1a1a1e');
+        } else {
+            bg.addColorStop(0, pid === 0 ? '#4a7a5e' : (pid === 1 ? '#3a5a8a' : '#7a4a5a'));
+            bg.addColorStop(1, pid === 0 ? '#2a4a3e' : (pid === 1 ? '#1a2a4a' : '#4a2a3a'));
+        }
+        ctx.fillStyle = bg;
+        const wTop = 32 * scale, wBot = 44 * scale;
+        ctx.beginPath();
+        ctx.moveTo(bodyTop.x - wTop, bodyTop.y);
+        ctx.lineTo(bodyTop.x + wTop, bodyTop.y);
+        ctx.lineTo(bodyBot.x + wBot, bodyBot.y);
+        ctx.lineTo(bodyBot.x - wBot, bodyBot.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,.4)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        /* 头 */
+        const headP = cam.project(x, headY, z);
+        if (headP) {
+            const hr = 24 * headP.scale;
+            const hg = ctx.createRadialGradient(headP.x - hr * 0.3, headP.y - hr * 0.3, hr * 0.1, headP.x, headP.y, hr);
+            if (isDead) { hg.addColorStop(0, '#5a5a5e'); hg.addColorStop(1, '#2a2a2e'); }
+            else { hg.addColorStop(0, '#f0d5b0'); hg.addColorStop(1, '#b08868'); }
+            ctx.fillStyle = hg;
+            ctx.beginPath();
+            ctx.arc(headP.x, headP.y, hr, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,.35)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            /* 名牌 */
+            ctx.font = `bold ${14 * Math.max(0.5, Math.min(1.6, headP.scale))}px "Microsoft YaHei","PingFang SC",sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const nameY = headP.y - hr - 14 * headP.scale;
+            ctx.fillStyle = 'rgba(0,0,0,.6)';
+            const tw = ctx.measureText(name).width;
+            this._roundRect(ctx, headP.x - tw / 2 - 12 * headP.scale, nameY - 12 * headP.scale,
+                            tw + 24 * headP.scale, 24 * headP.scale, 12 * headP.scale);
+            ctx.fill();
+            ctx.fillStyle = isDead ? '#a08080' : (this.landlordId === pid ? '#ffd740' : '#dce8fa');
+            ctx.fillText(name, headP.x, nameY);
+
+            /* 地主标记 */
+            if (this.landlordId === pid && !isDead) {
+                const iconY = nameY - 26 * headP.scale;
+                ctx.font = `${18 * headP.scale}px "Segoe UI Symbol",sans-serif`;
+                ctx.fillStyle = '#ffd740';
+                ctx.shadowColor = '#ffd740';
+                ctx.shadowBlur = 14;
+                ctx.fillText('👑', headP.x, iconY);
+                ctx.shadowBlur = 0;
+            }
+
+            /* 已淘汰标记 */
+            if (isDead) {
+                ctx.font = `bold ${22 * headP.scale}px sans-serif`;
+                ctx.fillStyle = '#ff5050';
+                ctx.shadowColor = '#a02020';
+                ctx.shadowBlur = 12;
+                ctx.fillText('✕', headP.x, headP.y);
+                ctx.shadowBlur = 0;
+            }
+
+            /* 当前回合指示 */
+            if (!isDead && this.currentPlayer === pid &&
+                (this.state === 'playing' || this.state === 'calling' || this.state === 'grabbing')) {
+                const pulse = 0.5 + 0.5 * Math.sin(this._tick / 12);
+                ctx.strokeStyle = `rgba(255,215,64,${0.5 + pulse * 0.5})`;
+                ctx.lineWidth = 3 * Math.max(0.6, Math.min(1.6, headP.scale));
+                ctx.shadowColor = '#ffd740';
+                ctx.shadowBlur = 16;
+                ctx.beginPath();
+                ctx.arc(headP.x, headP.y, hr + 8 * headP.scale, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+        }
+        ctx.restore();
+    }
+
+    /* —— AI 手牌（3D 世界里扇形排列） —— */
+    _drawAIHand3D(ctx, pid, seatX, seatZ) {
+        const hand = this.playersHand[pid];
+        const n = hand.length;
+        if (!n) return;
+
+        /* 玩家是否走到该 AI 后面窥视 */
+        const peeking = this.peekingAI === pid;
+
+        /* 手牌在 AI 和桌子之间，面朝 AI 的方向 */
+        /* 简化：手牌平放在 AI 面前，面向桌子中心 */
+        const faceAngle = Math.atan2(0 - seatX, 0 - seatZ);
+        const handDist = 130;
+        const handX = seatX + Math.sin(faceAngle) * handDist;
+        const handZ = seatZ + Math.cos(faceAngle) * handDist;
+
+        /* 扇形展开 */
+        const spread = Math.min(Math.PI * 0.55, n * 0.10);
+        const spacing = CARD_W_3D * 0.32;
+        const totalW = (n - 1) * spacing + CARD_W_3D;
+
+        const cam = this.camera;
+        const items = [];
+        for (let i = 0; i < n; i++) {
+            const card = hand[i];
+            const t = n > 1 ? (i - (n - 1) / 2) : 0;
+            const localAngle = t * (spread / Math.max(1, n - 1)) * 2;
+
+            /* 沿垂直方向偏移 */
+            const offX = -Math.sin(faceAngle) * 0 + Math.cos(faceAngle) * (i - (n - 1) / 2) * spacing;
+            const offZ = -Math.sin(faceAngle) * (i - (n - 1) / 2) * spacing;
+
+            const wx = handX + offX;
+            const wz = handZ + offZ;
+            const wy = TABLE_HEIGHT + 2;
+
+            const p = cam.project(wx, wy, wz);
+            items.push({
+                card, wx, wy, wz,
+                rotation: faceAngle,
+                depth: p ? p.depth : 99999,
+                faceUp: peeking || card.faceUp
+            });
+        }
+        items.sort((a, b) => b.depth - a.depth);
+        for (const item of items) {
+            this._drawCard3D(ctx, item.card, item.wx, item.wy, item.wz, item.rotation, item.faceUp);
+        }
+    }
+
+    /* —— 击毙特效 —— */
+    _drawShotEffects(ctx) {
+        const cam = this.camera;
+        for (const eff of this.shotEffects) {
+            const progress = 1 - eff.t / eff.maxT;
+            const alpha = Math.max(0, 1 - progress);
+            const worldR = 40 + progress * 160;
+
+            const p = cam.project(eff.x, eff.y, eff.z);
+            if (!p) continue;
+            const r = worldR * p.scale;
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = '#ffaa00';
+            ctx.lineWidth = 5 * (1 - progress) + 1;
+            ctx.shadowColor = '#ff8020';
+            ctx.shadowBlur = 24;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+            const g = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, r * 0.55);
+            g.addColorStop(0, `rgba(255,220,120,${alpha})`);
+            g.addColorStop(0.4, `rgba(255,80,40,${alpha * 0.7})`);
+            g.addColorStop(1, 'rgba(180,20,20,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r * 0.55, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffdd55';
+            ctx.lineWidth = 2.5;
+            for (let a = 0; a < 360; a += 45) {
+                const rad = a * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(p.x + Math.cos(rad) * r * 0.7, p.y + Math.sin(rad) * r * 0.7);
+                ctx.lineTo(p.x + Math.cos(rad) * r * 1.18, p.y + Math.sin(rad) * r * 1.18);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+    }
+
+    /* ══════════════════════════════════════════
+       HUD 层（玩家手牌 + 按钮）
+       ══════════════════════════════════════════ */
+    _drawHUD(ctx) {
+        /* 玩家手牌 */
+        for (const c of this.playersHand[0]) c.drawHUD(ctx, this.lang);
+
+        /* 玩家标签 */
+        this._drawPlayerLabel(ctx);
+
+        /* 提示 */
+        this._drawMessage(ctx);
+
+        /* 标题 */
+        this._drawTitle(ctx);
+
+        /* 按钮 */
+        this._drawButtons(ctx);
+
+        /* 窥视提示 */
+        if (this.peekingAI >= 0) {
+            ctx.save();
+            ctx.font = 'bold 16px "Microsoft YaHei","PingFang SC",sans-serif';
+            const txt = this.t('peeking') + ' AI ' + this.peekingAI;
+            const tw = ctx.measureText(txt).width;
+            const bx = CANVAS_WIDTH / 2 - tw / 2 - 22;
+            const by = 46;
+            ctx.fillStyle = 'rgba(40,20,80,.82)';
+            this._roundRect(ctx, bx, by, tw + 44, 34, 17);
+            ctx.fill();
+            ctx.strokeStyle = '#a080ff';
+            ctx.lineWidth = 1.6;
+            this._roundRect(ctx, bx, by, tw + 44, 34, 17);
+            ctx.stroke();
+            ctx.fillStyle = '#c8b0ff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, CANVAS_WIDTH / 2, by + 17);
+            ctx.restore();
+        }
+    }
+
+    _drawPlayerLabel(ctx) {
+        const name = this.t('you') + (this.landlordId === 0 ? ' · ' + this.t('landlord') : '');
+        const cnt = this.playersHand[0].length + this.t('cards_count');
+        const text = `${name}   ${cnt}`;
+        ctx.font = 'bold 15px "Microsoft YaHei","PingFang SC",sans-serif';
+        const tw = ctx.measureText(text).width;
+        const bx = CANVAS_WIDTH / 2 - tw / 2 - 18;
+        const by = CANVAS_HEIGHT - 168;
+
+        ctx.fillStyle = 'rgba(8,16,30,.78)';
+        this._roundRect(ctx, bx, by, tw + 36, 28, 14);
+        ctx.fill();
+        ctx.strokeStyle = this.landlordId === 0 ? 'rgba(255,215,64,.6)' : 'rgba(120,165,235,.32)';
+        ctx.lineWidth = 1.2;
+        this._roundRect(ctx, bx, by, tw + 36, 28, 14);
+        ctx.stroke();
+
+        ctx.fillStyle = this.landlordId === 0 ? '#ffd740' : '#dce8fa';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, CANVAS_WIDTH / 2, by + 15);
+
+        if (this.currentPlayer === 0 && this.state === 'playing') {
+            const pulse = 0.45 + 0.55 * Math.abs(Math.sin(this._tick / 22));
+            ctx.save();
+            ctx.globalAlpha = pulse;
+            ctx.strokeStyle = '#ffd740';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#ffd740';
+            ctx.shadowBlur = 16;
+            this._roundRect(ctx, bx, by, tw + 36, 28, 14);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    _drawTitle(ctx) {
+        if (this.state === 'idle' || this.state === 'ended') {
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 34px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.fillStyle = 'rgba(255,190,20,.25)';
+            ctx.fillText(this.t('title'), CANVAS_WIDTH / 2 + 2, 102);
+            const g = ctx.createLinearGradient(0, 72, 0, 110);
+            g.addColorStop(0, '#fff4c4');
+            g.addColorStop(0.5, '#ffd740');
+            g.addColorStop(1, '#dfa200');
+            ctx.fillStyle = g;
+            ctx.shadowColor = 'rgba(255,200,40,.6)';
+            ctx.shadowBlur = 22;
+            ctx.fillText(this.t('title'), CANVAS_WIDTH / 2, 100);
+            ctx.restore();
+        }
+    }
+
+    _drawMessage(ctx) {
+        if (!this.message || this.messageTimer <= 0) return;
+        const alpha = this.messageTimer > 9000 ? 1 : Math.min(1, this.messageTimer / 40);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC",sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const tw = ctx.measureText(this.message).width;
+        const bw = tw + 52, bh = 46;
+        const bx = CANVAS_WIDTH / 2 - bw / 2;
+        const by = CANVAS_HEIGHT - 230;
+
+        ctx.shadowColor = 'rgba(0,0,0,.65)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 5;
+        ctx.fillStyle = 'rgba(6,14,26,.88)';
+        this._roundRect(ctx, bx, by, bw, bh, bh / 2);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        const isWin = this.state === 'ended' && (this.message.includes('赢') || this.message.includes('Win'));
+        const isLose = this.state === 'ended' && !isWin;
+        ctx.strokeStyle = isWin ? 'rgba(120,240,150,.85)'
+                       : isLose ? 'rgba(255,120,120,.8)'
+                       : 'rgba(255,215,64,.68)';
+        ctx.lineWidth = 2;
+        this._roundRect(ctx, bx, by, bw, bh, bh / 2);
+        ctx.stroke();
+
+        const tg = ctx.createLinearGradient(0, by, 0, by + bh);
+        if (isWin) { tg.addColorStop(0, '#c2ffd8'); tg.addColorStop(1, '#4ce07a'); }
+        else if (isLose) { tg.addColorStop(0, '#ffd6d6'); tg.addColorStop(1, '#ff7b7b'); }
+        else { tg.addColorStop(0, '#fff6cc'); tg.addColorStop(1, '#ffd740'); }
+        ctx.fillStyle = tg;
+        ctx.fillText(this.message, CANVAS_WIDTH / 2, by + bh / 2 + 1);
+        ctx.restore();
+    }
+
+    _button(ctx, x, y, w, h, text, scheme) {
+        const hover = this._mouseX >= x && this._mouseX <= x + w &&
+                      this._mouseY >= y && this._mouseY <= y + h;
+        const s = hover ? 1.035 : 1;
+        const cx = x + w / 2, cy = y + h / 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(s, s);
+        ctx.translate(-w / 2, -h / 2);
+
+        ctx.shadowColor = scheme.glow || 'rgba(0,0,0,.5)';
+        ctx.shadowBlur = hover ? 24 : 12;
+        ctx.shadowOffsetY = 5;
+
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, hover ? scheme.topHover : scheme.top);
+        g.addColorStop(1, hover ? scheme.botHover : scheme.bot);
+        ctx.fillStyle = g;
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.fill();
+
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+
+        ctx.save();
+        ctx.beginPath();
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.clip();
+        const hg = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+        hg.addColorStop(0, 'rgba(255,255,255,.3)');
+        hg.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = hg;
+        ctx.fillRect(0, 0, w, h * 0.55);
+        ctx.restore();
+
+        ctx.strokeStyle = scheme.border || 'rgba(255,255,255,.5)';
+        ctx.lineWidth = 2;
+        this._roundRect(ctx, 0, 0, w, h, 12);
+        ctx.stroke();
+
+        if (text) {
+            ctx.fillStyle = scheme.textColor || '#ffffff';
+            ctx.font = 'bold 17px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,.35)';
+            ctx.shadowBlur = 3;
+            ctx.fillText(text, w / 2, h / 2 + 1);
+        }
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+    }
+
+    _drawGunIcon(ctx, cx, cy, scale, color) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = color;
+        ctx.fillRect(-20, -7, 30, 8);
+        ctx.fillRect(-10, -11, 18, 4);
+        ctx.fillRect(2, -14, 4, 3);
+        ctx.fillRect(-12, 1, 18, 4);
+        ctx.beginPath();
+        ctx.moveTo(-11, 5);
+        ctx.lineTo(-2, 5);
+        ctx.lineTo(-6, 17);
+        ctx.lineTo(-15, 17);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(-5, 6, 3.6, 0.15, Math.PI - 0.15);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    _drawButtons(ctx) {
+        this._playBtnRect = null;
+        this._passBtnRect = null;
+        this._callBtnRect = null;
+        this._noCallBtnRect = null;
+        this._grabBtnRect = null;
+        this._noGrabBtnRect = null;
+        this._startBtnRect = null;
+        this._gunBtnRect = null;
+
+        const BTN_Y = CANVAS_HEIGHT - 62, BTN_H = 46;
+
+        if (this.state === 'playing' && this.currentPlayer === 0) {
+            const selCount = this.playersHand[0].filter(c => c.selected).length;
+            const playLabel = this.t('play') + (selCount ? ` (${selCount})` : '');
+            const pw = 136, px = CANVAS_WIDTH / 2 - pw - 12;
+            this._button(ctx, px, BTN_Y, pw, BTN_H, playLabel, {
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#7cc0fc', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.6)'
+            });
+            this._playBtnRect = { x: px, y: BTN_Y, w: pw, h: BTN_H };
+
+            if (this.lastPlayInfo) {
+                const pw2 = 100, px2 = CANVAS_WIDTH / 2 + 12;
+                this._button(ctx, px2, BTN_Y, pw2, BTN_H, this.t('pass'), {
+                    top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                    border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
+                });
+                this._passBtnRect = { x: px2, y: BTN_Y, w: pw2, h: BTN_H };
+            }
+        }
+
+        if (this.state === 'calling' && this.callCurrent === 0) {
+            const cw = 152, ch = 48, cx = CANVAS_WIDTH / 2 - cw - 12;
+            this._button(ctx, cx, BTN_Y, cw, ch, this.t('call_landlord'), {
+                top: '#5aa9f5', bot: '#2d6fc0', topHover: '#7cc0fc', botHover: '#3d84d8',
+                border: 'rgba(200,230,255,.7)', glow: 'rgba(70,150,255,.6)'
+            });
+            this._callBtnRect = { x: cx, y: BTN_Y, w: cw, h: ch };
+
+            const ncw = 112, ncx = CANVAS_WIDTH / 2 + 12;
+            this._button(ctx, ncx, BTN_Y, ncw, ch, this.t('no_call'), {
+                top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
+            });
+            this._noCallBtnRect = { x: ncx, y: BTN_Y, w: ncw, h: ch };
+        }
+
+        if (this.state === 'grabbing' && this.grabCurrent === 0) {
+            const gw = 152, gh = 48, gx = CANVAS_WIDTH / 2 - gw - 12;
+            this._button(ctx, gx, BTN_Y, gw, gh, this.t('grab_landlord'), {
+                top: '#f2685a', bot: '#bb3225', topHover: '#ff8a7c', botHover: '#d24334',
+                border: 'rgba(255,210,150,.85)', glow: 'rgba(230,80,60,.6)'
+            });
+            this._grabBtnRect = { x: gx, y: BTN_Y, w: gw, h: gh };
+
+            const ngw = 112, ngx = CANVAS_WIDTH / 2 + 12;
+            this._button(ctx, ngx, BTN_Y, ngw, gh, this.t('no_grab'), {
+                top: '#e8a04c', bot: '#b06725', topHover: '#f7ba70', botHover: '#c47c36',
+                border: 'rgba(255,225,180,.6)', glow: 'rgba(230,150,60,.55)'
+            });
+            this._noGrabBtnRect = { x: ngx, y: BTN_Y, w: ngw, h: gh };
+        }
+
+        if (this.state === 'idle' || this.state === 'ended') {
+            const sw = 200, sh = 58;
+            const sx = CANVAS_WIDTH / 2 - sw / 2;
+            const sy = CANVAS_HEIGHT / 2 + 100;
+            const key = this.state === 'ended' ? 'restart' : 'start';
+
+            const pulse = 0.5 + 0.5 * Math.sin(this._tick / 26);
+            ctx.save();
+            ctx.globalAlpha = 0.25 + pulse * 0.4;
+            ctx.shadowColor = '#ffd740';
+            ctx.shadowBlur = 30;
+            ctx.strokeStyle = 'rgba(255,215,64,.95)';
+            ctx.lineWidth = 2;
+            this._roundRect(ctx, sx - 5, sy - 5, sw + 10, sh + 10, 18);
+            ctx.stroke();
+            ctx.restore();
+
+            this._button(ctx, sx, sy, sw, sh, '', {
+                top: '#ffd45e', bot: '#d99a10', topHover: '#ffe283', botHover: '#eba91c',
+                border: 'rgba(255,250,210,.9)', glow: 'rgba(255,200,50,.7)'
+            });
+
+            ctx.save();
+            ctx.fillStyle = '#3a2600';
+            ctx.font = 'bold 21px "Microsoft YaHei","PingFang SC",sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.t(key), sx + sw / 2, sy + sh / 2 + 1);
+            ctx.restore();
+            ctx.textAlign = 'start';
+            ctx.textBaseline = 'alphabetic';
+
+            this._startBtnRect = { x: sx, y: sy, w: sw, h: sh };
+        }
+
+        this._drawGunButton(ctx);
+        this._drawGear(ctx);
+    }
+
+    _drawGunButton(ctx) {
+        const gw = 84, gh = 72;
+        const gx = CANVAS_WIDTH - 100;
+        const gy = CANVAS_HEIGHT - 160;
+        const used = this.gunUsed;
+        const hover = !used && this._mouseX >= gx && this._mouseX <= gx + gw &&
+                      this._mouseY >= gy && this._mouseY <= gy + gh;
+
+        ctx.save();
+        if (!used && (this.aiming || hover)) {
+            const pulse = 0.5 + 0.5 * Math.sin(this._tick / 10);
+            ctx.globalAlpha = 0.25 + pulse * 0.4;
+            ctx.shadowColor = this.aiming ? '#ff3030' : '#ffd740';
+            ctx.shadowBlur = 26;
+            ctx.fillStyle = this.aiming ? 'rgba(255,60,60,.5)' : 'rgba(255,215,64,.4)';
+            this._roundRect(ctx, gx - 4, gy - 4, gw + 8, gh + 8, 16);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+        }
+        const bg = ctx.createLinearGradient(gx, gy, gx, gy + gh);
+        if (used) {
+            bg.addColorStop(0, 'rgba(38,38,42,.92)');
+            bg.addColorStop(1, 'rgba(20,20,24,.92)');
+        } else if (this.aiming) {
+            bg.addColorStop(0, 'rgba(150,20,20,.95)');
+            bg.addColorStop(1, 'rgba(90,10,10,.95)');
+        } else if (hover) {
+            bg.addColorStop(0, 'rgba(90,60,20,.95)');
+            bg.addColorStop(1, 'rgba(60,38,12,.95)');
+        } else {
+            bg.addColorStop(0, 'rgba(52,36,18,.9)');
+            bg.addColorStop(1, 'rgba(30,20,10,.9)');
+        }
+        ctx.fillStyle = bg;
+        this._roundRect(ctx, gx, gy, gw, gh, 14);
+        ctx.fill();
+        ctx.strokeStyle = used ? 'rgba(120,120,130,.5)'
+                       : this.aiming ? '#ff5050' : '#ffd740';
+        ctx.lineWidth = this.aiming ? 2.8 : 2.2;
+        this._roundRect(ctx, gx, gy, gw, gh, 14);
+        ctx.stroke();
+        const iconColor = used ? 'rgba(120,120,130,.55)'
+                        : this.aiming ? '#ffb0b0'
+                        : hover ? '#ffe98c' : '#ffd740';
+        this._drawGunIcon(ctx, gx + gw / 2, gy + gh / 2 - 8, 1.55, iconColor);
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
+        if (used) {
+            ctx.fillStyle = 'rgba(160,160,170,.75)';
+            ctx.fillText(this.t('gun_used'), gx + gw / 2, gy + gh - 12);
+        } else if (this.aiming) {
+            ctx.fillStyle = '#ffb0b0';
+            ctx.fillText('瞄准中…', gx + gw / 2, gy + gh - 12);
+        } else {
+            ctx.fillStyle = '#ffd740';
+            ctx.fillText(this.t('gun_ready'), gx + gw / 2, gy + gh - 12);
+        }
+        if (used) {
+            ctx.strokeStyle = 'rgba(200,60,60,.7)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(gx + 14, gy + 14);
+            ctx.lineTo(gx + gw - 14, gy + gh - 14);
+            ctx.stroke();
+        }
+        ctx.restore();
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+        this._gunBtnRect = { x: gx, y: gy, w: gw, h: gh };
+    }
+
+    _drawGear(ctx) {
+        const gx = CANVAS_WIDTH - 46, gy = 42, r = 22;
+        const hover = Math.hypot(this._mouseX - gx, this._mouseY - gy) < r;
+        ctx.save();
+        const g = ctx.createRadialGradient(gx - 6, gy - 8, 3, gx, gy, r);
+        if (hover) { g.addColorStop(0, '#5f8bc9'); g.addColorStop(1, '#2f5488'); }
+        else { g.addColorStop(0, '#2c3f5c'); g.addColorStop(1, '#16202f'); }
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(gx, gy, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = hover ? '#ffd740' : 'rgba(150,180,225,.42)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.strokeStyle = hover ? '#ffd740' : '#b8cae4';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(gx, gy, 6.5, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let a = 0; a < 360; a += 45) {
+            const rad = a * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(gx + Math.cos(rad) * 9, gy + Math.sin(rad) * 9);
+            ctx.lineTo(gx + Math.cos(rad) * 14, gy + Math.sin(rad) * 14);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    _drawAimPrompt(ctx) {
+        if (!this.aiming) return;
+        ctx.save();
+        ctx.font = 'bold 18px "Microsoft YaHei","PingFang SC",sans-serif';
+        const text = this.t('aim_prompt');
+        const tw = ctx.measureText(text).width;
+        const bw = tw + 62, bh = 48;
+        const bx = CANVAS_WIDTH / 2 - bw / 2;
+        const by = 100;
+
+        const pulse = 0.5 + 0.5 * Math.sin(this._tick / 8);
+        ctx.shadowColor = `rgba(255,50,50,${0.5 + pulse * 0.5})`;
+        ctx.shadowBlur = 22;
+
+        ctx.fillStyle = 'rgba(80,10,10,.94)';
+        this._roundRect(ctx, bx, by, bw, bh, 24);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = `rgba(255,80,80,${0.6 + pulse * 0.4})`;
+        ctx.lineWidth = 2.5;
+        this._roundRect(ctx, bx, by, bw, bh, 24);
+        ctx.stroke();
+        ctx.fillStyle = '#ffc0c0';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, CANVAS_WIDTH / 2, by + bh / 2 + 1);
+        ctx.restore();
+    }
+
+    _drawCrosshair(ctx) {
+        if (!this.aiming) return;
+        const mx = this._mouseX, my = this._mouseY;
+        if (mx < 0 || my < 0) return;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,60,60,.92)';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = '#ff3030';
+        ctx.shadowBlur = 10;
+        const pulse = 0.5 + 0.5 * Math.sin(this._tick / 6);
+        const r = 20 + pulse * 4;
+        ctx.beginPath();
+        ctx.arc(mx, my, r, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let a = 0; a < 360; a += 90) {
+            const rad = a * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(mx + Math.cos(rad) * (r - 8), my + Math.sin(rad) * (r - 8));
+            ctx.lineTo(mx + Math.cos(rad) * (r + 10), my + Math.sin(rad) * (r + 10));
+            ctx.stroke();
+        }
+        ctx.fillStyle = '#ff3030';
+        ctx.beginPath();
+        ctx.arc(mx, my, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    _roundRect(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+    }
+
+    /* ══════════════════════════════════════════
+       点击处理
+       ══════════════════════════════════════════ */
+    handleClick(pos) {
+        const { x, y } = pos;
+
+        if (Math.hypot(x - (CANVAS_WIDTH - 46), y - 42) < 26) {
+            this.settingsOpen = true;
+            settingsOverlay.classList.add('active');
+            return;
+        }
+
+        const inRect = r => r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
+
+        if (inRect(this._gunBtnRect) && !this.gunUsed && this.state !== 'ended') {
+            this.aiming = !this.aiming;
+            return;
+        }
+
+        if (this.aiming) {
+            /* 用屏幕点击检测是否射中 AI（用 3D 投影后的位置反查） */
+            const targets = [
+                { pid: 1, seat: SEAT_AI1 },
+                { pid: 2, seat: SEAT_AI2 }
+            ];
+            for (const t of targets) {
+                if (this.deadPlayers[t.pid]) continue;
+                const p = this.camera.project(t.seat.x, 130, t.seat.z);
+                if (!p) continue;
+                const dist = Math.hypot(x - p.x, y - p.y);
+                if (dist < 80 * Math.max(0.5, Math.min(2, p.scale))) {
+                    this._shootPlayer(t.pid);
+                    return;
+                }
+            }
+            this.aiming = false;
+            return;
+        }
+
+        if (inRect(this._startBtnRect)) { this.initNewGame(); return; }
+
+        if (inRect(this._callBtnRect)) {
+            this.callScores[0] = 1;
+            this.message = this.t('you') + ' · ' + this.t('call_landlord');
+            this.messageTimer = 60;
+            this._advanceCalling();
+            return;
+        }
+        if (inRect(this._noCallBtnRect)) {
+            this.callScores[0] = 0;
+            this.message = this.t('you') + ' · ' + this.t('no_call');
+            this.messageTimer = 60;
+            this._advanceCalling();
+            return;
+        }
+        if (inRect(this._grabBtnRect)) {
+            const base = Math.max(this.callScores[0], ...this.grabScores);
+            this.grabScores[0] = base + 1;
+            this.message = this.t('you') + ' · ' + this.t('grab_landlord');
+            this.messageTimer = 60;
+            this._advanceGrabbing();
+            return;
+        }
+        if (inRect(this._noGrabBtnRect)) {
+            this.grabScores[0] = 0;
+            this.message = this.t('you') + ' · ' + this.t('no_grab');
+            this.messageTimer = 60;
+            this._advanceGrabbing();
+            return;
+        }
+        if (inRect(this._playBtnRect)) {
+            const sel = this.playersHand[0].filter(c => c.selected);
+            if (sel.length) this.playerPlayCards(sel);
+            else { this.message = this.t('select_cards'); this.messageTimer = 55; }
+            return;
+        }
+        if (inRect(this._passBtnRect)) { this.playerPass(); return; }
+
+        if (this.state === 'playing' && this.currentPlayer === 0) {
+            const h0 = this.playersHand[0];
+            for (let i = h0.length - 1; i >= 0; i--) {
+                if (h0[i].containsPoint(x, y)) {
+                    h0[i].selected = !h0[i].selected;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+/* ══════════════════════════════════════════
+   启动
+   ══════════════════════════════════════════ */
+const game = new Game();
+
+game._updateAIDifficulty = function () {
+    if (this.aiPlayers[1]) this.aiPlayers[1].difficulty = this.difficulty;
+    if (this.aiPlayers[2]) this.aiPlayers[2].difficulty = this.difficulty;
+};
+
+let _lastUISig = '';
+function updateSettingsUI() {
+    const sig = [game.difficulty, game.lang].join('|');
+    if (sig === _lastUISig) return;
+    _lastUISig = sig;
+    diffEasy.classList.toggle('active', game.difficulty === 'easy');
+    diffNormal.classList.toggle('active', game.difficulty === 'normal');
+    diffHard.classList.toggle('active', game.difficulty === 'hard');
+    langZh.classList.toggle('active', game.lang === 'zh');
+    langEn.classList.toggle('active', game.lang === 'en');
+    settingsTitle.textContent = game.t('settings');
+    diffLabel.textContent = game.t('difficulty') + '：';
+    langLabel.textContent = game.t('language') + '：';
+    diffEasy.textContent = game.t('easy');
+    diffNormal.textContent = game.t('normal');
+    diffHard.textContent = game.t('hard');
+    langZh.textContent = game.t('chinese');
+    langEn.textContent = game.t('english');
+}
+
+settingsClose.addEventListener('click', () => {
+    game.settingsOpen = false;
+    settingsOverlay.classList.remove('active');
+});
+settingsOverlay.addEventListener('click', e => {
+    if (e.target === settingsOverlay) {
+        game.settingsOpen = false;
+        settingsOverlay.classList.remove('active');
+    }
+});
+diffEasy.addEventListener('click', () => { game.difficulty = 'easy'; game._updateAIDifficulty(); updateSettingsUI(); });
+diffNormal.addEventListener('click', () => { game.difficulty = 'normal'; game._updateAIDifficulty(); updateSettingsUI(); });
+diffHard.addEventListener('click', () => { game.difficulty = 'hard'; game._updateAIDifficulty(); updateSettingsUI(); });
+langZh.addEventListener('click', () => { game.lang = 'zh'; window._lang = 'zh'; updateSettingsUI(); });
+langEn.addEventListener('click', () => { game.lang = 'en'; window._lang = 'en'; updateSettingsUI(); });
+
+/* ───────── 键盘输入 ───────── */
+document.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (['w','a','s','d','q','e'].includes(k)) {
+        game.keys[k] = true;
+        if (k === 'w' || k === 'a' || k === 's' || k === 'd') e.preventDefault();
+    }
+    if (e.key === 'Escape') {
+        if (game.settingsOpen) {
+            game.settingsOpen = false;
+            settingsOverlay.classList.remove('active');
+        } else if (game.aiming) {
+            game.aiming = false;
+        }
+    }
+    if (e.code === 'Space' && game.state === 'playing' && game.currentPlayer === 0) {
+        e.preventDefault();
+        const sel = game.playersHand[0].filter(c => c.selected);
+        if (sel.length) game.playerPlayCards(sel);
+    }
+    if (k === 'p') {
+        if (game.state === 'playing' && game.currentPlayer === 0 && game.lastPlayInfo) game.playerPass();
+    }
+    if (k === 'g') {
+        if (!game.gunUsed && game.state !== 'ended') game.aiming = !game.aiming;
+    }
+    if (k === 'r') {
+        /* 重置视角 */
+        game.cameraAngle = seatAngle(SEAT_PLAYER);
+        game.cameraRadius = 620;
+        game.cameraHeight = 340;
+        game.updateCameraFromSpherical();
+        game.camera.lookAt(0, 40, 0);
+    }
+});
+document.addEventListener('keyup', e => {
+    const k = e.key.toLowerCase();
+    if (['w','a','s','d','q','e'].includes(k)) game.keys[k] = false;
+});
+
+/* ───────── 鼠标 / 触摸输入 ───────── */
+canvas.addEventListener('mousedown', e => {
+    if (e.button === 0) {
+        game.mouseDrag = true;
+        game.lastMouseX = e.clientX;
+        game.lastMouseY = e.clientY;
+        /* 立即处理点击（不是拖动） */
+        const pos = getCanvasPos(e);
+        game.handleClick(pos);
+    }
+});
+canvas.addEventListener('mousemove', e => {
+    const pos = getCanvasPos(e);
+    game._mouseX = pos.x;
+    game._mouseY = pos.y;
+
+    if (game.mouseDrag) {
+        const dx = e.clientX - game.lastMouseX;
+        const dy = e.clientY - game.lastMouseY;
+        game.camera.yaw += dx * 0.005;
+        game.camera.pitch = clamp(game.camera.pitch - dy * 0.003, -1.2, 1.2);
+        game.lastMouseX = e.clientX;
+        game.lastMouseY = e.clientY;
+    }
+});
+canvas.addEventListener('mouseup', () => { game.mouseDrag = false; });
+canvas.addEventListener('mouseleave', () => {
+    game._mouseX = -999; game._mouseY = -999;
+    game.mouseDrag = false;
+});
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+/* 触摸 */
+let lastTouchDist = 0;
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+        const pos = getCanvasPos(e);
+        game._mouseX = pos.x;
+        game._mouseY = pos.y;
+        game.handleClick(pos);
+        game.mouseDrag = true;
+        game.lastMouseX = e.touches[0].clientX;
+        game.lastMouseY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        lastTouchDist = Math.sqrt(dx * dx + dy * dy);
+    }
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && game.mouseDrag) {
+        const dx = e.touches[0].clientX - game.lastMouseX;
+        const dy = e.touches[0].clientY - game.lastMouseY;
+        game.camera.yaw += dx * 0.005;
+        game.camera.pitch = clamp(game.camera.pitch - dy * 0.003, -1.2, 1.2);
+        game.lastMouseX = e.touches[0].clientX;
+        game.lastMouseY = e.touches[0].clientY;
+        const pos = getCanvasPos(e);
+        game._mouseX = pos.x;
+        game._mouseY = pos.y;
+    } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (lastTouchDist > 0) {
+            const delta = (d - lastTouchDist) * 0.4;
+            const cam = game.camera;
+            const fx = Math.sin(cam.yaw), fz = Math.cos(cam.yaw);
+            cam.x += fx * delta;
+            cam.z += fz * delta;
+        }
+        lastTouchDist = d;
+    }
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    game.mouseDrag = false;
+    lastTouchDist = 0;
+    game._mouseX = -999; game._mouseY = -999;
+}, { passive: false });
+
+/* ───────── 主循环 ───────── */
+function gameLoop() {
+    game.update();
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    game.draw(ctx);
+    updateSettingsUI();
+    canvas.style.cursor = game.aiming ? 'crosshair'
+                       : game.mouseDrag ? 'grabbing' : 'grab';
+    requestAnimationFrame(gameLoop);
+}
+
+game.state = 'idle';
+updateSettingsUI();
+gameLoop();
+
+})();
+</script>
+</body>
+</html>RANK_NAMES_ZH)[this.rank] || String(this.rank);
     }
     get displaySuit() { return SUIT_SYMBOLS[this.suit] || ''; }
 

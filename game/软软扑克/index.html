@@ -151,7 +151,7 @@ const TEXTS = {
         gun_ready:'手枪', gun_used:'已用',
         aim_prompt:'点击机器人面板击毙',
         shot_ok:'击毙成功！',
-        shot_kill_landlord:'地主被击毙！农民获胜！',
+        shot_kill_landlord:'地主已淘汰！继续对战',
         dead:'已淘汰', your_turn:'轮到你出牌',
         gun_tip:'手枪 · 一局一发'
     },
@@ -174,7 +174,7 @@ const TEXTS = {
         gun_ready:'Gun', gun_used:'Used',
         aim_prompt:'Click a robot panel to shoot',
         shot_ok:'Target eliminated!',
-        shot_kill_landlord:'Landlord down! Farmers win!',
+        shot_kill_landlord:'Landlord down! Fight on',
         dead:'Eliminated', your_turn:'Your turn',
         gun_tip:'Gun · one shot per game'
     }
@@ -538,14 +538,21 @@ class AIPlayer {
         return pid !== game.landlordId;
     }
     _getEnemies(game) {
-        if (this.isLandlord) return [0, 1, 2].filter(p => p !== this.playerId);
-        return [game.landlordId].filter(p => p >= 0);
+        if (this.isLandlord) return [0, 1, 2].filter(p => p !== this.playerId && !game.deadPlayers[p]);
+        return [game.landlordId].filter(p => p >= 0 && !game.deadPlayers[p]);
     }
 
     _leadPlay(game) {
         const hand = this.hand;
         const n = hand.length;
         if (n === 1) return [...hand];
+
+        /* 简单模式：只出最小单张，不做任何规划 */
+        if (this.difficulty === 'easy') {
+            const sorted = [...hand].sort((a, b) => a.rank - b.rank);
+            return [sorted[0]];
+        }
+
         const counts = getRankCounts(hand);
         const byRank = {};
         for (const c of hand) (byRank[c.rank] || (byRank[c.rank] = [])).push(c);
@@ -560,10 +567,10 @@ class AIPlayer {
             if (triDesc.length) return byRank[triDesc[0]].slice(0, 3);
             return [byRank[ranksAsc[ranksAsc.length - 1]][0]];
         }
-        if (this.difficulty !== 'easy') {
-            const st = this._findLongestStraight();
-            if (st && st.length >= 5) return st;
-        }
+
+        const st = this._findLongestStraight();
+        if (st && st.length >= 5) return st;
+
         if (this.difficulty === 'hard') {
             const tri = ranksAsc.filter(r => counts[r] === 3);
             if (tri.length && n <= 8) {
@@ -574,15 +581,18 @@ class AIPlayer {
                 if (rem.length === 2 && rem[0].rank === rem[1].rank) return [...tr, ...rem];
             }
         }
+
         const singles = ranksAsc.filter(r => counts[r] === 1);
         if (singles.length) return [byRank[singles[0]][0]];
+
         const pairs = ranksAsc.filter(r => counts[r] === 2 && r <= 15);
         if (pairs.length) return byRank[pairs[0]].slice(0, 2);
+
         const triples = ranksAsc.filter(r => counts[r] === 3);
         if (triples.length) {
             const tr = byRank[triples[0]].slice(0, 3);
             const rem = hand.filter(c => !tr.includes(c));
-            if (rem.length && this.difficulty !== 'easy' && rem.length <= 2) {
+            if (rem.length && rem.length <= 2) {
                 const remSorted = [...rem].sort((a, b) => a.rank - b.rank);
                 return [...tr, remSorted[0]];
             }
@@ -595,15 +605,21 @@ class AIPlayer {
         const enemies = this._getEnemies(game);
         const enemyMin = enemies.length ? Math.min(...enemies.map(p => game.playersHand[p].length)) : 99;
         const desperate = enemyMin <= 2;
+
         const same = this._findBeatingSame(last);
         if (same) {
             const info = analyzeHand(same);
+            /* 拆炸弹去压普通牌：简单 AI 更克制 */
             if (info && info.type === 'bomb' && last.type !== 'bomb' && last.type !== 'rocket') {
-                if (this.difficulty === 'easy') return Math.random() < 0.5 ? same : null;
+                if (this.difficulty === 'easy') {
+                    if (this.hand.length > 3) return null;
+                    return Math.random() < 0.25 ? same : null;
+                }
                 if (!desperate && this.hand.length > 5) return null;
             }
             return same;
         }
+
         const bomb = this._findSmallestBomb();
         if (bomb) {
             const bInfo = analyzeHand(bomb);
@@ -616,6 +632,7 @@ class AIPlayer {
                 if (this.difficulty === 'easy' && Math.random() < 0.12) return bomb;
             }
         }
+
         if (desperate || this.difficulty === 'hard') {
             const rocket = this._findRocket();
             if (rocket) {
@@ -840,7 +857,6 @@ class Game {
         this.messageTimer = 0;
         this.thinkingPid = -1;
 
-        /* —— 手枪 —— */
         this.gunUsed = false;
         this.aiming = false;
         this.deadPlayers = [false, false, false];
@@ -874,7 +890,6 @@ class Game {
         return base + Math.random() * 850;
     }
 
-    /* ───────── 初始化 ───────── */
     initNewGame() {
         if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
         this.thinkingPid = -1;
@@ -935,7 +950,6 @@ class Game {
         this.tableCards = [[], [], []];
         this.tablePassed = [false, false, false];
 
-        /* 重置手枪 */
         this.gunUsed = false;
         this.aiming = false;
         this.deadPlayers = [false, false, false];
@@ -953,7 +967,6 @@ class Game {
         }, 1200);
     }
 
-    /* ───────── 布局 ───────── */
     _layoutAllCards(snap = true) {
         const hand0 = this.playersHand[0];
         const n0 = hand0.length;
@@ -1043,7 +1056,6 @@ class Game {
         }
     }
 
-    /* ───────── 叫地主 ───────── */
     startCallingPhase() {
         this.state = 'calling';
         this.callScores = [0, 0, 0];
@@ -1272,7 +1284,6 @@ class Game {
         }
     }
 
-    /* ───────── AI 调度 ───────── */
     _scheduleAI(pid, extra = 0) {
         if (this.state !== 'playing') return;
         if (pid === 0) return;
@@ -1383,7 +1394,6 @@ class Game {
         }
     }
 
-    /* 跳过死者 */
     _getNextPlayer(pid) {
         let next = pid;
         for (let i = 0; i < 3; i++) {
@@ -1393,7 +1403,6 @@ class Game {
         return pid;
     }
 
-    /* ───────── 玩家操作 ───────── */
     playerPlayCards(selected) {
         if (this.currentPlayer !== 0 || this.state !== 'playing') return false;
         const info = analyzeHand(selected);
@@ -1448,7 +1457,7 @@ class Game {
         }
     }
 
-    /* ═══════════ 手枪逻辑 ═══════════ */
+    /* ═══════════ 手枪逻辑（修复版） ═══════════ */
     _shootPlayer(pid) {
         if (this.gunUsed || pid === 0 || pid === -1 || this.deadPlayers[pid]) return false;
         if (this.state === 'ended') return false;
@@ -1457,12 +1466,13 @@ class Game {
         this.aiming = false;
         this.deadPlayers[pid] = true;
 
+        /* 清理该玩家的现场状态 */
         this.callScores[pid] = 0;
         this.grabScores[pid] = 0;
         this.tableCards[pid] = [];
         this.tablePassed[pid] = false;
 
-        /* 击毙特效位置 */
+        /* 击毙特效 */
         const panel = pid === 1 ? PANEL_AI1 : PANEL_AI2;
         this.shotEffects.push({
             x: panel.x + panel.w / 2,
@@ -1470,37 +1480,35 @@ class Game {
             t: 65, maxT: 65
         });
 
-        /* 地主被击毙 → 游戏结束（农民胜） */
+        /* 提示文案：不再宣布胜利，只说"已淘汰" */
         if (this.landlordId === pid) {
-            if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
-            this.thinkingPid = -1;
             this.message = this.t('shot_kill_landlord');
-            this.messageTimer = 200;
-            this._gameOver(-2);
-            return true;
+            this.messageTimer = 160;
+        } else {
+            this.message = this.t('shot_ok');
+            this.messageTimer = 90;
         }
 
-        this.message = this.t('shot_ok');
-        this.messageTimer = 90;
+        /* 判断被击毙者是否是当前行动者 */
+        const wasActive =
+            (this.state === 'calling'  && this.callCurrent === pid) ||
+            (this.state === 'grabbing' && this.grabCurrent === pid) ||
+            (this.state === 'playing'  && (this.currentPlayer === pid || this.thinkingPid === pid));
 
-        /* 判断是否需要立即推进 */
-        let needAdvance = false;
-        if (this.state === 'calling' && this.callCurrent === pid) needAdvance = true;
-        else if (this.state === 'grabbing' && this.grabCurrent === pid) needAdvance = true;
-        else if (this.state === 'playing' && this.currentPlayer === pid) needAdvance = true;
-        else if (this.thinkingPid === pid) needAdvance = true;
+        if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
+        this.thinkingPid = -1;
 
-        if (needAdvance) {
-            if (this.aiTimer) { clearTimeout(this.aiTimer); this.aiTimer = null; }
-            this.thinkingPid = -1;
-
+        if (wasActive) {
             if (this.state === 'calling') {
-                if (this.calledSet) this.calledSet.add(pid);
                 this._advanceCalling();
             } else if (this.state === 'grabbing') {
-                if (this.grabbedSet) this.grabbedSet.add(pid);
                 this._advanceGrabbing();
             } else if (this.state === 'playing') {
+                /* 如果出牌者出完牌后被打死，看是否有玩家已经出完 */
+                if (this.playersHand[pid].length === 0) {
+                    this._gameOver(pid);
+                    return true;
+                }
                 this.currentPlayer = this._getNextPlayer(pid);
                 if (this.currentPlayer === 0) {
                     this.message = this.t('your_turn');
@@ -1519,14 +1527,10 @@ class Game {
         this.state = 'ended';
         this.winner = wid;
 
+        const winnerIsLandlord = (wid === this.landlordId);
         let humanWin;
-        if (wid === 0) humanWin = true;
-        else if (wid === -2) humanWin = (this.landlordId !== 0);
-        else {
-            const winnerIsLandlord = (wid === this.landlordId);
-            if (this.landlordId === 0) humanWin = winnerIsLandlord;
-            else humanWin = !winnerIsLandlord;
-        }
+        if (this.landlordId === 0) humanWin = winnerIsLandlord;
+        else humanWin = !winnerIsLandlord;
 
         this.message = humanWin ? this.t('you_win') : this.t('you_lose');
         this.messageTimer = 9999;
@@ -1535,7 +1539,6 @@ class Game {
         for (const c of this.landlordCards) c.faceUp = true;
     }
 
-    /* ───────── 更新 ───────── */
     update() {
         this._tick++;
         const all = [];
@@ -1553,9 +1556,7 @@ class Game {
         if (this.messageTimer > 0 && this.messageTimer < 9000) this.messageTimer--;
     }
 
-    /* ═══════════════════════════════════════
-       绘制
-       ═══════════════════════════════════════ */
+    /* ═══════════ 绘制 ═══════════ */
     draw(ctx) {
         this._drawBackground(ctx);
         this._drawTable(ctx);
@@ -1852,7 +1853,6 @@ class Game {
                 ctx.stroke();
             }
 
-            /* 头像 */
             const ax = p.x + 30, ay = p.y + h / 2;
             const ag = ctx.createRadialGradient(ax - 5, ay - 6, 2, ax, ay, 21);
             if (isDead) { ag.addColorStop(0, '#3a3a40'); ag.addColorStop(1, '#1a1a1e'); }
@@ -2092,20 +2092,15 @@ class Game {
         ctx.textBaseline = 'alphabetic';
     }
 
-    /* —— 手枪图标 —— */
     _drawGunIcon(ctx, cx, cy, scale, color) {
         ctx.save();
         ctx.translate(cx, cy);
         ctx.scale(scale, scale);
         ctx.fillStyle = color;
-        /* 枪管 + 套筒 */
         ctx.fillRect(-20, -7, 30, 8);
         ctx.fillRect(-10, -11, 18, 4);
-        /* 准星 */
         ctx.fillRect(2, -14, 4, 3);
-        /* 枪身 */
         ctx.fillRect(-12, 1, 18, 4);
-        /* 握把 */
         ctx.beginPath();
         ctx.moveTo(-11, 5);
         ctx.lineTo(-2, 5);
@@ -2113,7 +2108,6 @@ class Game {
         ctx.lineTo(-15, 17);
         ctx.closePath();
         ctx.fill();
-        /* 扳机护圈 */
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -2221,12 +2215,10 @@ class Game {
             this._startBtnRect = { x: sx, y: sy, w: sw, h: sh };
         }
 
-        /* —— 手枪按钮 —— */
         this._drawGunButton(ctx);
     }
 
     _drawGunButton(ctx) {
-        /* 位置：右下角 */
         const gw = 84, gh = 72;
         const gx = CANVAS_WIDTH - 100;
         const gy = CANVAS_HEIGHT - 160;
@@ -2236,7 +2228,6 @@ class Game {
 
         ctx.save();
 
-        /* 光晕 */
         if (!used && (this.aiming || hover)) {
             const pulse = 0.5 + 0.5 * Math.sin(this._tick / 10);
             ctx.globalAlpha = 0.25 + pulse * 0.4;
@@ -2250,7 +2241,6 @@ class Game {
             ctx.shadowBlur = 0;
         }
 
-        /* 背景 */
         const bg = ctx.createLinearGradient(gx, gy, gx, gy + gh);
         if (used) {
             bg.addColorStop(0, 'rgba(38,38,42,.92)');
@@ -2269,7 +2259,6 @@ class Game {
         this._roundRect(ctx, gx, gy, gw, gh, 14);
         ctx.fill();
 
-        /* 边框 */
         ctx.strokeStyle = used ? 'rgba(120,120,130,.5)'
                        : this.aiming ? '#ff5050'
                        : '#ffd740';
@@ -2277,14 +2266,12 @@ class Game {
         this._roundRect(ctx, gx, gy, gw, gh, 14);
         ctx.stroke();
 
-        /* 手枪图标 */
         const iconColor = used ? 'rgba(120,120,130,.55)'
                         : this.aiming ? '#ffb0b0'
                         : hover ? '#ffe98c'
                         : '#ffd740';
         this._drawGunIcon(ctx, gx + gw / 2, gy + gh / 2 - 8, 1.55, iconColor);
 
-        /* 文字 */
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = 'bold 11px "Microsoft YaHei","PingFang SC",sans-serif';
@@ -2299,7 +2286,6 @@ class Game {
             ctx.fillText(this.t('gun_ready'), gx + gw / 2, gy + gh - 12);
         }
 
-        /* 已使用：划掉 */
         if (used) {
             ctx.strokeStyle = 'rgba(200,60,60,.7)';
             ctx.lineWidth = 3;
@@ -2316,7 +2302,6 @@ class Game {
         this._gunBtnRect = { x: gx, y: gy, w: gw, h: gh };
     }
 
-    /* —— 瞄准模式提示 —— */
     _drawAimPrompt(ctx) {
         if (!this.aiming) return;
         ctx.save();
@@ -2351,7 +2336,6 @@ class Game {
         ctx.textBaseline = 'alphabetic';
     }
 
-    /* —— 准星 —— */
     _drawCrosshair(ctx) {
         if (!this.aiming) return;
         const mx = this._mouseX, my = this._mouseY;
@@ -2386,7 +2370,6 @@ class Game {
         ctx.restore();
     }
 
-    /* —— 击毙特效 —— */
     _drawShotEffects(ctx) {
         for (const eff of this.shotEffects) {
             const progress = 1 - eff.t / eff.maxT;
@@ -2396,7 +2379,6 @@ class Game {
             ctx.save();
             ctx.globalAlpha = alpha;
 
-            /* 外圈冲击波 */
             ctx.strokeStyle = '#ffaa00';
             ctx.lineWidth = 5 * (1 - progress) + 1;
             ctx.shadowColor = '#ff8020';
@@ -2405,7 +2387,6 @@ class Game {
             ctx.arc(eff.x, eff.y, r, 0, Math.PI * 2);
             ctx.stroke();
 
-            /* 内圈红雾 */
             ctx.shadowBlur = 0;
             const g = ctx.createRadialGradient(eff.x, eff.y, 2, eff.x, eff.y, r * 0.55);
             g.addColorStop(0, `rgba(255,220,120,${alpha})`);
@@ -2416,7 +2397,6 @@ class Game {
             ctx.arc(eff.x, eff.y, r * 0.55, 0, Math.PI * 2);
             ctx.fill();
 
-            /* 火花 */
             ctx.strokeStyle = '#ffdd55';
             ctx.lineWidth = 2.5;
             for (let a = 0; a < 360; a += 45) {
@@ -2448,11 +2428,9 @@ class Game {
         ctx.closePath();
     }
 
-    /* ───────── 点击处理 ───────── */
     handleClick(pos) {
         const { x, y } = pos;
 
-        /* 设置齿轮 */
         if (Math.hypot(x - (CANVAS_WIDTH - 46), y - 42) < 26) {
             this.settingsOpen = true;
             settingsOverlay.classList.add('active');
@@ -2461,17 +2439,14 @@ class Game {
 
         const inRect = r => r && x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
 
-        /* 手枪按钮点击 */
         if (inRect(this._gunBtnRect) && !this.gunUsed && this.state !== 'ended') {
             this.aiming = !this.aiming;
             return;
         }
 
-        /* 瞄准模式：点击 AI 面板击毙 */
         if (this.aiming) {
             if (inRect(PANEL_AI1) && !this.deadPlayers[1]) { this._shootPlayer(1); return; }
             if (inRect(PANEL_AI2) && !this.deadPlayers[2]) { this._shootPlayer(2); return; }
-            /* 点击其他区域取消瞄准 */
             this.aiming = false;
             return;
         }

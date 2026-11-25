@@ -7,7 +7,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Raccoon OS - 终极增强版</title>
+    <title>Raccoon OS 6.3.3 - 终极增强版</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
@@ -253,8 +253,9 @@
             flex-direction: column;
             overflow: hidden;
             z-index: 100;
-            min-width: 400px;
-            min-height: 300px;
+            min-width: 320px;
+            min-height: 240px;
+            box-sizing: border-box;
             opacity: 0;
             transform: scale(0.92);
             transition: opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1), transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
@@ -2012,6 +2013,1119 @@
             color: #666;
             white-space: nowrap;
         }
+        /* ---- 小屏适配 ---- */
+        @media (max-width: 900px) {
+            .fm-toolbar {
+                flex-wrap: wrap;
+                row-gap: 6px;
+            }
+            .fm-breadcrumb {
+                display: none;
+            }
+            .fm-sidebar {
+                width: 124px;
+            }
+            .fm-search {
+                flex: 1 1 120px;
+            }
+            .set-sidebar {
+                width: 168px;
+            }
+            .browser-home .search-box {
+                width: min(420px, 86%);
+            }
+            .set-search {
+                display: none;
+            }
+        }
+        /* ============ 6.3.2 视觉升级：玻璃质感 / 更细腻的层次 ============ */
+        :root {
+            --acc: #5b9dff;
+            --acc-2: #8b6cf5;
+            --acc-soft: rgba(91, 157, 255, 0.14);
+            --line: rgba(255, 255, 255, 0.08);
+            --line-strong: rgba(255, 255, 255, 0.14);
+            --text: #e9eefb;
+            --muted: #8e9ab0;
+            --r-lg: 16px;
+            --r-md: 12px;
+            --r-sm: 9px;
+            --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.45);
+            --shadow-2: 0 28px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 620px at 10% -12%, rgba(72, 116, 255, 0.30), transparent 62%),
+                radial-gradient(1000px 560px at 94% -4%, rgba(139, 108, 245, 0.24), transparent 58%),
+                radial-gradient(900px 600px at 68% 112%, rgba(38, 198, 190, 0.12), transparent 62%),
+                radial-gradient(600px 380px at 40% 45%, rgba(70, 100, 200, 0.06), transparent 70%),
+                #06080d;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: 0.1px;
+        }
+
+        input, textarea, select, button {
+            font-family: inherit;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.26);
+            background-clip: content-box;
+        }
+
+        /* ---------- 桌面 ---------- */
+        #desktop-area {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1.4px);
+            background-size: 28px 28px;
+            background-position: 14px 10px;
+        }
+
+        .desktop-icon {
+            width: 88px;
+            padding: 10px 6px 8px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            transition: transform 0.14s cubic-bezier(0.2, 0.8, 0.3, 1), background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+        }
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(255, 255, 255, 0.09);
+            transform: translateY(-2px);
+        }
+        .desktop-icon.active {
+            background: var(--acc-soft);
+            border-color: rgba(91, 157, 255, 0.42);
+            outline: none;
+            box-shadow: 0 6px 20px rgba(20, 60, 140, 0.35);
+        }
+        .desktop-icon > span:first-child {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            font-size: 27px;
+            color: #dfe9ff;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 18px rgba(0, 0, 0, 0.38);
+            transition: transform 0.14s ease, box-shadow 0.14s ease;
+        }
+        .desktop-icon:hover > span:first-child {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 24px rgba(0, 0, 0, 0.45);
+        }
+        .desktop-icon > img:first-child {
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.45));
+        }
+        .desktop-icon > span:last-child {
+            font-size: 11.5px;
+            margin-top: 7px;
+            color: rgba(233, 238, 251, 0.86);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+            line-height: 1.25;
+            letter-spacing: 0.2px;
+        }
+
+        /* ---------- 任务栏 ---------- */
+        .taskbar {
+            background: linear-gradient(180deg, rgba(18, 22, 31, 0.82), rgba(9, 11, 17, 0.94));
+            backdrop-filter: blur(26px) saturate(180%);
+            -webkit-backdrop-filter: blur(26px) saturate(180%);
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 -10px 34px rgba(0, 0, 0, 0.5);
+        }
+        .taskbar-item {
+            border-radius: 10px;
+        }
+        .taskbar-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            transform: translateY(-1px);
+        }
+        .taskbar-app {
+            color: #dbe4f5;
+        }
+        .taskbar-app .app-name {
+            font-size: 11.5px;
+            letter-spacing: 0.2px;
+        }
+        .taskbar-app.active {
+            background: rgba(91, 157, 255, 0.16);
+            color: #fff;
+        }
+        .taskbar-app.active::after {
+            width: 18px;
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--acc), var(--acc-2));
+            box-shadow: 0 0 12px rgba(91, 157, 255, 0.85);
+        }
+
+        /* ---------- 开始菜单 ---------- */
+        .start-menu {
+            width: 360px;
+            border-radius: var(--r-lg);
+            background: linear-gradient(180deg, rgba(26, 31, 43, 0.92), rgba(15, 18, 26, 0.96));
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid var(--line-strong);
+            box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+        .start-menu-header {
+            border-bottom: 1px solid var(--line);
+            padding: 18px 18px 12px;
+        }
+        .start-menu-search {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 9px 14px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .start-menu-search:focus {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(91, 157, 255, 0.45);
+        }
+        .start-menu-app {
+            border-radius: 11px;
+            padding: 9px 12px;
+            color: #dde5f4;
+        }
+        .start-menu-apps {
+            max-height: calc(100vh - 250px);
+            padding: 10px;
+            padding-bottom: 12px;
+        }
+        .start-menu-app:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateX(3px);
+        }
+        .start-menu-footer {
+            border-top: 1px solid var(--line);
+        }
+
+        /* ---------- 窗口 ---------- */
+        .window {
+            background: linear-gradient(180deg, #171c26 0%, #10141c 100%);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .window.window-maximized {
+            border-radius: 0 !important;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            box-shadow: none;
+        }
+        .window.window-maximized .window-content {
+            border-radius: 0;
+        }
+        .window.active {
+            border-color: rgba(91, 157, 255, 0.3);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(91, 157, 255, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .window-header {
+            height: 36px;
+            padding: 0 10px 0 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .window-title {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #dde6f7;
+            letter-spacing: 0.2px;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .window-title .material-symbols-outlined {
+            color: #9fb4d8;
+        }
+        .window-controls {
+            gap: 4px;
+        }
+        .win-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            color: #b9c5da;
+        }
+        .win-btn:hover {
+            background: rgba(255, 255, 255, 0.13);
+            color: #fff;
+        }
+        .win-btn.win-close:hover {
+            background: #e5484d;
+            color: #fff;
+        }
+        .window-content {
+            background: #0f131b;
+        }
+
+        /* ---------- 右键菜单 ---------- */
+        .context-menu {
+            background: rgba(28, 33, 45, 0.94);
+            backdrop-filter: blur(24px) saturate(170%);
+            -webkit-backdrop-filter: blur(24px) saturate(170%);
+            border: 1px solid var(--line-strong);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            padding: 6px;
+            min-width: 168px;
+        }
+        .context-menu-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #dbe4f5;
+            cursor: pointer;
+            transition: background 0.1s, color 0.1s;
+        }
+        .context-menu-item:hover {
+            background: rgba(91, 157, 255, 0.18);
+            color: #fff;
+        }
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 5px 8px;
+        }
+
+        /* ---------- 对话框 ---------- */
+        .system-dialog {
+            background: linear-gradient(180deg, #1b2130, #141922);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+        .system-dialog-header {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--line);
+            border-radius: 0;
+            padding: 13px 16px;
+        }
+        .system-dialog-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e8eefb;
+        }
+        .system-dialog-content {
+            color: #c7d2e5;
+        }
+        .system-dialog-input {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line-strong);
+            border-radius: 10px;
+            padding: 10px 12px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .system-dialog-input:focus {
+            border-color: rgba(91, 157, 255, 0.55);
+            background: rgba(255, 255, 255, 0.09);
+        }
+        .system-dialog-buttons {
+            border-top: 1px solid var(--line);
+            padding: 12px 16px;
+        }
+        .system-dialog-button {
+            border-radius: 9px;
+            padding: 7px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--line-strong);
+            color: #dbe4f5;
+            transition: background 0.12s, transform 0.12s;
+        }
+        .system-dialog-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .system-dialog-button.primary {
+            background: linear-gradient(135deg, var(--acc), #4779e6);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(70, 120, 230, 0.35);
+        }
+        .system-dialog-button.primary:hover {
+            filter: brightness(1.08);
+        }
+
+        /* ---------- 开机进入 / 登录 ---------- */
+        .entry-overlay {
+            background:
+                radial-gradient(800px 500px at 50% 12%, rgba(91, 157, 255, 0.2), transparent 60%),
+                radial-gradient(600px 400px at 70% 90%, rgba(139, 108, 245, 0.14), transparent 60%);
+        }
+        .entry-card {
+            background: linear-gradient(180deg, rgba(28, 33, 45, 0.9), rgba(14, 17, 24, 0.94));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 34px 90px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+            padding: 42px 46px 36px;
+        }
+        .entry-logo {
+            font-size: 62px;
+            filter: drop-shadow(0 12px 26px rgba(120, 160, 255, 0.35));
+        }
+        .entry-title {
+            font-size: 27px;
+            font-weight: 650;
+            letter-spacing: 0.3px;
+            background: linear-gradient(180deg, #ffffff, #c3d3f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+        .entry-text {
+            color: var(--muted);
+        }
+        .entry-btn {
+            border-radius: 11px;
+            padding: 10px 22px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--line-strong);
+            transition: background 0.16s, transform 0.12s;
+        }
+        .entry-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+        .entry-btn:active {
+            transform: scale(0.97);
+        }
+        .entry-btn.primary {
+            background: linear-gradient(135deg, var(--acc), #4a7aea 60%, var(--acc-2));
+            border-color: transparent;
+            box-shadow: 0 10px 26px rgba(70, 120, 230, 0.4);
+        }
+        .entry-btn.primary:hover {
+            filter: brightness(1.08);
+        }
+        .login-avatar {
+            background: linear-gradient(150deg, #5b9dff, #8b6cf5);
+            box-shadow: 0 14px 40px rgba(91, 120, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        .login-password {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 22px;
+        }
+        .login-password:focus {
+            border-color: rgba(91, 157, 255, 0.7);
+            background: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 0 0 4px rgba(91, 157, 255, 0.16);
+        }
+        .login-go {
+            background: rgba(255, 255, 255, 0.18);
+            transition: background 0.16s, transform 0.12s;
+        }
+        .login-go:hover {
+            background: linear-gradient(135deg, var(--acc), #4a7aea);
+        }
+        .login-password:focus + .login-go {
+            background: linear-gradient(135deg, var(--acc), #4a7aea);
+            box-shadow: 0 8px 22px rgba(70, 120, 230, 0.4);
+        }
+        .login-time, .login-name {
+            letter-spacing: 1px;
+        }
+
+        /* ---------- 通知中心 ---------- */
+        .notif-center {
+            background: linear-gradient(180deg, rgba(24, 29, 40, 0.94), rgba(12, 15, 22, 0.97));
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border-left: 1px solid var(--line-strong);
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
+        }
+        .notif-action {
+            border-radius: 12px;
+            transition: background 0.12s, transform 0.12s;
+        }
+        .notif-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+        .notif-action.active {
+            background: var(--acc-soft);
+        }
+
+        /* ---------- 文件管理器 ---------- */
+        .fm-toolbar {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+            border-bottom: 1px solid var(--line);
+            padding: 8px 10px;
+            gap: 4px;
+        }
+        .fm-icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            color: #c2cde1;
+            transition: background 0.12s, color 0.12s, transform 0.12s;
+        }
+        .fm-icon-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .fm-toolbar-divider {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 4px;
+        }
+        .fm-breadcrumb {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            height: 32px;
+            padding: 0 8px;
+        }
+        .fm-crumb {
+            border-radius: 7px;
+            padding: 4px 8px;
+            color: #cfdcf1;
+            transition: background 0.12s;
+        }
+        .fm-crumb:hover {
+            background: rgba(255, 255, 255, 0.09);
+        }
+        .fm-crumb-sep {
+            color: #6c7a93;
+        }
+        .fm-search {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 5px 10px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .fm-search:focus-within {
+            border-color: rgba(91, 157, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .fm-sidebar {
+            background: rgba(255, 255, 255, 0.022);
+            border-right: 1px solid var(--line);
+            padding: 10px 8px;
+        }
+        .fm-side-group {
+            color: #75839b;
+            font-size: 10.5px;
+            letter-spacing: 0.6px;
+            padding: 12px 10px 6px;
+            text-transform: uppercase;
+        }
+        .fm-tree-item {
+            border-radius: 9px;
+            padding: 8px 10px;
+            color: #c8d4e8;
+            transition: background 0.12s, color 0.12s;
+        }
+        .fm-tree-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .fm-tree-item.active {
+            background: var(--acc-soft);
+            color: #eaf1ff;
+            box-shadow: inset 0 0 0 1px rgba(91, 157, 255, 0.28);
+        }
+        .fm-content {
+            background: #0f131b;
+        }
+        .fm-item {
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: background 0.12s, border-color 0.12s, transform 0.12s;
+        }
+        .fm-item:hover {
+            background: rgba(255, 255, 255, 0.055);
+            border-color: rgba(255, 255, 255, 0.07);
+            transform: translateY(-1px);
+        }
+        .fm-item.selected {
+            background: var(--acc-soft);
+            border-color: rgba(91, 157, 255, 0.45);
+        }
+        .fm-item .fm-name {
+            color: #d7e1f2;
+        }
+        .fm-card {
+            border-radius: 14px;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+            border: 1px solid var(--line);
+            transition: transform 0.14s, border-color 0.14s, box-shadow 0.14s, background 0.14s;
+        }
+        .fm-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(91, 157, 255, 0.32);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+        }
+        .fm-card.selected {
+            border-color: rgba(91, 157, 255, 0.55);
+            background: var(--acc-soft);
+        }
+        .fm-statusbar {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--line);
+            color: #8b98ad;
+        }
+        .fm-section-title {
+            color: #93a2ba;
+            letter-spacing: 0.3px;
+        }
+
+        /* ---------- 设置（浅色玻璃） ---------- */
+        .set-sidebar {
+            background: linear-gradient(180deg, #edf1f8, #e9eef6);
+            border-right: 1px solid #dfe4ee;
+            padding: 10px 8px;
+            width: 208px;
+        }
+        .set-sidebar-group {
+            color: #8a94a6;
+            font-size: 10.5px;
+            letter-spacing: 0.7px;
+            padding: 14px 12px 6px;
+        }
+        .set-nav-item {
+            border-radius: 10px;
+            border-left: none;
+            margin: 2px 0;
+            padding: 9px 12px;
+            color: #37404f;
+            transition: background 0.12s, color 0.12s, box-shadow 0.12s;
+        }
+        .set-nav-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .set-nav-item.active {
+            background: #ffffff;
+            color: #1d63d8;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 0 0 1px rgba(29, 99, 216, 0.14);
+        }
+        .set-nav-icon,
+        .set-nav-item.active .set-nav-icon {
+            color: currentColor;
+            font-size: 17px;
+        }
+        .set-content {
+            background: #f7f9fc;
+        }
+        .set-search {
+            background: transparent;
+            border-bottom: 1px solid #e6eaf2;
+            padding: 12px 20px;
+        }
+        .set-search input {
+            color: #2c3444;
+        }
+        .set-pages {
+            padding: 8px 22px 18px;
+        }
+        .set-page-title {
+            font-size: 25px;
+            font-weight: 650;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+        .set-section {
+            background: #ffffff;
+            border: 1px solid #e8ecf3;
+            border-radius: 14px;
+            padding: 6px 18px 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        }
+        .set-section-title {
+            color: #6b7688;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            margin: 14px 0 4px;
+        }
+        .set-row {
+            border-bottom: 1px solid #f0f3f8;
+            padding: 13px 0;
+        }
+        .set-row-label {
+            color: #1b2432;
+            font-size: 13.5px;
+        }
+        .set-row-desc {
+            color: #7c8798;
+        }
+        .toggle-switch {
+            width: 42px;
+            height: 24px;
+            border-radius: 24px;
+            background: #cfd6e2;
+            transition: background 0.18s, box-shadow 0.18s;
+        }
+        .toggle-switch::after {
+            width: 18px;
+            height: 18px;
+            top: 3px;
+            left: 3px;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25);
+        }
+        .toggle-switch.toggle-active {
+            background: linear-gradient(135deg, #4d8bf5, #2f6fed);
+            box-shadow: 0 2px 8px rgba(47, 111, 237, 0.35);
+        }
+        .toggle-switch.toggle-active::after {
+            left: 21px;
+        }
+        .nt-btn {
+            background: #ffffff;
+            border: 1px solid #d9dfe9;
+            color: #283244;
+            border-radius: 9px;
+            padding: 7px 14px;
+            font-size: 13px;
+            transition: background 0.12s, border-color 0.12s, transform 0.12s;
+        }
+        .nt-btn:hover {
+            background: #f3f6fb;
+            border-color: #b9c4d6;
+            color: #0f172a;
+        }
+        .nt-btn:active {
+            transform: scale(0.98);
+        }
+        .wallpaper-preview {
+            border-radius: 10px;
+            transition: transform 0.14s, box-shadow 0.14s;
+        }
+        .wallpaper-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(16, 24, 40, 0.18);
+        }
+
+        /* ---------- 浏览器 ---------- */
+        .browser-toolbar {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+            border-bottom: 1px solid var(--line);
+        }
+        .browser-toolbar > button {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #c3cfe3;
+            transition: background 0.12s, color 0.12s, transform 0.12s;
+        }
+        .browser-toolbar > button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .browser-url-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            height: 34px;
+            transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+        .browser-url-pill:focus-within {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: rgba(91, 157, 255, 0.55);
+            box-shadow: 0 0 0 3px rgba(91, 157, 255, 0.14);
+        }
+        .browser-home {
+            background:
+                radial-gradient(700px 420px at 50% 0%, rgba(91, 157, 255, 0.28), transparent 65%),
+                radial-gradient(600px 400px at 85% 100%, rgba(139, 108, 245, 0.22), transparent 60%),
+                linear-gradient(160deg, #0b1120 0%, #12122b 55%, #0a0e1a 100%);
+        }
+        .browser-home .logo {
+            filter: drop-shadow(0 16px 34px rgba(120, 160, 255, 0.35));
+        }
+        .browser-home .title {
+            font-weight: 400;
+            letter-spacing: 0.4px;
+        }
+        .browser-home .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+        }
+        .browser-home .search-box:focus-within {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(91, 157, 255, 0.6);
+            box-shadow: 0 0 0 4px rgba(91, 157, 255, 0.16), 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+        .browser-home .quick-link {
+            border-radius: 12px;
+            padding: 8px 10px;
+            transition: transform 0.15s, background 0.15s;
+        }
+        .browser-home .quick-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .window:has(.set-content) .window-header {
+            background: linear-gradient(180deg, #f6f8fc, #eef2f8);
+            border-bottom: 1px solid #e3e8f1;
+        }
+        .window:has(.set-content) .window-title {
+            color: #2a3444;
+        }
+        .window:has(.set-content) .window-title .material-symbols-outlined {
+            color: #6b7889;
+        }
+        .window:has(.set-content) .win-btn {
+            color: #5b6577;
+        }
+        .window:has(.set-content) .win-btn:hover {
+            background: rgba(15, 23, 42, 0.07);
+            color: #111827;
+        }
+        .window:has(.set-content) .win-btn.win-close:hover {
+            background: #e5484d;
+            color: #fff;
+        }
+
+        .browser-tip {
+            background: rgba(255, 255, 255, 0.035);
+            border-bottom: 1px solid var(--line);
+            color: #97a4ba;
+        }
+        .browser-tip .material-symbols-outlined {
+            color: #6f7f99;
+        }
+
+        .nt-toolbar {
+            background: #f6f8fc;
+            border-bottom: 1px solid #e4e9f1;
+        }
+        .nt-statusbar {
+            background: #f6f8fc;
+            border-top: 1px solid #e4e9f1;
+            color: #7c8798;
+        }
+        .nt-sep {
+            background: #dde3ed;
+        }
+        .nt-textarea {
+            background: #ffffff;
+            color: #1b2432;
+            caret-color: #2f6fed;
+        }
+        .nt-textarea::placeholder {
+            color: #9aa4b5;
+        }
+        .nt-textarea::selection {
+            background: rgba(47, 111, 237, 0.18);
+            color: #0f172a;
+        }
+        .window:has(.nt-textarea) .window-header {
+            background: linear-gradient(180deg, #f6f8fc, #eef2f8);
+            border-bottom: 1px solid #e3e8f1;
+        }
+        .window:has(.nt-textarea) .window-title,
+        .window:has(.nt-textarea) .window-title .material-symbols-outlined {
+            color: #2a3444;
+        }
+        .window:has(.nt-textarea) .win-btn {
+            color: #5b6577;
+        }
+        .window:has(.nt-textarea) .win-btn:hover {
+            background: rgba(15, 23, 42, 0.07);
+            color: #111827;
+        }
+        .window:has(.nt-textarea) .win-btn.win-close:hover {
+            background: #e5484d;
+            color: #fff;
+        }
+
+        /* ---------- 终端 ---------- */
+        .terminal-body {
+            background:
+                radial-gradient(900px 420px at 100% -10%, rgba(94, 224, 141, 0.1), transparent 60%),
+                #080f0c;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Cascadia Code", monospace;
+            font-size: 13px;
+            line-height: 1.65;
+            padding: 14px 16px;
+            color: #cfe3d8;
+        }
+        .terminal-prompt {
+            color: #5ee08d;
+            opacity: 0.95;
+        }
+        .terminal-output {
+            color: #9fb3a8;
+        }
+        .terminal-input {
+            color: #eaf6ee;
+            caret-color: #5ee08d;
+        }
+        .terminal-line {
+            margin-bottom: 6px;
+        }
+
+        /* ---------- 计算器 ---------- */
+        .calc-btn {
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.055);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e8eefb;
+            font-weight: 400;
+            transition: background 0.12s, transform 0.08s, filter 0.12s;
+        }
+        .calc-btn:hover {
+            background: rgba(255, 255, 255, 0.11);
+        }
+        .calc-btn.num {
+            background: rgba(255, 255, 255, 0.075);
+        }
+        .calc-btn.num:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .calc-btn.fn {
+            background: rgba(255, 255, 255, 0.035);
+            color: #b9c6db;
+        }
+        .calc-btn.fn:hover {
+            background: rgba(255, 255, 255, 0.09);
+        }
+        .calc-btn.op,
+        .calc-btn.eq {
+            background: linear-gradient(135deg, var(--acc), #4a7aea);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(70, 120, 230, 0.28);
+        }
+        .calc-btn.op:hover,
+        .calc-btn.eq:hover {
+            filter: brightness(1.1);
+        }
+        .calc-btn.back {
+            background: rgba(255, 255, 255, 0.035);
+        }
+
+        /* 自带聚焦样式的输入框不再叠加上外框 */
+        .terminal-input:focus-visible,
+        .nt-textarea:focus-visible,
+        .fm-search input:focus-visible,
+        .set-search input:focus-visible,
+        .start-menu-search:focus-visible,
+        .login-password:focus-visible,
+        .system-dialog-input:focus-visible,
+        [id^="browser-url-"]:focus-visible,
+        [id^="browser-home-search-"]:focus-visible,
+        #login-password:focus-visible,
+        #dialog-input:focus-visible {
+            outline: none;
+        }
+
+        .shutdown-btn {
+            background: rgba(229, 72, 77, 0.14);
+            border: 1px solid rgba(229, 72, 77, 0.35);
+            color: #ff8d91;
+            border-radius: 10px;
+            transition: background 0.14s, color 0.14s, border-color 0.14s, transform 0.12s;
+        }
+        .shutdown-btn:hover {
+            background: #e5484d;
+            border-color: #e5484d;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .desktop-icon > img:first-child {
+            width: 46px;
+            height: 46px;
+            padding: 7px;
+            box-sizing: border-box;
+            border-radius: 14px;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 18px rgba(0, 0, 0, 0.38);
+        }
+        .desktop-icon:hover > img:first-child {
+            transform: translateY(-1px) scale(1.03);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        /* ---------- 通用细节 ---------- */
+        .material-symbols-outlined {
+            font-variation-settings: 'wght' 400;
+        }
+        button:focus-visible,
+        .taskbar-item:focus-visible,
+        .desktop-icon:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 2px solid rgba(91, 157, 255, 0.65);
+            outline-offset: 2px;
+        }
+        ::selection {
+            background: rgba(91, 157, 255, 0.35);
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            /* 手机：图标改用横向铺满的网格，避免超出屏幕 */
+            #desktop-area {
+                grid-auto-flow: row;
+                grid-template-rows: none;
+                grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+                gap: 6px 2px;
+                padding: 10px 6px;
+            }
+            .desktop-icon {
+                width: 100%;
+                padding: 8px 2px 6px;
+            }
+            .desktop-icon > span:first-child {
+                width: 44px;
+                height: 44px;
+                font-size: 23px;
+                border-radius: 13px;
+            }
+            .desktop-icon > span:last-child {
+                font-size: 10.5px;
+            }
+            .window-header {
+                height: 42px;
+                padding: 0 8px 0 14px;
+            }
+            .win-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .window-title {
+                font-size: 13px;
+            }
+            .set-section .grid.grid-cols-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+            }
+            /* 设置：窄侧栏 + 紧凑卡片 */
+            .set-sidebar {
+                width: 118px;
+                padding: 8px 6px;
+            }
+            .set-sidebar-group {
+                padding: 10px 8px 4px;
+                font-size: 9.5px;
+                letter-spacing: 0.4px;
+            }
+            .set-nav-item {
+                padding: 9px 8px;
+                font-size: 12.5px;
+                border-radius: 9px;
+            }
+            .set-nav-icon {
+                font-size: 16px;
+                margin-right: 7px;
+            }
+            .set-pages {
+                padding: 8px 12px 16px;
+            }
+            .set-page-title {
+                font-size: 20px;
+                margin-bottom: 14px;
+            }
+            .set-section {
+                padding: 2px 12px 10px;
+                border-radius: 12px;
+                margin-bottom: 12px;
+            }
+            .set-row {
+                padding: 11px 0;
+                gap: 8px;
+            }
+            .set-row-label {
+                font-size: 12.5px;
+            }
+            .set-row-desc {
+                font-size: 11px;
+                line-height: 1.45;
+            }
+            .toggle-switch {
+                width: 38px;
+                height: 22px;
+            }
+            .toggle-switch::after {
+                width: 16px;
+                height: 16px;
+                top: 3px;
+                left: 3px;
+            }
+            .toggle-switch.toggle-active::after {
+                left: 19px;
+            }
+            /* 文件管理器：单列卡片 */
+            .fm-home-grid {
+                grid-template-columns: 1fr;
+            }
+            .fm-grid {
+                grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+                padding: 10px 8px;
+            }
+            .fm-sidebar {
+                width: 112px;
+            }
+            .fm-tree-item {
+                font-size: 12.5px;
+                padding: 8px;
+            }
+            .fm-item {
+                padding: 10px 4px 8px;
+            }
+            .fm-item .fm-name {
+                font-size: 11px;
+            }
+            /* 浏览器 */
+            .browser-toolbar {
+                gap: 2px;
+                padding: 6px 4px;
+                height: 44px;
+            }
+            .browser-toolbar > button {
+                width: 28px;
+                height: 28px;
+            }
+            .browser-url-pill {
+                height: 32px;
+            }
+            .browser-home .title {
+                font-size: 26px;
+            }
+            .browser-home .logo {
+                font-size: 64px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -2041,7 +3155,7 @@
     <div id="start-menu" class="start-menu">
         <div class="start-menu-header"><input type="text" id="start-search" class="start-menu-search" placeholder="搜索应用..."></div>
         <div id="start-apps-list" class="start-menu-apps"></div>
-        <div class="start-menu-footer"><button id="shutdown-btn-start" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-sm flex items-center gap-2"><span class="material-symbols-outlined text-sm">power_settings_new</span> 关机</button></div>
+        <div class="start-menu-footer"><button id="shutdown-btn-start" class="shutdown-btn text-white px-4 py-1.5 text-sm flex items-center gap-2"><span class="material-symbols-outlined text-sm">power_settings_new</span> 关机</button></div>
     </div>
     <div id="volume-popup" class="fixed bottom-12 right-4 bg-[#2a2a2a] border border-white/20 rounded-lg p-3 w-48 hidden z-[1100]">
         <div class="text-xs mb-2">系统音量</div>
@@ -2293,6 +3407,14 @@
                         { name: "子文件.txt", type: "file", content: "这是子文件夹中的文件。" }
                     ]
                 };
+                try {
+                    const savedFs = JSON.parse(localStorage.getItem('raccoonos_filesystem') || 'null');
+                    if (savedFs && typeof savedFs === 'object') {
+                        Object.keys(savedFs).forEach(k => {
+                            if (Array.isArray(savedFs[k])) this.fileSystem[k] = savedFs[k];
+                        });
+                    }
+                } catch (e) {}
                 // 浏览器数据
                 this.bookmarks = this.loadBookmarks();
                 this.history = this.loadHistory();
@@ -2330,6 +3452,7 @@
                             showSeconds: parsed.showSeconds !== undefined ? parsed.showSeconds : false,
                             externalOpen: parsed.externalOpen !== undefined ? parsed.externalOpen : false,
                             autoRestoreUrl: parsed.autoRestoreUrl !== undefined ? parsed.autoRestoreUrl : false,
+                            searchEngine: parsed.searchEngine || 'bing',
                             systemNotifications: parsed.systemNotifications !== undefined ? parsed.systemNotifications : false,
                             desktopIconsVisible: parsed.desktopIconsVisible !== undefined ? parsed.desktopIconsVisible : true,
                             desktopIconsDraggable: parsed.desktopIconsDraggable !== undefined ? parsed.desktopIconsDraggable : false
@@ -2350,6 +3473,7 @@
                     showSeconds: false,
                     externalOpen: false,
                     autoRestoreUrl: false,
+                    searchEngine: 'bing',
                     systemNotifications: false,
                     desktopIconsVisible: true,
                     desktopIconsDraggable: false
@@ -2509,9 +3633,15 @@
                 this.setupFullscreenGuard();
                 this.showEntryConfirm();
                 this.initWakeLockVisibility();
+                this.initViewportHandling();
                 this.initSystemNotifications();
-                if (this.settings.autostartApps.includes('browser')) setTimeout(() => this.openApp('browser'), 500);
-                if (this.settings.autostartApps.includes('terminal')) setTimeout(() => this.openApp('terminal'), 800);
+                ['browser', 'terminal', 'settings', 'filemanager'].forEach((app, idx) => {
+                    if (!this.settings.autostartApps.includes(app)) return;
+                    setTimeout(() => {
+                        if (this.lockScreenEl || this.entryConfirmEl) return;
+                        this.openApp(app);
+                    }, 600 + idx * 300);
+                });
             }
 
             setupFullscreenGuard() {
@@ -2546,6 +3676,12 @@
                 document.getElementById('volume-slider').value = volume;
                 document.getElementById('volume-value').innerText = volume;
                 document.querySelectorAll('audio, video').forEach(el => el.volume = volume / 100);
+                const scale = parseInt(this.settings.displayScale) || 100;
+                document.body.style.fontSize = (scale / 100) * 16 + 'px';
+                if (this.settings.taskbarTransparent === false) {
+                    const tb = document.getElementById('taskbar');
+                    if (tb) tb.style.background = 'rgba(24,24,24,0.98)';
+                }
             }
 
             renderDesktop() {
@@ -2577,6 +3713,15 @@
                     });
                     div.addEventListener('click', (e) => {
                         e.stopPropagation();
+                        const wasActive = div.classList.contains('active');
+                        const now = Date.now();
+                        const quickSecondTap = wasActive && (now - (div._lastTap || 0) < 600);
+                        div._lastTap = now;
+                        if (!e.ctrlKey && !e.metaKey && quickSecondTap) {
+                            this.openApp(icon.app);
+                            this.deselectAllIcons();
+                            return;
+                        }
                         if (e.ctrlKey || e.metaKey) {
                             if (div.classList.contains('active')) {
                                 div.classList.remove('active');
@@ -2708,14 +3853,7 @@
                 this.windows.push(winObj);
                 this.addToTaskbar(winObj);
                 this.activateWindow(winObj);
-                let left = 100 + (this.windows.length * 20);
-                let top = 100 + (this.windows.length * 20);
-                left = Math.min(left, window.innerWidth - 400);
-                top = Math.min(top, window.innerHeight - 44 - 300);
-                winElement.style.left = `${left}px`;
-                winElement.style.top = `${top}px`;
-                winObj.savedPosition.left = left;
-                winObj.savedPosition.top = top;
+                this.placeWindow(winElement, winObj);
             }
 
             openBrowserInContainer(url) {
@@ -2727,14 +3865,7 @@
                 this.windows.push(winObj);
                 this.addToTaskbar(winObj);
                 this.activateWindow(winObj);
-                let left = 100 + (this.windows.length * 20);
-                let top = 100 + (this.windows.length * 20);
-                left = Math.min(left, window.innerWidth - 400);
-                top = Math.min(top, window.innerHeight - 44 - 300);
-                winElement.style.left = `${left}px`;
-                winElement.style.top = `${top}px`;
-                winObj.savedPosition.left = left;
-                winObj.savedPosition.top = top;
+                this.placeWindow(winElement, winObj);
                 if (url) {
                     if (typeof winElement._navigate === 'function') {
                         winElement._navigate(url);
@@ -2999,42 +4130,101 @@ case 'textviewer':
                 this.bindSettingsEvents('personalization');
             }
 
+            bindSettingsSearch(mainContent) {
+                const box = mainContent.closest('.set-content');
+                if (!box) return;
+                const input = box.querySelector('.set-search input');
+                if (!input || input.dataset.searchBound === '1') return;
+                input.dataset.searchBound = '1';
+                const jump = () => {
+                    const q = (input.value || '').trim().toLowerCase();
+                    if (!q) return;
+                    const navs = Array.from(box.querySelectorAll('.set-nav-item'));
+                    for (const nav of navs) {
+                        nav.click();
+                        const page = box.querySelector('#settings-main-content');
+                        const text = ((nav.textContent || '') + ' ' + (page ? page.textContent : '')).toLowerCase();
+                        if (text.includes(q)) {
+                            this.showToast('已定位到：' + (nav.textContent || '').trim(), 'search');
+                            if (page) page.scrollTop = 0;
+                            input.blur();
+                            return;
+                        }
+                    }
+                    this.showToast('没有找到匹配的设置项', 'search_off');
+                };
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); jump(); } });
+            }
+
             bindSettingsEvents(page) {
                 const mainContent = document.getElementById('settings-main-content');
                 if (!mainContent) return;
+                try { this.bindSettingsSearch(mainContent); } catch (e) {}
 
                 if (page === 'system') {
                     const batteryEl = document.getElementById('battery-status');
                     if (batteryEl) this.refreshBatteryInfo(batteryEl);
+                    const resultEl = document.getElementById('device-test-result');
                     const camBtn = document.getElementById('camera-test-btn');
+                    const micBtn = document.getElementById('mic-test-btn');
+                    const stopStream = (key) => {
+                        const stream = this[key];
+                        if (stream && stream.getTracks) stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
+                        this[key] = null;
+                    };
                     if (camBtn) {
-                        camBtn.addEventListener('click', () => {
+                        camBtn.addEventListener('click', async () => {
                             const preview = document.getElementById('camera-preview');
-                            if (!preview) return;
-                            if (preview.querySelector('camera')) {
-                                preview.innerHTML = '';
+                            if (this._cameraStream) {
+                                stopStream('_cameraStream');
                                 camBtn.textContent = '测试摄像头';
+                                if (preview) preview.innerHTML = '';
+                                if (resultEl) resultEl.textContent = '摄像头已关闭';
                                 return;
                             }
-                            preview.innerHTML = '<camera style="width:320px;height:200px;border-radius:8px;"></camera>';
-                            camBtn.textContent = '关闭摄像头';
+                            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                                if (resultEl) resultEl.textContent = '当前环境不支持摄像头 API';
+                                return;
+                            }
+                            try {
+                                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                                this._cameraStream = stream;
+                                camBtn.textContent = '关闭摄像头';
+                                if (preview) {
+                                    preview.innerHTML = '';
+                                    const video = document.createElement('video');
+                                    video.autoplay = true;
+                                    video.muted = true;
+                                    video.playsInline = true;
+                                    video.srcObject = stream;
+                                    video.style.cssText = 'width:320px;max-width:100%;border-radius:8px;border:1px solid #444;';
+                                    preview.appendChild(video);
+                                }
+                                if (resultEl) resultEl.textContent = '摄像头可用：' + (stream.getVideoTracks().map(t => t.label).join(', ') || '已连接');
+                            } catch (e) {
+                                if (resultEl) resultEl.textContent = '摄像头不可用：' + (e && e.name ? e.name : '未知错误');
+                            }
                         });
                     }
-                    const micBtn = document.getElementById('mic-test-btn');
                     if (micBtn) {
-                        micBtn.addEventListener('click', () => {
-                            if (micBtn.textContent === '测试麦克风') {
-                                micBtn.textContent = '关闭麦克风';
-                                const el = document.createElement('microphone');
-                                el.style.width = '0';
-                                el.style.height = '0';
-                                el.style.display = 'none';
-                                document.body.appendChild(el);
-                                this._micEl = el;
-                            } else {
-                                if (this._micEl) this._micEl.remove();
-                                this._micEl = null;
+                        micBtn.addEventListener('click', async () => {
+                            if (this._micStream) {
+                                stopStream('_micStream');
                                 micBtn.textContent = '测试麦克风';
+                                if (resultEl) resultEl.textContent = '麦克风已关闭';
+                                return;
+                            }
+                            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                                if (resultEl) resultEl.textContent = '当前环境不支持麦克风 API';
+                                return;
+                            }
+                            try {
+                                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                                this._micStream = stream;
+                                micBtn.textContent = '关闭麦克风';
+                                if (resultEl) resultEl.textContent = '麦克风可用：' + (stream.getAudioTracks().map(t => t.label).join(', ') || '已连接');
+                            } catch (e) {
+                                if (resultEl) resultEl.textContent = '麦克风不可用：' + (e && e.name ? e.name : '未知错误');
                             }
                         });
                     }
@@ -3227,6 +4417,29 @@ case 'textviewer':
                 }
 
                 if (page === 'browser') {
+                    const engineSelect = mainContent.querySelector('#settings-search-engine');
+                    if (engineSelect) {
+                        engineSelect.addEventListener('change', (e) => {
+                            this.settings.searchEngine = e.target.value;
+                            this.saveSettings();
+                            this.showToast('默认搜索引擎已切换', 'search');
+                        });
+                    }
+                    const clearBtn = mainContent.querySelector('#settings-clear-browser');
+                    if (clearBtn) {
+                        clearBtn.addEventListener('click', () => {
+                            this.showSystemDialog('清除浏览数据', '将删除全部书签与历史记录，确定继续？', () => {
+                                this.bookmarks = [];
+                                this.history = [];
+                                this.saveBookmarks();
+                                this.saveHistory();
+                                try { localStorage.removeItem('raccoonos_browser_url'); } catch (e) {}
+                                this.showToast('浏览数据已清除', 'delete');
+                                mainContent.innerHTML = this.getSettingsBrowser();
+                                this.bindSettingsEvents('browser');
+                            });
+                        });
+                    }
                     const externalToggle = mainContent.querySelector('#settings-external-open');
                     if (externalToggle) {
                         externalToggle.addEventListener('click', () => {
@@ -3241,6 +4454,34 @@ case 'textviewer':
                             autoRestoreToggle.classList.toggle('toggle-active');
                             this.settings.autoRestoreUrl = autoRestoreToggle.classList.contains('toggle-active');
                             this.saveSettings();
+                        });
+                    }
+                }
+
+                if (page === 'storage') {
+                    const detail = mainContent.querySelector('#storage-detail');
+                    if (detail) {
+                        const parts = [
+                            '设置 ' + ((localStorage.getItem('raccoonos_settings') || '').length * 2 / 1024).toFixed(1) + ' KB',
+                            '虚拟文件 ' + ((localStorage.getItem('raccoonos_filesystem') || '').length * 2 / 1024).toFixed(1) + ' KB',
+                            '书签 ' + ((localStorage.getItem('raccoonos_bookmarks') || '').length * 2 / 1024).toFixed(1) + ' KB',
+                            '历史 ' + ((localStorage.getItem('raccoonos_history') || '').length * 2 / 1024).toFixed(1) + ' KB'
+                        ];
+                        detail.innerHTML = parts.join(' · ');
+                    }
+                    const exportBtn = mainContent.querySelector('#settings-export-config');
+                    if (exportBtn) exportBtn.addEventListener('click', () => this.exportConfig());
+                    const importBtn = mainContent.querySelector('#settings-import-config');
+                    if (importBtn) importBtn.addEventListener('click', () => this.importConfig());
+                    const clearAllBtn = mainContent.querySelector('#settings-clear-all');
+                    if (clearAllBtn) {
+                        clearAllBtn.addEventListener('click', () => {
+                            this.showSystemDialog('清空全部数据', '将删除设置、虚拟文件、书签与历史，且无法恢复。确定继续？', () => {
+                                try {
+                                    Object.keys(localStorage).filter(k => k.startsWith('raccoonos_')).forEach(k => localStorage.removeItem(k));
+                                } catch (e) {}
+                                location.reload();
+                            });
                         });
                     }
                 }
@@ -3549,7 +4790,7 @@ case 'textviewer':
                     <div class="set-section" style="text-align:center;padding:20px 0;">
                         <div class="text-4xl mb-2">🦝</div>
                         <h4 style="font-size:20px;font-weight:400;color:#111;">Raccoon OS</h4>
-                        <p style="font-size:13px;color:#777;">版本 6.3.0</p>
+                        <p style="font-size:13px;color:#777;">版本 6.3.3</p>
                     </div>
                     <div class="set-section">
                         <div class="set-section-title">系统信息</div>
@@ -3565,15 +4806,15 @@ case 'textviewer':
                             <div class="set-row" style="padding:8px 0;"><span style="color:#777;">电池</span><span id="battery-status">读取中...</span></div>
                         </div>
                     </div>
-                    ${('HTMLCameraElement' in window || 'HTMLMicrophoneElement' in window) ? `
                     <div class="set-section">
-                        <div class="set-section-title">诊断</div>
-                        <div class="flex gap-2">
-                            ${'HTMLCameraElement' in window ? '<button id="camera-test-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">测试摄像头</button>' : ''}
-                            ${'HTMLMicrophoneElement' in window ? '<button id="mic-test-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">测试麦克风</button>' : ''}
+                        <div class="set-section-title">设备诊断</div>
+                        <div class="flex gap-2" style="flex-wrap:wrap;">
+                            <button id="camera-test-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">测试摄像头</button>
+                            <button id="mic-test-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">测试麦克风</button>
                         </div>
+                        <div id="device-test-result" style="font-size:12px;color:#777;margin-top:8px;line-height:1.7;">只有点击按钮时才会申请权限，测试完可再次点击关闭。</div>
                         <div id="camera-preview" class="mt-3"></div>
-                    </div>` : ''}
+                    </div>
                 `;
             }
 
@@ -3604,11 +4845,12 @@ case 'textviewer':
                 `;
             }
 
-getSettingsBrowser() {
+            getSettingsBrowser() {
                 const info = this.getSystemInfo();
                 const capList = Object.entries(info.caps).map(([k, v]) =>
                     `<span style="display:inline-block;padding:2px 8px;border-radius:4px;background:${v ? 'rgba(46,160,67,0.15)' : 'rgba(255,0,0,0.1)'};color:${v ? '#2ea043' : '#d73a49'};font-size:11px;margin:2px;">${k}</span>`
                 ).join('');
+                const engine = this.settings.searchEngine || 'bing';
                 return `
                     <div class="set-page-title">浏览器</div>
                     <div class="set-section">
@@ -3616,16 +4858,37 @@ getSettingsBrowser() {
                         <div class="set-row">
                             <div>
                                 <div class="set-row-label">网页可在外部打开</div>
-                                <div class="set-row-desc">关闭时，所有网页都将在 Raccoon 浏览器内嵌显示</div>
+                                <div class="set-row-desc">开启后，浏览器窗口内输入的网址会交给系统浏览器打开（适合需要登录的网站）</div>
                             </div>
                             <div class="toggle-switch ${this.settings.externalOpen ? 'toggle-active' : ''}" id="settings-external-open"></div>
                         </div>
                         <div class="set-row">
                             <div>
                                 <div class="set-row-label">自动恢复上次页面</div>
-                                <div class="set-row-desc">进入浏览器时自动加载上一次访问的页面</div>
+                                <div class="set-row-desc">重新打开浏览器时加载上一次访问的页面</div>
                             </div>
                             <div class="toggle-switch ${this.settings.autoRestoreUrl ? 'toggle-active' : ''}" id="settings-auto-restore"></div>
+                        </div>
+                        <div class="set-row">
+                            <div>
+                                <div class="set-row-label">默认搜索引擎</div>
+                                <div class="set-row-desc">地址栏输入的不是网址时，用它来搜索</div>
+                            </div>
+                            <select id="settings-search-engine" style="padding:6px 10px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#111;font-size:13px;">
+                                <option value="bing" ${engine === 'bing' ? 'selected' : ''}>Bing</option>
+                                <option value="google" ${engine === 'google' ? 'selected' : ''}>Google</option>
+                                <option value="baidu" ${engine === 'baidu' ? 'selected' : ''}>百度</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="set-section">
+                        <div class="set-section-title">数据</div>
+                        <div class="set-row">
+                            <div>
+                                <div class="set-row-label">书签 / 历史记录</div>
+                                <div class="set-row-desc">当前 ${this.bookmarks.length} 个书签，${this.history.length} 条历史</div>
+                            </div>
+                            <button id="settings-clear-browser" class="nt-btn">清除浏览数据</button>
                         </div>
                     </div>
                     <div class="set-section">
@@ -3636,30 +4899,99 @@ getSettingsBrowser() {
             }
 
             getSettingsStorage() {
+                const bytes = this.getLocalStorageUsage();
+                const kb = bytes / 1024;
+                const percent = Math.min(100, Math.round((kb / 5120) * 100));
                 return `
                     <div class="set-page-title">存储</div>
                     <div class="set-section">
-                        <div class="set-section-title">存储空间</div>
+                        <div class="set-section-title">本机数据</div>
                         <div class="bg-gray-200 rounded-full h-3 overflow-hidden mb-1">
-                            <div class="bg-blue-500 h-full" style="width: 35%"></div>
+                            <div class="bg-blue-500 h-full" style="width: ${percent}%"></div>
                         </div>
-                        <div style="font-size:12px;color:#777;">已使用 350 MB / 1 GB</div>
+                        <div style="font-size:12px;color:#777;">已使用 ${kb < 1024 ? kb.toFixed(1) + ' KB' : (kb / 1024).toFixed(2) + ' MB'} · 浏览器 localStorage 配额约 5 MB</div>
+                        <div id="storage-detail" style="font-size:12px;color:#777;margin-top:8px;line-height:1.8;"></div>
                     </div>
                     <div class="set-section">
                         <div class="set-section-title">配置</div>
-                        <div class="flex gap-3">
-                            <button class="nt-btn">导出配置</button>
-                            <button class="nt-btn">导入配置</button>
+                        <div class="flex gap-3" style="flex-wrap:wrap;">
+                            <button id="settings-export-config" class="nt-btn">导出配置</button>
+                            <button id="settings-import-config" class="nt-btn">导入配置</button>
+                            <button id="settings-clear-all" class="nt-btn">清空全部数据</button>
                         </div>
                     </div>
                 `;
             }
 
+            getLocalStorageUsage() {
+                let total = 0;
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (!key || !key.startsWith('raccoonos_')) continue;
+                        total += (key.length + (localStorage.getItem(key) || '').length) * 2;
+                    }
+                } catch (e) {}
+                return total;
+            }
+
+            exportConfig() {
+                const data = {};
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (!key || !key.startsWith('raccoonos_')) continue;
+                        data[key] = localStorage.getItem(key);
+                    }
+                } catch (e) {}
+                const text = JSON.stringify({ app: 'RaccoonOS', version: '6.3.3', exportedAt: new Date().toISOString(), data }, null, 2);
+                try {
+                    const blob = new Blob([text], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'raccoonos-config-' + Date.now() + '.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+                    this.showToast('配置已导出', 'download');
+                } catch (e) {
+                    this.showSystemDialog('导出配置', '<textarea style="width:100%;height:180px;font-size:12px;">' + text.replace(/</g, '&lt;') + '</textarea>');
+                }
+            }
+
+            importConfig() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json,.json';
+                input.addEventListener('change', async () => {
+                    const file = input.files && input.files[0];
+                    if (!file) return;
+                    try {
+                        const parsed = JSON.parse(await file.text());
+                        const data = parsed && parsed.data ? parsed.data : parsed;
+                        let count = 0;
+                        Object.keys(data || {}).forEach(key => {
+                            if (!key.startsWith('raccoonos_')) return;
+                            localStorage.setItem(key, data[key]);
+                            count++;
+                        });
+                        this.settings = this.loadSettings();
+                        this.bookmarks = this.loadBookmarks();
+                        this.history = this.loadHistory();
+                        this.applySettings();
+                        this.renderDesktop();
+                        this.showToast('已导入 ' + count + ' 项配置，部分内容刷新后生效', 'upload');
+                    } catch (e) {
+                        this.showToast('导入失败：文件格式不正确', 'error');
+                    }
+                });
+                input.click();
+            }
             showWindowContextMenu(x, y, winObj) {
                 this.removeAllContextMenus();
                 const menu = document.createElement('div');
                 menu.className = 'context-menu';
-                const isMaximized = winObj.element.style.width === '100%';
+                const isMaximized = !!winObj.maximized;
                 menu.innerHTML = `
                     <div class="context-menu-item" data-action="restore" style="${isMaximized ? '' : 'display:none'}">还原</div>
                     <div class="context-menu-item" data-action="maximize" style="${isMaximized ? 'display:none' : ''}">最大化</div>
@@ -3789,7 +5121,7 @@ getSettingsBrowser() {
                 const offset = 24;
                 visible.forEach((win, idx) => {
                     const el = win.element;
-                    if (el.style.width === '100%') return;
+                    if (win.maximized || el.classList.contains('window-maximized')) return;
                     el.style.left = (startX + idx * offset) + 'px';
                     el.style.top = (startY + idx * offset) + 'px';
                     win.savedPosition.left = startX + idx * offset;
@@ -3801,8 +5133,9 @@ getSettingsBrowser() {
             createBaseWindow(id, icon, title) {
                 const win = document.createElement('div');
                 win.className = 'window';
-                win.style.width = '800px';
-                win.style.height = '550px';
+                const baseRect = this.fitWindowRect(800, 550);
+                win.style.width = baseRect.width + 'px';
+                win.style.height = baseRect.height + 'px';
                 win.innerHTML = `
                     <div class="window-header">
                         <div class="window-title"><span class="material-symbols-outlined text-sm">${icon}</span> ${title}</div>
@@ -3821,12 +5154,14 @@ getSettingsBrowser() {
                 let offsetX, offsetY, isDragging = false;
                 const constrain = (left, top) => {
                     const maxX = window.innerWidth - win.offsetWidth;
-                    const maxY = window.innerHeight - 44 - win.offsetHeight;
+                    const maxY = window.innerHeight - this.taskbarHeight() - win.offsetHeight;
                     return { left: Math.max(0, Math.min(left, maxX)), top: Math.max(0, Math.min(top, maxY)) };
                 };
                 header.addEventListener('mousedown', (e) => {
                     if (this.useNativeWindowDrag && this.isStandalonePwa) return;
                     if (e.target.closest('.win-btn')) return;
+                    const draggingWin = this.windows.find(w => w.id === id);
+                    if (draggingWin && draggingWin.maximized) return;
                     isDragging = true;
                     offsetX = e.clientX - win.offsetLeft;
                     offsetY = e.clientY - win.offsetTop;
@@ -3863,42 +5198,56 @@ getSettingsBrowser() {
                     if (winObj) this.closeWindow(winObj);
                 });
                 const maximizeBtn = win.querySelector('[data-action="maximize"]');
+                maximizeBtn.title = '最大化';
+                const applyMaximize = (maximize) => {
+                    const winObj = this.windows.find(w => w.id === id);
+                    if (!winObj) return;
+                    const winContent = win.querySelector('.window-content');
+                    if (maximize) {
+                        const r = win.getBoundingClientRect();
+                        winObj.restoreRect = {
+                            left: Math.round(r.left),
+                            top: Math.round(r.top),
+                            width: Math.round(r.width),
+                            height: Math.round(r.height)
+                        };
+                        winObj.maximized = true;
+                        win.classList.add('window-maximized');
+                        win.style.width = window.innerWidth + 'px';
+                        win.style.height = Math.max(200, window.innerHeight - this.taskbarHeight()) + 'px';
+                        win.style.left = '0px';
+                        win.style.top = '0px';
+                        win.style.borderRadius = '0';
+                        win.style.boxSizing = 'border-box';
+                        if (winContent) winContent.style.borderRadius = '0';
+                        maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">fullscreen_exit</span>';
+                        maximizeBtn.title = '还原';
+                    } else {
+                        const r = winObj.restoreRect || { left: 80, top: 60, width: 800, height: 550 };
+                        winObj.maximized = false;
+                        win.classList.remove('window-maximized');
+                        win.style.width = Math.max(280, r.width) + 'px';
+                        win.style.height = Math.max(220, r.height) + 'px';
+                        win.style.left = r.left + 'px';
+                        win.style.top = r.top + 'px';
+                        win.style.borderRadius = '';
+                        win.style.boxSizing = '';
+                        if (winContent) winContent.style.borderRadius = '';
+                        maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">crop_square</span>';
+                        maximizeBtn.title = '最大化';
+                        this.clampWindowToViewport(win);
+                    }
+                    winObj.savedPosition.left = parseInt(win.style.left) || 0;
+                    winObj.savedPosition.top = parseInt(win.style.top) || 0;
+                    winObj.savedPosition.width = win.style.width;
+                    winObj.savedPosition.height = win.style.height;
+                };
                 maximizeBtn.addEventListener('click', () => {
                     const winObj = this.windows.find(w => w.id === id);
                     if (!winObj) return;
-                    const isMaximized = win.style.width === '100%';
-                    if (isMaximized) {
-                        win.style.width = winObj.savedPosition.width || '800px';
-                        win.style.height = winObj.savedPosition.height || '550px';
-                        win.style.left = winObj.savedPosition.left + 'px';
-                        win.style.top = winObj.savedPosition.top + 'px';
-                        win.style.borderRadius = '10px';
-                        win.style.boxSizing = '';
-                        const winContent = win.querySelector('.window-content');
-                        if (winContent) {
-                            winContent.style.borderRadius = '';
-                            winContent.style.overflow = '';
-                        }
-                        maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">crop_square</span>';
-                    } else {
-                        winObj.savedPosition.width = win.style.width;
-                        winObj.savedPosition.height = win.style.height;
-                        winObj.savedPosition.left = parseInt(win.style.left);
-                        winObj.savedPosition.top = parseInt(win.style.top);
-                        win.style.width = '100%';
-                        win.style.height = 'calc(100vh - 44px)';
-                        win.style.left = '0';
-                        win.style.top = '0';
-                        win.style.borderRadius = '0 0 10px 10px';
-                        win.style.boxSizing = 'border-box';
-                        const winContent = win.querySelector('.window-content');
-                        if (winContent) {
-                            winContent.style.borderRadius = '0 0 10px 10px';
-                            winContent.style.overflow = 'hidden';
-                        }
-                        maximizeBtn.innerHTML = '<span class="material-symbols-outlined text-sm">fullscreen_exit</span>';
-                    }
+                    applyMaximize(!winObj.maximized);
                 });
+                win._setMaximized = applyMaximize;
                 win.addEventListener('mousedown', () => {
                     const winObj = this.windows.find(w => w.id === id);
                     if (winObj) this.activateWindow(winObj);
@@ -3906,9 +5255,135 @@ getSettingsBrowser() {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         win.classList.add('window-open');
+                        this.clampWindowToViewport(win);
                     });
                 });
                 return win;
+            }
+
+            taskbarHeight() {
+                const tb = document.getElementById('taskbar');
+                return (tb && tb.offsetHeight) ? tb.offsetHeight : 44;
+            }
+
+            isNarrow() {
+                return window.innerWidth <= 900;
+            }
+
+            fitWindowRect(prefW, prefH) {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const tb = this.taskbarHeight();
+                const maxW = Math.max(280, vw - 8);
+                const maxH = Math.max(220, vh - tb - 10);
+                if (this.isNarrow()) {
+                    return {
+                        width: Math.min(Math.round(vw * 0.94), maxW),
+                        height: Math.min(vh - tb - 14, maxH),
+                        narrow: true
+                    };
+                }
+                return {
+                    width: Math.min(Math.max(320, prefW || 800), Math.min(maxW, vw - 40)),
+                    height: Math.min(Math.max(240, prefH || 550), Math.min(maxH, vh - tb - 32)),
+                    narrow: false
+                };
+            }
+
+            placeWindow(winElement, winObj, prefW, prefH) {
+                const rect = this.fitWindowRect(prefW, prefH);
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const tb = this.taskbarHeight();
+                let left, top;
+                if (rect.narrow) {
+                    left = Math.round((vw - rect.width) / 2);
+                    top = 6;
+                } else {
+                    const cascade = Math.min(this.windows.length, 6) * 18;
+                    left = 80 + cascade;
+                    top = 56 + Math.round(cascade * 0.7);
+                    if (left + rect.width > vw) left = Math.max(0, vw - rect.width);
+                    if (top + rect.height > vh - tb) top = Math.max(0, vh - tb - rect.height);
+                }
+                winElement.style.width = rect.width + 'px';
+                winElement.style.height = rect.height + 'px';
+                winElement.style.left = left + 'px';
+                winElement.style.top = top + 'px';
+                if (winObj) {
+                    winObj.maximized = false;
+                    winObj.savedPosition = winObj.savedPosition || {};
+                    winObj.savedPosition.left = left;
+                    winObj.savedPosition.top = top;
+                    winObj.savedPosition.width = rect.width + 'px';
+                    winObj.savedPosition.height = rect.height + 'px';
+                }
+                return { left, top, width: rect.width, height: rect.height };
+            }
+
+            clampWindowToViewport(win) {
+                try {
+                    const vw = window.innerWidth;
+                    const vh = window.innerHeight - this.taskbarHeight();
+                    const winObj = this.windows.find(w => w.element === win);
+                    if (winObj && winObj.maximized) return;
+                    const rect = win.getBoundingClientRect();
+                    let width = Math.min(Math.max(280, rect.width), vw);
+                    let height = Math.min(Math.max(220, rect.height), vh);
+                    if (width !== rect.width) win.style.width = width + 'px';
+                    if (height !== rect.height) win.style.height = height + 'px';
+                    const r2 = win.getBoundingClientRect();
+                    let left = parseFloat(win.style.left);
+                    let top = parseFloat(win.style.top);
+                    if (isNaN(left)) left = win.offsetLeft || 0;
+                    if (isNaN(top)) top = win.offsetTop || 0;
+                    if (left + r2.width > vw) left = Math.max(0, vw - r2.width);
+                    if (top + r2.height > vh) top = Math.max(0, vh - r2.height);
+                    left = Math.max(0, Math.min(left, Math.max(0, vw - r2.width)));
+                    top = Math.max(0, Math.min(top, Math.max(0, vh - r2.height)));
+                    win.style.left = left + 'px';
+                    win.style.top = top + 'px';
+                    if (winObj) {
+                        winObj.savedPosition.left = left;
+                        winObj.savedPosition.top = top;
+                        winObj.savedPosition.width = win.style.width || (r2.width + 'px');
+                        winObj.savedPosition.height = win.style.height || (r2.height + 'px');
+                    }
+                } catch (e) {}
+            }
+
+            handleViewportResize() {
+                const tb = this.taskbarHeight();
+                const desktop = document.getElementById('desktop-area');
+                if (desktop) desktop.style.height = Math.max(200, window.innerHeight - tb) + 'px';
+                this.windows.forEach(winObj => {
+                    const win = winObj.element;
+                    if (!win || !win.isConnected) return;
+                    if (winObj.maximized) {
+                        win.style.width = window.innerWidth + 'px';
+                        win.style.height = Math.max(200, window.innerHeight - tb) + 'px';
+                        win.style.left = '0px';
+                        win.style.top = '0px';
+                        return;
+                    }
+                    this.clampWindowToViewport(win);
+                });
+            }
+
+            initViewportHandling() {
+                if (this._viewportHandlingBound) return;
+                this._viewportHandlingBound = true;
+                let timer = null;
+                const schedule = () => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        try { this.handleViewportResize(); } catch (e) {}
+                    }, 120);
+                };
+                window.addEventListener('resize', schedule);
+                window.addEventListener('orientationchange', schedule);
+                document.addEventListener('fullscreenchange', schedule);
+                if (window.visualViewport) window.visualViewport.addEventListener('resize', schedule);
             }
 
             // 文件管理器（完整功能）
@@ -3939,7 +5414,10 @@ getSettingsBrowser() {
                         <button class="fm-icon-btn" data-nav="refresh" title="刷新"><span class="material-symbols-outlined">refresh</span></button>
                         <div class="fm-toolbar-divider"></div>
                         <button class="fm-icon-btn" data-nav="newfolder" title="新建文件夹"><span class="material-symbols-outlined">create_new_folder</span></button>
+                        <button class="fm-icon-btn" data-nav="newfile" title="新建文本文件"><span class="material-symbols-outlined">note_add</span></button>
                         <button class="fm-icon-btn" data-nav="paste" title="粘贴"><span class="material-symbols-outlined">content_paste</span></button>
+                        <button class="fm-icon-btn" data-nav="delete" title="删除"><span class="material-symbols-outlined">delete</span></button>
+                        <button class="fm-icon-btn" data-nav="rename" title="重命名"><span class="material-symbols-outlined">drive_file_rename_outline</span></button>
                         <div class="fm-breadcrumb" id="fm-breadcrumb"></div>
                         <div class="fm-search">
                             <span class="material-symbols-outlined" style="font-size:16px;color:#888;">search</span>
@@ -3957,6 +5435,8 @@ getSettingsBrowser() {
                             <div class="fm-tree-item" data-path="pictures"><span class="material-symbols-outlined">image</span>图片</div>
                             <div class="fm-tree-item" data-path="music"><span class="material-symbols-outlined">music_note</span>音乐</div>
                             <div class="fm-tree-item" data-path="videos"><span class="material-symbols-outlined">video_library</span>视频</div>
+                            <div class="fm-side-group">本机</div>
+                            <div class="fm-tree-item" data-path="__local__"><span class="material-symbols-outlined">hard_drive</span>本机文件</div>
                         </div>
                         <div class="fm-right">
                             <div class="fm-content" id="fm-content"></div>
@@ -3965,18 +5445,12 @@ getSettingsBrowser() {
                     </div>
                 `;
 
-                const sidebar = content.querySelector('.fm-sidebar');
                 const breadcrumb = content.querySelector('#fm-breadcrumb');
                 const fmContent = content.querySelector('#fm-content');
                 const statusEl = content.querySelector('#fm-status');
                 const searchInput = content.querySelector('#fm-search-input');
-
-                let currentPath = 'root';
-                let currentDirHandle = null;
-                let currentDirLabel = null;
-                const historyBack = [];
-                const historyForward = [];
-                let selectedFile = null;
+                const toolbar = content.querySelector('.fm-toolbar');
+                const btn = (name) => toolbar.querySelector(`[data-nav="${name}"]`);
 
                 const dirMeta = {
                     desktop: { name: '桌面', icon: 'desktop_windows', cls: 'fm-folder-icon' },
@@ -3987,31 +5461,69 @@ getSettingsBrowser() {
                     videos: { name: '视频', icon: 'video_library', cls: 'fm-video-icon' }
                 };
 
+                let currentPath = 'root';
+                let currentDirHandle = null;
+                let currentDirLabel = null;
+                let selectedFile = null;
+                let realEntries = [];
+                const historyBack = [];
+                const historyForward = [];
+
+                const fsList = (path) => (this.fileSystem[path] = this.fileSystem[path] || []);
+                const persist = () => { try { this.saveFileSystem(); } catch (e) {} };
+
+                const findParentPath = (path) => {
+                    for (const key of Object.keys(this.fileSystem)) {
+                        const hit = (this.fileSystem[key] || []).find(f => f && f.type === 'dir' && f.path === path);
+                        if (hit) return key;
+                    }
+                    return 'root';
+                };
+
+                const pathChain = (path) => {
+                    const chain = [];
+                    let cur = path;
+                    let guard = 0;
+                    while (cur && cur !== 'root' && guard++ < 20) {
+                        chain.unshift(cur);
+                        cur = findParentPath(cur);
+                    }
+                    return chain;
+                };
+
+                const labelOfPath = (path) => {
+                    if (dirMeta[path]) return dirMeta[path].name;
+                    for (const key of Object.keys(this.fileSystem)) {
+                        const hit = (this.fileSystem[key] || []).find(f => f && f.type === 'dir' && f.path === path);
+                        if (hit) return hit.name;
+                    }
+                    return path;
+                };
+
                 const renderBreadcrumb = () => {
-                    const crumb = (label, path) => `<span class="fm-crumb" data-path="${path}">${label}</span>`;
-                    let html = crumb('此电脑', 'root');
+                    let html = `<span class="fm-crumb" data-path="root">此电脑</span>`;
                     if (currentDirHandle) {
-                        html += `<span class="fm-crumb-sep">›</span><span class="fm-crumb" style="cursor:default;color:#fff;">${currentDirLabel || '磁盘'}</span>`;
+                        html += `<span class="fm-crumb-sep">›</span><span class="fm-crumb" style="cursor:default;color:#fff;">${currentDirLabel || '本机文件夹'}</span>`;
                     } else if (currentPath !== 'root') {
-                        html += `<span class="fm-crumb-sep">›</span>${crumb(dirMeta[currentPath] ? dirMeta[currentPath].name : currentPath, currentPath)}`;
+                        pathChain(currentPath).forEach((p) => {
+                            html += `<span class="fm-crumb-sep">›</span><span class="fm-crumb" data-path="${p}">${labelOfPath(p)}</span>`;
+                        });
                     }
                     breadcrumb.innerHTML = html;
                     breadcrumb.querySelectorAll('.fm-crumb[data-path]').forEach(el => {
-                        el.addEventListener('click', () => {
-                            const p = el.dataset.path;
-                            if (p === 'root') navigateToInternal('root');
-                        });
+                        el.addEventListener('click', () => navigateTo(el.dataset.path));
                     });
                 };
 
                 const renderHome = () => {
+                    const localSupported = this.fileSystemAccessSupported || ('FileReader' in window);
                     fmContent.innerHTML = `
                         <div class="fm-section-title">设备名称：RACCOON-OS</div>
                         <div class="fm-section-title">设备和驱动器</div>
                         <div class="fm-home-grid">
-                            <div class="fm-card" data-path="c_drive">
+                            <div class="fm-card" data-path="__local__">
                                 <span class="material-symbols-outlined fm-icon fm-drive-icon">hard_drive</span>
-                                <div class="fm-card-info"><div class="fm-card-name">本地文件夹</div><div class="fm-card-sub">双击选择本机目录实时浏览</div></div>
+                                <div class="fm-card-info"><div class="fm-card-name">本机文件</div><div class="fm-card-sub">${this.fileSystemAccessSupported ? '选择本机目录实时浏览' : '选择本机文件导入浏览'}</div></div>
                             </div>
                         </div>
                         <div class="fm-section-title">文件夹</div>
@@ -4019,37 +5531,155 @@ getSettingsBrowser() {
                             ${Object.entries(dirMeta).map(([path, m]) => `
                                 <div class="fm-card" data-path="${path}">
                                     <span class="material-symbols-outlined fm-icon ${m.cls}">${m.icon}</span>
-                                    <div class="fm-card-info"><div class="fm-card-name">${m.name}</div></div>
+                                    <div class="fm-card-info"><div class="fm-card-name">${m.name}</div><div class="fm-card-sub">${fsList(path).length} 个项目</div></div>
                                 </div>
                             `).join('')}
                         </div>
                     `;
                     fmContent.querySelectorAll('.fm-card').forEach(card => {
-                        card.addEventListener('dblclick', () => {
+                        const open = () => {
                             const p = card.dataset.path;
-                            if (p === 'c_drive' || p === 'd_drive') {
-                                this.openRealFolder((handle, label) => {
-                                    navigateToReal(handle, label);
-                                });
-                            } else {
-                                navigateToInternal(p);
-                            }
-                        });
+                            if (p === '__local__') this.openLocalFolderFromDesktop((handle, label) => {
+                                if (handle) navigateToReal(handle, label);
+                                else render();
+                            });
+                            else navigateTo(p);
+                        };
                         card.addEventListener('click', () => {
-                            selectedFile = null;
-                            renderStatus();
                             fmContent.querySelectorAll('.fm-card').forEach(c => c.classList.remove('selected'));
                             card.classList.add('selected');
+                            selectedFile = null;
+                            renderStatus();
+                            clearTimeout(card._tapTimer);
+                            card._tapTimer = setTimeout(() => { if (card.classList.contains('selected')) open(); }, 320);
                         });
+                        card.addEventListener('dblclick', open);
                     });
                 };
 
+                const bindItemEvents = (itemEl, file, onOpen) => {
+                    let pressTimer = null;
+                    let longPressed = false;
+                    let startX = 0, startY = 0;
+
+                    itemEl.addEventListener('pointerdown', (e) => {
+                        if (e.pointerType === 'mouse' && e.button !== 0) return;
+                        longPressed = false;
+                        startX = e.clientX; startY = e.clientY;
+                        clearTimeout(pressTimer);
+                        pressTimer = setTimeout(() => {
+                            longPressed = true;
+                            selectItem(file);
+                            openContextMenu(e.clientX, e.clientY, file);
+                        }, 550);
+                    });
+                    itemEl.addEventListener('pointermove', (e) => {
+                        if (!pressTimer) return;
+                        if (Math.abs(e.clientX - startX) > 12 || Math.abs(e.clientY - startY) > 12) {
+                            clearTimeout(pressTimer);
+                            pressTimer = null;
+                        }
+                    });
+                    itemEl.addEventListener('pointerup', () => { clearTimeout(pressTimer); pressTimer = null; });
+                    itemEl.addEventListener('pointercancel', () => { clearTimeout(pressTimer); pressTimer = null; });
+
+                    itemEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (longPressed) { longPressed = false; return; }
+                        const now = Date.now();
+                        const last = itemEl._lastTap || 0;
+                        const wasSelected = itemEl.classList.contains('selected') &&
+                            fmContent.querySelectorAll('.fm-item.selected').length === 1;
+                        selectItem(file);
+                        itemEl._lastTap = now;
+                        if (wasSelected && now - last < 420) {
+                            onOpen();
+                        }
+                    });
+                    itemEl.addEventListener('dblclick', (e) => { e.stopPropagation(); onOpen(); });
+                    itemEl.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        selectItem(file);
+                        openContextMenu(e.clientX, e.clientY, file);
+                    });
+                };
+
+                const selectItem = (file) => {
+                    selectedFile = file;
+                    fmContent.querySelectorAll('.fm-item').forEach(i => i.classList.remove('selected'));
+                    const name = String(file.name || '').replace(/["\\]/g, '\\$&');
+                    const el = fmContent.querySelector(`.fm-item[data-name="${name}"]`);
+                    if (el) el.classList.add('selected');
+                    const editable = !currentDirHandle && currentPath !== 'root';
+                    btn('delete').disabled = !editable || !selectedFile;
+                    btn('rename').disabled = !editable || !selectedFile;
+                    renderStatus();
+                };
+
+                const openItem = (file) => {
+                    if (!file) return;
+                    if (file.type === 'dir') {
+                        navigateTo(file.path);
+                    } else if (file.handle) {
+                        this.openFileWithApp(file, file.handle);
+                    } else if (file.dataUrl) {
+                        this.openFileWithApp(file, null);
+                    } else {
+                        this.openFileWithApp(file, null);
+                    }
+                };
+
                 const renderInternalDir = () => {
-                    const files = this.fileSystem[currentPath] || [];
+                    const files = fsList(currentPath);
                     const query = searchInput.value.trim().toLowerCase();
-                    const shown = query ? files.filter(f => f.name.toLowerCase().includes(query)) : files;
+                    const shown = query ? files.filter(f => f.name.toLowerCase().includes(query)) : files.slice();
+                    shown.sort((a, b) => {
+                        if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+                        return a.name.localeCompare(b.name, 'zh-CN');
+                    });
                     if (shown.length === 0) {
                         fmContent.innerHTML = `<div class="fm-empty">此文件夹为空${query ? '，无匹配搜索结果' : ''}</div>`;
+                        renderStatus();
+                        return;
+                    }
+                    fmContent.innerHTML = `<div class="fm-grid">
+                        ${shown.map((file) => {
+                            const { icon, cls } = this.fileIconOf(file.name, file.type);
+                            return `<div class="fm-item" data-name="${file.name}" draggable="false">
+                                <span class="material-symbols-outlined fm-icon ${cls}">${icon}</span>
+                                <span class="fm-name">${file.name}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>`;
+                    fmContent.querySelectorAll('.fm-item').forEach((itemEl) => {
+                        const file = shown.find(f => f.name === itemEl.dataset.name);
+                        if (!file) return;
+                        bindItemEvents(itemEl, file, () => openItem(file));
+                    });
+                    renderStatus();
+                };
+
+                const renderRealDir = async () => {
+                    if (!currentDirHandle) return;
+                    const query = searchInput.value.trim().toLowerCase();
+                    realEntries = [];
+                    try {
+                        for await (const [name, handle] of currentDirHandle.entries()) {
+                            realEntries.push({ name, type: handle.kind === 'directory' ? 'dir' : 'file', handle });
+                        }
+                    } catch (e) {
+                        fmContent.innerHTML = `<div class="fm-empty">无法读取该目录（可能未授权）</div>`;
+                        return;
+                    }
+                    realEntries.sort((a, b) => {
+                        if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+                        return a.name.localeCompare(b.name, 'zh-CN');
+                    });
+                    const shown = query ? realEntries.filter(f => f.name.toLowerCase().includes(query)) : realEntries;
+                    if (shown.length === 0) {
+                        fmContent.innerHTML = `<div class="fm-empty">此文件夹为空${query ? '，无匹配搜索结果' : ''}</div>`;
+                        renderStatus();
                         return;
                     }
                     fmContent.innerHTML = `<div class="fm-grid">
@@ -4062,115 +5692,67 @@ getSettingsBrowser() {
                         }).join('')}
                     </div>`;
                     fmContent.querySelectorAll('.fm-item').forEach((itemEl) => {
-                        const file = files.find(f => f.name === itemEl.dataset.name);
-                        itemEl.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            selectedFile = file;
-                            fmContent.querySelectorAll('.fm-item').forEach(i => i.classList.remove('selected'));
-                            itemEl.classList.add('selected');
-                            renderStatus();
-                        });
-                        itemEl.addEventListener('dblclick', () => {
-                            if (file.type === 'dir') {
-                                navigateToInternal(file.path);
-                            } else {
-                                this.openFileWithApp(file, null);
-                            }
-                        });
-                        itemEl.addEventListener('contextmenu', (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            this.showFileContextMenu(e.clientX, e.clientY, file, () => renderInternalDir(), content, currentPath);
+                        const file = shown.find(f => f.name === itemEl.dataset.name);
+                        if (!file) return;
+                        bindItemEvents(itemEl, file, () => {
+                            if (file.type === 'dir') navigateToReal(file.handle, file.name);
+                            else this.openFileWithApp(file, file.handle);
                         });
                     });
-                };
-
-                const renderRealDir = () => {
-                    if (!currentDirHandle) return;
-                    const query = searchInput.value.trim().toLowerCase();
-                    const entries = [];
-                    (async () => {
-                        try {
-                            for await (const [name, handle] of currentDirHandle.entries()) {
-                                entries.push({ name, type: handle.kind === 'directory' ? 'dir' : 'file', handle });
-                            }
-                        } catch (e) { fmContent.innerHTML = `<div class="fm-empty">无法读取目录</div>`; return; }
-                        entries.sort((a, b) => {
-                            if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
-                            return a.name.localeCompare(b.name, 'zh-CN');
-                        });
-                        const shown = query ? entries.filter(f => f.name.toLowerCase().includes(query)) : entries;
-                        if (shown.length === 0) {
-                            fmContent.innerHTML = `<div class="fm-empty">此文件夹为空${query ? '，无匹配搜索结果' : ''}</div>`;
-                            renderStatus();
-                            return;
-                        }
-                        fmContent.innerHTML = `<div class="fm-grid">
-                            ${shown.map((file) => {
-                                const { icon, cls } = this.fileIconOf(file.name, file.type);
-                                return `<div class="fm-item" data-name="${file.name}">
-                                    <span class="material-symbols-outlined fm-icon ${cls}">${icon}</span>
-                                    <span class="fm-name">${file.name}</span>
-                                </div>`;
-                            }).join('')}
-                        </div>`;
-                        fmContent.querySelectorAll('.fm-item').forEach((itemEl) => {
-                            const file = entries.find(f => f.name === itemEl.dataset.name);
-                            itemEl.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                selectedFile = file;
-                                fmContent.querySelectorAll('.fm-item').forEach(i => i.classList.remove('selected'));
-                                itemEl.classList.add('selected');
-                                renderStatus();
-                            });
-                            itemEl.addEventListener('dblclick', async () => {
-                                if (file.type === 'dir') {
-                                    navigateToReal(file.handle, file.name);
-                                } else {
-                                    this.openFileWithApp(file, file.handle);
-                                }
-                            });
-                            itemEl.addEventListener('contextmenu', (e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            });
-                        });
-                        renderStatus();
-                    })();
-                };
-
-                const renderDir = () => {
-                    if (currentDirHandle) renderRealDir();
-                    else renderInternalDir();
+                    renderStatus();
                 };
 
                 const render = () => {
                     renderBreadcrumb();
-                    sidebar.querySelectorAll('.fm-tree-item').forEach(t => {
-                        const active = currentDirHandle ? t.dataset.path === 'root' : t.dataset.path === currentPath;
+                    try {
+                        const titleText = currentDirHandle
+                            ? (currentDirLabel || '本机文件夹')
+                            : (currentPath === 'root' ? '此电脑' : labelOfPath(currentPath));
+                        win.querySelector('.window-title').innerHTML =
+                            '<span class="material-symbols-outlined text-sm">folder</span> ' + titleText;
+                    } catch (e) {}
+                    content.querySelectorAll('.fm-tree-item').forEach(t => {
+                        const active = currentDirHandle ? t.dataset.path === '__local__' : t.dataset.path === currentPath;
                         t.classList.toggle('active', active);
                     });
-                    if (currentPath === 'root') renderHome();
-                    else renderDir();
+                    if (currentPath === 'root' && !currentDirHandle) renderHome();
+                    else if (currentDirHandle) renderRealDir();
+                    else renderInternalDir();
                     renderStatus();
-                    const backBtn = content.querySelector('[data-nav="back"]');
-                    const fwdBtn = content.querySelector('[data-nav="forward"]');
-                    const upBtn = content.querySelector('[data-nav="up"]');
-                    backBtn.disabled = historyBack.length === 0;
-                    fwdBtn.disabled = historyForward.length === 0;
-                    upBtn.disabled = currentPath === 'root' && !currentDirHandle;
+                    btn('back').disabled = historyBack.length === 0;
+                    btn('forward').disabled = historyForward.length === 0;
+                    btn('up').disabled = !currentDirHandle && currentPath === 'root';
+                    btn('newfolder').disabled = !!currentDirHandle || currentPath === 'root';
+                    btn('newfile').disabled = !!currentDirHandle || currentPath === 'root';
+                    btn('paste').disabled = !!currentDirHandle || currentPath === 'root';
+                    btn('delete').disabled = !!currentDirHandle || currentPath === 'root' || !selectedFile;
+                    btn('rename').disabled = !!currentDirHandle || currentPath === 'root' || !selectedFile;
                 };
 
                 const renderStatus = () => {
                     if (currentPath === 'root' && !currentDirHandle) {
-                        const n = Object.keys(this.fileSystem).filter(k => k !== 'desktop_folder').length;
-                        statusEl.textContent = `${n} 个项目`;
+                        statusEl.textContent = `${Object.keys(dirMeta).length} 个文件夹 · 本机文件可导入`;
                         return;
                     }
-                    statusEl.textContent = selectedFile ? `已选择: ${selectedFile.name}` : '';
+                    if (currentDirHandle) {
+                        const count = realEntries.length;
+                        statusEl.textContent = selectedFile ? `已选择: ${selectedFile.name}` : `${count} 个项目（本机只读浏览）`;
+                        return;
+                    }
+                    const files = fsList(currentPath);
+                    statusEl.textContent = selectedFile
+                        ? `已选择: ${selectedFile.name}${selectedFile.size ? ' · ' + formatSize(selectedFile.size) : ''}`
+                        : `${files.length} 个项目`;
                 };
 
-                const navigateToInternal = (path) => {
+                const formatSize = (bytes) => {
+                    if (!bytes) return '';
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+                };
+
+                const navigateTo = (path) => {
                     if (path === currentPath && !currentDirHandle) return;
                     historyBack.push({ path: currentPath, handle: currentDirHandle, label: currentDirLabel });
                     historyForward.length = 0;
@@ -4187,123 +5769,340 @@ getSettingsBrowser() {
                     historyForward.length = 0;
                     currentPath = null;
                     currentDirHandle = handle;
-                    currentDirLabel = label || '磁盘';
+                    currentDirLabel = label || '本机文件夹';
                     selectedFile = null;
                     searchInput.value = '';
                     render();
                 };
 
-                content.querySelector('[data-nav="back"]').addEventListener('click', () => {
-                    if (historyBack.length === 0) return;
-                    historyForward.unshift({ path: currentPath, handle: currentDirHandle, label: currentDirLabel });
-                    const entry = historyBack.pop();
+                const restoreState = (entry) => {
                     currentPath = entry.path;
                     currentDirHandle = entry.handle;
                     currentDirLabel = entry.label;
                     selectedFile = null;
                     searchInput.value = '';
                     render();
-                });
-                content.querySelector('[data-nav="forward"]').addEventListener('click', () => {
-                    if (historyForward.length === 0) return;
-                    historyBack.push({ path: currentPath, handle: currentDirHandle, label: currentDirLabel });
-                    const entry = historyForward.shift();
-                    currentPath = entry.path;
-                    currentDirHandle = entry.handle;
-                    currentDirLabel = entry.label;
-                    selectedFile = null;
-                    searchInput.value = '';
-                    render();
-                });
-                content.querySelector('[data-nav="up"]').addEventListener('click', () => {
-                    if (currentDirHandle) {
-                        navigateToInternal('root');
+                };
+
+                const refresh = () => { if (currentDirHandle) renderRealDir(); else render(); };
+
+                const openContextMenu = (x, y, file) => {
+                    this.removeAllContextMenus();
+                    const menu = document.createElement('div');
+                    menu.className = 'context-menu';
+                    menu.style.position = 'absolute';
+                    menu.style.zIndex = '1000';
+                    const rect = content.getBoundingClientRect();
+                    menu.style.left = Math.max(4, Math.min(x - rect.left, rect.width - 150)) + 'px';
+                    menu.style.top = Math.max(4, Math.min(y - rect.top, rect.height - 190)) + 'px';
+                    const isReal = !!file.handle;
+                    menu.innerHTML = `
+                        <div class="context-menu-item" data-action="open">打开</div>
+                        <div class="context-menu-divider"></div>
+                        ${isReal ? `
+                        <div class="context-menu-item" data-action="props">属性</div>
+                        ` : `
+                        <div class="context-menu-item" data-action="rename">重命名</div>
+                        <div class="context-menu-item" data-action="copy">复制</div>
+                        <div class="context-menu-item" data-action="cut">剪切</div>
+                        <div class="context-menu-divider"></div>
+                        <div class="context-menu-item" data-action="props">属性</div>
+                        <div class="context-menu-item" data-action="share">分享</div>
+                        <div class="context-menu-item" data-action="delete">删除</div>
+                        `}
+                    `;
+                    content.appendChild(menu);
+                    const close = () => menu.remove();
+                    menu.querySelector('[data-action="open"]').addEventListener('click', () => { close(); openItem(file); });
+                    const renameEl = menu.querySelector('[data-action="rename"]');
+                    if (renameEl) renameEl.addEventListener('click', () => { close(); renameFile(file); });
+                    const copyEl = menu.querySelector('[data-action="copy"]');
+                    if (copyEl) copyEl.addEventListener('click', () => {
+                        this.copyFile = file; this.copyFilePath = currentPath; this.cutFile = null; this.cutFilePath = null;
+                        close(); this.showToast('已复制，可到其它文件夹粘贴', 'content_copy');
+                    });
+                    const cutEl = menu.querySelector('[data-action="cut"]');
+                    if (cutEl) cutEl.addEventListener('click', () => {
+                        this.cutFile = file; this.cutFilePath = currentPath; this.copyFile = null; this.copyFilePath = null;
+                        close(); this.showToast('已剪切，可到其它文件夹粘贴', 'content_cut');
+                    });
+                    const delEl = menu.querySelector('[data-action="delete"]');
+                    if (delEl) delEl.addEventListener('click', () => { close(); removeFile(file); });
+                    const shareEl = menu.querySelector('[data-action="share"]');
+                    if (shareEl) shareEl.addEventListener('click', () => { close(); this.shareFile(file); });
+                    menu.querySelector('[data-action="props"]').addEventListener('click', () => {
+                        close();
+                        this.showSystemDialog('属性',
+                            `<div style="line-height:1.9;font-size:13px;">
+                                <div>名称：${file.name}</div>
+                                <div>类型：${file.type === 'dir' ? '文件夹' : (file.name.split('.').pop() || '文件')}</div>
+                                <div>位置：${currentDirHandle ? (currentDirLabel || '本机文件夹') : labelOfPath(currentPath)}</div>
+                                ${file.size ? `<div>大小：${formatSize(file.size)}</div>` : ''}
+                                ${file.handle ? '<div style="color:#2ea043;">本机真实文件（只读）</div>' : '<div style="color:#888;">虚拟文件</div>'}
+                            </div>`);
+                    });
+                    const onDoc = (e) => { if (!menu.contains(e.target)) { close(); document.removeEventListener('click', onDoc); } };
+                    setTimeout(() => document.addEventListener('click', onDoc), 0);
+                };
+
+                const renameFile = (file) => {
+                    if (!file || currentDirHandle) return;
+                    this.showSystemDialog('重命名', '请输入新名称：', (newName) => {
+                        const name = (newName || '').trim();
+                        if (!name) return;
+                        if (fsList(currentPath).some(f => f !== file && f.name === name)) {
+                            this.showToast('同名文件已存在', 'error');
+                            return;
+                        }
+                        file.name = name;
+                        persist();
+                        refresh();
+                        this.showToast('已重命名', 'drive_file_rename_outline');
+                    }, true);
+                };
+
+                const removeFile = (file) => {
+                    if (!file || currentDirHandle) return;
+                    this.showSystemDialog('删除', `确定要删除「${file.name}」吗？此操作不可撤销。`, () => {
+                        const list = fsList(currentPath);
+                        const idx = list.indexOf(file);
+                        if (idx !== -1) list.splice(idx, 1);
+                        selectedFile = null;
+                        persist();
+                        refresh();
+                        this.showToast('已删除', 'delete');
+                    });
+                };
+
+                const createEntry = (name, type) => {
+                    const n = (name || '').trim();
+                    if (!n) return;
+                    const list = fsList(currentPath);
+                    if (list.some(f => f.name === n)) { this.showToast('同名项目已存在', 'error'); return; }
+                    if (type === 'dir') {
+                        const key = `${currentPath}_${Date.now().toString(36)}`;
+                        list.push({ name: n, type: 'dir', path: key });
+                        this.fileSystem[key] = [];
                     } else {
-                        navigateToInternal('root');
+                        list.push({ name: /\.\w+$/.test(n) ? n : n + '.txt', type: 'file', content: '' });
                     }
+                    persist();
+                    refresh();
+                };
+
+                btn('back').addEventListener('click', () => {
+                    if (!historyBack.length) return;
+                    historyForward.unshift({ path: currentPath, handle: currentDirHandle, label: currentDirLabel });
+                    restoreState(historyBack.pop());
                 });
-                content.querySelector('[data-nav="refresh"]').addEventListener('click', () => {
-                    render();
+                btn('forward').addEventListener('click', () => {
+                    if (!historyForward.length) return;
+                    historyBack.push({ path: currentPath, handle: currentDirHandle, label: currentDirLabel });
+                    restoreState(historyForward.shift());
+                });
+                btn('up').addEventListener('click', () => {
+                    if (currentDirHandle) { navigateTo('root'); return; }
+                    if (currentPath === 'root') return;
+                    const parent = findParentPath(currentPath);
+                    navigateTo(parent || 'root');
+                });
+                btn('refresh').addEventListener('click', () => {
+                    refresh();
                     this.showToast('已刷新', 'refresh');
                 });
-                content.querySelector('[data-nav="newfolder"]').addEventListener('click', () => {
-                    if (currentDirHandle) {
-                        this.showToast('真实目录不支持新建，请在虚拟文件夹中操作', 'lock');
-                        return;
-                    }
-                    if (currentPath === 'root') {
-                        this.showToast('请先进入一个文件夹目录', 'info');
-                        return;
-                    }
-                    this.showSystemDialog('新建文件夹', '请输入文件夹名称:', (name) => {
-                        if (name) {
-                            this.fileSystem[currentPath].push({
-                                name,
-                                type: 'dir',
-                                path: `${currentPath}_${Date.now()}`
-                            });
-                            render();
-                        }
-                    }, true);
+                btn('newfolder').addEventListener('click', () => {
+                    if (currentDirHandle) { this.showToast('本机目录为只读浏览，请在虚拟文件夹中新建', 'lock'); return; }
+                    if (currentPath === 'root') { this.showToast('请先进入一个文件夹', 'info'); return; }
+                    this.showSystemDialog('新建文件夹', '请输入文件夹名称：', (name) => createEntry(name, 'dir'), true);
                 });
-                content.querySelector('[data-nav="paste"]').addEventListener('click', () => {
-                    if (currentDirHandle) {
-                        this.showToast('真实目录不支持粘贴，请在虚拟文件夹中操作', 'lock');
-                        return;
-                    }
-                    if (currentPath === 'root') {
-                        this.showToast('请先进入一个文件夹目录', 'info');
-                        return;
-                    }
+                btn('newfile').addEventListener('click', () => {
+                    if (currentDirHandle) { this.showToast('本机目录为只读浏览，请在虚拟文件夹中新建', 'lock'); return; }
+                    if (currentPath === 'root') { this.showToast('请先进入一个文件夹', 'info'); return; }
+                    this.showSystemDialog('新建文本文件', '文件名（可省略 .txt）：', (name) => createEntry(name, 'file'), true);
+                });
+                btn('delete').addEventListener('click', () => {
+                    if (selectedFile) removeFile(selectedFile);
+                });
+                btn('rename').addEventListener('click', () => {
+                    if (selectedFile) renameFile(selectedFile);
+                });
+                btn('paste').addEventListener('click', () => {
+                    if (currentDirHandle) { this.showToast('本机目录为只读浏览，不能粘贴', 'lock'); return; }
+                    if (currentPath === 'root') { this.showToast('请先进入一个文件夹', 'info'); return; }
+                    const list = fsList(currentPath);
                     if (this.copyFile) {
-                        const newFile = { ...this.copyFile, name: `副本 - ${this.copyFile.name}` };
-                        this.fileSystem[currentPath].push(newFile);
-                        this.copyFile = null;
-                        this.copyFilePath = null;
-                        render();
+                        const base = this.copyFile.name.replace(/(\.[^.]+)?$/, '');
+                        const ext = (this.copyFile.name.match(/(\.[^.]+)$/) || [''])[0];
+                        let name = `副本 - ${this.copyFile.name}`;
+                        let n = 1;
+                        while (list.some(f => f.name === name)) { name = `副本 (${n++}) - ${base}${ext}`; }
+                        const cloned = JSON.parse(JSON.stringify(this.copyFile));
+                        cloned.name = name;
+                        if (cloned.type === 'dir') {
+                            const key = `${currentPath}_${Date.now().toString(36)}`;
+                            cloned.path = key;
+                            this.fileSystem[key] = [];
+                        }
+                        list.push(cloned);
+                        persist(); refresh();
+                        this.showToast('已粘贴', 'content_paste');
                     } else if (this.cutFile) {
                         const srcPath = this.cutFilePath;
-                        if (srcPath && srcPath !== currentPath) {
-                            const srcIdx = this.fileSystem[srcPath].indexOf(this.cutFile);
-                            if (srcIdx !== -1) {
-                                this.fileSystem[srcPath].splice(srcIdx, 1);
-                                this.fileSystem[currentPath].push(this.cutFile);
-                            }
+                        const srcList = fsList(srcPath);
+                        const idx = srcList.indexOf(this.cutFile);
+                        if (idx !== -1 && srcPath !== currentPath) {
+                            srcList.splice(idx, 1);
+                            list.push(this.cutFile);
+                            persist(); refresh();
+                            this.showToast('已移动', 'content_paste');
+                        } else if (srcPath === currentPath) {
+                            this.showToast('已在该文件夹内', 'info');
                         }
-                        this.cutFile = null;
-                        this.cutFilePath = null;
-                        render();
+                        this.cutFile = null; this.cutFilePath = null;
                     } else {
-                        this.showToast('剪贴板中没有可粘贴的内容', 'content_paste');
+                        this.showToast('剪贴板中没有内容', 'content_paste');
                     }
                 });
-                sidebar.querySelectorAll('.fm-tree-item').forEach(el => {
-                    el.addEventListener('click', () => navigateToInternal(el.dataset.path));
+
+                content.querySelectorAll('.fm-tree-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        if (el.dataset.path === '__local__') {
+                            this.openLocalFolderFromDesktop((handle, label) => {
+                                if (handle) navigateToReal(handle, label);
+                            });
+                            return;
+                        }
+                        navigateTo(el.dataset.path);
+                        if (dirMeta[el.dataset.path]) fsList(el.dataset.path);
+                    });
                 });
+
                 fmContent.addEventListener('contextmenu', (e) => {
                     if (e.target.closest('.fm-item') || e.target.closest('.fm-card')) return;
                     if (currentPath === 'root' || currentDirHandle) return;
                     e.preventDefault();
                     selectedFile = null;
                     renderStatus();
-                    this.showFolderContextMenu(e.clientX, e.clientY, () => renderInternalDir(), content, currentPath);
+                    this.removeAllContextMenus();
+                    const menu = document.createElement('div');
+                    menu.className = 'context-menu';
+                    menu.style.position = 'absolute';
+                    const rect = content.getBoundingClientRect();
+                    menu.style.left = Math.max(4, Math.min(e.clientX - rect.left, rect.width - 160)) + 'px';
+                    menu.style.top = Math.max(4, Math.min(e.clientY - rect.top, rect.height - 160)) + 'px';
+                    menu.innerHTML = `
+                        <div class="context-menu-item" data-action="newfolder">新建文件夹</div>
+                        <div class="context-menu-item" data-action="newfile">新建文本文件</div>
+                        <div class="context-menu-divider"></div>
+                        <div class="context-menu-item" data-action="paste">粘贴</div>
+                        <div class="context-menu-item" data-action="refresh">刷新</div>
+                    `;
+                    content.appendChild(menu);
+                    menu.querySelector('[data-action="newfolder"]').addEventListener('click', () => {
+                        menu.remove();
+                        this.showSystemDialog('新建文件夹', '请输入文件夹名称：', (name) => createEntry(name, 'dir'), true);
+                    });
+                    menu.querySelector('[data-action="newfile"]').addEventListener('click', () => {
+                        menu.remove();
+                        this.showSystemDialog('新建文本文件', '文件名（可省略 .txt）：', (name) => createEntry(name, 'file'), true);
+                    });
+                    menu.querySelector('[data-action="paste"]').addEventListener('click', () => { menu.remove(); btn('paste').click(); });
+                    menu.querySelector('[data-action="refresh"]').addEventListener('click', () => { menu.remove(); refresh(); });
+                    const onDoc = (ev) => { if (!menu.contains(ev.target)) { menu.remove(); document.removeEventListener('click', onDoc); } };
+                    setTimeout(() => document.addEventListener('click', onDoc), 0);
                 });
+
                 fmContent.addEventListener('click', () => {
                     if (selectedFile) {
                         selectedFile = null;
-                        renderStatus();
                         fmContent.querySelectorAll('.fm-item').forEach(i => i.classList.remove('selected'));
+                        renderStatus();
                     }
                 });
+
                 searchInput.addEventListener('input', () => {
                     if (currentPath === 'root' && !currentDirHandle) return;
-                    renderDir();
+                    if (currentDirHandle) renderRealDir(); else renderInternalDir();
                 });
 
+                content.tabIndex = 0;
+                content.addEventListener('keydown', (e) => {
+                    if (e.target === searchInput) return;
+                    if (!selectedFile) return;
+                    if (e.key === 'Enter') { e.preventDefault(); openItem(selectedFile); }
+                    else if (e.key === 'Delete') { e.preventDefault(); removeFile(selectedFile); }
+                    else if (e.key === 'F2') { e.preventDefault(); renameFile(selectedFile); }
+                    else if (e.key === 'Backspace') { e.preventDefault(); btn('up').click(); }
+                });
+
+                win._refresh = refresh;
                 render();
                 return win;
             }
+            saveFileSystem() {
+                const strip = (keepData) => {
+                    const plain = {};
+                    Object.keys(this.fileSystem).forEach(k => {
+                        plain[k] = (this.fileSystem[k] || []).map(f => {
+                            const o = { name: f.name, type: f.type };
+                            if (f.path) o.path = f.path;
+                            if (typeof f.content === 'string') o.content = f.content;
+                            if (f.size) o.size = f.size;
+                            if (keepData && f.dataUrl && f.dataUrl.length < 400000) o.dataUrl = f.dataUrl;
+                            return o;
+                        });
+                    });
+                    return JSON.stringify(plain);
+                };
+                try {
+                    localStorage.setItem('raccoonos_filesystem', strip(true));
+                } catch (e) {
+                    try { localStorage.setItem('raccoonos_filesystem', strip(false)); } catch (e2) {}
+                }
+            }
 
+            openLocalFolderFromDesktop(onReady) {
+                if (this.fileSystemAccessSupported) {
+                    this.openRealFolder((handle) => {
+                        if (handle) onReady(handle, handle.name || '本机文件夹');
+                    });
+                    return;
+                }
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.multiple = true;
+                input.style.display = 'none';
+                document.body.appendChild(input);
+                input.addEventListener('change', async () => {
+                    const files = Array.from(input.files || []);
+                    input.remove();
+                    if (!files.length) return;
+                    const list = this.fileSystem['downloads'] = this.fileSystem['downloads'] || [];
+                    let imported = 0;
+                    for (const f of files) {
+                        const kind = this.getFileKind(f.name);
+                        const entry = { name: f.name, type: 'file', size: f.size };
+                        if (kind === 'text' && f.size < 512 * 1024) {
+                            try { entry.content = await f.text(); } catch (e) {}
+                        } else if (kind === 'image' && f.size < 2 * 1024 * 1024) {
+                            try {
+                                entry.dataUrl = await new Promise((res, rej) => {
+                                    const r = new FileReader();
+                                    r.onload = () => res(r.result);
+                                    r.onerror = rej;
+                                    r.readAsDataURL(f);
+                                });
+                            } catch (e) {}
+                        }
+                        list.push(entry);
+                        imported++;
+                    }
+                    this.saveFileSystem();
+                    this.showToast('已导入 ' + imported + ' 个文件到「下载」', 'folder_open');
+                    onReady(null, null);
+                });
+                input.click();
+            }
             getFileKind(name) {
                 const ext = (name.split('.').pop() || '').toLowerCase();
                 if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico'].includes(ext)) return 'image';
@@ -4357,6 +6156,7 @@ getSettingsBrowser() {
                     if (handle) {
                         try { const blob = await handle.getFile(); if (blob) url = URL.createObjectURL(blob); } catch (e) {}
                     }
+                    if (!url && file.dataUrl) url = file.dataUrl;
                     if (!url) url = this.makeSvgImageUrl(file.name);
                     const winElement = this.createImageViewerWindow(winId, [{ name: file.name, url }]);
                     this.finishOpenWindow(winElement, 'imagerviewer', winId);
@@ -4365,6 +6165,7 @@ getSettingsBrowser() {
                     if (handle) {
                         try { const blob = await handle.getFile(); if (blob) url = URL.createObjectURL(blob); } catch (e) {}
                     }
+                    if (!url && file.dataUrl) url = file.dataUrl;
                     const winElement = this.createVideoViewerWindow(winId, [{ name: file.name, url, isVirtual: !handle }]);
                     this.finishOpenWindow(winElement, 'videoviewer', winId);
                 } else if (kind === 'audio') {
@@ -4372,6 +6173,7 @@ getSettingsBrowser() {
                     if (handle) {
                         try { const blob = await handle.getFile(); if (blob) url = URL.createObjectURL(blob); } catch (e) {}
                     }
+                    if (!url && file.dataUrl) url = file.dataUrl;
                     if (!url) url = this.makeToneWav(440 + (file.name.charCodeAt(0) % 400));
                     const winElement = this.createMusicPlayerWindow(winId, [{ name: file.name, url, isVirtual: !handle }]);
                     this.finishOpenWindow(winElement, 'musicplayer', winId);
@@ -4394,14 +6196,7 @@ getSettingsBrowser() {
                 this.windows.push(winObj);
                 this.addToTaskbar(winObj);
                 this.activateWindow(winObj);
-                let left = 120 + (this.windows.length * 22);
-                let top = 90 + (this.windows.length * 22);
-                left = Math.min(left, window.innerWidth - 400);
-                top = Math.min(top, window.innerHeight - 44 - 320);
-                winElement.style.left = left + 'px';
-                winElement.style.top = top + 'px';
-                winObj.savedPosition.left = left;
-                winObj.savedPosition.top = top;
+                this.placeWindow(winElement, winObj, 800, 500);
             }
 
             createImageViewerWindow(id, images) {
@@ -4908,7 +6703,7 @@ getSettingsBrowser() {
                 content.style.display = 'flex';
                 content.style.flexDirection = 'column';
                 content.innerHTML = `
-                    <div style="display:flex;gap:4px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.1);background:#202020;align-items:center;flex-wrap:wrap;">
+                    <div class="nt-toolbar" style="display:flex;gap:4px;padding:8px 10px;align-items:center;flex-wrap:wrap;">
                         <button class="nt-btn" data-act="new">新建</button>
                         <button class="nt-btn" data-act="open">打开</button>
                         <button class="nt-btn" data-act="save">保存</button>
@@ -4920,7 +6715,7 @@ getSettingsBrowser() {
                         <span style="margin-left:auto;font-size:11px;color:#888;" id="nt-filename">无标题</span>
                     </div>
                     <textarea id="nt-text" class="nt-textarea" spellcheck="false" placeholder="在此输入文本..."></textarea>
-                    <div style="height:26px;display:flex;align-items:center;padding:0 12px;font-size:11px;color:#888;border-top:1px solid rgba(255,255,255,0.08);background:#202020;">
+                    <div class="nt-statusbar" style="height:28px;display:flex;align-items:center;padding:0 12px;font-size:11px;">
                         <span id="nt-status">行 1，列 1</span>
                         <span style="margin-left:auto;" id="nt-charcount">0 字符</span>
                     </div>
@@ -5172,260 +6967,498 @@ getSettingsBrowser() {
                 content.style.flexDirection = 'column';
                 content.style.overflow = 'hidden';
                 content.innerHTML = `
-                    <div id="browser-tip-${id}" style="flex-shrink:0; display:flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(0,120,215,0.22); border-bottom:1px solid rgba(0,120,215,0.5); font-size:12px; color:#cde7ff; box-sizing:border-box;">
+                    <div id="browser-tip-${id}" class="browser-tip" style="flex-shrink:0; display:flex; align-items:center; gap:8px; padding:6px 12px; font-size:11.5px; box-sizing:border-box;">
                         <span class="material-symbols-outlined" style="font-size:16px;flex-shrink:0;">info</span>
-                        <span>提示：如需在容器内新窗口打开链接，请长按链接拖动到右下角"在此打开新窗口"区域</span>
-                        <button class="browser-tip-close" style="margin-left:auto;background:none;border:none;color:#cde7ff;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0;">✕</button>
+                        <span>提示：多数网站禁止被嵌入；被拦截时点错误页的「在容器内新窗口打开」即可。</span>
+                        <button class="browser-tip-close" style="margin-left:auto;background:none;border:none;color:inherit;opacity:.6;cursor:pointer;font-size:14px;line-height:1;flex-shrink:0;">✕</button>
                     </div>
-                    <div style="flex-shrink: 0; display: flex; padding: 8px; gap: 8px; background:#2a2a2a; border-bottom: 1px solid #444; box-sizing: border-box; height: 44px; align-items: center;">
-                        <button class="browser-nav-back p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
-                        <button class="browser-nav-forward p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
-                        <button class="browser-nav-reload p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">refresh</span></button>
-                        <div class="flex-1 bg-[#333] rounded-full px-3 py-1 flex items-center gap-2">
+                    <div class="browser-toolbar" style="flex-shrink: 0; display: flex; padding: 6px 8px; gap: 4px; box-sizing: border-box; height: 46px; align-items: center;">
+                        <button class="browser-nav-back p-1 rounded hover:bg-white/10" title="后退"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                        <button class="browser-nav-forward p-1 rounded hover:bg-white/10" title="前进"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+                        <button class="browser-nav-reload p-1 rounded hover:bg-white/10" title="刷新"><span class="material-symbols-outlined text-sm">refresh</span></button>
+                        <button class="browser-nav-home p-1 rounded hover:bg-white/10" title="主页"><span class="material-symbols-outlined text-sm">home</span></button>
+                        <div class="browser-url-pill flex-1 px-3 flex items-center gap-2" style="min-width:0;">
                             <span class="material-symbols-outlined text-xs text-white/50">lock</span>
-                            <input type="text" id="browser-url-${id}" class="bg-transparent flex-1 outline-none text-sm text-white" placeholder="输入网址或搜索" value="">
+                            <input type="text" id="browser-url-${id}" class="bg-transparent flex-1 outline-none text-sm text-white" placeholder="输入网址或搜索" value="" autocomplete="off" spellcheck="false">
                         </div>
-                        <button class="browser-go p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
-                        <button class="browser-bookmark p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">bookmark</span></button>
-                        <button class="browser-history p-1 rounded hover:bg-white/10"><span class="material-symbols-outlined text-sm">history</span></button>
+                        <button class="browser-go p-1 rounded hover:bg-white/10" title="转到"><span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+                        <button class="browser-bookmark p-1 rounded hover:bg-white/10" title="书签"><span class="material-symbols-outlined text-sm">star_border</span></button>
+                        <button class="browser-history p-1 rounded hover:bg-white/10" title="历史记录"><span class="material-symbols-outlined text-sm">history</span></button>
                     </div>
-                    <div id="browser-home-${id}" class="browser-home" style="flex:1;overflow-y:auto;box-sizing:border-box;">
+                    <div id="browser-progress-${id}" style="flex-shrink:0;height:2px;background:#0078d4;width:0;transition:width .25s ease;"></div>
+                    <div id="browser-home-${id}" class="browser-home" style="position:relative;inset:auto;flex:1;overflow-y:auto;box-sizing:border-box;">
                         <div class="logo">🦝</div>
                         <div class="title">Raccoon Browser</div>
                         <div class="search-box">
                             <span class="material-symbols-outlined">search</span>
                             <input type="text" id="browser-home-search-${id}" placeholder="搜索或输入网址">
                         </div>
-                        <div class="quick-links">
-                            ${this.bookmarks.map(b => `<div class="quick-link" data-url="${b.url}"><span class="material-symbols-outlined text-blue-500">language</span><span>${b.title}</span></div>`).join('')}
-                        </div>
-                        <div style="margin-top: 24px; width: 500px;">
+                        <div class="quick-links" id="browser-quick-${id}"></div>
+                        <div style="margin-top: 24px; width: 500px; max-width:86%;">
                             <div class="text-sm opacity-70 mb-2">最近访问</div>
                             <div id="recent-history-${id}" class="flex flex-wrap gap-2"></div>
                         </div>
                         <div style="position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5;">安全浏览 · 无痕模式可用</div>
                     </div>
-                    <div id="browser-error-${id}" style="display:none; position:absolute; top:44px; left:0; right:0; bottom:0; background:#1a1a1a; z-index:5; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:40px; box-sizing:border-box;">
+                    <div id="browser-error-${id}" style="display:none; position:absolute; top:94px; left:0; right:0; bottom:0; background:#1a1a1a; z-index:5; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:12px; padding:40px; box-sizing:border-box;">
                         <div style="font-size:52px;">⚠️</div>
                         <div style="font-size:18px; font-weight:600;">此网页无法在此处显示</div>
                         <div style="font-size:13px; color:#aaa; max-width:460px; line-height:1.6;">该网站可能通过 X-Frame-Options 或 CSP 安全策略禁止被嵌入。某些网站也会因 iframe 第三方 Cookie 限制而无法保持登录状态。</div>
-                        <button class="browser-error-open" style="background:#0078d4; color:#fff; border:none; padding:10px 24px; border-radius:6px; cursor:pointer; font-size:14px;">在新标签页中打开</button>
-                        <div class="browser-error-hint" style="font-size:11px; color:#888; max-width:460px; line-height:1.6;">提示：如需保持登录，建议开启【设置 → 浏览器 → 网页可在外部打开】在新标签页中访问；或在浏览器中将本网站加入信任站点、允许第三方 Cookie。</div>
+                        <div class="flex gap-2" style="flex-wrap:wrap;justify-content:center;">
+                            <button class="browser-error-open" style="background:#0078d4; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-size:14px;">在容器内新窗口打开</button>
+                            <button class="browser-error-external" style="background:#3a3a3a; color:#fff; border:1px solid #555; padding:10px 20px; border-radius:6px; cursor:pointer; font-size:14px;">在浏览器标签页打开</button>
+                            <button class="browser-error-retry" style="background:#3a3a3a; color:#fff; border:1px solid #555; padding:10px 20px; border-radius:6px; cursor:pointer; font-size:14px;">重试</button>
+                        </div>
+                        <div class="browser-error-hint" style="font-size:11px; color:#888; max-width:460px; line-height:1.6;">提示：需要登录态的网站，建议用「在浏览器标签页打开」在系统浏览器中访问。</div>
                         <div id="browser-error-url-${id}" style="font-size:12px; color:#666; word-break:break-all; max-width:460px;"></div>
                     </div>
-                    <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;" name="browser-frame-${id}" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads"></iframe>
+                    <div id="browser-ext-${id}" style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#ccc; text-align:center; padding:30px; box-sizing:border-box;">
+                        <span class="material-symbols-outlined" style="font-size:44px;color:#4da3ff;">open_in_new</span>
+                        <div style="font-size:15px;">已在系统浏览器的新标签页中打开</div>
+                        <div id="browser-ext-url-${id}" style="font-size:12px;color:#888;word-break:break-all;max-width:460px;"></div>
+                        <button class="browser-ext-inline" style="background:#3a3a3a;color:#fff;border:1px solid #555;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;">仍在本窗口内显示</button>
+                    </div>
+                    <iframe id="browser-frame-${id}" style="flex:1;display:none;border:none;box-sizing:border-box;background:#fff;" name="browser-frame-${id}" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups"></iframe>
                 `;
+
                 const urlInput = content.querySelector(`#browser-url-${id}`);
                 const goBtn = content.querySelector('.browser-go');
                 const backBtn = content.querySelector('.browser-nav-back');
                 const forwardBtn = content.querySelector('.browser-nav-forward');
                 const reloadBtn = content.querySelector('.browser-nav-reload');
+                const homeBtn = content.querySelector('.browser-nav-home');
                 const bookmarkBtn = content.querySelector('.browser-bookmark');
                 const historyBtn = content.querySelector('.browser-history');
                 const frame = content.querySelector(`#browser-frame-${id}`);
                 const homeDiv = content.querySelector(`#browser-home-${id}`);
                 const homeSearch = content.querySelector(`#browser-home-search-${id}`);
-                const quickLinks = content.querySelectorAll('.quick-link');
+                const quickWrap = content.querySelector(`#browser-quick-${id}`);
                 const recentDiv = content.querySelector(`#recent-history-${id}`);
                 const errorDiv = content.querySelector(`#browser-error-${id}`);
-                const errorOpenBtn = errorDiv.querySelector('.browser-error-open');
                 const errorUrlSpan = content.querySelector(`#browser-error-url-${id}`);
+                const extDiv = content.querySelector(`#browser-ext-${id}`);
+                const extUrlSpan = content.querySelector(`#browser-ext-url-${id}`);
+                const progress = content.querySelector(`#browser-progress-${id}`);
                 const tipClose = content.querySelector('.browser-tip-close');
                 const tipBar = content.querySelector(`#browser-tip-${id}`);
-                if (tipClose && tipBar) {
-                    tipClose.addEventListener('click', () => { tipBar.style.display = 'none'; });
-                }
+                if (tipClose && tipBar) tipClose.addEventListener('click', () => { tipBar.style.display = 'none'; });
+
+                const engines = {
+                    bing: 'https://www.bing.com/search?q=',
+                    google: 'https://www.google.com/search?q=',
+                    baidu: 'https://www.baidu.com/s?wd='
+                };
 
                 let currentUrl = '';
-
-                const updateRecentHistory = () => {
-                    recentDiv.innerHTML = this.history.slice(0, 5).map(h => `
-                        <div class="text-xs bg-white/10 px-2 py-1 rounded-full cursor-pointer hover:bg-white/20" data-url="${h.url}">${h.title || h.url}</div>
-                    `).join('');
-                    recentDiv.querySelectorAll('[data-url]').forEach(el => {
-                        el.addEventListener('click', () => navigate(el.dataset.url));
-                    });
-                };
-                updateRecentHistory();
+                let stack = [''];
+                let stackIndex = 0;
+                let pendingUrl = '';
 
                 const isUrl = (input) => {
-                    const s = input.trim();
+                    const s = String(input || '').trim();
                     if (!s) return false;
                     if (/\s/.test(s)) return false;
-                    if (/^(https?:\/\/)/i.test(s)) return true;
-                    if (/^(file|ftp|ssh|mailto):/i.test(s)) return true;
+                    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) return true;
+                    if (/^(mailto|tel|data|blob):/i.test(s)) return true;
                     if (/^localhost(:\d+)?(\/.*)?$/i.test(s)) return true;
                     if (/^(\d{1,3}\.){3}\d{1,3}(:\d+)?(\/.*)?$/.test(s)) return true;
                     if (/^[\w-]+(\.[\w-]+)+(:\d+)?(\/.*)?$/.test(s)) return true;
                     return false;
                 };
-
                 const buildUrl = (input) => {
-                    let s = input.trim();
+                    const s = String(input || '').trim();
                     if (!s) return '';
-                    if (/^https?:\/\//i.test(s)) return s;
-                    if (/^(file|ftp|ssh|mailto):/i.test(s)) return s;
+                    if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return s;
                     return 'https://' + s;
                 };
-
-                const navigate = (raw) => {
-                    let url = raw.trim();
-                    if (!url) return;
-                    if (!isUrl(url)) {
-                        url = 'https://www.bing.com/search?q=' + encodeURIComponent(url);
-                    } else {
-                        url = buildUrl(url);
-                    }
-                    if (this.settings.externalOpen) {
-                        currentUrl = url;
-                        urlInput.value = url;
-                        homeDiv.style.display = 'none';
-                        errorDiv.style.display = 'none';
-                        frame.style.display = 'block';
-                        this.addToHistory(url, url);
-                        errorUrlSpan.textContent = url;
-                        window.open(url, '_blank');
-                        frame.src = 'about:blank';
-                    } else {
-                        currentUrl = url;
-                        urlInput.value = url;
-                        homeDiv.style.display = 'none';
-                        errorDiv.style.display = 'none';
-                        frame.style.display = 'block';
-                        this.addToHistory(url, url);
-                        frame.src = url;
-                        errorUrlSpan.textContent = url;
-                    }
-                    localStorage.setItem('raccoonos_browser_url', url);
-                    this.updateMediaSession(url.replace(/^https?:\/\//, '').split('/')[0], 'RaccoonOS 浏览器');
+                const searchUrl = (q) => {
+                    const key = engines[this.settings.searchEngine] ? this.settings.searchEngine : 'bing';
+                    return engines[key] + encodeURIComponent(q);
+                };
+                const resolveInput = (raw) => {
+                    const s = String(raw || '').trim();
+                    if (!s) return '';
+                    return isUrl(s) ? buildUrl(s) : searchUrl(s);
                 };
 
-                const openInNewTab = (url) => {
-                    if (!this.settings.externalOpen) {
-                        this.showToast('外部打开已禁用。请在【设置 → 浏览器】中开启', 'lock');
+                const setProgress = (pct) => {
+                    if (!progress) return;
+                    progress.style.width = pct + '%';
+                    if (pct >= 100) setTimeout(() => { progress.style.width = '0'; }, 260);
+                };
+
+                const updateNavButtons = () => {
+                    backBtn.style.opacity = stackIndex > 0 ? '1' : '0.35';
+                    forwardBtn.style.opacity = stackIndex < stack.length - 1 ? '1' : '0.35';
+                    backBtn.style.pointerEvents = stackIndex > 0 ? 'auto' : 'none';
+                    forwardBtn.style.pointerEvents = stackIndex < stack.length - 1 ? 'auto' : 'none';
+                };
+
+                const updateBookmarkIcon = () => {
+                    const starred = !!this.bookmarks.find(b => b.url === currentUrl);
+                    const icon = bookmarkBtn.querySelector('.material-symbols-outlined');
+                    if (icon) icon.textContent = starred ? 'star' : 'star_border';
+                    bookmarkBtn.style.color = starred ? '#ffd54f' : '';
+                };
+
+                const renderQuickLinks = () => {
+                    quickWrap.innerHTML = this.bookmarks.length ? this.bookmarks.map(b =>
+                        `<div class="quick-link" data-url="${b.url}" title="${b.url}"><span class="material-symbols-outlined text-blue-500">language</span><span>${b.title || b.url}</span></div>`
+                    ).join('') : '<div style="font-size:12px;opacity:.5;">还没有书签，浏览网页时点星标即可添加</div>';
+                    quickWrap.querySelectorAll('.quick-link').forEach(el => {
+                        el.addEventListener('click', () => navigate(el.dataset.url));
+                        el.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            const url = el.dataset.url;
+                            this.showLinkContextMenu(e.clientX, e.clientY, url, null);
+                        });
+                    });
+                };
+                const renderRecent = () => {
+                    recentDiv.innerHTML = this.history.slice(0, 6).map(h =>
+                        `<div class="text-xs bg-white/10 px-2 py-1 rounded-full cursor-pointer hover:bg-white/20" data-url="${h.url}" title="${h.url}">${h.title || h.url}</div>`
+                    ).join('') || '<div style="font-size:12px;opacity:.4;">暂无记录</div>';
+                    recentDiv.querySelectorAll('[data-url]').forEach(el => {
+                        el.addEventListener('click', () => navigate(el.dataset.url));
+                    });
+                };
+
+                const showHome = () => {
+                    currentUrl = '';
+                    urlInput.value = '';
+                    frame.src = 'about:blank';
+                    frame.style.display = 'none';
+                    errorDiv.style.display = 'none';
+                    extDiv.style.display = 'none';
+                    homeDiv.style.display = 'block';
+                    renderQuickLinks();
+                    renderRecent();
+                    updateBookmarkIcon();
+                    win.querySelector('.window-title').innerHTML = '<span class="material-symbols-outlined text-sm">public</span> Raccoon Browser';
+                };
+
+                const showBlocked = (url) => {
+                    frame.style.display = 'none';
+                    homeDiv.style.display = 'none';
+                    extDiv.style.display = 'none';
+                    errorDiv.style.display = 'flex';
+                    errorUrlSpan.textContent = url || '';
+                };
+
+                const applyUrlToFrame = (url) => {
+                    currentUrl = url;
+                    urlInput.value = url;
+                    homeDiv.style.display = 'none';
+                    errorDiv.style.display = 'none';
+                    extDiv.style.display = 'none';
+                    frame.style.display = 'block';
+                    setProgress(25);
+                    pendingUrl = url;
+                    try {
+                        frame.src = url;
+                    } catch (e) {
+                        showBlocked(url);
+                    }
+                    updateBookmarkIcon();
+                    try {
+                        const host = url.replace(/^[a-z]+:\/\//i, '').split('/')[0];
+                        win.querySelector('.window-title').innerHTML = '<span class="material-symbols-outlined text-sm">public</span> ' + host;
+                    } catch (e) {}
+                    localStorage.setItem('raccoonos_browser_url', url);
+                };
+
+                const pushToStack = (url) => {
+                    if (stack[stackIndex] === url) return;
+                    stack = stack.slice(0, stackIndex + 1);
+                    stack.push(url);
+                    stackIndex = stack.length - 1;
+                    updateNavButtons();
+                };
+
+                const go = (url, push) => {
+                    if (!url) return;
+                    if (this.settings.externalOpen) {
+                        const nativeOpen = window.__raccoonNativeOpen || window.open;
+                        try { nativeOpen.call(window, url, '_blank', 'noopener'); } catch (e) {}
+                        currentUrl = url;
+                        urlInput.value = url;
+                        homeDiv.style.display = 'none';
+                        errorDiv.style.display = 'none';
+                        frame.style.display = 'none';
+                        extDiv.style.display = 'flex';
+                        extUrlSpan.textContent = url;
+                        if (push) pushToStack(url);
+                        this.addToHistory(url, url);
+                        localStorage.setItem('raccoonos_browser_url', url);
+                        updateBookmarkIcon();
                         return;
                     }
-                    let target = url || currentUrl || urlInput.value;
-                    if (target && !/^https?:\/\//i.test(target) && isUrl(target)) {
-                        target = buildUrl(target);
-                    }
-                    if (target) window.open(target, '_blank');
+                    applyUrlToFrame(url);
+                    if (push) pushToStack(url);
+                    this.addToHistory(url, url);
+                    renderRecent();
                 };
 
-                // 导航按钮事件
+                const navigate = (raw, push) => {
+                    const url = resolveInput(raw);
+                    if (!url) return;
+                    go(url, push !== false);
+                };
+
                 goBtn.onclick = () => navigate(urlInput.value);
-                urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigate(urlInput.value); });
-
-                // 前进、后退、刷新：通过 iframe 原生 API
-                const execIframe = (method) => {
-                    try {
-                        const w = frame.contentWindow;
-                        if (w && w[method]) w[method]();
-                    } catch(e) {
-                        // 跨域限制，忽略
-                    }
-                };
-                backBtn.onclick = () => execIframe('history.back');
-                forwardBtn.onclick = () => execIframe('history.forward');
-                reloadBtn.onclick = () => {
-                    try {
-                        const w = frame.contentWindow;
-                        if (w && w.location && typeof w.location.reload === 'function') {
-                            w.location.reload();
-                            return;
-                        }
-                    } catch (e) {
-                        // 跨域，contentWindow 不可访问
-                    }
-                    const src = frame.src;
-                    if (!src || src === 'about:blank') return;
-                    frame.src = 'about:blank';
-                    setTimeout(() => { frame.src = src; }, 10);
-                };
-
-                // 主页搜索
+                urlInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); navigate(urlInput.value); }
+                });
                 homeSearch.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        navigate(homeSearch.value);
-                    }
-                });
-                quickLinks.forEach(link => {
-                    link.addEventListener('click', () => navigate(link.dataset.url));
+                    if (e.key === 'Enter') { e.preventDefault(); navigate(homeSearch.value); }
                 });
 
-                // iframe 加载事件
-                frame.addEventListener('load', () => {
-                    try {
-                        const doc = frame.contentDocument || frame.contentWindow.document;
-                        if (doc && doc.body) {
-                            const bodyText = (doc.body.textContent || '').trim().toLowerCase();
-                            if (bodyText.length < 20 && (bodyText.includes('refused') || bodyText.includes('denied') || bodyText.includes('blocked') || bodyText.includes('无法') || bodyText.includes('拒绝'))) {
-                                errorDiv.style.display = 'flex';
-                            }
-                        }
-                    } catch (e) {
-                        // 跨域页面，无法检测内容，不显示错误
+                backBtn.onclick = () => {
+                    if (stackIndex <= 0) return;
+                    stackIndex--;
+                    updateNavButtons();
+                    const url = stack[stackIndex];
+                    if (!url) { showHome(); return; }
+                    applyUrlToFrame(url);
+                    this.addToHistory(url, url);
+                };
+                forwardBtn.onclick = () => {
+                    if (stackIndex >= stack.length - 1) return;
+                    stackIndex++;
+                    updateNavButtons();
+                    const url = stack[stackIndex];
+                    if (!url) { showHome(); return; }
+                    applyUrlToFrame(url);
+                    this.addToHistory(url, url);
+                };
+                reloadBtn.onclick = () => {
+                    if (!currentUrl) { showHome(); return; }
+                    applyUrlToFrame(currentUrl);
+                };
+                homeBtn.onclick = () => {
+                    stack = [''];
+                    stackIndex = 0;
+                    updateNavButtons();
+                    showHome();
+                };
+
+                bookmarkBtn.addEventListener('click', () => {
+                    const url = currentUrl || urlInput.value.trim();
+                    if (!url) { this.showToast('先打开一个网页再收藏', 'star_border'); return; }
+                    const existing = this.bookmarks.findIndex(b => b.url === url);
+                    if (existing !== -1) {
+                        this.bookmarks.splice(existing, 1);
+                        this.saveBookmarks();
+                        updateBookmarkIcon();
+                        renderQuickLinks();
+                        this.showToast('已取消收藏', 'star_border');
+                        return;
                     }
-                    try {
-                        this.injectIframeProxy(id);
-                    } catch(e) {}
+                    let host = url;
+                    try { host = new URL(url).hostname; } catch (e) {}
+                    this.showSystemDialog('添加书签', '书签名称（默认使用域名）：', (title) => {
+                        this.bookmarks.push({ title: (title || '').trim() || host, url });
+                        this.saveBookmarks();
+                        updateBookmarkIcon();
+                        renderQuickLinks();
+                        this.showToast('书签已添加', 'star');
+                    }, true);
                 });
 
-                // 错误页面打开按钮：在容器内新开一个浏览器窗口
-                errorOpenBtn.addEventListener('click', () => {
+                historyBtn.addEventListener('click', () => {
+                    this.showBrowserPanel('历史记录', this.history, 'history', () => {
+                        renderRecent();
+                    }, (it) => navigate(it.url));
+                });
+
+                content.querySelector('.browser-error-open').addEventListener('click', () => {
                     const target = currentUrl || urlInput.value;
                     if (target) this.openBrowserInContainer(target);
                 });
+                content.querySelector('.browser-error-external').addEventListener('click', () => {
+                    const target = currentUrl || urlInput.value;
+                    if (!target) return;
+                    const nativeOpen = window.__raccoonNativeOpen || window.open;
+                    try { nativeOpen.call(window, target, '_blank', 'noopener'); } catch (e) {}
+                });
+                content.querySelector('.browser-error-retry').addEventListener('click', () => {
+                    if (currentUrl) applyUrlToFrame(currentUrl);
+                });
+                content.querySelector('.browser-ext-inline').addEventListener('click', () => {
+                    const saved = this.settings.externalOpen;
+                    this.settings.externalOpen = false;
+                    if (currentUrl) applyUrlToFrame(currentUrl);
+                    this.settings.externalOpen = saved;
+                    this.showToast('已切换到容器内显示', 'public');
+                });
 
-                // 浏览器窗口内链接元素右键：显示"打开"菜单
                 content.addEventListener('contextmenu', (e) => {
                     const link = e.target && e.target.closest ? e.target.closest('a[href], [data-url]') : null;
                     if (!link) return;
                     const url = link.getAttribute('href') || link.dataset.url;
-                    if (url && /^https?:/i.test(url)) {
+                    if (url && /^[a-z]+:\/\//i.test(url)) {
                         e.preventDefault();
                         this.showLinkContextMenu(e.clientX, e.clientY, url, null);
                     }
                 });
 
-                // 书签
-                bookmarkBtn.addEventListener('click', () => {
-                    this.showSystemDialog('添加书签', '输入书签名称:', (title) => {
-                        if (title) {
-                            const url = currentUrl || urlInput.value;
-                            this.bookmarks.push({ title, url });
-                            this.saveBookmarks();
-                            this.showSystemDialog('成功', '书签已添加');
+                frame.addEventListener('load', () => {
+                    setProgress(100);
+                    if (frame.src === 'about:blank' || frame.src === 'about:srcdoc') return;
+                    let blocked = false;
+                    try {
+                        const doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
+                        if (doc && doc.body) {
+                            const bodyText = (doc.body.textContent || '').trim();
+                            const low = bodyText.toLowerCase();
+                            if (bodyText.length < 60 && /(refused to (connect|display)|x-frame-options|frame-ancestors|blocked by|denied by|禁止|拒绝)/.test(low)) blocked = true;
+                            if (doc.body.children.length === 0 && bodyText.length < 10) blocked = true;
+                            const loc = frame.contentWindow.location.href;
+                            if (loc && loc !== 'about:blank' && loc !== currentUrl) {
+                                currentUrl = loc;
+                                urlInput.value = loc;
+                                pushToStack(loc);
+                                updateBookmarkIcon();
+                            }
+                            const t = doc.title;
+                            if (t) win.querySelector('.window-title').innerHTML = '<span class="material-symbols-outlined text-sm">public</span> ' + t;
                         }
-                    }, true);
+                    } catch (e) {
+                        blocked = false;
+                    }
+                    if (blocked) showBlocked(currentUrl || pendingUrl);
+                    if (!blocked && tipBar && tipBar.style.display !== 'none') {
+                        setTimeout(() => { if (tipBar) tipBar.style.display = 'none'; }, 1600);
+                    }
+                    try { this.injectIframeProxy(id); } catch (e) {}
                 });
 
-                // 历史
-                historyBtn.addEventListener('click', () => {
-                    let historyHtml = this.history.map(h =>
-                        `<div class="history-item">${h.title || h.url} - ${new Date(h.time).toLocaleString()}</div>`
-                        ).join('');
-                    this.showSystemDialog('历史记录',
-                    `<div style="max-height:300px; overflow-y:auto;">${historyHtml || '无历史记录'}</div>`);
+                frame.addEventListener('error', () => {
+                    setProgress(100);
+                    showBlocked(currentUrl || pendingUrl);
                 });
 
-                // 拖放支持
-                urlInput.addEventListener('dragover', function(e) { e.preventDefault();
-                    e.dataTransfer.dropEffect = 'copy'; });
-                urlInput.addEventListener('drop', function(e) {
+                const onMessage = (e) => {
+                    try {
+                        if (e.source !== frame.contentWindow) return;
+                    } catch (err) { return; }
+                    const d = e.data;
+                    if (!d || typeof d !== 'object') return;
+                    if (d.type === 'urlUpdated' && d.url) {
+                        if (d.url !== currentUrl && d.url !== 'about:blank') {
+                            currentUrl = d.url;
+                            urlInput.value = d.url;
+                            pushToStack(d.url);
+                            this.addToHistory(d.url, d.url);
+                            renderRecent();
+                            updateBookmarkIcon();
+                        }
+                    }
+                };
+                window.addEventListener('message', onMessage);
+
+                content.addEventListener('keydown', (e) => {
+                    const mod = e.ctrlKey || e.metaKey;
+                    if (mod && (e.key === 'l' || e.key === 'L')) { e.preventDefault(); urlInput.focus(); urlInput.select(); }
+                    else if (mod && (e.key === 'r' || e.key === 'R')) { e.preventDefault(); reloadBtn.onclick(); }
+                    else if (e.altKey && e.key === 'ArrowLeft') { e.preventDefault(); backBtn.onclick(); }
+                    else if (e.altKey && e.key === 'ArrowRight') { e.preventDefault(); forwardBtn.onclick(); }
+                });
+
+                urlInput.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+                urlInput.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    const url = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list');
+                    const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
                     if (url) navigate(url);
                 });
 
-                // 清理资源
-                win.addEventListener('remove', () => {});
-                win._navigate = navigate;
-                win._openInNewTab = openInNewTab;
+                const originalRemove = win.remove.bind(win);
+                win.remove = () => {
+                    try { window.removeEventListener('message', onMessage); } catch (e) {}
+                    originalRemove();
+                };
 
+                showHome();
+                updateNavButtons();
+                win._navigate = (u) => navigate(u, true);
+                win._openInNewTab = (u) => {
+                    const target = u || currentUrl || urlInput.value;
+                    if (!target) return;
+                    const nativeOpen = window.__raccoonNativeOpen || window.open;
+                    try { nativeOpen.call(window, resolveInput(target), '_blank', 'noopener'); } catch (e) {}
+                };
+                win._showHome = showHome;
+
+                if (this.settings.autoRestoreUrl) {
+                    const savedUrl = localStorage.getItem('raccoonos_browser_url');
+                    if (savedUrl) setTimeout(() => { if (!currentUrl) navigate(savedUrl); }, 60);
+                }
                 return win;
             }
 
+            showBrowserPanel(title, items, kind, onChange, onPick) {
+                this.removeAllContextMenus();
+                const existing = document.querySelector('.browser-panel-overlay');
+                if (existing) existing.remove();
+                const overlay = document.createElement('div');
+                overlay.className = 'browser-panel-overlay';
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100002;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+                const rows = (items || []).map((it, i) => {
+                    const time = it.time ? new Date(it.time).toLocaleString('zh-CN') : '';
+                    return `<div class="bp-row" data-index="${i}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:#eee;">
+                        <span class="material-symbols-outlined" style="font-size:16px;opacity:.6;">${kind === 'bookmarks' ? 'star' : 'history'}</span>
+                        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.title || it.url}</span>
+                        ${time ? `<span style="font-size:11px;color:#888;flex-shrink:0;">${time}</span>` : ''}
+                        <span class="bp-del" data-del="${i}" style="flex-shrink:0;opacity:.55;padding:0 4px;">✕</span>
+                    </div>`;
+                }).join('') || '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">暂无记录</div>';
+                overlay.innerHTML = `
+                    <div style="width:min(560px,100%);max-height:80vh;display:flex;flex-direction:column;background:#252526;border:1px solid #444;border-radius:10px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.5);">
+                        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #3a3a3a;color:#fff;font-size:14px;">
+                            <span>${title}</span>
+                            <span style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+                                <span class="bp-clear" style="font-size:12px;color:#7fb8ff;cursor:pointer;">清空</span>
+                                <span class="bp-close" style="cursor:pointer;font-size:16px;color:#bbb;">✕</span>
+                            </span>
+                        </div>
+                        <div style="overflow-y:auto;padding:6px;">${rows}</div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                const close = () => overlay.remove();
+                overlay.querySelector('.bp-close').addEventListener('click', close);
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+                overlay.querySelector('.bp-clear').addEventListener('click', () => {
+                    if (kind === 'bookmarks') { this.bookmarks = []; this.saveBookmarks(); }
+                    else { this.history = []; this.saveHistory(); }
+                    this.showToast(kind === 'bookmarks' ? '书签已清空' : '历史记录已清空', 'delete');
+                    if (onChange) onChange();
+                    close();
+                });
+                overlay.querySelectorAll('.bp-row').forEach(row => {
+                    row.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('bp-del')) return;
+                        const it = items[+row.dataset.index];
+                        if (!it) return;
+                        close();
+                        if (typeof onPick === 'function') onPick(it);
+                        else {
+                            const targetWin = this.windows.slice().reverse().find(w => w.appName === 'browser' && !w.minimized);
+                            if (targetWin && typeof targetWin.element._navigate === 'function') targetWin.element._navigate(it.url);
+                            else this.openBrowserInContainer(it.url);
+                        }
+                    });
+                    const del = row.querySelector('.bp-del');
+                    if (del) del.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = +del.dataset.del;
+                        if (kind === 'bookmarks') { this.bookmarks.splice(idx, 1); this.saveBookmarks(); }
+                        else { this.history.splice(idx, 1); this.saveHistory(); }
+                        row.remove();
+                        if (onChange) onChange();
+                    });
+                });
+            }
             injectIframeProxy(id) {
                 const frame = document.querySelector(`#browser-frame-${id}`);
                 if (!frame) return;
@@ -5768,12 +7801,7 @@ getSettingsBrowser() {
                 this.windows.push(winObj);
                 this.addToTaskbar(winObj);
                 this.activateWindow(winObj);
-                winElement.style.width = '900px';
-                winElement.style.height = '600px';
-                winElement.style.left = '120px';
-                winElement.style.top = '80px';
-                winObj.savedPosition.left = 120;
-                winObj.savedPosition.top = 80;
+                this.placeWindow(winElement, winObj, 900, 600);
             }
 
             // 设置窗口（完整设置）
@@ -6561,7 +8589,7 @@ createSettingsWindow(id) {
                 const overlay = document.createElement('div');
                 overlay.className = 'entry-overlay';
                 overlay.style.background =
-                    `linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.5) 100%), linear-gradient(140deg, ${this.settings.theme} 0%, #000 170%)`;
+                    `radial-gradient(900px 540px at 50% 6%, rgba(91,157,255,0.24), transparent 62%), radial-gradient(700px 460px at 84% 94%, rgba(139,108,245,0.18), transparent 60%), linear-gradient(180deg, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.12) 48%, rgba(0,0,0,0.55) 100%), linear-gradient(140deg, ${this.settings.theme} 0%, #05070c 175%)`;
                 overlay.innerHTML = `
                     <div class="entry-card">
                         <div class="entry-logo">🦝</div>
@@ -6620,7 +8648,7 @@ createSettingsWindow(id) {
                 const screen = document.createElement('div');
                 screen.className = 'login-screen';
                 screen.style.background =
-                    `linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0.5) 100%), linear-gradient(140deg, ${bg} 0%, #000 170%)`;
+                    `radial-gradient(900px 540px at 50% 6%, rgba(91,157,255,0.22), transparent 62%), radial-gradient(700px 460px at 84% 94%, rgba(139,108,245,0.16), transparent 60%), linear-gradient(180deg, rgba(0,0,0,0.34) 0%, rgba(0,0,0,0.1) 45%, rgba(0,0,0,0.55) 100%), linear-gradient(140deg, ${bg} 0%, #05070c 175%)`;
                 screen.innerHTML = `
                     <div class="login-clock">
                         <div class="login-time" id="login-time"></div>
@@ -6766,14 +8794,13 @@ createSettingsWindow(id) {
             }
 
             initSystemNotifications() {
+                if (!this.settings.systemNotifications) return;
                 if (!('Notification' in window)) return;
-                if (Notification.permission === 'granted') return;
-                if (Notification.permission === 'denied') return;
+                if (Notification.permission !== 'default') return;
                 try {
                     Notification.requestPermission().catch(() => {});
                 } catch (e) {}
             }
-
             showNativeNotification(title, body, icon) {
                 if (!this.settings.systemNotifications || !('Notification' in window)) return;
                 if (Notification.permission !== 'granted') return;
@@ -7004,12 +9031,7 @@ createSettingsWindow(id) {
                 this.windows.push(winObj);
                 this.addToTaskbar(winObj);
                 this.activateWindow(winObj);
-                winElement.style.width = '640px';
-                winElement.style.height = '420px';
-                winElement.style.left = '150px';
-                winElement.style.top = '90px';
-                winObj.savedPosition.left = 150;
-                winObj.savedPosition.top = 90;
+                this.placeWindow(winElement, winObj, 640, 420);
             }
 
             shutdown() {
